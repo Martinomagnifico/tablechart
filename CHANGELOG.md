@@ -1,13 +1,13 @@
 # Changelog
 
-## [0.1.1]
+## [0.1.1] - 2026-10-05
 
 ### Fixed
 
 - The key under a donut is no longer made smaller when a name does not fit a column: its names are not in columns.
 - Removed some comments
 
-## [0.1.0]
+## [0.1.0] - 2026-10-04
 
 ### Added
 
