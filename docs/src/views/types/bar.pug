@@ -1,0 +1,83 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Chart types | Bar"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Bar
+				p.lead Bars laid sideways, for long names.
+
+	+section("Bar chart")
+		p Each row of the table is a bar. The names are shown to the left of the bars, so a long name fits on one line.
+
+		+chart
+			figure(data-chart="bar")
+				figcaption
+					b Juice pressed by variety
+					br
+					span thousands of litres
+				table
+					tbody
+						each row in [['Bramley seedling', '31.4'], ['Cox’s orange pippin', '27.8'], ['Egremont russet', '18.2'], ['Discovery', '12.6'], ['Worcester pearmain', '9.1']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+	+section("Numbers")
+		p If a bar is long enough, its number is shown inside it. If not, the number is shown after the bar.
+
+	+section("Long names")
+		p A name beside a bar takes at most 40% of the width of the chart. A longer name wraps onto more lines, and the chart gets taller if it needs to. To change the width, set #[code --tablechart-name-max], such as #[code 30%].
+		p A long word is hyphenated if the page has a #[code lang] attribute, such as #[code lang="en"].
+
+	+section("Grouped bars")
+		p If the table has more than one value column, each row is a group, with one bar for each value column. The column headers are the names in the legend under the chart.
+
+		+chart
+			figure(data-chart="bar")
+				figcaption
+					b Apples sold by variety
+					br
+					span thousands
+				table
+					thead
+						tr
+							th Variety
+							th 2022
+							th 2026
+					tbody
+						each row in [['Elstar', '118', '131', false], ['Granny Johnson', '12', '45', 'granny'], ['Jonagold', '140', '135', false], ['Braeburn', '109', '121', false]]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+	+section("Stacked bars")
+		p Add #[code data-chart-stack] to the figure. The values of a row are shown one after the other in one bar, the first value column on the left. The total of the row is after the bar.
+
+		+chart
+			figure(data-chart="bar" data-chart-stack)
+				figcaption
+					b Apples sold
+					br
+					span thousands
+				table
+					thead
+						tr
+							th Variety
+							th Farm shop
+							th Market
+					tbody
+						each row in [['Elstar', '64', '38'], ['Granny Johnson', '12', '21'], ['Jonagold', '71', '45'], ['Braeburn', '52', '30']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+		p A number is shown inside its part of the bar if it fits. If not, it is left out. If you point at the row, or tap it, the numbers of that row are shown.
+
+	+section("Next")
+		p For short names, a #[a(href=url('/types/column.html')) column chart] uses less height.

@@ -1,0 +1,147 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Reference | API"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 API
+				p.lead init(), create() and what they return.
+
+	+section("init()")
+		p #[code init()] makes a chart of every element that matches #[code selector], and builds each chart when it scrolls into view. It returns a promise.
+
+		+codeblock('JS').
+			import { init } from "@martinomagnifico/tablechart";
+			import "@martinomagnifico/tablechart/style.css";
+
+			const tablechart = await init(options, root);
+
+		table
+			thead
+				tr
+					th Argument
+					th Is
+			tbody
+				tr
+					td: code options
+					td The #[a(href=url('/reference/options.html')) options]. Optional.
+				tr
+					td: code root
+					td The element to look for charts in. #[code document] by default.
+
+		p If you call #[code init()] again, it skips the elements that are already charts. To make charts of elements that are added to the page later, call it again with the element that holds them as #[code root], or use #[code create()].
+
+	+section("What it returns")
+		table
+			thead
+				tr
+					th Property
+					th Is
+			tbody
+				tr
+					td: code charts
+					td A list of the charts it made. See #[a(href="#one-chart") One chart].
+				tr
+					td: code refresh()
+					td Lays out every chart again, for example after a script has changed the text of a chart
+				tr
+					td: code destroy()
+					td Stops watching scroll, size and language. The charts stay as they are.
+
+	+section("create()")
+		p #[code create()] makes a chart of one element, and builds it when it scrolls into view. It returns a promise with the chart, or #[code null] if the element has no data to draw. If the element is already a chart, it returns that chart.
+
+		+codeblock('JS').
+			import { create } from "@martinomagnifico/tablechart";
+
+			const chart = await create(document.querySelector("#sales"), {
+				threshold: 0.3
+			});
+
+		p The options are the same as for #[code init()]. #[code selector] is not used.
+
+	+section("One chart")
+		p Each chart that #[code init()] or #[code create()] makes is also on its element, as #[code tablechart].
+
+		+codeblock('JS').
+			document.querySelector("#sales").tablechart.refresh();
+
+		table
+			thead
+				tr
+					th Property
+					th Is
+			tbody
+				tr
+					td: code figure
+					td The element that holds the chart
+				tr
+					td: code refresh()
+					td Lays the chart out again
+				tr
+					td: code destroy()
+					td Stops watching scroll, size and language for this chart. The chart stays as it is, and #[code tablechart] is removed from the element.
+
+	+section("Building blocks")
+		p For a script or a plugin that decides itself when a chart is built and shown, #[code @martinomagnifico/tablechart/core] has the steps that #[code init()] and #[code create()] take.
+
+		+codeblock('JS').
+			import { prepare, build, layout, setShown, defaultConfig } from "@martinomagnifico/tablechart/core";
+
+			const config = { ...defaultConfig };
+			const [figure] = await prepare([element], config);
+			const chart = build(figure, config);
+
+			// Once the chart has a width:
+			layout(chart, config);
+			setShown(chart, true);
+
+		table
+			thead
+				tr
+					th Function
+					th Does
+			tbody
+				tr
+					td: code prepare()
+					td Turns elements into figures with a table: a table from Markdown, or the data of a JSON file. Adds translation keys.
+				tr
+					td: code build()
+					td Makes everything in the chart, with its text. It needs no width.
+				tr
+					td: code layout()
+					td Places everything. Run it again when the width changes.
+				tr
+					td: code setShown()
+					td Starts the animation, or shows the chart whole.
+				tr
+					td: code relabel()
+					td Formats the numbers again, for example after a language change.
+				tr
+					td: code unbuild()
+					td Removes what #[code build()] made, so the chart can be built again.
+
+	+section("With a script tag")
+		p Without a build tool, load #[code tablechart.js] and #[code tablechart.css]. #[code Tablechart.init()] and #[code Tablechart.create()] work the same as #[code init()] and #[code create()].
+
+		+codeblock('HTML').
+			<link rel="stylesheet" href="tablechart.css">
+			<script src="tablechart.js"></script>
+			<script>
+				Tablechart.init();
+			</script>
+
+	+section("Defaults")
+		p #[code defaultConfig] holds the default options.
+
+		+codeblock('JS').
+			import { defaultConfig } from "@martinomagnifico/tablechart";
+
+	+section("TypeScript")
+		p #[code TablechartConfig] describes the options, #[code TablechartInstance] what #[code init()] returns, and #[code TablechartChart] one chart.
+
+		+codeblock('JS').
+			import type { TablechartConfig, TablechartInstance, TablechartChart } from "@martinomagnifico/tablechart";

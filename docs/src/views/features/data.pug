@@ -1,0 +1,137 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Features | Data"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Data
+				p.lead A table in your HTML, a table from Markdown or a JSON file.
+
+	+section("A table")
+		p A chart is a #[code figure] with #[code data-chart] and a table in it. Each row of the table is a bar or a point. The first cell of a row is its name, the other cells are its values.
+
+		+chart
+			figure(data-chart="column")
+				figcaption
+					b Apples picked
+					br
+					span thousands
+				table
+					tbody
+						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		p The table stays in the page, but it is hidden. Screen readers, search engines and translation scripts can still read it. If JavaScript does not run, the table is all there is.
+		p The #[code figcaption] is the title of the chart. Text after a #[code br] is shown as its subtitle. A #[code figcaption] is not needed: you can also put a heading above the figure, and style it like the other headings on your page.
+
+	+section("Several value columns")
+		p If the table has more than one value column, each column is a line, or a bar in each group. The table needs a #[code thead]: its headers are the names of the columns.
+
+		+codeblock('HTML').
+			<table>
+				<thead>
+					<tr><th>Variety</th><th>2022</th><th>2026</th></tr>
+				</thead>
+				<tbody>
+					<tr><th>Elstar</th><td>118</td><td>131</td></tr>
+				</tbody>
+			</table>
+
+		p See #[a(href=url('/types/column.html')) Column], #[a(href=url('/types/bar.html')) Bar], #[a(href=url('/types/line.html')) Line] and #[a(href=url('/types/area.html')) Area].
+
+	+section("Attributes on rows and headers")
+		table
+			thead
+				tr
+					th Attribute
+					th On
+					th Does
+			tbody
+				tr
+					td: code data-kind="total"
+					td A row
+					td Makes the row a total, in a waterfall or a donut
+				tr
+					td: code class
+					td A row
+					td Is copied to the bar, the number and the name of the row
+				tr
+					td: code data-kind="focus"
+					td A column header
+					td Highlights that line or bar
+				tr
+					td: code data-marker
+					td A column header
+					td Sets the point of a line
+				tr
+					td: code data-line
+					td A column header
+					td Makes a line dashed or dotted
+
+	+section("A JSON file")
+		p Add #[code data-chart-src] with the address of a JSON file. Tablechart reads the file and makes a table from it, so the chart works as if you had written the table. A table in the figure is removed.
+
+		+chart
+			figure(data-chart="column" data-chart-src=url('/data/apples.json'))
+				figcaption: b Apples sold by variety
+
+		p The file is a list of rows, or an object with #[code rows] and the names of the value columns in #[code series]. Write a value as a string, such as #[code "1.0"], to keep its decimals.
+
+		+codeblock('JSON').
+			{
+				"series": ["2022", "2026"],
+				"rows": [
+					{ "label": "Elstar", "values": ["118", "131"] },
+					{ "label": "Jonagold", "values": ["140", "135"] },
+					{ "label": "Braeburn", "values": ["109", "121"] }
+				]
+			}
+
+		p A row with one value uses #[code value] instead of #[code values]. A row with #[code "kind": "total"] is a total.
+		p A browser cannot read a file from a page that is opened from your computer, with an address that starts with #[code file://]. Open the page from a server.
+
+	+section("A table from Markdown")
+		p If your Markdown tool can add attributes to a table, add #[code data-chart] to the table. This example uses #[a(href="https://github.com/arve0/markdown-it-attrs") markdown-it-attrs], which reads the attributes from the line after the table.
+
+		+codeblock('Markdown').
+			: **Apples picked**\
+			thousands
+
+			| Season | Apples |
+			| ------ | ------ |
+			| Spring | 58     |
+			| Summer | 72     |
+			| Autumn | 70     |
+			{data-chart=column}
+
+		p Markdown has no #[code figcaption], so a paragraph that starts with #[code ": "] just before or after the table is the title. A line break in it starts the subtitle. Tablechart puts the table and the title together in a #[code div] with the chart attributes.
+		p You can also leave out the #[code ": "] paragraph and write the title as a heading above the table, such as #[code #### Apples picked].
+
+		.card
+			.demo
+				div
+					p
+						| :#{' '}
+						strong Apples picked
+						br
+						| thousands
+					table(data-chart="column")
+						thead
+							tr
+								th Season
+								th Apples
+						tbody
+							each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70']]
+								tr
+									td= row[0]
+									td= row[1]
+
+		p In the first column, a name in #[code **bold**] makes the row a total. In the header, a name in bold is highlighted.
+
+	+section("Next")
+		p To change how the numbers are shown, see #[a(href=url('/features/numbers.html')) Numbers].

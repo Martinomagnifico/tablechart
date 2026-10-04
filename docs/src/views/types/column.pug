@@ -1,0 +1,196 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Chart types | Column"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Column
+				p.lead One bar per row, standing on the baseline.
+
+	+section("Column chart")
+		p Each row of the table is a column. The number is shown above it.
+
+		.card
+			.demo
+				figure(data-chart="column")
+					figcaption
+						b Apples picked
+						br
+						span thousands
+					table
+						tbody
+							tr
+								th Spring
+								td 58
+							tr
+								th Summer
+								td 72
+							tr
+								th Autumn
+								td 70
+							tr
+								th Winter
+								td 91
+
+			+codeblock('HTML')
+				figure(data-chart="column")
+					figcaption
+						b Apples picked
+						br
+						span thousands
+					table
+						tbody
+							tr
+								th Spring
+								td 58
+							+n
+							// …one row per column
+
+	+section("Numbers inside the columns")
+		p Add #[code data-chart-labels="inside"] to show each number inside its column. If a column is too short for its number, the number is shown above it.
+
+		.card
+			.demo
+				figure(data-chart="column" data-chart-labels="inside")
+					table
+						tbody
+							tr
+								th Spring
+								td 58
+							tr
+								th Summer
+								td 72
+							tr
+								th Autumn
+								td 70
+							tr
+								th Winter
+								td 9
+
+			+codeblock('HTML')
+				figure(data-chart="column" data-chart-labels="inside")
+
+	+section("Height")
+		p The height of a chart is a share of its width. Set it with #[code data-chart-aspect]. The default is #[code 0.38].
+		p On a narrow screen, a chart is never less high than #[code --tablechart-min-height]: #[code 200px] by default. Below that width, the height stays the same. Use #[code px], #[code em] or #[code rem], or #[code none] for no minimum.
+
+		+chart
+			figure(data-chart="column" data-chart-aspect="0.6")
+				table
+					tbody
+						tr
+							th Spring
+							td 58
+						tr
+							th Summer
+							td 72
+						tr
+							th Autumn
+							td 70
+
+	+section("Grouped columns")
+		p If the table has more than one value column, each row is a group, with one column for each value column. The column headers are the names in the legend under the chart.
+
+		+chart
+			figure(data-chart="column")
+				figcaption
+					b Apples sold by variety
+					br
+					span thousands
+				table
+					thead
+						tr
+							th Variety
+							th 2022
+							th 2026
+					tbody
+						each row in [['Elstar', '118', '131', false], ['Granny Johnson', '12', '45', 'granny'], ['Jonagold', '140', '135', false], ['Braeburn', '109', '121', false]]
+							tr(class=row[3] || false)
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+		p Each column of a group is a bit lighter than the one before it. To set a colour for each, use a #[a(href=url('/styling/colours.html')) palette]. A class on a row styles its whole group, as the Granny Johnson does here:
+
+		+style.
+			.granny {
+				--tablechart-bar-color: #7fb03f;
+			}
+
+		p If the numbers are wider than their columns, they all get smaller together, down to 70% of their size. If they still do not fit, none of them are shown. If you point at the row, or tap it, the numbers of that row are shown.
+
+	+section("Stacked columns")
+		p Add #[code data-chart-stack] to the figure. The values of a row are shown on top of each other, the first value column at the bottom. The total of the row is above the column.
+
+		+chart
+			figure(data-chart="column" data-chart-stack)
+				figcaption
+					b Apples sold
+					br
+					span thousands
+				table
+					thead
+						tr
+							th Year
+							th Farm shop
+							th Market
+					tbody
+						each row in [['2023', '64', '38'], ['2024', '71', '45'], ['2025', '69', '57'], ['2026', '80', '62']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+		p A number is shown inside its part of the column if it fits. If not, it is left out. If you point at the row, or tap it, the numbers of that row are shown.
+		p A value below zero takes no room in a stack.
+
+	+section("A bar chart on narrow screens")
+		p A column chart with many rows can be shown as a bar chart when it is narrow. Set #[code --tablechart-type: bar] on the figure, in a container query or a media query. The chart is built again as a bar chart when the query applies, and as a column chart when it does not.
+
+		+style.
+			.type-box {
+				container-type: inline-size;
+			}
+			@container (max-width: 500px) {
+				.type-box > [data-chart] {
+					--tablechart-type: bar;
+				}
+			}
+
+		p The buttons change the width of the example.
+
+		.width-toggle.lang-toggle(role="group" aria-label="Width of the example")
+			button(type="button" data-width="" aria-pressed="true") Wide
+			button(type="button" data-width="360px" aria-pressed="false") Narrow
+		+chart
+			.type-box
+				figure(data-chart="column")
+					figcaption: b Visitors per month
+					table
+						tbody
+							each row in [['Jan', '41'], ['Feb', '38'], ['Mar', '52'], ['Apr', '61'], ['May', '74'], ['Jun', '88'], ['Jul', '93'], ['Aug', '90'], ['Sep', '77'], ['Oct', '63'], ['Nov', '49'], ['Dec', '45']]
+								tr
+									th= row[0]
+									td= row[1]
+
+		script.
+			document.querySelectorAll('.width-toggle:not([data-ready])').forEach(function (group) {
+				var box = group.nextElementSibling.querySelector('.type-box');
+				group.dataset.ready = '';
+				group.querySelectorAll('button').forEach(function (button) {
+					button.addEventListener('click', function () {
+						box.style.maxWidth = button.dataset.width;
+						group.querySelectorAll('button').forEach(function (other) {
+							other.setAttribute('aria-pressed', String(other === button));
+						});
+					});
+				});
+			});
+
+		p #[code --tablechart-type] works for column and bar charts. It can also turn a bar chart into a column chart, with #[code --tablechart-type: column].
+
+	+section("Next")
+		p #[a(href=url('/features/annotations.html')) Annotations] add a bracket or a trend arrow to a column chart.

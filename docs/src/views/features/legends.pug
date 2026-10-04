@@ -1,0 +1,84 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Features | Legends"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Legends
+				p.lead The names of the lines or slices, in a row under the chart.
+
+	+section("Legend for several lines")
+		p On a line chart with several lines, the names are shown at the end of the lines. Add #[code data-chart-legend] to the figure to show them in a legend under the chart instead. Each name has a short sample of its line.
+
+		+chart
+			figure(data-chart="line" data-chart-legend)
+				figcaption: b Apples per tree
+				table
+					thead
+						tr
+							th Year
+							th North
+							th South
+							th East
+					tbody
+						each row in [['2016', '41', '30', '22'], ['2019', '58', '39', '35'], ['2022', '77', '52', '41'], ['2025', '105', '61', '70']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+								td= row[3]
+
+		p To use a legend for every chart, set the #[code legend] option. Then #[code data-chart-legend="false"] turns it off for one chart.
+
+		+codeblock('JS').
+			init({ legend: true });
+
+	+section("Area, column and bar legends")
+		p In an area chart, #[code data-chart-legend] works the same way. Each name has a square of the colour of its area.
+		p A grouped or stacked column or bar chart always has a legend under the chart, with a square for each name.
+
+	+section("Donut legend")
+		p A donut chart always has a legend under the ring. See #[a(href=url('/types/donut.html')) Donut].
+
+	+section("Style the legend")
+		p A legend is as wide as its items. These variables set its background, border, padding and corners. By default, there are none.
+
+		+chart
+			figure(data-chart="line" data-chart-legend style="--tablechart-legend-border: 1px solid currentColor; --tablechart-legend-padding: 0.3em 0.8em; --tablechart-legend-radius: 0.4em")
+				table
+					thead
+						tr
+							th Year
+							th North
+							th South
+					tbody
+						each row in [['2016', '41', '30'], ['2019', '58', '39'], ['2022', '77', '52'], ['2025', '105', '61']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+		table
+			thead
+				tr
+					th Variable
+					th Sets
+			tbody
+				tr
+					td: code --tablechart-legend-surface
+					td The background
+				tr
+					td: code --tablechart-legend-border
+					td The border
+				tr
+					td: code --tablechart-legend-padding
+					td The space inside the border
+				tr
+					td: code --tablechart-legend-radius
+					td The corners
+				tr
+					td: code --tablechart-legend-gap
+					td The space above the legend of a line chart

@@ -1,0 +1,120 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Styling | Colours"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Colours
+				p.lead One colour for all bars, colours for a waterfall, and a palette.
+
+	+section("One colour")
+		p #[code --tablechart-bar-color] sets the colour of all bars, and of a single line.
+
+		+style.
+			.orange {
+				--tablechart-bar-color: #e4572e;
+			}
+
+		+chart
+			figure.orange(data-chart="column")
+				table
+					tbody
+						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '91']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+	+section("Waterfall colours")
+		p Set the colours of rising steps, falling steps and totals. The number inside a bar is dark or light, whichever reads on the colour of the bar.
+
+		+style.
+			.warm {
+				--tablechart-up-color: #b4552d;
+				--tablechart-down-color: #d69a52;
+				--tablechart-total-color: #cfc4b4;
+			}
+
+		+chart
+			figure.warm(data-chart="waterfall")
+				table
+					tbody
+						each row in [['Picked', '74.5', 'total'], ['Windfalls', '28.2'], ['Bruised', '-16.1'], ['Peelings', '-13.3'], ['Pressed', '73.3', 'total']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+	+section("A palette")
+		p Set #[code --tablechart-color-1], #[code --tablechart-color-2] and on. Donut slices use them in order. If a colour is not set, that slice uses the default.
+
+		+style.
+			.fruity {
+				--tablechart-color-1: #b4552d;
+				--tablechart-color-2: #d69a52;
+				--tablechart-color-3: #7fa87f;
+				--tablechart-color-4: #cfc4b4;
+			}
+
+		+chart
+			figure.fruity(data-chart="donut")
+				table
+					tbody
+						each row in [['Picked', '74.5', 'total'], ['Juiced', '38.2'], ['Eaten fresh', '18.1'], ['Sold whole', '12.4'], ['Composted', '5.8']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+		p If a line chart has several lines, the lines use the palette too.
+
+		+chart
+			figure.fruity(data-chart="line")
+				table
+					thead
+						tr
+							th Year
+							th North
+							th South
+							th East
+					tbody
+						each row in [['2016', '41', '30', '22'], ['2019', '58', '39', '35'], ['2022', '77', '52', '41'], ['2025', '105', '61', '70']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+								td= row[3]
+
+	+section("Without a palette")
+		p Without a palette, each slice or line is a bit lighter than the one before it. These variables set how much.
+
+		table
+			thead
+				tr
+					th Variable
+					th Sets
+			tbody
+				tr
+					td: code --tablechart-slice-color
+					td The colour of the first slice. The text colour by default.
+				tr
+					td: code --tablechart-slice-fade
+					td How much lighter each slice is: 15% by default.
+				tr
+					td: code --tablechart-slice-min
+					td The lightest a slice gets: 20% of its colour by default.
+				tr
+					td: code --tablechart-series-color
+					td The colour of the first line. The bar colour by default.
+				tr
+					td: code --tablechart-series-fade
+					td How much lighter each line is: 30% by default. With more than three lines, the steps are smaller, so the last line is not lighter than #[code --tablechart-series-min].
+				tr
+					td: code --tablechart-series-min
+					td The lightest a line gets: 40% of its colour by default.
+				tr
+					td: code --tablechart-muted-share
+					td The strength of a line next to a highlighted line: 45% by default.
+				tr
+					td: code --tablechart-series-ink
+					td The colour of one line, set on [data-series="2"] and so on.

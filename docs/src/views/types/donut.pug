@@ -1,0 +1,43 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Chart types | Donut"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Donut
+				p.lead Parts of a whole, as a ring.
+
+	+section("Donut chart")
+		p Each row is a slice. The slices start at the top and go clockwise, in the order of the table. The names are shown in a legend under the ring.
+
+		+chart
+			figure(data-chart="donut")
+				figcaption
+					b Where the crop went
+					br
+					span thousands of apples
+				table
+					tbody
+						each row in [['Juiced', '38.2'], ['Eaten fresh', '18.1'], ['Sold whole', '12.4'], ['Composted', '5.8']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+	+section("The number in the middle")
+		p If a row has #[code data-kind="total"], its value is shown in the middle, and it is not a slice. If there is no total row, the middle shows the sum of the slices.
+		p Screen readers read the table, not the middle of the ring. So if there is no total row, Tablechart adds a hidden row to the bottom of the table with the sum, named "Total". To use another name, set the #[code totallabel] option. With #[code data-chart-keys], the name gets a translation key that ends in #[code -total].
+
+		+chart
+			figure(data-chart="donut")
+				table
+					tbody
+						each row in [['Picked', '74.5', 'total'], ['Juiced', '38.2'], ['Eaten fresh', '18.1'], ['Sold whole', '12.4'], ['Composted', '5.8']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+	+section("Next")
+		p By default, all slices use one colour, each one a bit lighter. To set a colour for each slice, see #[a(href=url('/styling/colours.html')) Colours].

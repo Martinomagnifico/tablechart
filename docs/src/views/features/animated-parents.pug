@@ -1,0 +1,78 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Features | Animated parents"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Animated parents
+				p.lead Charts inside an element that animates or transitions in.
+
+	+section("Waiting for the parent")
+		p A chart can be inside an element that animates in: a block that slides in, a panel that opens, a tab that fades in. If the chart built at the same time, it would be half done before you could see it.
+		p So if an element around the chart has a CSS animation or a CSS transition, Tablechart waits until it is halfway, and then builds the chart. This works for the parent of the chart and for any element further up. You do not need to set anything.
+
+	+section("Example")
+		p This block slides in from the right when it scrolls into view. The chart starts when the block is halfway.
+
+		+style.
+			.slide-in-area {
+				overflow-x: clip;
+			}
+			.slide-in {
+				opacity: 0;
+				transform: translateX(6em);
+			}
+			.slide-in.is-visible {
+				animation: slide-in 1.2s ease forwards;
+			}
+			@keyframes slide-in {
+				to {
+					opacity: 1;
+					transform: none;
+				}
+			}
+
+		p A small script adds #[code is-visible] when the block scrolls into view:
+
+		+codeblock('JS').
+			const observer = new IntersectionObserver((entries) => {
+				for (const entry of entries) {
+					if (entry.isIntersecting) entry.target.classList.add("is-visible");
+				}
+			}, { threshold: 0.5 });
+
+			document.querySelectorAll(".slide-in").forEach((block) => observer.observe(block));
+
+		.slide-in-area
+			.slide-in
+				+chart
+					figure(data-chart="column")
+						figcaption: b Apples picked
+						table
+							tbody
+								each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '31']]
+									tr
+										th= row[0]
+										td= row[1]
+
+		script.
+			(function () {
+				var observer = new IntersectionObserver(function (entries) {
+					entries.forEach(function (entry) {
+						if (entry.isIntersecting) entry.target.classList.add('is-visible');
+					});
+				}, { threshold: 0.5 });
+				document.querySelectorAll('.slide-in').forEach(function (block) { observer.observe(block); });
+			})();
+
+	+section("A parent that is still hidden")
+		p A parent can be invisible, with an opacity of 0, until its own script starts the animation. If the chart comes into view before that, Tablechart waits until the parent starts to animate in, or becomes visible.
+
+	+section("Animations that follow the scroll")
+		p A CSS animation with #[code animation-timeline] follows the scroll position, and has no duration in seconds. Tablechart does not wait for it.
+
+	+section("Reduced motion")
+		p If the visitor has asked for reduced motion in their system settings, Tablechart does not wait, and charts are shown without animation.

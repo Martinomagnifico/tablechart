@@ -1,0 +1,112 @@
+// Charts on the docs pages use the text colour and the background of the page.
+// These rules are wrapped in :where(), so a class in an example overrides them.
+:where(.tablechart, [data-chart]) {
+	--tablechart-surface: var(--bg-surface);
+	color: var(--text-default);
+}
+
+// A chart in a demo card uses the background of the card.
+:where(.demo [data-chart]) {
+	--tablechart-surface: var(--demo-surface-tint);
+}
+
+// The three charts on the start page, each in a box of its own.
+.hero-charts {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 1.5em;
+	margin: 2em 0;
+
+	@media (max-width: 640px) {
+		grid-template-columns: 1fr;
+	}
+
+	[data-chart] {
+		margin: 0;
+		padding: 1em;
+		border: 1px solid color-mix(in oklab, currentColor 25%, transparent);
+		border-radius: 1rem;
+	}
+}
+
+// The shapes use the accent colour of the site. Text keeps the text colour. The
+// accent is read on the root: a demo card sets the site's colours to its own hue,
+// so a variable read inside the card would give the card's colour.
+:root {
+	--chart-accent: var(--btn-primary-bg-normal);
+}
+
+:where(.tablechart, [data-chart]) {
+	--tablechart-bar-color: var(--chart-accent);
+	--tablechart-slice-color: var(--chart-accent);
+}
+
+// A donut is as tall as it is wide, so on its own it gets a narrower box.
+.demo [data-chart="donut"] {
+	max-width: 32rem;
+	margin-inline: auto;
+}
+
+// The "Default" example on the styling pages: no colours from this site.
+.plain [data-chart] {
+	--tablechart-bar-color: initial;
+	--tablechart-slice-color: initial;
+}
+
+// The Light / Dark buttons on the "Light and dark" page, in the top right corner
+// of the example. Their colours follow the example's own colour scheme.
+.scheme-example {
+	position: relative;
+}
+
+.scheme-toggle {
+	position: absolute;
+	z-index: 10;
+	top: 2.1em;
+	right: 2.1em;
+}
+
+// Buttons that change something about an example: the colour scheme, the language.
+.scheme-toggle,
+.lang-toggle {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 0.25em;
+
+	button {
+		padding: 0.3em 0.9em;
+		border: 1px solid light-dark(#c9d4da, #4a5c66);
+		border-radius: 0.4em;
+		background: light-dark(#ffffff, #2a3a44);
+		color: light-dark(#16323f, #e9eef1);
+		font: inherit;
+		font-size: 0.85em;
+		cursor: pointer;
+
+		&[aria-pressed="true"] {
+			background: var(--chart-accent);
+			border-color: var(--chart-accent);
+			color: #ffffff;
+		}
+	}
+}
+
+.lang-toggle {
+	margin-bottom: 0.8em;
+}
+
+// The buttons set color-scheme on the example only, not on its code block.
+.scheme-example .demo {
+	color-scheme: light;
+}
+
+.scheme-example [data-chart] {
+	color: inherit;
+	--tablechart-surface: inherit;
+}
+
+// The boxes that the Wide and Narrow buttons narrow, in the middle of their example.
+.type-box,
+.text-box {
+	margin-inline: auto;
+}

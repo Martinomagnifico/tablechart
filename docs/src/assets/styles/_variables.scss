@@ -1,0 +1,187 @@
+:root {
+	color-scheme: light dark;
+
+	--main-hue: 210.0;
+	--special-hue: calc(var(--main-hue) + 135);
+	--special-hue: mod(calc(var(--main-hue) + 135), 360);
+}
+
+:root {
+	--color-tint-0:   oklch(0.99 0.008 var(--main-hue));
+	--color-tint-25:  oklch(0.98 0.010 var(--main-hue));
+	--color-tint-50:  oklch(0.96 0.015 var(--main-hue));
+	--color-tint-100: oklch(0.935 0.018 var(--main-hue));
+	--color-tint-150: oklch(0.90 0.030 var(--main-hue));
+	--color-tint-200: oklch(0.82 0.060 var(--main-hue));
+	--color-tint-300: oklch(0.72 0.070 var(--main-hue));
+	--color-tint-400: oklch(0.64 0.080 var(--main-hue));
+	--color-tint-500: oklch(0.60 0.090 var(--main-hue));
+	--color-tint-550: oklch(0.54 0.093 var(--main-hue));
+	--color-tint-600: oklch(0.48 0.095 var(--main-hue));
+	--color-tint-700: oklch(0.39 0.060 var(--main-hue));
+	--color-tint-750: oklch(0.27 0.040 var(--main-hue));
+	--color-tint-800: oklch(0.25 0.035 var(--main-hue));
+	--color-tint-850: oklch(0.24 0.032 var(--main-hue));
+	--color-tint-900: oklch(0.20 0.030 var(--main-hue));
+	--color-tint-925: oklch(0.18 0.028 var(--main-hue));
+	--color-tint-950: oklch(0.15 0.022 var(--main-hue));
+
+	--color-special-tint-0:   oklch(1.00 0.009 var(--special-hue));
+	--color-special-tint-25:  oklch(0.97 0.019 var(--special-hue));
+	--color-special-tint-50:  oklch(0.95 0.020 var(--special-hue));
+	--color-special-tint-100: oklch(0.95 0.040 var(--special-hue));
+	--color-special-tint-150: oklch(0.90 0.072 var(--special-hue));
+	--color-special-tint-200: oklch(0.82 0.090 var(--special-hue));
+	--color-special-tint-300: oklch(0.72 0.090 var(--special-hue));
+	--color-special-tint-400: oklch(0.64 0.090 var(--special-hue));
+	--color-special-tint-500: oklch(0.58 0.100 var(--special-hue));
+	--color-special-tint-550: oklch(0.52 0.100 var(--special-hue));
+	--color-special-tint-600: oklch(0.48 0.100 var(--special-hue));
+	--color-special-tint-700: oklch(0.39 0.100 var(--special-hue));
+	--color-special-tint-800: oklch(0.25 0.090 var(--special-hue));
+	--color-special-tint-900: oklch(0.20 0.068 var(--special-hue));
+	--color-special-tint-950: oklch(0.10 0.038 var(--special-hue));
+
+	--color-special-helptext: light-dark(oklch(0.25 0.009 var(--special-hue)), oklch(0.90 0.009 var(--special-hue)));
+	--color-error: light-dark(oklch(0.60 0.25 30), oklch(60% 0.18 25));
+	
+}
+
+// Each colour is light-dark(light, dark). It follows color-scheme, set on :root at the top.
+:root {
+	--text-heading-1: light-dark(var(--color-tint-900), var(--color-tint-100));
+	--text-heading-2: light-dark(var(--color-tint-700), var(--color-tint-200));
+	--text-heading-3: light-dark(var(--color-tint-600), var(--color-tint-300));
+
+	--bg-surface: light-dark(var(--color-tint-25), var(--color-tint-925));
+	--bg-surface-off: light-dark(var(--color-tint-25), var(--color-tint-900));
+
+	--bg-surface-tint: light-dark(var(--color-tint-50), var(--color-tint-850));
+	--bg-surface-tint-contrast: light-dark(var(--color-tint-100), var(--color-tint-750));
+	--bg-sidebar: light-dark(var(--color-tint-100), var(--color-tint-800));
+
+	--demo-surface: light-dark(var(--color-special-tint-0), var(--color-special-tint-950));
+	--demo-surface-tint: light-dark(var(--color-special-tint-50), var(--color-special-tint-900));
+
+	--text-default: light-dark(var(--color-tint-950), var(--color-tint-50));
+	--text-muted: light-dark(var(--color-tint-700), var(--color-tint-300));
+	--text-tinted: light-dark(var(--color-tint-400), var(--color-tint-300));
+
+	--link-focus: light-dark(var(--color-tint-600), var(--color-tint-200));
+	
+	--border-default: light-dark(var(--color-tint-200), var(--color-tint-700));
+
+	--btn-plain-text: light-dark(var(--color-tint-600), var(--color-tint-200));
+	--btn-plain-text-hover: light-dark(var(--color-tint-700), var(--color-tint-200));
+	--btn-plain-hover-bg: light-dark(oklch(from var(--color-tint-500) l c h / 0.1), oklch(from var(--color-tint-400) l c h / 0.15));
+
+	--btn-primary-hover: light-dark(var(--color-tint-700), var(--color-tint-600));
+
+
+
+	--btn-primary-bg-normal: var(--color-tint-600);
+	--btn-primary-text-normal: var(--color-tint-0);
+	--btn-primary-stroke-normal: var(--color-tint-600);
+
+	--btn-primary-bg-current: var(--color-special-tint-0);
+	--btn-primary-text-current: var(--color-special-tint-700);
+	--btn-primary-stroke-current: var(--color-special-tint-700);
+
+	--btn-primary-bg-hover: var(--color-tint-700);
+	--btn-primary-text-hover: var(--color-tint-0);
+	--btn-primary-stroke-hover: var(--color-tint-700);
+
+
+
+	//-----// 
+	--doc-code-transparent: light-dark(oklch(from var(--color-tint-700) l c h / 0.08), oklch(from var(--color-tint-100) l c h / 0.1));
+
+	--special-demoblock: var(--color-special-tint-300);
+	--special-normal: light-dark(var(--color-special-tint-600), var(--color-special-tint-300));
+	--special-hover: light-dark(var(--color-special-tint-700), var(--color-special-tint-25));
+	--special-active: var(--color-special-tint-700);
+	--special-shadow: light-dark(oklch(from var(--special-normal) l c h / 0.33), oklch(from var(--special-normal) l c h / 0.25));
+	--special-shadow-dark: oklch(from var(--special-normal) calc(l * 0.1) calc(c * 2) h / 0.2);
+
+	--tab-text-normal: light-dark(var(--color-tint-600), var(--color-tint-300));
+	--tab-text-hover: light-dark(var(--color-tint-700), var(--color-tint-200));
+	--tab-text-active: light-dark(var(--color-tint-600), var(--color-tint-50));
+
+	--tab-underline-hover: var(--color-tint-300);
+	--tab-underline-active: light-dark(var(--color-tint-600), var(--color-tint-50));
+
+
+
+	.demo {
+		--border-default: light-dark(var(--color-special-tint-400), var(--color-special-tint-700));
+		--text-tinted: light-dark(var(--color-special-tint-400), var(--color-special-tint-200));
+		--link-focus: light-dark(var(--color-special-tint-400), var(--color-special-tint-200));
+
+		--btn-plain-text: light-dark(var(--color-special-tint-600), var(--color-special-tint-300));
+		--btn-plain-text-hover: light-dark(var(--color-special-tint-700), var(--color-special-tint-100));
+		--btn-plain-hover-bg: light-dark(oklch(from var(--color-special-tint-500) l c h / 0.1), oklch(from var(--color-special-tint-400) l c h / 0.15));
+
+		--text-heading-1: light-dark(var(--color-special-tint-900), var(--color-special-tint-100));
+		--text-heading-2: light-dark(var(--color-special-tint-700), var(--color-special-tint-200));
+		--text-heading-3: light-dark(var(--color-special-tint-600), var(--color-special-tint-300));
+
+		--text-muted: light-dark(var(--color-special-tint-800), var(--color-special-tint-300));
+
+		--ps-spinner-track-color: light-dark(#0000001a, rgba(256, 256, 256, 0.1));
+		--ps-spinner-color: light-dark(var(--color-special-tint-600), var(--color-special-tint-300));
+
+		--tab-text-normal: light-dark(var(--color-special-tint-550), var(--color-special-tint-300));
+		--tab-text-hover: light-dark(var(--color-special-tint-600), var(--color-special-tint-200));
+		--tab-text-active: light-dark(var(--color-special-tint-700), var(--color-special-tint-100));
+
+		--tab-underline-hover: light-dark(var(--color-special-tint-300), var(--color-special-tint-400));
+		--tab-underline-active: light-dark(var(--color-special-tint-600), var(--color-special-tint-100));
+		
+		--btn-primary-bg-normal: light-dark(var(--color-special-tint-25), var(--color-special-tint-800));
+		--btn-primary-text-normal: light-dark(var(--color-special-tint-600), var(--color-special-tint-100));
+		--btn-primary-stroke-normal: light-dark(var(--color-special-tint-600), var(--color-special-tint-200));
+
+		--btn-primary-bg-current: light-dark(var(--color-special-tint-0), var(--color-special-tint-700));
+		--btn-primary-text-current: light-dark(var(--color-special-tint-700), var(--color-special-tint-25));
+		--btn-primary-stroke-current: light-dark(var(--color-special-tint-700), var(--color-special-tint-100));
+
+		--btn-primary-bg-hover: light-dark(var(--color-special-tint-0), var(--color-special-tint-700));
+		--btn-primary-text-hover: light-dark(var(--color-special-tint-700), var(--color-special-tint-25));
+		--btn-primary-stroke-hover: light-dark(var(--color-special-tint-700), var(--color-special-tint-100));
+
+	}
+
+	--sidebar-item-text: light-dark(var(--color-tint-700), var(--color-tint-200));
+	--sidebar-item-hover-bg: light-dark(var(--color-tint-25), oklch(from var(--color-tint-400) l c h / 0.15));
+	--sidebar-item-hover-text: light-dark(var(--color-tint-950), var(--color-tint-25));
+	--sidebar-item-active-text: light-dark(var(--color-tint-600), var(--color-tint-50));
+	--sidebar-item-active-bg: light-dark(var(--color-tint-150), var(--color-tint-700));
+
+	--demo-btn-bg: light-dark(white, var(--color-special-tint-900));
+	--demo-btn-bg-off: light-dark(var(--color-special-tint-25), var(--color-special-tint-800));
+}
+
+:root {
+	--doc-max-width: 1000px;
+	--doc-sidebar-width: 200px;
+
+
+	--padding-large: 1.25rem;
+	--padding-medium: 1rem;
+	--padding-small: 0.75rem;
+
+	--standard-padding: var(--padding-small);
+
+	@media (min-width: 480px) {
+		--standard-padding: var(--padding-medium);
+	}
+	@media (min-width: 769px) {
+		--standard-padding: var(--padding-large);
+		--doc-sidebar-width: 256px;
+	}
+}
+
+body {
+	background: var(--bg-surface);
+}
+

@@ -1,0 +1,42 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Styling | Background"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Background
+				p.lead The colour that lighter lines and slices are mixed with.
+
+	+section("What uses the background colour")
+		p #[code --tablechart-surface] is the background colour of a chart. Each line after the first is lighter than the one before it, and so is each donut slice. The lighter colour is the line or slice colour mixed with #[code --tablechart-surface].
+		p If you set a colour for each line or slice with a #[a(href=url('/styling/colours.html')) palette], the background colour is not used.
+		p These parts are cut out of the chart, so they show the real background. You do not need to set anything for them:
+		ul
+			li the inside of open points on a line;
+			li the callout of a bracket or trend arrow;
+			li the gaps between donut slices;
+			li the break in a scale.
+
+	+section("Set it")
+		p By default, #[code --tablechart-surface] is the background the browser uses for the page: white in light mode and dark in dark mode. See #[a(href=url('/styling/light-dark.html')) Light and dark]. If your page or a part of it has another background, set #[code --tablechart-surface] to that colour.
+
+		+style.
+			.dark {
+				background: #16323f;
+				color: #f3efe9;
+				padding: 1em;
+				--tablechart-surface: #16323f;
+				--tablechart-slice-color: #f3efe9;
+			}
+
+		+chart
+			figure.dark(data-chart="donut")
+				table
+					tbody
+						each row in [['Juiced', '38.2'], ['Eaten fresh', '18.1'], ['Sold whole', '12.4'], ['Composted', '5.8']]
+							tr
+								th= row[0]
+								td= row[1]

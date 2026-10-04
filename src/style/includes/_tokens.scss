@@ -1,0 +1,54 @@
+// Shared values: timing, the background, the ink of numbers inside bars, the
+// colours of slices and lines, and the legend box. Every other part uses these.
+
+$duration: var(--tablechart-duration, 0.5s);
+$stagger: var(--tablechart-stagger, 0.12s);
+$easing: var(--tablechart-easing, cubic-bezier(0.22, 0.75, 0.3, 1));
+
+// The background behind the chart: the browser's page background, unless a page
+// sets another.
+// The lighter colours of lines and slices are mixed with it.
+$surface: "var(--tablechart-surface, Canvas)";
+
+// The colour of a number inside a bar, from the colour of the bar: near black on
+// a light bar, near white on a dark one. A kind's own ink variable overrides it.
+@function ink($fill) {
+	@return "oklch(from #{$fill} calc(0.18 + 0.8 * clamp(0, (0.68 - l) * 1000, 1)) 0 0)";
+}
+$barfill: "var(--tablechart-bar-color, currentColor)";
+
+// Each slice gets its colour from the palette, `--tablechart-color-1` and on, which
+// the plugin hands it as `--palette`. If that colour is not set, the slice uses
+// the slice colour, a step lighter for each slice, down to a minimum. Written once,
+// because the legend under the ring uses the same colours.
+$sliceink: "var(--palette, color-mix(in oklab, var(--tablechart-slice-color, currentColor) max(var(--tablechart-slice-min, 20%), calc(100% - var(--n) * var(--tablechart-slice-fade, 15%))), #{$surface}))";
+
+// A chart with several lines does the same, with its own step. A line that is not
+// in focus, when another is, is lighter still, by one amount whatever its place.
+// `--tablechart-series-ink` on `[data-series="1"]` sets one line's colour as it is.
+// One line has no `--n` and no palette, and keeps the series colour.
+$seriesbase: "var(--tablechart-series-color, var(--tablechart-bar-color, currentColor))";
+// Each line is lighter than the one before by `--tablechart-series-fade`, or by
+// less if there are many lines, so the last one is still `--tablechart-series-min`.
+$seriesmin: "var(--tablechart-series-min, 40%)";
+$seriesfade: "min(var(--tablechart-series-fade, 30%), calc((100% - #{$seriesmin}) / max(var(--tablechart-series-count, 2) - 1, 1)))";
+$seriesown: "var(--palette, color-mix(in oklab, #{$seriesbase} max(#{$seriesmin}, calc((100% - var(--n, 0) * #{$seriesfade}) * (1 - var(--m, 0)) + var(--m, 0) * 100%)), #{$surface}))";
+$seriesink: "var(--tablechart-series-ink, color-mix(in oklab, #{$seriesown} calc(100% - var(--m, 0) * (100% - var(--tablechart-muted-share, 45%))), #{$surface}))";
+
+// A legend is as wide as its items and centred, so a background or a border fits
+// around them. It wraps if the items do not fit on one line. Both legends, under
+// a donut and under a chart with several lines, use the same variables.
+@mixin legend-box {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0.3em 1.2em;
+	width: fit-content;
+	max-width: 100%;
+	margin-inline: auto;
+	box-sizing: border-box;
+	padding: var(--tablechart-legend-padding, 0);
+	border: var(--tablechart-legend-border, none);
+	border-radius: var(--tablechart-legend-radius, 0);
+	background: var(--tablechart-legend-surface, none);
+}

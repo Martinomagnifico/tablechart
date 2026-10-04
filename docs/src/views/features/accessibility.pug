@@ -1,0 +1,53 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Features | Accessibility"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Accessibility
+				p.lead What screen readers read, and what works without colour, motion or JavaScript.
+
+	+section("Screen readers read the table")
+		p The table stays in the page. It is hidden from sight, but screen readers read it like any other table: the names of the rows and columns, and every number.
+		p The drawing is hidden from screen readers, with #[code aria-hidden="true"]. That includes the numbers and names in the drawing, because the table already has them. So a screen reader does not read everything twice. The names under the chart and the legend are also #[code inert], because Safari with VoiceOver reads them otherwise.
+		p Give the chart a title with a #[code figcaption]. Tablechart makes it the name of the figure and of the table, with #[code aria-labelledby]. So a screen reader that jumps to the table also reads the title and the unit. If the figure or the table already has a name, with #[code aria-label], #[code aria-labelledby] or a #[code caption], it keeps that name.
+		p A screen reader does not read a line break. So Tablechart puts a full stop before each #[code br] in the title, hidden from sight, and a screen reader pauses between the title and the subtitle. If the line already ends with a full stop, a question mark, a colon or a comma, nothing is added.
+
+		+codeblock('HTML').
+			<figure data-chart="column">
+				<figcaption><b>Apples picked</b><br><span>thousands</span></figcaption>
+				<table>…</table>
+			</figure>
+
+		p If the chart has no #[code figcaption], add #[code aria-label] to the figure, such as #[code aria-label="Apples picked, in thousands"].
+
+	+section("The total of a donut")
+		p If a donut has no total row, the number in the middle is the sum of the slices. Tablechart adds it to the table, in a hidden row at the bottom, so screen readers read it with a name: "Total, 74.5". The #[code totallabel] option sets the name.
+
+	+section("Annotations")
+		p The text of an annotation, such as #[code +24%] on a bracket, stays in the page under the table, hidden from sight. Screen readers read it there. The callout in the drawing is hidden from them.
+
+	+section("Without JavaScript")
+		p If JavaScript does not run, there is no chart. The table is then shown instead, with its title.
+
+	+section("Colour")
+		ul
+			li Lines are told apart by their points as well: filled and open circles, squares and diamonds. You can also make a line dashed or dotted. See #[a(href=url('/types/line.html')) Line].
+			li A number inside a bar is dark or light, whichever reads on the colour of the bar.
+			li If you set your own colours, check that they contrast enough with the background: 3:1 for bars and lines, and 4.5:1 for a number inside a bar.
+
+	+section("Zoom and text size")
+		p All text is HTML, sized in #[code em]. It follows the text size and the zoom of the browser, and stays sharp. Long names beside the bars of a bar chart wrap onto more lines.
+
+	+section("Motion")
+		p If the visitor has asked for reduced motion in their system settings, charts are shown without animation.
+
+	+section("Numbers that do not fit")
+		p If there is no room for a number, it is left out of the drawing. It is still in the table, so screen readers read it. Pointing at the row, or tapping it, shows the number.
+		p Showing a number this way does not work with the keyboard yet.
+
+	+section("Language")
+		p Set the #[code lang] attribute on the #[code html] element, such as #[code lang="en"]. Screen readers use it to read the text in the right language, and Tablechart uses it to format the numbers. See #[a(href=url('/features/numbers.html')) Numbers].

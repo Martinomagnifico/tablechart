@@ -1,0 +1,67 @@
+{
+  "name": "@martinomagnifico/tablechart",
+  "version": "0.1.0",
+  "description": "Simple charts from an HTML or Markdown table: column, bar, line, area, waterfall and donut, with annotations. A chart builds when it scrolls into view.",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.scss"
+  ],
+  "main": "./dist/tablechart.mjs",
+  "types": "./dist/tablechart.d.ts",
+  "unpkg": "./dist/tablechart.js",
+  "jsdelivr": "./dist/tablechart.js",
+  "exports": {
+    ".": {
+      "types": "./dist/tablechart.d.ts",
+      "import": "./dist/tablechart.mjs"
+    },
+    "./core": {
+      "types": "./dist/tablechart-core.d.ts",
+      "import": "./dist/tablechart-core.mjs"
+    },
+    "./style.css": "./dist/tablechart.css"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "start": "cd docs && npm start",
+    "dev": "vite",
+    "docs": "cd docs && npm start",
+    "docs:build": "cd docs && npm run build",
+    "docs:preview": "npm run build && cd docs && rm -rf dist && npm run build && npm run preview",
+    "preview": "npm run docs:preview",
+    "build": "npm run clean && npm run build:lib",
+    "build:lib": "vite build",
+    "prepack": "npm run build",
+    "clean": "rm -rf dist",
+    "setup": "cd docs && npm install"
+  },
+  "keywords": [
+    "chart",
+    "charts",
+    "svg",
+    "table",
+    "waterfall",
+    "donut"
+  ],
+  "author": "Martijn De Jongh",
+  "license": "MIT",
+  "devDependencies": {
+    "@microsoft/api-extractor": "^7.59.3",
+    "@vituum/vite-plugin-pug": "^2.0.1",
+    "sass": "^1.97.3",
+    "terser": "^5.46.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.0",
+    "vite-plugin-dts": "5.0.0-beta.6",
+    "vituum": "^2.0.1"
+  },
+  "module": "./dist/tablechart.mjs",
+  "publishConfig": {
+    "access": "public"
+  }
+}

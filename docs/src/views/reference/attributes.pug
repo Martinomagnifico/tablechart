@@ -1,0 +1,150 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Reference | Attributes"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Attributes
+				p.lead Every data attribute on a chart, a row and an annotation.
+
+	+section("On the figure")
+		table
+			thead
+				tr
+					th Attribute
+					th Does
+			tbody
+				tr
+					td: code data-chart
+					td Makes the figure a chart: #[code column], #[code bar], #[code line], #[code area], #[code waterfall] or #[code donut]
+				tr
+					td: code data-chart-src
+					td Reads the data from a JSON file. See #[a(href=url('/features/data.html')) Data].
+				tr
+					td: code data-chart-stack
+					td Puts the values of a row on top of each other, in a column, bar, line or area chart
+				tr
+					td: code data-chart-shape="step"
+					td Makes each value flat across its row, in a line or area chart
+				tr
+					td: code data-chart-legend
+					td Puts the names of the lines in a legend. #[code data-chart-legend="false"] turns it off.
+				tr
+					td: code data-chart-labels
+					td Puts the numbers of a column chart #[code inside] or #[code outside] the columns
+				tr
+					td: code data-chart-aspect
+					td Sets the height of the chart as a share of its width, such as #[code 0.5]
+				tr
+					td: code data-chart-hover="false"
+					td Turns off showing left-out numbers when a row is pointed at
+				tr
+					td: code data-chart-keys
+					td Adds translation keys to the names, starting with its value. See #[a(href=url('/features/translation.html')) Translation].
+
+	+section("On a row")
+		table
+			thead
+				tr
+					th Attribute
+					th Does
+			tbody
+				tr
+					td: code data-kind="total"
+					td Makes the row a total, in a waterfall or a donut
+				tr
+					td: code class
+					td Is copied to the bar, the number and the name of the row
+
+	+section("On a column header")
+		table
+			thead
+				tr
+					th Attribute
+					th Does
+			tbody
+				tr
+					td: code data-kind="focus"
+					td Highlights the line or the bars of this column. The others are shown fainter.
+				tr
+					td: code data-marker
+					td Sets the point of the line: #[code circle], #[code square] or #[code diamond], with #[code open] for an open point
+				tr
+					td: code data-line
+					td Makes the line #[code dashed] or #[code dotted]
+
+	+section("On an annotation")
+		p Each annotation is a #[code span] with #[code data-annotation], in a #[code div] with the class #[code chart-annotations]. See #[a(href=url('/features/annotations.html')) Annotations].
+
+		table
+			thead
+				tr
+					th Annotation
+					th Attribute
+					th Sets
+			tbody
+				tr
+					td: code bracket
+					td: code data-from, data-to
+					td The rows the bracket runs between. The first row is #[code 1].
+				tr
+					td: code trend
+					td: code data-at
+					td Where the callout is along the arrow, from #[code 0] to #[code 1]
+				tr
+					td: code trend
+					td: code data-years
+					td The number of years, to check the yearly rate you wrote
+				tr
+					td: code axis-break
+					td: code data-from, data-to
+					td The part of the scale that is made smaller
+				tr
+					td: code axis-break
+					td: code data-size
+					td The share of the height that part gets, as a percentage
+				tr
+					td: code axis-break
+					td: code data-mark
+					td How the break is shown: two slanted lines by default, or #[code zigzag]
+				tr
+					td All
+					td: code data-series
+					td The line the annotation uses, on a chart with several lines. The first line is #[code 1].
+
+	+section("Set by Tablechart")
+		p Tablechart adds these attributes. You can use them in CSS.
+
+		table
+			thead
+				tr
+					th Attribute
+					th On
+					th Says
+			tbody
+				tr
+					td: code data-row
+					td Bars, numbers
+					td The row, counted from 1
+				tr
+					td: code data-series
+					td Lines, points, bars, numbers, names
+					td The value column, counted from 1
+				tr
+					td: code data-slice
+					td Donut slices
+					td The slice, counted from 1
+				tr
+					td: code data-marker, data-open
+					td Points
+					td The shape of the point, and if it is open
+				tr
+					td: code data-left-out
+					td Numbers
+					td The number is left out for lack of room
+
+	+section("Next")
+		p For the options of #[code init()], see #[a(href=url('/reference/options.html')) Options].

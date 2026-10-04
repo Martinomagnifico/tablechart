@@ -1,0 +1,135 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Reference | CSS variables"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 CSS variables
+				p.lead Every CSS variable, and what it sets.
+
+	+section("Variables")
+		p Every variable is optional. Set them on #[code :root], on a class or on a chart. See #[a(href=url('/styling/index.html')) Styling].
+
+		table
+			thead
+				tr
+					th Variable
+					th Sets
+			tbody
+				tr
+					td: code --tablechart-color
+					td The colour of text and marks: the text colour by default
+				tr
+					td: code --tablechart-surface
+					td The background colour, for lighter lines and slices: the browser’s page background by default
+				tr
+					td: code --tablechart-bar-color / -bar-ink
+					td All bars and a single line, and the number inside a bar. The number is dark or light by default
+				tr
+					td: code --tablechart-up-color / -up-ink
+					td Rising waterfall steps, and the number inside them
+				tr
+					td: code --tablechart-down-color / -down-ink
+					td Falling waterfall steps, and the number inside them
+				tr
+					td: code --tablechart-total-color / -total-ink
+					td Totals, and the number inside them
+				tr
+					td: code --tablechart-color-1, -2 and on
+					td The palette, for donut slices and several lines
+				tr
+					td: code --tablechart-value-color
+					td The numbers on the bars
+				tr
+					td: code --tablechart-slice-color / -fade / -min
+					td Donut slices without a palette
+				tr
+					td: code --tablechart-slice-gap
+					td The gap between donut slices
+				tr
+					td: code --tablechart-centre-color / -size
+					td The number in the middle of a donut
+				tr
+					td: code --tablechart-key-size
+					td The dot in the donut legend
+				tr
+					td: code --tablechart-series-color / -width / -fade / -min
+					td Lines without a palette
+				tr
+					td: code --tablechart-series-ink
+					td The colour of one line
+				tr
+					td: code --tablechart-muted-share
+					td A line next to a highlighted line
+				tr
+					td: code --tablechart-point-color
+					td The points on a line
+				tr
+					td: code --tablechart-name-max
+					td The widest a name beside a bar may be, as a share of the chart's width: 40% by default. A longer name wraps.
+				tr
+					td: code --tablechart-type
+					td Shows a column chart as a bar chart, or a bar chart as a column chart: #[code bar] or #[code column]
+				tr
+					td: code --tablechart-dash / -dot
+					td The pattern of a dashed or dotted line, in pixels
+				tr
+					td: code --tablechart-area-color / -opacity
+					td The fill under a line, in an area chart
+				tr
+					td: code --tablechart-piece-ink
+					td A number inside a part of a stacked column or bar
+				tr
+					td: code --tablechart-pointer-color
+					td The band behind a row that is pointed at
+				tr
+					td: code --tablechart-name-size
+					td The names of lines
+				tr
+					td: code --tablechart-legend-surface / -border / -padding / -radius / -gap
+					td The legend
+				tr
+					td: code --tablechart-rule-color / -width / -opacity
+					td The baseline
+				tr
+					td: code --tablechart-connector-color / -width / -dash / -opacity
+					td Waterfall connectors
+				tr
+					td: code --tablechart-leader-color / -width / -opacity
+					td The line from a slice to its number
+				tr
+					td: code --tablechart-annotation-color / -width / -duration
+					td Annotation lines and arrowheads
+				tr
+					td: code --tablechart-break-color / -width / -opacity
+					td The lines of a break in the scale
+				tr
+					td: code --tablechart-badge-surface / -padding / -radius / -border-width
+					td The callout
+				tr
+					td: code --tablechart-bar-max
+					td The widest a bar may be
+				tr
+					td: code --tablechart-min-height
+					td The least height of a chart, on a narrow screen: 200px by default
+				tr
+					td: code --tablechart-font-size / -line-height
+					td All text in a chart
+				tr
+					td: code --tablechart-category-size / -category-padding / -categories-gap
+					td The names under the bars
+				tr
+					td: code --tablechart-value-size
+					td The numbers on the bars
+				tr
+					td: code --tablechart-caption-align / -caption-gap
+					td The title
+				tr
+					td: code --tablechart-margin
+					td The space around a chart
+				tr
+					td: code --tablechart-duration / -stagger / -easing
+					td Animation

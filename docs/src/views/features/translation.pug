@@ -1,0 +1,114 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Features | Translation"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Translation
+				p.lead Translate the names in a chart, and show numbers in the language of the page.
+
+	+section("What gets translated")
+		p All text in a chart is HTML: the title, the names of the rows and columns, and the callouts of annotations. A translation script can translate it like any other text on the page.
+		p Numbers are not translated. They are formatted for the language of the page. See #[a(href=url('/features/numbers.html')) Numbers].
+
+	+section("Translation keys")
+		p Many translation scripts find text by a translation key in an attribute, such as #[code data-i18n]. Add #[code data-chart-keys] to the figure, and Tablechart adds translation keys to the names in the table. The value of #[code data-chart-keys] is the start of each key: #[code -row1], #[code -row2] and so on for the names of the rows, and #[code -col1], #[code -col2] and so on for the column headers. The names in the chart get the same keys.
+
+		+codeblock('HTML').
+			<figure data-chart="column" data-chart-keys="apples">
+				<table>
+					<tbody>
+						<tr><th data-i18n="apples-row1">Spring</th><td>58</td></tr>
+						<tr><th data-i18n="apples-row2">Summer</th><td>72</td></tr>
+					</tbody>
+				</table>
+			</figure>
+
+		p If a cell already has a key, Tablechart keeps it. The title and the callouts are your own HTML, so give them a key yourself.
+		p Without #[code data-chart-keys], Tablechart adds no translation keys.
+		p To use another attribute for the keys, set the #[code langattribute] option. To add no keys at all, also on figures with #[code data-chart-keys], set it to #[code false].
+
+		+codeblock('JS').
+			init({ langattribute: "data-key" });
+
+	+section("Example")
+		p The figure has #[code data-chart-keys="harvest"], so Tablechart adds the translation keys #[code harvest-row1] to #[code harvest-row3] to the names of the rows. The title and the subtitle have keys of their own. Each language has a file with a text for each key:
+
+		+codeblock('JSON', 'es.json').
+			{
+				"harvest-title": "Manzanas recogidas",
+				"harvest-unit": "miles",
+				"harvest-row1": "Primavera",
+				"harvest-row2": "Verano",
+				"harvest-row3": "Otoño"
+			}
+
+		+codeblock('JSON', 'fr.json').
+			{
+				"harvest-title": "Pommes cueillies",
+				"harvest-unit": "milliers",
+				"harvest-row1": "Printemps",
+				"harvest-row2": "Été",
+				"harvest-row3": "Automne"
+			}
+
+		p The buttons do what a translation script does: they replace the text of each element with a key, and then set the #[code lang] attribute of the page. The numbers change with the language, and the chart is laid out again for the new names.
+
+		.lang-toggle.translate-toggle(role="group" aria-label="Language of the example")
+			button(type="button" data-lang="en" aria-pressed="true") English
+			button(type="button" data-lang="es" aria-pressed="false") Español
+			button(type="button" data-lang="fr" aria-pressed="false") Français
+
+		+chart
+			figure#harvest(data-chart="column" data-chart-keys="harvest")
+				figcaption
+					b(data-i18n="harvest-title") Apples picked
+					br
+					span(data-i18n="harvest-unit") thousands
+				table
+					tbody
+						each row in [['Spring', '58.5'], ['Summer', '72.0'], ['Autumn', '70.5']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		script.
+			var dictionaries = {"en": {"harvest-title": "Apples picked", "harvest-unit": "thousands", "harvest-row1": "Spring", "harvest-row2": "Summer", "harvest-row3": "Autumn"}, "es": {"harvest-title": "Manzanas recogidas", "harvest-unit": "miles", "harvest-row1": "Primavera", "harvest-row2": "Verano", "harvest-row3": "Otoño"}, "fr": {"harvest-title": "Pommes cueillies", "harvest-unit": "milliers", "harvest-row1": "Printemps", "harvest-row2": "Été", "harvest-row3": "Automne"}};
+			document.querySelectorAll('.translate-toggle button').forEach(function (button) {
+				button.addEventListener('click', function () {
+					var lang = button.dataset.lang;
+					document.querySelectorAll('#harvest [data-i18n]').forEach(function (element) {
+						var text = dictionaries[lang][element.getAttribute('data-i18n')];
+						if (text) element.textContent = text;
+					});
+					document.documentElement.lang = lang;
+					button.parentElement.querySelectorAll('button').forEach(function (other) {
+						other.setAttribute('aria-pressed', String(other === button));
+					});
+				});
+			});
+
+	+section("When to translate")
+		p Tablechart makes the names in the chart when it starts. Run your translation script after #[code init()] has finished. #[code init()] returns a promise.
+
+		+codeblock('JS').
+			import { init } from "@martinomagnifico/tablechart";
+
+			await init();
+			translatePage();
+
+	+section("Changing the language")
+		p If the #[code lang] attribute of the #[code html] element changes, the numbers change with it. Then the charts are laid out again, a moment later, so a translation script has time to change the names first.
+		p If a script changes the text of a chart without changing #[code lang], lay the charts out again with #[code refresh()].
+
+		+codeblock('JS').
+			const tablechart = await init();
+
+			translatePage();
+			tablechart.refresh();
+
+	+section("Next")
+		p To check what screen readers read, see #[a(href=url('/features/accessibility.html')) Accessibility].

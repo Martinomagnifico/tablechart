@@ -1,0 +1,26 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "About / Buy me a coffee"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 About
+
+	.lane
+		.container
+			p Tablechart is a small open-source library built and maintained by Martinomagnifico&nbsp;(Yeah I know, but 'Martino' was already taken on GitHub). And those are not my real ears.
+
+			.avatar
+				img(src="/img/martino.png" alt="Martinomagnifico")
+
+
+			p I needed a simple way to create charts from tables in my projects. Especially for texts in the chart, I prefer HTML over SVG or Canvas, because it is easily styled with CSS.
+
+			p If you like Tablechart and want to support its development, consider buying me a coffee. #[em I need the coffee].
+
+			a.btn.solid.chevron.mobileblock(href="https://ko-fi.com/martinomagnifico" target="_blank" rel="noopener") 
+				| Buy me a coffee. As you can see, I really need it
+				+chevron()

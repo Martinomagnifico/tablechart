@@ -1,0 +1,103 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Styling | Text"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Text
+				p.lead The font and the sizes of the text in a chart.
+
+	+section("Font")
+		p All text in a chart is HTML, so it uses the font of the page. To use another font in a chart, set #[code font-family] on it.
+
+	+section("Sizes")
+		p #[code --tablechart-font-size] sets the size of all text in a chart: #[code 1em] by default. The other sizes are relative to it.
+
+		+style.
+			.sizes {
+				--tablechart-value-size: 2em;
+				--tablechart-category-size: 0.75em;
+			}
+
+		+chart
+			figure.sizes(data-chart="column")
+				table
+					tbody
+						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '91']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+		table
+			thead
+				tr
+					th Variable
+					th Sets
+			tbody
+				tr
+					td: code --tablechart-font-size
+					td All text in a chart: 1em by default.
+				tr
+					td: code --tablechart-category-size
+					td The names under the bars: 0.95em by default.
+				tr
+					td: code --tablechart-value-size
+					td The numbers on the bars: 1.3 times the names by default.
+				tr
+					td: code --tablechart-centre-size
+					td The number in the middle of a donut: 1.6em by default.
+				tr
+					td: code --tablechart-name-size
+					td The names of lines: the size of the names under the bars by default.
+				tr
+					td: code --tablechart-caption-align
+					td The alignment of the title: left by default.
+				tr
+					td: code --tablechart-caption-gap
+					td The space under the title: 0.5em by default.
+
+	+section("Smaller text on narrow charts")
+		p With many columns on a narrow screen, smaller text lets more numbers fit. Make the element around the chart a container, and set #[code --tablechart-font-size] with #[code clamp()] and #[code cqi], a share of the width of the container. In this example, the text is full size from 500px wide, and gets smaller below that, down to 75%.
+
+		+style.
+			.text-box {
+				container-type: inline-size;
+			}
+			.text-box > [data-chart] {
+				--tablechart-font-size: clamp(0.75em, 3.2cqi, 1em);
+			}
+
+		p The buttons change the width of the example.
+
+		.width-toggle.lang-toggle(role="group" aria-label="Width of the example")
+			button(type="button" data-width="" aria-pressed="true") Wide
+			button(type="button" data-width="360px" aria-pressed="false") Narrow
+		+chart
+			.text-box
+				figure(data-chart="column")
+					figcaption: b Visitors per month
+					table
+						tbody
+							each row in [['Jan', '41'], ['Feb', '38'], ['Mar', '52'], ['Apr', '61'], ['May', '74'], ['Jun', '88'], ['Jul', '93'], ['Aug', '90'], ['Sep', '77'], ['Oct', '63'], ['Nov', '49'], ['Dec', '45']]
+								tr
+									th= row[0]
+									td= row[1]
+
+		script.
+			document.querySelectorAll('.width-toggle').forEach(function (group) {
+				var box = group.nextElementSibling.querySelector('.text-box');
+				group.querySelectorAll('button').forEach(function (button) {
+					button.addEventListener('click', function () {
+						box.style.maxWidth = button.dataset.width;
+						group.querySelectorAll('button').forEach(function (other) {
+							other.setAttribute('aria-pressed', String(other === button));
+						});
+					});
+				});
+			});
+
+		p Much smaller than that, text gets hard to read. Numbers that still do not fit are left out, and shown when you point at their row.
+

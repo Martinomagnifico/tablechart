@@ -1,0 +1,72 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Get started"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Get started
+				p.lead Install Tablechart, write the markup and start it.
+
+	+section("Install")
+		+installWizard('Tablechart', 'init')
+
+	+section("Markup")
+		p A chart is an element with #[code data-chart] and a table in it. The first cell of a row is the label, the second the value.
+
+		.card
+			.demo
+				figure(data-chart="column")
+					table
+						tbody
+							tr
+								th Spring
+								td 58
+							tr
+								th Summer
+								td 72
+							tr
+								th Autumn
+								td 70
+
+			p.code-note See below how it is just a table.
+
+			+codeblock('HTML', null, '2-8')
+				figure(data-chart="column")
+					table
+						tbody
+							tr
+								th Spring
+								td 58
+							tr
+								th Summer
+								td 72
+							tr
+								th Autumn
+								td 70
+
+		p #[code data-chart] sets the chart type: #[code column], #[code bar], #[code line], #[code waterfall] or #[code donut].
+
+	+section("Start it")
+		p Call #[code init()] once the page has loaded. It makes a chart of every element with #[code data-chart].
+
+		+codeblock('JS').
+			import { init } from '@martinomagnifico/tablechart';
+			import '@martinomagnifico/tablechart/style.css';
+
+			init();
+
+		p To change when a chart builds, pass options. See #[a(href=url('/reference/options.html')) Options].
+
+		+codeblock('JS').
+			init({
+			  threshold: 0.5, // How much of a chart must be in view
+			  replay: false   // Build again when it scrolls back into view
+			});
+
+	+section("Next")
+		ul
+			li #[a(href=url('/types/column.html')) Chart types]
+			li #[a(href=url('/styling/index.html')) Styling]

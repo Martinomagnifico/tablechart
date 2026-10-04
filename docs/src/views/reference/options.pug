@@ -1,0 +1,88 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Reference | Options"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Options
+				p.lead Everything init() takes.
+
+	+section("Set options")
+		p Pass the options to #[code init()]. Options that you leave out keep their default.
+
+		+codeblock('JS').
+			init({
+				threshold: 0.3,
+				legend: true
+			});
+
+	+section("All options")
+		table
+			thead
+				tr
+					th Option
+					th Default
+					th Sets
+			tbody
+				tr
+					td: code selector
+					td: code "[data-chart]"
+					td The elements that become charts
+				tr
+					td: code aspect
+					td: code 0.38
+					td The height of a chart as a share of its width. #[code data-chart-aspect] on a figure sets it for one chart.
+				tr
+					td: code barfill
+					td: code 0.58
+					td The share of its row that a bar takes, up to #[code --tablechart-bar-max]
+				tr
+					td: code ringfill
+					td: code 0.42
+					td The share of the radius of a donut that the ring takes
+				tr
+					td: code animate
+					td: code true
+					td If #[code false], a chart is shown whole, without animation
+				tr
+					td: code labels
+					td: code "outside"
+					td Where the number of a column goes: #[code "outside"], above the column, or #[code "inside"]. #[code data-chart-labels] on a figure sets it for one chart.
+				tr
+					td: code legend
+					td: code false
+					td If #[code true], the names of the lines are in a legend under the chart. #[code data-chart-legend] on a figure sets it for one chart.
+				tr
+					td: code hover
+					td: code true
+					td If a number is left out for lack of room, pointing at its row shows it. #[code data-chart-hover="false"] on a figure turns it off for one chart.
+				tr
+					td: code totallabel
+					td: code "Total"
+					td The name of the total of a donut without a total row, for screen readers
+				tr
+					td: code threshold
+					td: code 0.5
+					td How much of a chart must be in view before it builds, from #[code 0] to #[code 1]
+				tr
+					td: code replay
+					td: code false
+					td If #[code true], a chart builds again each time it scrolls back into view
+				tr
+					td: code locale
+					td Not set
+					td The language for numbers, such as #[code "nl"]. If not set, the #[code lang] attribute of the page is used.
+				tr
+					td: code langattribute
+					td: code "data-i18n"
+					td The attribute for translation keys. #[code false] adds no translation keys.
+				tr
+					td: code debug
+					td: code false
+					td If #[code true], Tablechart shows messages in the console
+
+	+section("Next")
+		p For the attributes on a chart, see #[a(href=url('/reference/attributes.html')) Attributes]. For what #[code init()] returns, see #[a(href=url('/reference/api.html')) API].

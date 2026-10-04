@@ -1,0 +1,89 @@
+block scripts
+	script(src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js")
+	script(src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.6.0/highlightjs-line-numbers.min.js")
+
+	if isProd
+		script(src=`${basePath}assets/scripts/copybutton.js` vite-ignore)
+		script(src=`${basePath}assets/scripts/anchorlink.js` vite-ignore)
+		script(src=`${basePath}assets/scripts/install-wizard.js` vite-ignore)
+		script(src=`${basePath}assets/scripts/main.js` vite-ignore)
+		script(src=`${basePath}lib/panelset.js` vite-ignore)
+		script(src=`${basePath}lib/tablechart.js` vite-ignore)
+		script.
+			Panel.init('.docs-sidebar [data-panel]', { returnFocus: false });
+			PanelSet.init();
+			PanelControl.init();
+			Tablechart.init();
+
+	else
+		script(type="module" src="/src/assets/scripts/copybutton.js")
+		script(type="module" src="/src/assets/scripts/anchorlink.js")
+		script(type="module" src="/src/assets/scripts/install-wizard.js")
+		script(type="module" src="/src/assets/scripts/main.js")
+		//- PanelSet for the sidebar and any tabs on a page, and Tablechart for the charts.
+		script(type="module").
+			import { Panel, PanelSet, PanelControl } from 'panelset';
+			import { init } from '@martinomagnifico/tablechart';
+			Panel.init('.docs-sidebar [data-panel]', { returnFocus: false });
+			PanelSet.init();
+			PanelControl.init();
+			init({ debug: true });
+
+
+	//- Dismiss the drawer, and hold focus inside it while it is open. On desktop the nav is static (data-panel-static)
+	script.
+		document.addEventListener('DOMContentLoaded', function () {
+			var nav = document.getElementById('main-nav');
+			if (!nav) return;
+			var content = document.querySelector('.docs-content');
+
+			// Click beside the drawer. The toggle is skipped: it already toggles itself.
+			document.addEventListener('click', function (e) {
+				if (nav.contains(e.target) || e.target.closest('.nav-toggle')) return;
+				nav.panel?.close(e);
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape') nav.panel?.close(e);
+			});
+
+			// The drawer looks modal, so it behaves modal: nothing behind it is tabbable. The check matters, because the nav sections are panels whose events bubble.
+			nav.addEventListener('panel:opening', function (e) {
+				if (e.target === nav) content?.setAttribute('inert', '');
+			});
+			nav.addEventListener('panel:closed', function (e) {
+				if (e.target === nav) content?.removeAttribute('inert');
+			});
+
+			// Resizing to desktop makes it static, which is not a close, so release here.
+			nav.addEventListener('panel:staticchange', function () {
+				content?.removeAttribute('inert');
+			});
+		});
+
+	script.
+		// Highlight. Exclude the install wizard, and any block JS writes itself (.live-code): hljs rebuilds a block from its text, which would throw away the <mark> elements the static demo puts there.
+		hljs.configure({ cssSelector: 'pre code:not(.iw-code):not(.live-code)' });
+		hljs.highlightAll();
+		hljs.initLineNumbersOnLoad();
+
+		// Highlight the lines a code block asks for with data-lines, such as "2-8", once
+		// the line numbers have made a row of each line.
+		(function () {
+			var blocks = document.querySelectorAll('pre[data-lines]');
+			if (!blocks.length) return;
+			var mark = function (pre) {
+				var rows = pre.querySelectorAll('table.hljs-ln tr');
+				if (!rows.length) return false;
+				pre.dataset.lines.split(',').forEach(function (part) {
+					var ends = part.split('-').map(Number);
+					for (var n = ends[0]; n <= (ends[1] || ends[0]); n++) rows[n - 1]?.classList.add('is-highlighted');
+				});
+				return true;
+			};
+			blocks.forEach(function (pre) {
+				if (mark(pre)) return;
+				var watcher = new MutationObserver(function () { if (mark(pre)) watcher.disconnect(); });
+				watcher.observe(pre, { childList: true, subtree: true });
+			});
+		})();

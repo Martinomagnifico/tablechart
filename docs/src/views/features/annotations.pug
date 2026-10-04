@@ -1,0 +1,114 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Features | Annotations"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Annotations
+				p.lead A bracket, a trend arrow or a break in the scale, placed by the data.
+
+	+section("How to add an annotation")
+		p Put a #[code div] with the class #[code chart-annotations] inside the chart. Each annotation in it is a #[code span] with #[code data-annotation]. An annotation is placed by the data, so if you change a number, the annotation moves with it.
+
+		+codeblock('HTML')
+			figure(data-chart="column")
+				table …
+				.chart-annotations
+					span(data-annotation="bracket") +11%
+
+	+section("Bracket")
+		p A bracket shows the change between two bars. If the chart has two bars, no other attributes are needed.
+
+		+chart
+			figure(data-chart="column")
+				figcaption
+					b Apple juice
+					br
+					span thousands of litres
+				table
+					tbody
+						each row in [['Last season', '251.5'], ['This season', '279.6']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+				.chart-annotations
+					span(data-annotation="bracket") +11%
+
+	+section("Choose the bars")
+		p If the chart has more bars, set #[code data-from] and #[code data-to] to the row numbers. The first row is #[code 1].
+
+		+chart
+			figure(data-chart="column")
+				table
+					tbody
+						each row in [['2021', '74'], ['2022', '80'], ['2023', '91'], ['2024', '102'], ['2025', '116']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+				.chart-annotations
+					span(data-annotation="bracket" data-from="2" data-to="5") +45%
+
+	+section("Trend")
+		p A trend arrow runs from the first value to the last. #[code data-at] sets where the callout is along the arrow, from #[code 0] to #[code 1].
+		p Set #[code data-years] to the number of years. Tablechart calculates the yearly rate, and shows a warning in the console if it is different from yours. Your number is always the one shown.
+		p A #[code span] with the class #[code tablechart-caption] is shown above the callout.
+
+		+chart
+			figure(data-chart="column")
+				figcaption
+					b Apples per tree
+					br
+					span each
+				table
+					tbody
+						each row in [['2021', '74'], ['2022', '80'], ['2023', '91'], ['2024', '102'], ['2025', '116']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+				.chart-annotations
+					span(data-annotation="trend" data-years="4" data-at="0.46")
+						span.tablechart-caption A year
+						span +12%
+
+	+section("Break the scale")
+		p If one value is much larger than the others, add an #[code axis-break]. Part of the scale is then shown smaller, so the small values have more room. Above the break, bar heights are not to scale, so every bar shows its number.
+
+		+chart
+			figure(data-chart="column")
+				table
+					tbody
+						each row in [['North', '12'], ['South', '15'], ['East', '14'], ['West', '140']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+				.chart-annotations
+					span(data-annotation="axis-break" data-from="20")
+
+		table
+			thead
+				tr
+					th Attribute
+					th Sets
+			tbody
+				tr
+					td: code data-from
+					td Where the smaller part of the scale starts. The baseline if not set.
+				tr
+					td: code data-to
+					td Where it ends. The top of the scale if not set.
+				tr
+					td: code data-size
+					td The share of the height the smaller part gets, as a percentage. 22% for the top, 30% otherwise.
+				tr
+					td: code data-mark
+					td How the break is drawn: two slanted lines by default, or #[code zigzag].
+		p A break works on column, line and waterfall charts.
+
+	+section("Annotations on several lines")
+		p On a chart with several lines, #[code data-series] sets which line an annotation uses. The first line is #[code 1], and is used if #[code data-series] is not set.
+
+		+codeblock('HTML')
+			span(data-annotation="trend" data-series="2" data-years="9") +8%

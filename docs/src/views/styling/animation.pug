@@ -1,0 +1,54 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Styling | Animation"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Animation
+				p.lead How fast a chart builds.
+
+	+section("Speed")
+		p #[code --tablechart-duration] sets how long each bar takes to grow. #[code --tablechart-stagger] sets the time between one bar and the next. #[code --tablechart-easing] sets the easing.
+
+		+style.
+			.slow {
+				--tablechart-duration: 0.9s;
+				--tablechart-stagger: 0.22s;
+			}
+
+		+chart
+			figure.slow(data-chart="waterfall")
+				table
+					tbody
+						each row in [['Picked', '74.5', 'total'], ['Windfalls', '28.2'], ['Bruised', '-16.1'], ['Peelings', '-13.3'], ['Pressed', '73.3', 'total']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+		table
+			thead
+				tr
+					th Variable
+					th Sets
+			tbody
+				tr
+					td: code --tablechart-duration
+					td How long a bar or slice takes: 0.5s by default.
+				tr
+					td: code --tablechart-stagger
+					td The time between one bar and the next: 0.12s by default.
+				tr
+					td: code --tablechart-easing
+					td The easing of bars and slices.
+				tr
+					td: code --tablechart-annotation-duration
+					td How long an annotation line takes: 0.6s by default.
+
+	+section("No animation")
+		p To show charts without animation, set #[code animate] to #[code false]. If the visitor prefers reduced motion, charts build without animation anyway.
+
+		+codeblock('JS').
+			init({ animate: false });

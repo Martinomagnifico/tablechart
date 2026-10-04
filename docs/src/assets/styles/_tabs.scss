@@ -1,0 +1,157 @@
+
+.tab-content {
+	padding: 1.5rem;
+	background: var(--bg-surface);
+	border-radius: 6px;
+	
+	.demo & {
+		background: var(--demo-surface);
+	}
+}
+
+
+.tabs, .rail {
+
+	display: flex;
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+
+	button {
+		background: transparent;
+		border: none;
+		padding: 0.75rem 1rem;
+
+		@container (min-width: 512px) {
+			padding: 0.75rem 1.5rem;
+		}
+
+		border-radius: 1px;
+		outline-offset: 3px;
+		outline-width: 3px;
+
+		position: relative;
+		color: var(--tab-text-normal);
+		font-size: 1.1rem;
+		font-weight: 600;
+		transition: color 0.125s;
+
+		cursor: pointer;
+
+		&:before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			width: 100%;
+			height: 3px;
+			opacity: 1;
+			background: transparent;
+			transition: background-color 0.125s;
+			bottom: 0;
+			top: auto;
+			z-index: 1;
+		}
+
+		&:focus-visible {
+			z-index: 1;
+		}
+
+		&[aria-selected=true] {
+			font-weight: 600;
+		}
+
+		&:not([aria-disabled=true]):hover {
+			background: none;
+			box-shadow: none;
+		}
+
+		&:not([aria-selected=true]):not([aria-disabled=true]):hover {
+			color: var(--tab-text-hover);
+
+
+			&:before {
+				background: var(--tab-underline-hover);
+			}
+		}
+
+		&[aria-selected="true"]{
+			background: none;
+			color: var(--tab-text-active);
+			&:before {
+				background: var(--tab-underline-active);
+			}
+		}
+	}
+
+}
+
+.tabs[aria-orientation="vertical"], .rail {
+
+	padding-left: 0;
+	padding-right: 0;
+
+	button {
+		font-weight: 500;
+		text-align: left;
+		padding: 0.66rem 1.25rem;
+
+
+		&:before {
+			top: 0;
+			bottom: auto;
+			left: 0;
+			height: 100%;
+			width: 3px;
+		}
+
+		&[aria-selected="true"] {
+			font-weight: 600;
+		}
+	}
+}
+
+.rail {
+	flex: 0 0 7rem;
+	flex-direction: column;
+	align-items: stretch;
+
+	@container (min-width: 800px) {
+		flex: 0 0 10rem;
+	}
+
+	h3, h4 {
+		margin-top: 0.25rem;
+		margin-bottom: 0.75rem;
+		border-radius: 0;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		opacity: 0.6;
+		color: var(--color-special-helptext);
+	}
+	button + h4 {
+		margin-top: 1rem;
+	}
+
+
+}
+
+.background-wrapper {
+	flex: 1;
+	background: var(--demo-surface);
+	border-radius: 0.25rem;
+
+	[data-panelset] > .panel-wrapper > [role="tabpanel"] {
+		// padding: 1.5rem;
+		padding: var(--standard-padding);
+
+		@container (min-width: 480px) {
+			padding: var(--padding-medium);
+		}
+
+		@container (min-width: 769px) {
+			padding: var(--padding-large);
+		}
+
+
+	}
+}

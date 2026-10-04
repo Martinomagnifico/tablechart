@@ -1,0 +1,110 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Features | Numbers"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Numbers
+				p.lead Decimals, text around a number, missing values and the language of the page.
+
+	+section("Text around a number")
+		p Tablechart reads the first number in each cell. Text before or after the number is shown with it, such as a currency sign, a percent sign or a footnote mark.
+
+		+chart
+			figure(data-chart="column")
+				figcaption: b Price of a bag of apples
+				table
+					tbody
+						each row in [['Market', '€2.40'], ['Farm shop', '€2.90*'], ['Supermarket', '€3.10']]
+							tr
+								th= row[0]
+								td= row[1]
+
+	+section("Decimals")
+		p All numbers on a chart have the same number of decimals: the most that any cell has. To show one decimal, write one in at least one cell, such as #[code 3.0].
+
+		+chart
+			figure(data-chart="column")
+				figcaption: b Rainfall in a day
+				table
+					tbody
+						each row in [['Mon', '2.5'], ['Tue', '3.0'], ['Wed', '4'], ['Thu', '1.5']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		p In the middle of a donut, the total keeps its own decimals.
+
+	+section("Thousands")
+		p Write numbers without a thousands separator, such as #[code 12500]. Tablechart adds the separator of the language of the page. A comma or a point in a number is read as the decimal separator, so #[code 12,500] is read as 12.5.
+
+		+chart
+			figure(data-chart="bar")
+				figcaption: b Apples picked
+				table
+					tbody
+						each row in [['North', '12500'], ['South', '9800'], ['East', '7250']]
+							tr
+								th= row[0]
+								td= row[1]
+
+	+section("Language")
+		p The decimal and thousands separators follow the #[code lang] attribute of the #[code html] element. If the #[code lang] attribute changes, the numbers change with it, and the chart is laid out again.
+		p The buttons change the language of this page.
+
+		.lang-toggle(role="group" aria-label="Language of the page")
+			button(type="button" data-lang="en" aria-pressed="true") English
+			button(type="button" data-lang="nl" aria-pressed="false") Nederlands
+			button(type="button" data-lang="de-CH" aria-pressed="false") Deutsch (Schweiz)
+			button(type="button" data-lang="fr" aria-pressed="false") Français
+
+		+chart
+			figure(data-chart="column")
+				figcaption: b Apples picked
+				table
+					tbody
+						each row in [['2023', '10250.5'], ['2024', '11800.0'], ['2025', '12500.5']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		script.
+			document.querySelectorAll('.lang-toggle button').forEach(function (button) {
+				button.addEventListener('click', function () {
+					document.documentElement.lang = button.dataset.lang;
+					button.parentElement.querySelectorAll('button').forEach(function (other) {
+						other.setAttribute('aria-pressed', String(other === button));
+					});
+				});
+			});
+
+		p To use one language for all charts, whatever the page says, set the #[code locale] option.
+
+		+codeblock('JS').
+			init({ locale: "nl" });
+
+	+section("Missing values")
+		p If a cell has no number, such as #[code n/a], the row has no bar. The text of the cell is shown where the bar would be. In a line chart, the line has a gap.
+
+		+chart
+			figure(data-chart="column")
+				figcaption: b Apples picked
+				table
+					tbody
+						each row in [['2022', '86'], ['2023', 'n/a'], ['2024', '94'], ['2025', '101']]
+							tr
+								th= row[0]
+								td= row[1]
+
+	+section("Numbers that do not fit")
+		p If there is no room for a number, it is left out. This can happen in a stacked or grouped chart, a step chart or a line chart with three lines or more. The number is still in the table.
+		p If you point at a row, or tap it, the numbers of that row are shown, and the other numbers are hidden for that time. To turn this off, set the #[code hover] option to #[code false], or add #[code data-chart-hover="false"] to the figure.
+
+		+codeblock('JS').
+			init({ hover: false });
+
+	+section("Next")
+		p To put the numbers inside the columns, see #[a(href=url('/types/column.html')) Column]. To change their size and colour, see #[a(href=url('/styling/text.html')) Text].

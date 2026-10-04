@@ -1,0 +1,46 @@
+@use "tokens" as *;
+
+// Commentary laid over the data, with tokens of its own, so it can be restyled
+// without touching the marks underneath it.
+
+.tablechart-line {
+	stroke: var(--tablechart-annotation-color, currentColor);
+	stroke-width: var(--tablechart-annotation-width, 1.25px);
+	fill: none;
+	stroke-linecap: butt;
+	stroke-linejoin: miter;
+	vector-effect: non-scaling-stroke;
+}
+
+.tablechart-head {
+	fill: var(--tablechart-annotation-color, currentColor);
+}
+
+// The callout is a box with a 50% radius rather than an SVG ellipse, because it
+// has to grow around whatever its text turns out to be once a page is
+// translated. An ellipse inscribed in a box only touches it at four points, so
+// the padding has to push the text well inside or its corners poke through.
+.tablechart-badge {
+	position: absolute;
+	transform: translate(-50%, -50%);
+	// No background: the marks under it are cut out, so the background behind the
+	// chart shows through.
+	background: var(--tablechart-badge-surface, none);
+	color: var(--tablechart-annotation-color, currentColor);
+	border: var(--tablechart-badge-border-width, 1px) solid currentColor;
+	border-radius: var(--tablechart-badge-radius, 50%);
+	padding: var(--tablechart-badge-padding, 0.5em 1.25em);
+	white-space: nowrap;
+	line-height: 1;
+
+	// A word above the callout, naming what the number is.
+	:where(.tablechart-caption) {
+		position: absolute;
+		bottom: calc(100% + 0.45em);
+		left: 50%;
+		transform: translateX(-50%);
+		border: 0;
+		background: none;
+		color: var(--tablechart-color, currentColor);
+	}
+}

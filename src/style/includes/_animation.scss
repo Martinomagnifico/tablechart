@@ -1,0 +1,191 @@
+@use "tokens" as *;
+
+// One class, `is-shown`, starts the whole build. Bars grow out of the total they
+// depart from, and commentary lands after the data it comments on: `--after` is
+// how many stagger steps the data itself takes.
+
+:where([data-animate]) {
+	:where(.tablechart-bar) {
+		transform: scaleY(0);
+		transform-box: fill-box;
+		transform-origin: bottom;
+		transition: transform #{$duration} #{$easing};
+		transition-delay: calc(var(--i) * #{$stagger});
+	}
+
+	// A rising step leaves its opening total upwards, a falling one downwards.
+	:where(.tablechart-bar[data-grow="down"]) {
+		transform-origin: top;
+	}
+
+	// One laid on its side grows out of the baseline it stands on, which is upright.
+	:where(.tablechart-bar[data-grow="right"]) {
+		transform: scaleX(0);
+		transform-origin: left;
+	}
+
+	// A line is one stroke, not a row of marks. Each piece takes exactly the step
+	// from one point to the next and starts where the piece before it stopped, so
+	// the line grows continuously: give it the duration the bars have and three
+	// pieces draw at once, which reads as several lines rather than one. Linear,
+	// for the same reason — a piece that eases pulses at every join.
+	:where(.tablechart-series) {
+		stroke-dasharray: var(--len);
+		stroke-dashoffset: var(--len);
+		transition: stroke-dashoffset #{$stagger} linear;
+		transition-delay: calc(max(var(--i) - 1, 0) * #{$stagger});
+	}
+
+	// A dashed line cannot draw itself on by its dashes, because it uses them for
+	// its pattern. Each piece is shown from left to right instead.
+	:where(.tablechart-series[data-line]) {
+		clip-path: inset(-20px 100% -20px 0);
+		transition: clip-path #{$stagger} linear;
+		transition-delay: calc(max(var(--i) - 1, 0) * #{$stagger});
+	}
+
+	// An area fades in as a whole, from when its line starts until it ends.
+	:where(.tablechart-area-fill) {
+		opacity: 0;
+		transition: opacity calc(max(var(--rows) - 1, 1) * #{$stagger}) ease;
+		transition-delay: calc(max(var(--i) - 1, 0) * #{$stagger});
+	}
+
+	:where(.tablechart-point, .tablechart-hole) {
+		opacity: 0;
+		transition: opacity #{$duration} ease;
+		transition-delay: calc((var(--i) + 0.2) * #{$stagger});
+	}
+
+	// The hole under a callout appears with the callout.
+	:where(.tablechart-hole[data-for="badge"]) {
+		transition: opacity 0.3s ease;
+		transition-delay: calc(var(--after) * #{$stagger} + 0.35s);
+	}
+
+	:where(.tablechart-value, .tablechart-name) {
+		opacity: 0;
+		transition: opacity #{$duration} ease;
+		transition-delay: calc((var(--i) + 0.4) * #{$stagger});
+	}
+
+	// A dotted line cannot be drawn on by its dash offset: the offset only slides
+	// the dots along a pattern that is already there, so the connector would be
+	// visible from the start and then march. It keeps its dots and fades instead,
+	// on `stroke-opacity` so the connector's own opacity token still holds.
+	:where(.tablechart-connector) {
+		stroke-opacity: 0;
+		transition: stroke-opacity #{$duration} ease;
+		// Counted back from the column it leads into, so it arrives just ahead of it —
+		// and never before its own step, which is what the floor is for.
+		transition-delay: max(0s, calc((var(--i) - 0.45) * #{$stagger}));
+	}
+
+	// A slice is a circle with one dash in it, so the dash growing to its share is
+	// the ring drawing itself round.
+	:where(.tablechart-slice) {
+		stroke-dasharray: 0 var(--circ);
+		transition: stroke-dasharray #{$duration} #{$easing};
+		transition-delay: calc(var(--i) * #{$stagger});
+	}
+
+	:where(.tablechart-centre) {
+		opacity: 0;
+		transition: opacity #{$duration} ease;
+		transition-delay: calc((var(--i, 0) + 0.5) * #{$stagger});
+	}
+
+	// On `stroke-opacity`, as the connectors are: these have an opacity token of
+	// their own, and a rule with a class beats one that weighs nothing.
+	:where(.tablechart-leader) {
+		stroke-opacity: 0;
+		transition: stroke-opacity #{$duration} ease;
+		transition-delay: calc((var(--i, 0) + 0.5) * #{$stagger});
+	}
+
+	// The lines of a break appear after the bar they cut has grown, on their stroke.
+	:where(.tablechart-break[data-part="edge"]) {
+		stroke-opacity: 0;
+		transition: stroke-opacity 0.2s ease;
+		transition-delay: calc((var(--after) + 0.9) * #{$stagger});
+	}
+
+	:where(.tablechart-line) {
+		stroke-dasharray: var(--len);
+		stroke-dashoffset: var(--len);
+		transition: stroke-dashoffset var(--tablechart-annotation-duration, 0.6s) #{$easing};
+		transition-delay: calc(var(--after) * #{$stagger});
+	}
+
+	:where(.tablechart-head) {
+		opacity: 0;
+		transition: opacity 0.2s ease;
+		transition-delay: calc(var(--after) * #{$stagger} + 0.55s);
+	}
+
+	:where(.tablechart-badge) {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+		transition-delay: calc(var(--after) * #{$stagger} + 0.35s);
+	}
+}
+
+:where([data-animate].is-shown) {
+	:where(.tablechart-bar) {
+		transform: scaleY(1);
+	}
+	:where(.tablechart-bar[data-grow="right"]) {
+		transform: scaleX(1);
+	}
+	:where(.tablechart-series) {
+		stroke-dashoffset: 0;
+	}
+	:where(.tablechart-series[data-line]) {
+		clip-path: inset(-20px);
+	}
+	:where(.tablechart-point),
+	:where(.tablechart-hole),
+	:where(.tablechart-area-fill) {
+		opacity: 1;
+	}
+	:where(.tablechart-value),
+	:where(.tablechart-name),
+	:where(.tablechart-head),
+	:where(.tablechart-badge),
+	:where(.tablechart-centre) {
+		opacity: 1;
+	}
+	:where(.tablechart-leader),
+	:where(.tablechart-break[data-part="edge"]) {
+		stroke-opacity: 1;
+	}
+	:where(.tablechart-slice) {
+		stroke-dasharray: var(--arc) calc(var(--circ) - var(--arc));
+	}
+	:where(.tablechart-connector) {
+		stroke-opacity: 1;
+	}
+	:where(.tablechart-line) {
+		stroke-dashoffset: 0;
+	}
+}
+
+// --- sequencing --------------------------------------------------------------
+// A chart in a sequence waits hidden, caption, baseline and all, and fades in as
+// its marks start to build. The fade is part of the chart's own animation, so a
+// chart that plays after it waits for the fade as well.
+
+:where([data-animate]) {
+	transition: opacity var(--tablechart-queue-duration, 0.4s) ease;
+}
+
+:where([data-animate].tablechart-queued) {
+	opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:where([data-animate]) :where(*) {
+		transition-duration: 1ms !important;
+		transition-delay: 0ms !important;
+	}
+}

@@ -1,0 +1,99 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Styling | Lines and marks"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Lines and marks
+				p.lead The baseline, connectors, the callout and the bar width.
+
+	+section("Baseline and connectors")
+		p The baseline and the connectors between waterfall steps each have a colour, width and opacity. #[code --tablechart-connector-dash] sets the dashes.
+
+		+style.
+			.dotty {
+				--tablechart-connector-width: 2.5px;
+				--tablechart-connector-dash: 0 6;
+				--tablechart-connector-opacity: 1;
+				--tablechart-rule-width: 2px;
+				--tablechart-rule-opacity: 1;
+			}
+			/* A dash of 0 with round ends is a dot. */
+			.dotty .tablechart-connector {
+				stroke-linecap: round;
+			}
+
+		+chart
+			figure.dotty(data-chart="waterfall")
+				table
+					tbody
+						each row in [['Picked', '74.5', 'total'], ['Windfalls', '28.2'], ['Bruised', '-16.1'], ['Peelings', '-13.3'], ['Pressed', '73.3', 'total']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+	+section("The callout")
+		p The callout of a bracket or trend arrow is an ellipse by default. These variables set its corners, padding and background.
+
+		+style.
+			.pill {
+				--tablechart-badge-radius: 0.4em;
+				--tablechart-badge-padding: 0.4em 0.8em;
+			}
+
+		+chart
+			figure.pill(data-chart="column")
+				table
+					tbody
+						each row in [['Last season', '251.5'], ['This season', '279.6']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+				.chart-annotations
+					span(data-annotation="bracket") +11%
+
+	+section("Bar width")
+		p A bar is never wider than #[code --tablechart-bar-max]: #[code 60px] by default. Use #[code px], #[code %] of the chart width, #[code em] or #[code rem]. Set it to #[code none] for no maximum.
+
+		+chart
+			figure(data-chart="column" style="--tablechart-bar-max: 24px")
+				table
+					tbody
+						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '91']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+		table
+			thead
+				tr
+					th Variable
+					th Sets
+			tbody
+				tr
+					td: code --tablechart-rule-color / -width / -opacity
+					td The baseline
+				tr
+					td: code --tablechart-connector-color / -width / -dash / -opacity
+					td The connectors between waterfall steps
+				tr
+					td: code --tablechart-leader-color / -width / -opacity
+					td The line from a donut slice to its number
+				tr
+					td: code --tablechart-annotation-color / -width
+					td The lines and arrowheads of annotations
+				tr
+					td: code --tablechart-break-color / -width / -opacity
+					td The lines of a break in the scale
+				tr
+					td: code --tablechart-badge-surface / -padding / -radius / -border-width
+					td The callout
+				tr
+					td: code --tablechart-slice-gap
+					td The gap between donut slices, in the units of the plot: 4 by default
+				tr
+					td: code --tablechart-bar-max
+					td The widest a bar may be: 60px by default

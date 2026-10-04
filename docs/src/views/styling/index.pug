@@ -1,0 +1,92 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Styling | Getting started"
+
+append styles
+	link(rel="preconnect" href="https://fonts.googleapis.com")
+	link(rel="preconnect" href="https://fonts.gstatic.com" crossorigin)
+	link(rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400&display=swap")
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Styling
+				p.lead What a chart looks like by default, and where to change it.
+
+	+section("Default")
+		p If no variables are set, a chart uses the text colour of the page. Donut slices and lines get lighter one by one. All text uses the font of the page.
+
+		.plain
+			+chart
+				figure(data-chart="waterfall")
+					figcaption: b Nothing set
+					table
+						tbody
+							each row in [['Picked', '74.5', 'total'], ['Windfalls', '28.2'], ['Bruised', '-16.1'], ['Peelings', '-13.3'], ['Pressed', '73.3', 'total']]
+								tr(data-kind=row[2])
+									th= row[0]
+									td= row[1]
+
+	+section("Where to set it")
+		p Charts are styled with CSS variables. To style every chart on a page, set them on #[code :root]. To style one chart, or the charts in one part of the page, set them on a class.
+
+		+codeblock('CSS').
+			:root {
+				--tablechart-bar-color: #e4572e;
+			}
+			.highlight {
+				--tablechart-bar-color: #f2b134;
+			}
+
+		p A variable can also be set on the chart itself, with #[code style].
+
+		+codeblock('HTML')
+			figure(data-chart="column" style="--tablechart-bar-color: #e4572e")
+
+	+section("Make one bar stand out")
+		p A class on a row of the table is copied to everything drawn for that row: its bar, its number and its name. Use it to give one bar its own colour, and its number its own font. The font here is Roboto Slab, from Google Fonts.
+
+		+style.
+			.granny {
+				--tablechart-bar-color: #7fb03f;
+				--tablechart-value-color: #5d8a2b;
+			}
+			.tablechart-value.granny {
+				font-family: "Roboto Slab", Rockwell, serif;
+				font-weight: 400;
+				font-size: 2.2em;
+			}
+
+		+chart
+			figure(data-chart="column")
+				figcaption
+					b Apples sold by variety
+					br
+					span thousands
+				table
+					tbody
+						tr
+							th Elstar
+							td 128
+						tr.granny
+							th Granny Johnson
+							td 45
+						tr
+							th Jonagold
+							td 135
+						tr
+							th Braeburn
+							td 121
+
+		p The class is also copied to the slice and the legend name of a donut, and to the bar of a bar chart or a waterfall.
+
+	+section("The pages in this section")
+		ul
+			li #[a(href=url('/styling/colours.html')) Colours]: one colour for all bars, colours for a waterfall, and a palette.
+			li #[a(href=url('/styling/background.html')) Background]: the colour that text inside bars uses.
+			li #[a(href=url('/styling/text.html')) Text]: the sizes of the text in a chart.
+			li #[a(href=url('/styling/lines.html')) Lines and marks]: the baseline, connectors, the callout and the bar width.
+			li #[a(href=url('/styling/animation.html')) Animation]: how fast a chart builds.
+			li #[a(href=url('/reference/variables.html')) All variables].

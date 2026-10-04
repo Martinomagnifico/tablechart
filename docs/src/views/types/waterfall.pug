@@ -1,0 +1,45 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Chart types | Waterfall"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Waterfall
+				p.lead Steps between totals.
+
+	+section("Steps and totals")
+		p Add #[code data-kind="total"] to a row to make it a total. A total starts at the baseline. The other rows are steps up or down from the running total. A negative number is a step down.
+
+		+chart
+			figure(data-chart="waterfall")
+				figcaption
+					b What happened to the crop
+					br
+					span thousands of apples
+				table
+					tbody
+						each row in [['Picked', '74.5', 'total'], ['Windfalls', '28.2'], ['Bruised', '-16.1'], ['Peelings', '-13.3'], ['Pressed', '73.3', 'total']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+	+section("Totals are not calculated")
+		p Tablechart shows the total you write. It does not add up the steps. If your numbers are rounded, the total stays as you wrote it. Here the steps add up to 73.3, and the total is 73.4.
+
+		+chart
+			figure(data-chart="waterfall")
+				table
+					tbody
+						each row in [['Picked', '74.5', 'total'], ['Windfalls', '28.2'], ['Bruised', '-16.1'], ['Peelings', '-13.3'], ['Pressed', '73.4', 'total']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+	+section("Numbers")
+		p If a step is tall enough, its number is shown inside it. If not, the number is shown next to it.
+
+	+section("Next")
+		p To set the colours of rising steps, falling steps and totals, see #[a(href=url('/styling/colours.html')) Colours].

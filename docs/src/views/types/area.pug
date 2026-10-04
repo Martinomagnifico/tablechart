@@ -1,0 +1,155 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Chart types | Area"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Area
+				p.lead A line chart with the space under the line filled.
+
+	+section("Area chart")
+		p Each row of the table is a point. The space between the line and zero is filled. The number is shown above each point.
+
+		+chart
+			figure(data-chart="area")
+				figcaption
+					b Visitors to the orchard
+					br
+					span thousands
+				table
+					tbody
+						each row in [['2021', '12'], ['2022', '19'], ['2023', '24'], ['2024', '31'], ['2025', '38']]
+							tr
+								th= row[0]
+								td= row[1]
+
+	+section("Several areas")
+		p Each value column is an area. The column header is the name of the area, shown at the end of its line. The areas overlap, so each one is see-through.
+
+		+chart
+			figure(data-chart="area")
+				figcaption: b Apples per tree
+				table
+					thead
+						tr
+							th Year
+							th North
+							th South
+					tbody
+						each row in [['2016', '41', '30'], ['2019', '58', '39'], ['2022', '77', '52'], ['2025', '105', '61']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+		p The numbers work as in a #[a(href=url('/types/line.html')) line chart]. With two areas, the number of the lower point is below it. If there is no room for it above zero, it is above the point.
+
+	+section("Highlight an area")
+		p Add #[code data-kind="focus"] to the header of a column. That area keeps its colour and shows its numbers. The other areas are shown fainter.
+
+		+chart
+			figure(data-chart="area")
+				table
+					thead
+						tr
+							th Year
+							th(data-kind="focus") North
+							th South
+							th East
+					tbody
+						each row in [['2016', '41', '30', '22'], ['2019', '58', '39', '35'], ['2022', '77', '52', '41'], ['2025', '105', '61', '70']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+								td= row[3]
+
+	+section("Change the fill")
+		p The fill has the colour of the line, at 25% opacity. To change it, set these variables.
+
+		table
+			thead
+				tr
+					th Variable
+					th Sets
+			tbody
+				tr
+					td: code --tablechart-area-opacity
+					td The opacity of the fill. The default is #[code 0.25].
+				tr
+					td: code --tablechart-area-color
+					td The colour of the fill. By default, the colour of the line.
+
+		+chart
+			figure(data-chart="area" style="--tablechart-area-opacity: 0.5")
+				table
+					tbody
+						each row in [['2021', '12'], ['2022', '19'], ['2023', '24'], ['2024', '31'], ['2025', '38']]
+							tr
+								th= row[0]
+								td= row[1]
+
+	+section("Stacked areas")
+		p Add #[code data-chart-stack] to the figure. Each area starts on top of the one before it, the first value column at the bottom. Each number is shown in the middle of its area, if there is room for it. If you point at the row, or tap it, the numbers of that row are shown.
+
+		+chart
+			figure(data-chart="area" data-chart-stack)
+				figcaption
+					b Apples sold
+					br
+					span thousands
+				table
+					thead
+						tr
+							th Year
+							th Farm shop
+							th Market
+					tbody
+						each row in [['2023', '64', '38'], ['2024', '71', '45'], ['2025', '69', '57'], ['2026', '80', '62']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+		p Stacked areas do not overlap, so their default opacity is #[code 0.5].
+		p A value below zero takes no room in a stack.
+
+	+section("Steps")
+		p Add #[code data-chart-shape="step"] to the figure. Each value is flat across the width of its row, and the line goes straight up or down to the next row. A number is shown only where the value changes, in the middle of the rows that have that value. If a number is wider than those rows, it is left out. If you point at the row, or tap it, the numbers of that row are shown.
+
+		+chart
+			figure(data-chart="area" data-chart-stack data-chart-shape="step" data-chart-legend)
+				figcaption
+					b Land at the orchard
+					br
+					span share of the land, by kind of tree
+				table
+					thead
+						tr
+							th Year
+							th Apple trees
+							th Pear trees
+					tbody
+						each row in [['2014', 90], ['2015', 90], ['2016', 90], ['2017', 75], ['2018', 75], ['2019', 75], ['2020', 75], ['2021', 60], ['2022', 60], ['2023', 55], ['2024', 55], ['2025', 55]]
+							tr
+								th= row[0]
+								td #{row[1]}%
+								td #{100 - row[1]}%
+
+	+section("Missing values")
+		p If a cell has no number, such as #[code n/a], the area has a gap there.
+
+		+chart
+			figure(data-chart="area")
+				table
+					tbody
+						each row in [['Jan', '88'], ['Feb', '74'], ['Mar', 'n/a'], ['Apr', '49'], ['May', '55']]
+							tr
+								th= row[0]
+								td= row[1]
+
+	+section("Next")
+		p To show the names in a row under the chart, see #[a(href=url('/features/legends.html')) Legends].

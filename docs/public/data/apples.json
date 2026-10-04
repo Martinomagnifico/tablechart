@@ -1,0 +1,8 @@
+{
+	"series": ["2022", "2026"],
+	"rows": [
+		{ "label": "Elstar", "values": ["118", "131"] },
+		{ "label": "Jonagold", "values": ["140", "135"] },
+		{ "label": "Braeburn", "values": ["109", "121"] }
+	]
+}

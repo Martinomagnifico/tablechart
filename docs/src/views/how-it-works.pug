@@ -1,0 +1,57 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "How it works"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 How it works
+				p.lead How a table becomes a chart, and when the chart builds.
+
+	+section("From table to chart")
+		p When you call #[code init()], Tablechart finds every element with #[code data-chart]. It reads the table in it: the first cell of a row is the label, the other cells are values. Then it adds the chart to the element.
+		p The table stays in the page, hidden from view. Screen readers read it, and a translation script finds the labels in it.
+
+	+section("When a chart builds")
+		p A chart builds when it scrolls into view. By default, half of the chart must be in view. Set #[code threshold] to change that, from #[code 0] to #[code 1].
+		p If #[code replay] is #[code true], a chart builds again each time it scrolls back into view. If not, it builds once.
+
+		+codeblock('JS').
+			init({
+			  threshold: 0.5,
+			  replay: false
+			});
+
+	+section("Inside an animated container")
+		p If a chart is inside an element that animates in, for example with a CSS animation, the chart builds when that animation is halfway. Then the chart builds in a container that can already be seen. See #[a(href=url('/features/animated-parents.html')) Animated parents].
+
+	+section("Text")
+		p All text in a chart is HTML: the title, the names and the numbers. It uses the font of the page. Only the bars, lines and slices are SVG.
+
+	+section("Size")
+		p A chart fills the width of its container. Its height is a share of its width, set with #[code data-chart-aspect], but never less than #[code --tablechart-min-height], 200px by default. If the width changes, the chart is laid out again.
+
+	+section("Reduced motion and print")
+		p If the visitor prefers reduced motion, charts build without animation. When the page is printed, every chart is shown whole.
+
+	+section("Accessibility")
+		p Screen readers read the table, not the drawing. See #[a(href=url('/features/accessibility.html')) Accessibility].
+
+	+section("Next")
+		p See #[a(href=url('/get-started.html')) Get started] to add Tablechart to your page.
+
+	hr
+	section.no-hr
+		.container
+			+anchor(title="Support this project")
+			p Tablechart is free. If it saved you time, a coffee goes a long way.
+
+			a.btn.solid.chevron(href="https://ko-fi.com/martinomagnifico" target="_blank" rel="noopener")
+				+coffee()
+				| Support my work on Ko-fi
+				+chevron()
+
+
+

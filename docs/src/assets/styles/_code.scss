@@ -1,0 +1,174 @@
+
+code, .code {
+	background: var(--bg-surface-tint-contrast);
+
+	.card & {
+		background: var(--bg-surface);
+		background: var(--doc-code-transparent);
+	}
+	.card .card & {
+		background: var(--doc-code-transparent);
+	}
+
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 1em;
+	display: inline-block;
+}
+
+.card .card {
+	border-radius: 4px;
+}
+
+p code, li code, dl code, dt.code, td code, h3 code {
+	background: var(--doc-code-transparent);
+	padding: 0em 0.3em;
+	font-size: 0.9em;
+}
+
+p code, li code, h3.code, dt.code {
+	display: inline;
+	align-self: start;
+}
+
+pre {
+	border-radius: 6px;
+	padding: 1rem;
+	overflow-x: auto;
+	margin-bottom: 1rem;
+
+	code {
+		background: none;
+		padding: 0;
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	pre code {
+		opacity: 0.8;
+	}
+}
+
+.card pre,
+.card code,
+.code-block pre {
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+	overflow-x: visible;
+}
+
+dl.horizontal {
+	display: grid;
+	grid-template-columns: max-content auto;
+	gap: 1rem;
+}
+
+.code-block {
+	position: relative;
+	border-radius: 6px;
+	background: var(--bg-surface-tint-contrast);
+
+	.card & {
+		background: var(--bg-surface-off);
+	}
+	.card .tab-content &,
+	.card.indented &,
+	.card-content & {
+		background: var(--bg-surface-tint-contrast);
+	}
+
+	.code-header {
+		padding: 0.5rem 0.5rem 0.5rem 1rem;
+		border-bottom: 1px solid var(--border-default);
+		border-radius: 6px 6px 0 0;
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--text-muted);
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	pre {
+		margin: 0;
+		border-radius: 0 0 6px 6px;
+	}
+}
+
+// A block that JS writes itself is kept away from hljs (see _scripts.pug), so it never gets the .hljs class, and without that class the inline-code background above shows through. Clear it here. It needs `pre code.live-code` to out-rank `.card code`.
+pre code.live-code {
+	background: none;
+	padding: 0;
+	tab-size: 2;
+}
+
+.hljs {
+	tab-size: 2;
+
+	pre &:is(code) {
+		padding: 0;
+		background: none;
+	}
+
+	&-ln {
+		td.hljs-ln-numbers {
+			-webkit-touch-callout: none;
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+			text-align: right;
+			color: var(--text-muted);
+			opacity: 0.5;
+			padding-right: 1.5rem;
+			vertical-align: top;
+		}
+		&-code {
+			padding-left: 10px;
+		}
+
+		// In a code block with data-lines, the other lines are dimmed.
+		pre[data-lines] & tr:not(.is-highlighted) td {
+			opacity: 0.5;
+		}
+	}
+	&-attribute, &-doctag, &-keyword, &-meta &-keyword,
+	&-name, &-selector-tag, &-section, &-title {
+		font-weight: 600;
+	}
+}
+
+.hljs-code, .hljs-comment, .hljs-formula {
+	color: light-dark(var(--text-muted), white);
+	opacity: 0.8;
+}
+
+
+
+
+
+
+button.copy {
+	background: none;
+	border: none;
+	border-radius: 3px;
+	padding: 0.2rem 0.5rem;
+	font-size: 1rem;
+	font-weight: 400;
+	color: var(--btn-plain-text);
+	cursor: pointer;
+	transition: background 0.125s, color 0.125s;
+	outline-width: 2px;
+	outline-offset: 2px;
+
+	&:hover {
+		background: var(--btn-plain-hover-bg);
+		color: var(--btn-plain-text-hover);
+	}
+}
+
+// A line of text in a card, just above its code block.
+.code-note {
+	margin: 0;
+}

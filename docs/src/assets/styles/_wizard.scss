@@ -1,0 +1,53 @@
+.card.install-wizard {
+
+	.tabs {
+		padding-left: 0;
+		padding-right: 0;
+		margin-top: 3px;
+		button {
+			flex: 1;
+			@container (min-width: 512px) {
+				flex-grow: 0;
+				min-width: 160px;
+			}
+		}
+
+	}
+	.card-content {
+
+		@container (min-width: 768px) {
+			padding: 2rem;
+		}
+	}
+
+
+}
+
+.arrowdown {
+	color: var(--border-default);
+	position: relative;
+	width: 100%;
+
+	svg {
+		margin: -0.5rem auto -1rem auto;
+		display: block;
+		transform: scale(0.8);
+	}
+
+	&:before,
+	&:after {
+		content: '';
+		position: absolute;
+		top: 0;
+		width: calc(50% - 16px);
+		height: 50%;
+		border-bottom: 1px solid currentColor;
+	}
+	&:before{
+		left: 0;
+	}
+	&:after{
+		right: 0;
+	}
+
+}

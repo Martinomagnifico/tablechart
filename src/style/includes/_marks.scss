@@ -1,0 +1,149 @@
+@use "tokens" as *;
+
+.tablechart-bar {
+	fill: var(--tablechart-bar-color, currentColor);
+
+	&[data-kind="up"] {
+		fill: var(--tablechart-up-color, var(--tablechart-bar-color, currentColor));
+	}
+	&[data-kind="down"] {
+		fill: var(--tablechart-down-color, var(--tablechart-bar-color, currentColor));
+	}
+	&[data-kind="total"] {
+		fill: var(--tablechart-total-color, var(--tablechart-bar-color, currentColor));
+	}
+
+	// A bar in a grouped chart takes the colour of its series, as a line does.
+	&[data-series] {
+		fill: #{$seriesink};
+	}
+}
+
+// A piece of a stacked bar, in the colour of its series.
+.tablechart-piece {
+	fill: #{$seriesink};
+}
+
+// The numbers of a grouped chart are a bit smaller, so they fit above their bars.
+.tablechart-plot[data-grouped] :where(.tablechart-value) {
+	font-size: calc(var(--tablechart-group-value-size, 0.95em) * var(--tablechart-fit, 1));
+}
+
+// Strokes are given in screen pixels, not viewBox units, so a rule is the same
+// weight in a small multiple as in a chart that fills the page.
+.tablechart-rule {
+	stroke: var(--tablechart-rule-color, currentColor);
+	stroke-width: var(--tablechart-rule-width, 1px);
+	opacity: var(--tablechart-rule-opacity, 0.45);
+	vector-effect: non-scaling-stroke;
+}
+
+.tablechart-connector {
+	stroke: var(--tablechart-connector-color, currentColor);
+	stroke-width: var(--tablechart-connector-width, 1px);
+	stroke-dasharray: var(--tablechart-connector-dash, 2 3);
+	opacity: var(--tablechart-connector-opacity, 0.55);
+	fill: none;
+	vector-effect: non-scaling-stroke;
+}
+
+// A line through the values, and the points on it.
+.tablechart-series {
+	stroke: #{$seriesink};
+	stroke-width: var(--tablechart-series-width, 2px);
+	stroke-linecap: round;
+	fill: none;
+	vector-effect: non-scaling-stroke;
+}
+
+// The space under a line, in an area chart. The opacity is on the group, so the
+// pieces of one area do not show where they meet.
+.tablechart-area {
+	fill: var(--tablechart-area-color, #{$seriesink});
+	opacity: var(--tablechart-area-opacity, 0.25);
+
+	// Next to a highlighted area, at half the opacity.
+	&[data-muted] {
+		opacity: calc(var(--tablechart-area-opacity, 0.25) / 2);
+	}
+
+	// Stacked areas do not overlap, so they are less see-through.
+	&[data-stacked] {
+		opacity: var(--tablechart-area-opacity, 0.5);
+	}
+	&[data-stacked][data-muted] {
+		opacity: calc(var(--tablechart-area-opacity, 0.5) / 2);
+	}
+}
+
+// A dashed or dotted line, from `data-line` on its column header. Each piece
+// starts its dashes where the piece before it ended.
+.tablechart-series[data-line="dashed"] {
+	stroke-dasharray: var(--tablechart-dash, 6 4);
+	stroke-dashoffset: var(--along, 0);
+}
+.tablechart-series[data-line="dotted"] {
+	stroke-dasharray: var(--tablechart-dot, 0 4);
+	stroke-dashoffset: var(--along, 0);
+}
+
+.tablechart-point {
+	fill: var(--tablechart-point-color, #{$seriesink});
+
+	// Every second series has open points, so two lines stay apart without colour.
+	// Open: the line under it is cut out, so the background shows through.
+	&[data-open] {
+		fill: none;
+		stroke: var(--tablechart-point-color, #{$seriesink});
+		stroke-width: var(--tablechart-series-width, 2px);
+		vector-effect: non-scaling-stroke;
+	}
+}
+
+// A ring names no colour of its own either. Every slice is the same ink, stepped
+// towards the surface behind it by its place in the table, so a chart that is told
+// nothing still tells its slices apart — and a page that wants a palette writes
+// one rule with a class and an element, which wins.
+.tablechart-slice {
+	fill: none;
+	stroke: #{$sliceink};
+}
+
+// A gap between two slices, as a line in the mask of the ring: black is cut out.
+// Its width is in the plot's own units, so it scales with the ring.
+.tablechart-divide {
+	stroke: #000;
+	stroke-width: var(--tablechart-slice-gap, 4);
+	fill: none;
+}
+
+// The short reach from a slice to the number that belongs to it.
+.tablechart-leader {
+	stroke: var(--tablechart-leader-color, currentColor);
+	stroke-width: var(--tablechart-leader-width, 1px);
+	opacity: var(--tablechart-leader-opacity, 0.45);
+	fill: none;
+	vector-effect: non-scaling-stroke;
+}
+
+// The whole, in the hole.
+.tablechart-centre {
+	position: absolute;
+	transform: translate(-50%, -50%);
+	white-space: nowrap;
+	text-align: center;
+	font-size: var(--tablechart-centre-size, 1.6em);
+	color: var(--tablechart-centre-color, currentColor);
+}
+
+// The two lines of a break in the scale. The gap between them is cut out of the
+// marks with a mask, so the background shows through.
+.tablechart-break {
+	&[data-part="edge"] {
+		fill: none;
+		stroke: var(--tablechart-break-color, currentColor);
+		stroke-width: var(--tablechart-break-width, 1px);
+		opacity: var(--tablechart-break-opacity, 0.55);
+		vector-effect: non-scaling-stroke;
+	}
+}

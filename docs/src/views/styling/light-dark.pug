@@ -1,0 +1,128 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Styling | Light and dark"
+
+append styles
+	link(rel="preconnect" href="https://fonts.googleapis.com")
+	link(rel="preconnect" href="https://fonts.gstatic.com" crossorigin)
+	link(rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400&display=swap")
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Light and dark
+				p.lead How charts look in light mode and in dark mode.
+
+	+section("By default")
+		p By default, a chart uses the text colour of the page. If the text is light in dark mode, the bars are light too. You do not need to set anything.
+
+	+section("A colour you set")
+		p A colour you set is used in light mode and in dark mode. That is fine if the colour can be read on both, such as a medium orange. If you do not use dark mode, you can stop here.
+
+	+section("Two colours")
+		p If a colour does not work on both, give it two values with #[code light-dark()]: the first for light mode, the second for dark mode. Every colour you set needs two values.
+
+		+codeblock('CSS').
+			.granny {
+				--tablechart-bar-color: light-dark(#7fb03f, #a5d46a);
+				--tablechart-value-color: light-dark(#5d8a2b, #c3e59a);
+			}
+
+		p The two values can be any colour: a hex value, a named CSS colour or a variable. If your site already has variables for its colours, use those.
+
+		+codeblock('CSS').
+			:root {
+				--brand-green: #7fb03f;
+				--brand-green-light: #a5d46a;
+			}
+			.granny {
+				--tablechart-bar-color: light-dark(var(--brand-green), var(--brand-green-light));
+			}
+			.elstar {
+				--tablechart-bar-color: light-dark(seagreen, palegreen);
+			}
+
+		p #[code light-dark()] only works if the page says it has a light and a dark mode, with #[code color-scheme]. To follow the setting of the system, set it on #[code :root]:
+
+		+codeblock('CSS').
+			:root {
+				color-scheme: light dark;
+			}
+
+		p If your site has its own dark theme, set #[code color-scheme: dark] on the class of that theme.
+
+	+section("Try it")
+		p The buttons in the example set #[code color-scheme] on this example only. The Granny Johnson column and its number have two colours each. The other columns use one colour.
+
+		+style.
+			.scheme-example .demo {
+				background: light-dark(#f7f2f5, #1d2b33);
+				color: light-dark(#16323f, #e9eef1);
+				--tablechart-surface: light-dark(#f7f2f5, #1d2b33);
+			}
+			.scheme-example .granny {
+				--tablechart-bar-color: light-dark(#7fb03f, #a5d46a);
+				--tablechart-value-color: light-dark(#5d8a2b, #c3e59a);
+			}
+			.scheme-example .tablechart-value.granny {
+				font-family: "Roboto Slab", Rockwell, serif;
+				font-weight: 400;
+				font-size: 2.2em;
+			}
+
+		.scheme-example
+			.scheme-toggle(role="group" aria-label="Colour scheme of the example")
+				button(type="button" data-scheme="light" aria-pressed="true") Light
+				button(type="button" data-scheme="dark" aria-pressed="false") Dark
+			+chart
+				figure(data-chart="column")
+					figcaption
+						b Apples sold by variety
+						br
+						span thousands
+					table
+						tbody
+							tr
+								th Elstar
+								td 128
+							tr.granny
+								th Granny Johnson
+								td 45
+							tr
+								th Jonagold
+								td 135
+							tr
+								th Braeburn
+								td 121
+
+		script.
+			document.querySelectorAll('.scheme-toggle button').forEach(function (button) {
+				button.addEventListener('click', function () {
+					var demo = document.querySelector('.scheme-example .demo');
+					demo.style.colorScheme = button.dataset.scheme;
+					button.parentElement.querySelectorAll('button').forEach(function (other) {
+						other.setAttribute('aria-pressed', String(other === button));
+					});
+				});
+			});
+
+	+section("The long way")
+		p Without #[code light-dark()], set the variable again for dark mode. This follows the setting of the system only.
+
+		+codeblock('CSS').
+			.granny {
+				--tablechart-bar-color: #7fb03f;
+			}
+			@media (prefers-color-scheme: dark) {
+				.granny {
+					--tablechart-bar-color: #a5d46a;
+				}
+			}
+
+	+section("Numbers inside bars")
+		p The number inside a bar is dark or light, whichever reads on the colour of the bar. You do not need to set it for light and dark mode. To set it yourself, use #[code --tablechart-bar-ink], #[code --tablechart-up-ink], #[code --tablechart-down-ink] or #[code --tablechart-total-ink].
+
+	+section("Background")
+		p The background colour of a chart, #[code --tablechart-surface], is the background the browser uses for the page: white in light mode and dark in dark mode. Lighter lines and slices are mixed with it. If your page has another background, set #[code --tablechart-surface] with two values as well. See #[a(href=url('/styling/background.html')) Background].

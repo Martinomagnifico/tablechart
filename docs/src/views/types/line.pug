@@ -1,0 +1,174 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Chart types | Line"
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Line
+				p.lead A line through the values, or several lines.
+
+	+section("Line chart")
+		p Each row of the table is a point. The number is shown above each point.
+
+		+chart
+			figure(data-chart="line")
+				figcaption
+					b Rainfall at the orchard
+					br
+					span millimetres
+				table
+					tbody
+						each row in [['Jan', '88'], ['Feb', '74'], ['Mar', '61'], ['Apr', '49']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+	+section("Several lines")
+		p Each value column is a line. The column header is the name of the line, shown at the end of the line.
+
+		+chart
+			figure(data-chart="line")
+				figcaption: b Apples per tree
+				table
+					thead
+						tr
+							th Year
+							th North
+							th South
+					tbody
+						each row in [['2016', '41', '30'], ['2019', '58', '39'], ['2022', '77', '52'], ['2025', '105', '61']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+		p The numbers depend on the number of lines:
+		ul
+			li One line: the number is above each point.
+			li Two lines: the number of the higher point is above it, the number of the lower point below it.
+			li Three lines or more: no numbers, unless one line is highlighted. If you point at a point, or tap it, the numbers of that row are shown.
+
+	+section("Points")
+		p With several lines, each line has its own point, in this order: a filled circle, an open circle, a filled square, an open square, a filled diamond and an open diamond. A seventh line starts again with the filled circle. The legend shows the same points.
+
+		+chart
+			figure(data-chart="line" data-chart-legend)
+				figcaption: b Apples per tree
+				table
+					thead
+						tr
+							th Year
+							th North
+							th South
+							th East
+							th West
+					tbody
+						each row in [['2016', '41', '30', '22', '12'], ['2019', '58', '39', '35', '20'], ['2022', '77', '52', '41', '33'], ['2025', '105', '61', '70', '45']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+								td= row[3]
+								td= row[4]
+
+		p To choose the point of a line, add #[code data-marker] to its column header: #[code circle], #[code square] or #[code diamond]. Add #[code open] for an open point, such as #[code data-marker="diamond open"].
+
+		+chart
+			figure(data-chart="line" data-chart-legend)
+				table
+					thead
+						tr
+							th Year
+							th(data-marker="diamond") North
+							th(data-marker="diamond open") South
+					tbody
+						each row in [['2016', '41', '30'], ['2019', '58', '39'], ['2022', '77', '52'], ['2025', '105', '61']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+		p An open point is cut out of the line, so the background shows through it.
+
+	+section("Dashed and dotted lines")
+		p Add #[code data-line="dashed"] or #[code data-line="dotted"] to the column header of a line. The legend shows the same line.
+
+		+chart
+			figure(data-chart="line" data-chart-legend)
+				figcaption: b Apples per tree
+				table
+					thead
+						tr
+							th Year
+							th North
+							th(data-line="dashed") South
+							th(data-line="dotted") East
+							th West
+					tbody
+						each row in [['2016', '41', '30', '22', '12'], ['2019', '58', '39', '35', '20'], ['2022', '77', '52', '41', '33'], ['2025', '105', '61', '70', '45']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+								td= row[3]
+								td= row[4]
+
+		p #[code --tablechart-dash] and #[code --tablechart-dot] set the pattern, in pixels: #[code 6 4] and #[code 0 4] by default.
+		p To give each line its own colour, use a #[a(href=url('/styling/colours.html')) palette].
+
+	+section("Highlight a line")
+		p Add #[code data-kind="focus"] to the header of a line. That line keeps its colour and shows its numbers. The other lines are shown fainter.
+
+		+chart
+			figure(data-chart="line")
+				table
+					thead
+						tr
+							th Year
+							th(data-kind="focus") North
+							th South
+							th East
+					tbody
+						each row in [['2016', '41', '30', '22'], ['2019', '58', '39', '35'], ['2022', '77', '52', '41'], ['2025', '105', '61', '70']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+								td= row[3]
+
+	+section("Steps")
+		p Add #[code data-chart-shape="step"] to the figure. Each value is a flat line across the width of its row, and the line goes straight up or down to the next row. A step line has no points. A number is shown only where the value changes, in the middle of the rows that have that value.
+
+		+chart
+			figure(data-chart="line" data-chart-shape="step")
+				figcaption
+					b Price of a bag of apples
+					br
+					span euros
+				table
+					tbody
+						each row in [['Jan', '2.40'], ['Feb', '2.40'], ['Mar', '2.60'], ['Apr', '2.60'], ['May', '2.60'], ['Jun', '2.90'], ['Jul', '2.90'], ['Aug', '2.70']]
+							tr
+								th= row[0]
+								td= row[1]
+
+	+section("Stacked lines")
+		p Add #[code data-chart-stack] to the figure. Each line starts on top of the one before it. For stacked lines, an #[a(href=url('/types/area.html')) area chart] is usually easier to read.
+
+	+section("Missing values")
+		p If a cell has no number, such as #[code n/a], the line has a gap there.
+
+		+chart
+			figure(data-chart="line")
+				table
+					tbody
+						each row in [['Jan', '88'], ['Feb', '74'], ['Mar', 'n/a'], ['Apr', '49'], ['May', '55']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+	+section("Next")
+		p To show the names in a row under the chart, see #[a(href=url('/features/legends.html')) Legends].
