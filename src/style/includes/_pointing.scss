@@ -1,7 +1,6 @@
 @use "tokens" as *;
 
-// While a row is pointed at, only its numbers are shown. Once a chart has been
-// pointed at, its numbers show and hide at once rather than in turn.
+// While a row is pointed at, only its numbers show; after that, numbers show and hide at once.
 
 .tablechart-plot[data-active] .tablechart-value:not([data-active]) {
 	visibility: hidden;
@@ -11,8 +10,7 @@
 	transition-delay: 0s;
 }
 
-// A plot that can be pointed at has the normal cursor, and its numbers cannot be
-// selected, so pointing at a row does not start a selection.
+// Numbers cannot be selected, so pointing at a row does not start a selection.
 .tablechart-plot[data-hover] {
 	cursor: default;
 
@@ -22,7 +20,6 @@
 	}
 }
 
-// The band behind the row that is pointed at.
 .tablechart-pointer {
 	position: absolute;
 	display: none;

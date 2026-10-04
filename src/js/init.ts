@@ -7,9 +7,7 @@ import { assignKeys } from "./functions/read-table";
 import { adoptTables, loadSources, readMarkdownRows } from "./functions/sources";
 import type { ChartState } from "./types";
 
-/** One chart, as `create` returns it and as `figure.tablechart` holds it. */
 export interface TablechartChart {
-	/** The element that holds the chart. */
 	figure: HTMLElement;
 	/** Lays the chart out again, for example after a script has changed its text. */
 	refresh(): void;
@@ -17,7 +15,6 @@ export interface TablechartChart {
 	destroy(): void;
 }
 
-/** What `init` returns: the charts it made, and a way to act on all of them. */
 export interface TablechartInstance {
 	charts: TablechartChart[];
 	/** Lays out every chart again, for example after a script has changed its text. */
@@ -28,27 +25,17 @@ export interface TablechartInstance {
 
 declare global {
 	interface HTMLElement {
-		/** The chart made of this element, by `init` or `create`. */
 		tablechart?: TablechartChart;
 	}
 }
 
-// Marks a figure that has been made into a chart, so a second `init` skips it.
 const MADE = "data-chart-made";
 
 const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/**
- * If the chart is inside something that animates in, such as a panel with a CSS
- * animation, this resolves when that animation is halfway, so the chart builds in
- * a panel that can already be seen. Every element from the chart up to the body
- * counts, and the chart itself, but only for a CSS animation: its own fade is a
- * transition. A frame first, so a script that starts the animation on the same
- * event has done so. Without an animation, or with reduced motion, it resolves at
- * once.
- */
+/** Resolves when an animation around the chart is halfway, so it builds in a panel that can already be seen. */
 const entrance = async (figure: HTMLElement): Promise<void> => {
 	if (reduced()) return;
 	await new Promise(requestAnimationFrame);
@@ -73,10 +60,7 @@ const entrance = async (figure: HTMLElement): Promise<void> => {
 	if (left > 0) await wait(left);
 };
 
-/**
- * The element around the chart that cannot be seen yet, with an opacity of 0, or
- * null. Such an element usually animates in later, when its own script says so.
- */
+/** The element around the chart with an opacity of 0, which usually animates in later. */
 const hiddenAround = (figure: HTMLElement): HTMLElement | null => {
 	for (let element: HTMLElement | null = figure; element && element !== document.body; element = element.parentElement) {
 		if (getComputedStyle(element).opacity === "0") return element;
@@ -84,11 +68,7 @@ const hiddenAround = (figure: HTMLElement): HTMLElement | null => {
 	return null;
 };
 
-/**
- * Resolves when the element starts an animation or a transition, so `entrance`
- * can then wait for it to be halfway. Also when a class or style makes it visible
- * without an animation.
- */
+/** Resolves when the element starts an animation or transition, or becomes visible without one. */
 const startOf = (element: HTMLElement): Promise<void> =>
 	new Promise((resolve) => {
 		const events = ["animationstart", "transitionrun"];
@@ -107,16 +87,13 @@ const startOf = (element: HTMLElement): Promise<void> =>
 		changes.observe(element, { attributes: true, attributeFilter: ["class", "style"] });
 	});
 
-// Every chart that is watching the language of the page. One watcher serves them all.
 const speakers = new Set<{ relabel(): void; refresh(): void }>();
 let language: MutationObserver | null = null;
 
 const listen = (chart: { relabel(): void; refresh(): void }): void => {
 	speakers.add(chart);
 	if (language) return;
-	// Numbers follow the language of the document without the chart being rebuilt.
-	// The text may now be longer or shorter, so the charts are laid out again, a
-	// frame later, after a translation script has had its turn.
+	// A language change reformats the numbers, then lays out again after a translation script has run.
 	language = new MutationObserver(() => {
 		for (const one of speakers) one.relabel();
 		requestAnimationFrame(() =>
@@ -135,9 +112,7 @@ const unlisten = (chart: { relabel(): void; refresh(): void }): void => {
 	language = null;
 };
 
-// A column chart and a bar chart have the same data, so one can be shown as the
-// other. `--tablechart-type` on the figure says which, for example in a container
-// query for a narrow chart.
+// `--tablechart-type` switches a column chart to a bar chart and back, for example in a container query.
 const SWITCHABLE = ["column", "bar"];
 
 const kindFor = (figure: HTMLElement): string | null => {
@@ -147,15 +122,10 @@ const kindFor = (figure: HTMLElement): string | null => {
 	return SWITCHABLE.includes(asked) ? asked : own;
 };
 
-/**
- * Watches one built chart: lays it out whenever it has a width and that width
- * changes, and shows it when it scrolls into view.
- */
 const watch = (first: ChartState, config: Config): TablechartChart => {
 	let state = first;
 	let kind = kindFor(state.figure);
-	// The width the chart was last laid out at. Without one, it has not been laid
-	// out yet and cannot be shown.
+	// The width it was last laid out at; null until it is laid out.
 	let placed: number | null = null;
 	let inView = false;
 	let waiting = false;
@@ -165,21 +135,16 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		const shown = state.figure.classList.contains("is-shown");
 		if (inView && placed !== null && !shown && !waiting) {
 			waiting = true;
-			// Something around the chart cannot be seen yet: wait until it starts to
-			// animate in, and then until it is halfway.
 			const hidden = reduced() ? null : hiddenAround(state.figure);
 			if (hidden) await startOf(hidden);
 			await entrance(state.figure);
 			waiting = false;
-			// It may have scrolled out again while waiting.
 			if (inView || !config.replay) setShown(state, true);
 		} else if (!inView && config.replay && shown) {
 			setShown(state, false);
 		}
 	};
 
-	// If `--tablechart-type` asks for the other kind, the chart is built again as
-	// that kind. A chart that has been shown stays shown, without animating again.
 	const switchKind = (): void => {
 		const wanted = kindFor(state.figure);
 		if (!wanted || wanted === kind) return;
@@ -191,7 +156,6 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		placed = null;
 	};
 
-	// Pass 3, whenever the chart has a width, and again when the width changes.
 	const place = (): void => {
 		switchKind();
 		const width = state.plot.clientWidth;
@@ -221,7 +185,6 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		{ threshold: config.threshold }
 	);
 
-	// On paper the chart is shown whole.
 	const print = () => setShown(state, true);
 
 	const refresh = () => {
@@ -229,8 +192,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		place();
 	};
 	const speaker = { relabel: () => relabel(state, config), refresh };
-	// Before the first layout, so a chart that starts narrow is built as the right
-	// kind straight away.
+	// Before the first layout, so a chart that starts narrow is the right kind straight away.
 	switchKind();
 
 	place();
@@ -254,11 +216,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 	return chart;
 };
 
-/**
- * Turns elements into figures with a table, ready to build: a table from Markdown
- * is wrapped, a JSON file becomes a table, and translation keys are added. All at
- * once, so two charts with the same `data-chart-keys` are found.
- */
+/** Turns elements into figures with a table and translation keys, all at once, so duplicate keys are found. */
 export const prepare = async (found: HTMLElement[], config: Config): Promise<HTMLElement[]> => {
 	const figures = adoptTables(found.filter((element) => !element.hasAttribute(MADE)));
 	await loadSources(figures);
@@ -267,7 +225,6 @@ export const prepare = async (found: HTMLElement[], config: Config): Promise<HTM
 	return figures;
 };
 
-// Pass 1 and 2: every label, before anything is laid out.
 const make = (figure: HTMLElement, config: Config): TablechartChart | null => {
 	const state = build(figure, config);
 	if (!state) return null;
@@ -275,17 +232,7 @@ const make = (figure: HTMLElement, config: Config): TablechartChart | null => {
 	return watch(state, config);
 };
 
-/**
- * Makes a chart of one element, and builds it when it scrolls into view. Returns
- * the chart, or null if the element has no data to draw. If the element is
- * already a chart, returns that chart.
- *
- * ```js
- * import { create } from "@martinomagnifico/tablechart";
- *
- * const chart = await create(document.querySelector("#sales"), { threshold: 0.3 });
- * ```
- */
+/** Makes a chart of one element; returns the existing chart if there is one, or null without data. */
 export const create = async (
 	element: HTMLElement,
 	options: Partial<Config> = {}
@@ -297,18 +244,7 @@ export const create = async (
 	return figure ? make(figure, config) : null;
 };
 
-/**
- * Makes charts of every element in `root` that matches the selector, and builds
- * each one when it scrolls into view. An element that is already a chart is
- * skipped.
- *
- * ```js
- * import { init } from "@martinomagnifico/tablechart";
- * import "@martinomagnifico/tablechart/style.css";
- *
- * init({ threshold: 0.5 });
- * ```
- */
+/** Makes a chart of every element in `root` that matches the selector, skipping existing charts. */
 export const init = async (
 	options: Partial<Config> = {},
 	root: ParentNode = document

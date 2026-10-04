@@ -35,28 +35,8 @@ const CHARTS: Record<string, ChartType> = { area, bar, column, donut, line, wate
 const ANNOTATIONS: Record<string, AnnotationType> = { "axis-break": axisBreak, trend, bracket };
 export const ANNOTATION_NAMES = Object.keys(ANNOTATIONS);
 
-/**
- * Tablechart draws in three passes, and the order is forced rather than chosen.
- *
- * A translation plugin collects the elements it will translate once, when it
- * starts, in a single sweep of the page. Anything created after that is invisible
- * to it for good. But a chart's geometry cannot be worked out until its figure
- * has a width, and a page that is not showing has none — so drawing has to wait
- * until after that sweep has happened.
- *
- * The two are reconciled by never making a text node in the late pass:
- *
- *   1. keys      — written onto the source table. Needs no layout.
- *   2. elements  — every label, category and badge, with its text and its key.
- *                  Needs no layout.
- *   3. geometry  — scales, marks, and the positions of things that already exist.
- *                  Needs layout, and makes no text.
- *
- * It pays twice: the third pass can run again whenever the figure changes size,
- * with no churn in the DOM and no translations lost along the way.
- */
+/** Three passes: keys, then every text element, then geometry. Geometry makes no text, so a translation script that sweeps once finds it all. */
 
-// The text before a line break in a title, without the break itself.
 const textBefore = (node: Node): string => {
 	let text = "";
 	for (let sibling = node.previousSibling; sibling; sibling = sibling.previousSibling) {
@@ -66,12 +46,7 @@ const textBefore = (node: Node): string => {
 	return text.trim();
 };
 
-/**
- * A screen reader reads a title and its subtitle as one sentence, "Apples picked
- * thousands", because a line break is not read. So a full stop is put before each
- * line break in the title, hidden from sight, and a screen reader pauses there.
- * Not if the line already ends with a mark that makes it pause.
- */
+/** A hidden full stop before each line break in the title, so a screen reader pauses there. */
 const pauseLines = (caption: HTMLElement): void => {
 	for (const br of caption.querySelectorAll("br")) {
 		if (br.previousElementSibling?.classList.contains(SR_CLASS)) continue;
@@ -83,13 +58,7 @@ const pauseLines = (caption: HTMLElement): void => {
 	}
 };
 
-/**
- * The row at the bottom of a donut's table for the total that Tablechart works
- * out, so screen readers read it with its name. Its name is the `totallabel`
- * option, with a translation key when the figure has `data-chart-keys`. The
- * number is formatted like the one in the middle. Made once: a chart built again
- * keeps the row it has.
- */
+/** A total row in a donut's table, so screen readers read the total with its name. */
 const addTotalRow = (figure: HTMLElement, centre: HTMLElement, config: Config): HTMLElement | null => {
 	const table = figure.querySelector("table");
 	if (!table) return null;
@@ -111,14 +80,9 @@ const addTotalRow = (figure: HTMLElement, centre: HTMLElement, config: Config): 
 	return cell;
 };
 
-// Each title that names a table gets an id that is unique on the page.
 let captions = 0;
 
-/**
- * The title of the chart is the name of the figure and of its table, so a screen
- * reader that reads the table, or jumps to it, reads the title and the unit with
- * it. A figure or table that has a name of its own keeps it.
- */
+/** The title names the figure and its table, for screen readers. A name of their own is kept. */
 const nameTable = (figure: HTMLElement): void => {
 	const caption = figure.querySelector<HTMLElement>(":scope > figcaption");
 	if (!caption) return;
@@ -128,24 +92,19 @@ const nameTable = (figure: HTMLElement): void => {
 		if (!caption.id) caption.id = `tablechart-caption-${++captions}`;
 		element.setAttribute("aria-labelledby", caption.id);
 	};
-	// Browsers do not all name a figure after its figcaption, so it is said. Only
-	// on a figure: a div, as around a Markdown table, may not have a name.
+	// Not every browser names a figure after its figcaption; a div may not have a name.
 	if (figure.tagName === "FIGURE" && !named(figure)) link(figure);
 	const table = figure.querySelector("table");
 	if (table && !named(table) && !table.querySelector(":scope > caption")) link(table);
 };
 
-/**
- * Pass 2. Everything a reader will read, before a translation script looks.
- *
- */
+/** Pass 2: everything a reader will read, before a translation script looks. */
 export const build = (
 	figure: HTMLElement,
 	config: Config,
 	asKind: string | null = null
 ): ChartState | null => {
-	// `asKind` builds the chart as another kind than `data-chart` says, such as a
-	// column chart as a bar chart on a narrow screen.
+	// `asKind` builds the chart as another kind, such as a column chart as a bar chart on a narrow screen.
 	const kind = asKind ?? (figure.getAttribute("data-chart") || "column");
 	const type = CHARTS[kind];
 	if (!type) {
@@ -165,8 +124,6 @@ export const build = (
 
 	nameTable(figure);
 
-	// Every value column is a series, but only a kind that draws them all is given
-	// more than the first.
 	let series = readSeries(figure, rows, config.langattribute);
 	if (series.length > 1 && !type.series) {
 		console.warn(
@@ -178,8 +135,6 @@ export const build = (
 	// How many lines or bars share the colour steps, so the last is not too light.
 	if (several) figure.style.setProperty("--tablechart-series-count", String(series.length));
 
-	// `data-chart-stack`: the series of a row on top of each other. A value below
-	// zero takes no room in a stack.
 	const stackAsked = figure.hasAttribute("data-chart-stack");
 	if (stackAsked && !type.stackable)
 		console.warn(`[${PLUGIN_ID}] A ${kind} chart cannot be stacked.`);
@@ -192,8 +147,7 @@ export const build = (
 			`[${PLUGIN_ID}] A stacked chart has a value below zero. It takes no room in the stack.`
 		);
 
-	// The drawing, its numbers and its names are hidden from screen readers: they
-	// read the table, which has the same numbers and names.
+	// Hidden from screen readers: they read the table, which has the same numbers and names.
 	const plot = document.createElement("div");
 	plot.className = PLOT_CLASS;
 	plot.setAttribute("aria-hidden", "true");
@@ -201,17 +155,13 @@ export const build = (
 	plot.appendChild(svg);
 	figure.appendChild(plot);
 
-	// On a chart with a middle, a total is the number in the middle rather than a
-	// mark, and a different kind of number from the marks: an amount in the middle of
-	// a ring of shares. So the marks take their decimal places from the marks alone,
-	// and the middle keeps the total's own (see `centre` below).
+	// The marks take their decimal places from the marks alone; the middle keeps the total's own.
 	const marked = type.centre ? rows.filter((r) => !r.isTotal) : rows;
 	const decimals = Math.max(
 		0,
 		...marked.flatMap((r) => r.cells.slice(0, series.length).map((c) => decimalsIn(c.number)))
 	);
 
-	// Each number goes with its row.
 	const seriesValues = series.map((_one, s) =>
 		rows.map((row, i) => {
 			const cell = row.cells[s] ?? row.cells[0];
@@ -222,7 +172,6 @@ export const build = (
 			if (cell.suffix) node.dataset.suffix = cell.suffix;
 			if (cell.missing) node.dataset.missing = cell.raw;
 			if (several) node.dataset.series = String(s + 1);
-			// Its row, counted from 1, so pointing at the row can show it.
 			node.dataset.row = String(i + 1);
 			node.style.setProperty("--i", String(row.slot));
 			return node;
@@ -230,8 +179,6 @@ export const build = (
 	);
 	const values = seriesValues[0];
 
-	// The total of each row of a stacked chart, above its stack. It arrives with the
-	// last piece of the stack.
 	const totals =
 		stacked && type.totals
 			? rows.map((row, i) => {
@@ -248,9 +195,6 @@ export const build = (
 				})
 			: [];
 
-	// With more than one series, each one is named: at the end of its line, or in a
-	// legend under the chart if the figure or the page asks for one. A name arrives
-	// with the last mark of its series, in either place.
 	const last = rows[rows.length - 1];
 	const focused = series.some((one) => one.focus);
 	const legendAsked = figure.getAttribute("data-chart-legend");
@@ -271,8 +215,7 @@ export const build = (
 				const swatch = type.legend ?? type.swatch;
 				if (swatch) node.dataset.swatch = swatch;
 				node.textContent = one.name;
-				// In a legend, a line has a sample of itself: a short line with its point.
-				// A step line has no points.
+				// A step line has no points, so its legend sample has none.
 				if (!swatch && figure.dataset.chartShape !== "step") {
 					const marker = markerOf(series, s);
 					node.dataset.marker = marker.shape;
@@ -289,9 +232,7 @@ export const build = (
 			})
 		: [];
 
-	// A chart with a middle gets one number more than it has rows. It is made here,
-	// with the rest of the text, so a translation sweep finds it — and it is filled
-	// by `relabel`, like every other number on the chart.
+	// Made with the rest of the text, so a translation script finds it; `relabel` fills it.
 	const centre = type.centre ? htmlEl(CENTRE_CLASS, plot) : null;
 	if (centre) {
 		const stated = rows.find((row) => row.isTotal);
@@ -302,23 +243,17 @@ export const build = (
 		if (stated) centre.dataset.decimals = String(decimalsIn(stated.number));
 	}
 
-	// A total that Tablechart works out, without a total row, is only in the
-	// middle of the ring, which screen readers do not read. So it is added to the
-	// table, in a row at the bottom, with its name: "Total, 74.5".
+	// A total that Tablechart works out is added to the table, so screen readers read it.
 	const totalCell = centre && !rows.some((row) => row.isTotal) ? addTotalRow(figure, centre, config) : null;
 
-	// Beside the marks or under the plot. Beside means inside the plot, because that
-	// is what the names are then positioned against; a chart that wants them there
-	// places each one itself, in pass 3, the way it places a value.
+	// Beside means inside the plot, and the chart places each name itself.
 	const beside = type.categories === "beside";
 	const categories = document.createElement("div");
 	categories.className = CATEGORIES_CLASS;
-	// Hidden from screen readers, which read the names in the table. `inert` as
-	// well as `aria-hidden`: Safari with VoiceOver reads the names otherwise.
+	// `inert` as well as `aria-hidden`: Safari with VoiceOver reads the names otherwise.
 	categories.setAttribute("aria-hidden", "true");
 	categories.inert = true;
 	if (beside) categories.dataset.place = "beside";
-	// Under a ring the names are a legend, not a row of bands: they share no columns.
 	else if (type.centre) categories.dataset.place = "key";
 	categories.style.setProperty("--tablechart-columns", String(rows.length));
 	let slice = 0;
@@ -327,9 +262,6 @@ export const build = (
 		span.classList.add(...row.classes);
 		span.textContent = row.label;
 		if (row.key && config.langattribute) span.setAttribute(config.langattribute, row.key);
-		// Under a ring the names are its key, so each one is told which slice it
-		// answers to. A total is the middle rather than a slice, and its name goes
-		// with it.
 		if (type.centre) {
 			span.dataset.kind = row.isTotal ? "total" : "slice";
 			if (!row.isTotal) {
@@ -339,9 +271,6 @@ export const build = (
 				slice += 1;
 			}
 		}
-		// A category is there from the start, like the baseline it stands under. It
-		// gets its row's timing anyway, so a page that wants the labels to arrive
-		// with their bars can say so in a stylesheet rather than wait for a release.
 		span.style.setProperty("--i", String(row.slot));
 		span.dataset.row = String(rows.indexOf(row) + 1);
 		categories.appendChild(span);
@@ -359,7 +288,6 @@ export const build = (
 				);
 				return null;
 			}
-			// The line it reads: `data-series`, counted from 1. It appears with that line.
 			const asked = Number.parseInt(spec.getAttribute("data-series") ?? "1", 10);
 			const index = asked >= 1 && asked <= series.length ? asked - 1 : 0;
 			if (asked !== index + 1)
@@ -371,7 +299,6 @@ export const build = (
 				type: annotationType,
 				badge: annotationType.create(spec, plot),
 				series: index,
-				// It lands after the data it is about: after every row.
 				after: rows.length,
 			};
 		})
@@ -389,7 +316,6 @@ export const build = (
 		values,
 		series,
 		seriesValues,
-		// Names in a legend are not placed by the chart, so they are not handed to it.
 		names: legend ? [] : names,
 		categories: Array.from(categories.children) as HTMLElement[],
 		centre,
@@ -406,10 +332,7 @@ export const build = (
 	return state;
 };
 
-// A length set with a CSS variable on the chart, in viewBox units: px, % of the
-// chart's width, em or rem. If it is not set, the fallback; if it is not a length,
-// such as `none`, null. The fallbacks are here rather than in the stylesheet, so
-// a value set on a parent still applies.
+// A CSS length in viewBox units, or null if it is not a length, such as `none`.
 const cssLength = (figure: HTMLElement, unit: number, name: string, fallback: string) => {
 	const style = getComputedStyle(figure);
 	const raw = style.getPropertyValue(name).trim() || fallback;
@@ -426,7 +349,6 @@ const cssLength = (figure: HTMLElement, unit: number, name: string, fallback: st
 	return amount * size * unit;
 };
 
-// The widest a bar may be: `--tablechart-bar-max`, 60px if not set, no maximum with `none`.
 const barMax = (figure: HTMLElement, unit: number): number =>
 	cssLength(figure, unit, "--tablechart-bar-max", "60px") ?? Number.POSITIVE_INFINITY;
 
@@ -438,24 +360,18 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	const widthPx = plot.clientWidth;
 	if (!widthPx) return false;
 
-	// viewBox units per screen pixel, so anything that should look the same at any
-	// size can be sized in pixels and converted here.
+	// viewBox units per screen pixel.
 	const unit = VIEWBOX_WIDTH / widthPx;
-	// A figure can ask for its own shape, which beats the kind's and the page's: a
-	// page of small multiples wants taller plots than a page with one wide chart.
+	// A figure's own `data-chart-aspect` beats the kind's and the page's.
 	const ownAspect = Number.parseFloat(state.figure.dataset.chartAspect ?? "");
 	const shaped = VIEWBOX_WIDTH * (ownAspect > 0 ? ownAspect : (type.aspect ?? config.aspect));
 
-	// Measured from the real elements rather than guessed at: they are already in
-	// the document, so their height is a fact and not a constant to be tuned.
 	plot.classList.add(PLACED_CLASS);
 	const labelHeight = (values[0]?.offsetHeight || 0) * unit;
 	const badgeHeight = annotations[0]?.badge
 		? (annotations[0].badge as HTMLElement).offsetHeight * unit
 		: 0;
-	// On a narrow screen the height stops following the width: it is never less
-	// than `--tablechart-min-height`, 200px if not set, and no minimum with `none`.
-	// A kind can need more than that, such as room for a number beside every bar.
+	// Never less than `--tablechart-min-height` (200px), or what the kind needs.
 	const height = Math.max(
 		shaped,
 		cssLength(state.figure, unit, "--tablechart-min-height", "200px") ?? 0,
@@ -469,8 +385,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		}) ?? 0
 	);
 
-	// In a stacked chart, a row's value is its total, so an annotation on a row reads
-	// the top of its stack.
+	// In a stacked chart a row's value is its total, so an annotation reads the top of its stack.
 	const stackedRows = state.stacked
 		? rows.map((row) => {
 				const value = stackTotal(row, series.length);
@@ -504,19 +419,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	const plotHeight = height - top - floor;
 	const ceiling = extent * 1.02;
 
-	// A break in the scale, when an annotation asks for one and the chart is the
-	// kind that can honour it. A range of values is compressed into a share of the
-	// plot that the author names, the way think-cell's breaks work: the marks still
-	// run through it, cut by the break, rather than the range being left out. It is
-	// read here rather than drawn here: the mark that says so is the annotation's.
-	//
-	//   data-from   where the compressed range starts; the baseline when left out
-	//   data-to     where it ends; the top of the scale when left out
-	//   data-at     the older spelling of data-from, kept so no page breaks
-	//   data-size   the share of the plot the range keeps, as a percentage
-	//
-	// So `data-to` alone cuts tall bars from the bottom, to give small differences
-	// on top of them room, and `data-from` alone squeezes one towering bar.
+	// The break squeezes `data-from` to `data-to` into `data-size` of the plot; `data-at` is the old spelling of `data-from`.
 	const breakSpec = annotations.find(
 		(a) => a.spec.getAttribute("data-annotation") === "axis-break"
 	)?.spec;
@@ -531,9 +434,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	if (breakSpec && (fromAsked !== null || toAsked !== null)) {
 		const lo = fromAsked ?? 0;
 		const hi = toAsked ?? ceiling;
-		// The zigzag goes where the compressed part meets the part read at full
-		// scale: at the bottom of a squeezed top, at the top of a cut bottom, and in
-		// the middle of a band compressed out of the middle.
+		// The zigzag goes where the compressed part meets the part at full scale.
 		const gap = toAsked === null ? lo : fromAsked === null ? hi : (lo + hi) / 2;
 
 		const sizeAsked = breakSpec.getAttribute("data-size");
@@ -548,8 +449,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 			0.8
 		);
 
-		// A step that floats, as a waterfall's movements do, has no baseline to be
-		// cut from: compressing any part of it would make its height lie outright.
+		// Compressing any part of a floating step would make its height lie.
 		const floats = segments.filter(
 			(s) =>
 				(s.kind === "up" || s.kind === "down") &&
@@ -573,9 +473,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	}
 	const breakAt = compress ? compress.gap : null;
 
-	// Three runs of scale: full below the break, compressed through it, full again
-	// above it. The two full runs keep one density between them, so heights on
-	// either side of the break still compare with each other.
+	// Full scale below and above the break, compressed through it.
 	const base = height - floor;
 	let y: (value: number) => number = (value) => base - (value / ceiling) * plotHeight;
 	if (compress) {
@@ -590,8 +488,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 			return base - lo * density - squeezed - BREAK_GAP - (value - hi) * density;
 		};
 	}
-	// The names of the series go past the end of the plot, so the bands give up the
-	// room the widest one needs, and the categories under them the same.
+	// The bands give up the room the widest series name needs.
 	const gutter = names.length
 		? Math.max(...names.map((name) => name.offsetWidth)) * unit + 12 * unit
 		: 0;
@@ -600,8 +497,6 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	const band = (VIEWBOX_WIDTH - gutter) / rows.length;
 	const cx = (i: number) => (i + 0.5) * band;
 
-	// Which row is at a point: by its band across the plot, or down it for a chart
-	// with its names beside the marks. Not for a ring.
 	const inRange = (i: number) => (i >= 0 && i < rows.length ? i : null);
 	state.rowAt = type.centre
 		? null
@@ -655,10 +550,9 @@ export const layout = (state: ChartState, config: Config): boolean => {
 
 	type.draw(geo);
 
-	// The names under the plot get smaller together if one of them, or one word in
-	// it, is wider than its column, down to 70%. They are never left out.
+	// Names under the plot shrink together, down to 70%, if one is wider than its column.
 	const nameRow = state.categories[0]?.parentElement;
-	if (nameRow && type.categories !== "beside") {
+	if (nameRow && type.categories !== "beside" && !type.centre) {
 		fitTogether(
 			nameRow,
 			state.categories.filter((name) => name.offsetParent !== null),
@@ -691,8 +585,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		});
 	}
 
-	// A callout is a hole in the marks under it, so the background shows through it.
-	// The hole has the callout's shape, and appears with it.
+	// A callout is a hole in the marks under it, so the background shows through.
 	const holes = annotations.flatMap(({ badge }) => {
 		if (!(badge instanceof HTMLElement) || !badge.offsetWidth) return [];
 		const width = badge.offsetWidth * unit;
@@ -740,10 +633,7 @@ export const relabel = (state: ChartState, config: Config): void => {
 	}
 };
 
-/**
- * Removes what `build` added to the figure, so it can be built again. The table
- * and the figure's own attributes stay.
- */
+/** Removes what `build` added, so the chart can be built again. */
 export const unbuild = (state: ChartState): void => {
 	state.plot.remove();
 	state.categories[0]?.parentElement?.remove();
@@ -757,11 +647,7 @@ export const setShown = (state: ChartState, shown: boolean): void => {
 	if (!shown) state.plot.removeAttribute("data-pointed");
 };
 
-/**
- * If a chart has numbers that were left out for lack of room, pointing at a row,
- * or tapping it, shows the numbers of that row and hides the other numbers for
- * that time. A chart with every number shown changes nothing.
- */
+/** Pointing at a row shows its numbers that were left out for lack of room. */
 const pointAt = (state: ChartState): void => {
 	const { plot } = state;
 	const labels = () => [...state.seriesValues.flat(), ...state.totals];

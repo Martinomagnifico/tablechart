@@ -1,12 +1,6 @@
 @use "tokens" as *;
 
-// Every rule here weighs one class, with whatever follows it wrapped in
-// `:where()`. A rule of your own with a class and an element, or with two
-// classes, therefore wins without a fight. One class is as light as it can go,
-// because a site's own styles often set `table`, `th`, `td` and `figure` by element.
-//
-// Nothing here names a colour. A chart takes the page's own text colour through
-// `currentColor` and turns around with it on a page whose background contrasts
+// Each rule weighs one class, the rest in `:where()`, so a site's own rules win. Nothing here names a colour.
 
 :root {
 	--cssimported-tablechart: true;
@@ -19,23 +13,12 @@
 	font-size: var(--tablechart-font-size, 1em);
 	line-height: var(--tablechart-line-height, 1.25);
 
-	// The caption above the plot: what the chart is, and what its unit is. It reads
-	// from the left whatever the page around it does, the way a chart's title does
-	// on paper — a page that wants it centred says so in one rule.
 	:where(figcaption) {
 		margin-bottom: var(--tablechart-caption-gap, 0.5em);
 		text-align: var(--tablechart-caption-align, left);
 	}
 
-	// The source table stays in the page, for screen readers, translation scripts
-	// and pages without scripts. It is clipped out of sight, but keeps its own
-	// layout across the width of the chart, a row per line: a screen reader then
-	// reads it cell by cell, and shows where it is reading on the chart, not in a
-	// corner of it. Clipped rather than transparent, because a browser can treat a
-	// transparent table as hidden, and then a screen reader cannot go through
-	// its cells. Its text stays selectable for the same reason: VoiceOver in Chrome
-	// moves through text the way a selection does. Being clipped, it cannot be
-	// pointed at.
+	// Clipped rather than hidden, so screen readers can go through the cells and VoiceOver shows where it reads.
 	position: relative;
 
 	:where(table),
@@ -57,8 +40,6 @@
 	}
 }
 
-// The plot box. Everything placed over it is positioned as a percentage of the
-// viewBox, so it keeps its spot at any size without being told about a resize.
 .tablechart-plot {
 	position: relative;
 
@@ -70,16 +51,13 @@
 	}
 }
 
-// Text is created before it can be placed, so it waits until the measuring pass
-// has run rather than appearing in the corner first.
+// Text waits until it has been placed, so it never shows in the corner first.
 .tablechart-plot:not(.is-placed) {
 	:where(.tablechart-value, .tablechart-badge, .tablechart-name) {
 		visibility: hidden;
 	}
 }
 
-// Text that only screen readers read, such as the pause between a title and its
-// subtitle. Hidden from sight rather than from the machine.
 .tablechart-sr {
 	position: absolute;
 	width: 1px;

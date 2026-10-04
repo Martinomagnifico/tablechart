@@ -1,9 +1,6 @@
-// The plugin id, and the prefix on anything this plugin prints to the console.
 export const PLUGIN_ID = "tablechart";
 
-// Written onto what Tablechart builds, whatever the page called the figure. The
-// stylesheet uses these names only, so a renamed `selector` never takes the
-// styling with it. They are not options: a name nobody can change is the point.
+// The stylesheet uses these names only, so a renamed `selector` keeps its styling.
 export const PLOT_CLASS = "tablechart-plot";
 export const CATEGORIES_CLASS = "tablechart-categories";
 export const VALUE_CLASS = "tablechart-value";
@@ -29,19 +26,15 @@ export const LEADER_CLASS = "tablechart-leader";
 export const BREAK_CLASS = "tablechart-break";
 export const PLACED_CLASS = "is-placed";
 export const POINTER_CLASS = "tablechart-pointer";
-// Text for screen readers only, such as the pause between a title and a subtitle.
 export const SR_CLASS = "tablechart-sr";
 export const SHOWN_CLASS = "is-shown";
-// On a chart in a sequence that has not had its turn yet: the whole figure, its
-// caption and its baseline too, waits hidden rather than only its marks.
+// A chart in a sequence that has not had its turn: the whole figure waits hidden.
 export const QUEUED_CLASS = "tablechart-queued";
 
-// The plot is drawn in these units and then scaled by the viewBox, so nothing in
-// the drawing code has to know how wide the figure ended up on screen.
+// The plot is drawn in these units and scaled by the viewBox.
 export const VIEWBOX_WIDTH = 1000;
 
-// How much of the plot a broken scale leaves empty where it jumps, in viewBox
-// units. The scale leaves the gap and the mark fills it, so both have to agree.
+// The gap a broken scale leaves where it jumps, in viewBox units; the scale and the mark both use it.
 export const BREAK_GAP = 13;
 
 export interface Config {
@@ -53,32 +46,15 @@ export interface Config {
 	barfill: number;
 	/** Share of a donut's radius that the ring itself takes. */
 	ringfill: number;
-	/**
-	 * Locale for number formatting. Left unset, the document's own language is
-	 * used and followed when it changes, so a translated page reformats itself.
-	 */
+	/** Locale for numbers. Unset, the document's language is used and followed when it changes. */
 	locale?: string;
 	/** Animate a chart when it builds. */
 	animate: boolean;
-	/**
-	 * Where a column's number goes: `outside`, standing on the bar, or `inside`,
-	 * in the middle of it, in the bar's own ink. A bar too short to hold its
-	 * number keeps it outside. A figure says otherwise with `data-chart-labels`.
-	 */
+	/** Where a column's number goes: on the bar, or inside it. A figure overrides it with `data-chart-labels`. */
 	labels: "outside" | "inside";
-	/**
-	 * Where the names of the lines go, in a chart with several lines: `false` puts
-	 * each name at the end of its line, `true` puts them all in a legend under the
-	 * chart. A figure says otherwise with `data-chart-legend`, or
-	 * `data-chart-legend="false"`.
-	 */
+	/** Names of several lines in a legend instead of at the end of each line. A figure overrides it with `data-chart-legend`. */
 	legend: boolean;
-	/**
-	 * If a chart has numbers that were left out because there is no room for them,
-	 * pointing at a row, or tapping it, shows the numbers of that row. The other
-	 * numbers are hidden for that time. A figure turns it off with
-	 * `data-chart-hover="false"`.
-	 */
+	/** Pointing at a row shows numbers that were left out for lack of room. A figure turns it off with `data-chart-hover="false"`. */
 	hover: boolean;
 	/** The name of the total that a donut without a total row works out, for screen readers. */
 	totallabel: string;
@@ -86,10 +62,7 @@ export interface Config {
 	threshold: number;
 	/** Build again each time a chart scrolls back into view, not only the first time. */
 	replay: boolean;
-	/**
-	 * The attribute that holds translation keys, for a translation script. A figure
-	 * with `data-chart-keys` gets translation keys on its names. `false` turns them off.
-	 */
+	/** The attribute for translation keys, for a translation script. `false` turns keys off. */
 	langattribute: string | false;
 	/** Show messages in the console for whoever is working on the page. */
 	debug?: boolean;

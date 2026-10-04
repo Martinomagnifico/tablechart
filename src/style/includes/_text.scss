@@ -1,43 +1,32 @@
 @use "tokens" as *;
 
-// Every label is HTML, and none of it is inside the SVG. An SVG `<text>` scales
-// with the viewBox, so in a small multiple it shrinks while the labels around it
-// do not, and the two drift apart. Out here they share one type scale.
+// Labels are HTML, not SVG `<text>`, which would scale with the viewBox and drift from the text around it.
 
 .tablechart-value {
 	position: absolute;
 	transform: translate(-50%, -100%);
 	white-space: nowrap;
-	// Bigger than the name under the mark, because it is usually the thing being
-	// talked about. Based on the category size so that a page which resizes
-	// the names keeps the proportion, and named separately so it can break it.
+	// Based on the category size, so a page that resizes the names keeps the proportion.
 	font-size: var(--tablechart-value-size, calc(var(--tablechart-category-size, 0.95em) * 1.3));
 
-	// Outside a bar, the number uses the text colour.
 	&[data-place="outside"] {
 		color: var(--tablechart-value-color, currentColor);
 	}
-	// Inside a bar, the number is dark or light, whichever reads on the bar.
 	&[data-place="inside"] {
 		transform: translate(-50%, -50%);
 		color: var(--tablechart-bar-ink, #{ink($barfill)});
 	}
 
-	// Around a ring, where there is no inside or outside to speak of: the number is
-	// centred on the point it was given, out beyond the slice it belongs to.
 	&[data-place="around"] {
 		transform: translate(-50%, -50%);
 		color: var(--tablechart-value-color, currentColor);
 	}
 
-	// Under a point, for the lower of two lines.
 	&[data-place="below"] {
 		transform: translate(-50%, 0);
 		color: var(--tablechart-value-color, currentColor);
 	}
 
-	// Just past the end of a bar that runs sideways.
-	// In the middle of its band, in a stacked line or area chart.
 	&[data-place="middle"] {
 		transform: translate(-50%, -50%);
 		color: var(--tablechart-value-color, currentColor);
@@ -48,13 +37,11 @@
 		color: var(--tablechart-value-color, currentColor);
 	}
 
-	// A total that has gone to the middle of a ring leaves no number behind.
 	&[data-place="none"] {
 		display: none;
 	}
 
-	// Left out for lack of room. Hidden rather than gone, so it can still be
-	// measured, and shown when its row is pointed at.
+	// Hidden rather than removed, so it can be measured and shown when its row is pointed at.
 	&[data-left-out] {
 		visibility: hidden;
 	}
@@ -67,7 +54,6 @@
 	&[data-place="inside"][data-kind="down"] {
 		color: var(--tablechart-down-ink, #{ink("var(--tablechart-down-color, #{$barfill})")});
 	}
-	// Inside a piece of a stacked bar, from the colour of its series.
 	&[data-place="inside"][data-series] {
 		color: var(--tablechart-piece-ink, #{ink($seriesink)});
 	}
@@ -76,8 +62,6 @@
 	}
 }
 
-// The name of a series, just past the end of its line and in its ink, so it reads
-// as the line's label rather than as a key to be looked up.
 .tablechart-name {
 	position: absolute;
 	transform: translate(0, -50%);
@@ -86,8 +70,6 @@
 	color: #{$seriesink};
 }
 
-// The legend of a chart with several lines: a centred row under the chart that
-// wraps, each name on one line, after a short sample of its line and point.
 .tablechart-legend {
 	@include legend-box;
 	margin-top: var(--tablechart-legend-gap, 0.6em);
@@ -100,9 +82,7 @@
 	color: inherit;
 	font-size: inherit;
 
-	// A short line with the point of its series on it, in the colour of the series.
-	// It is two masks over the colour: the line, solid, dashed or dotted, and the
-	// point. A step line has no points, so its sample is only the line.
+	// A sample of the line and its point, as two masks over the colour. A step line has no point.
 	&::before {
 		content: "";
 		display: inline-block;
@@ -126,7 +106,6 @@
 	&[data-marker="circle"] {
 		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Ccircle cx='12' cy='6' r='3.4' fill='white'/%3E%3C/svg%3E");
 	}
-	// An open point: the line stops at its edge.
 	&[data-marker="circle"][data-open] {
 		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Ccircle cx='12' cy='6' r='3.4'/%3E%3C/svg%3E");
 		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H8.6 M15.4 6H24'/%3E%3C/svg%3E");
@@ -164,7 +143,6 @@
 		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H7.9 M16.1 6H24' stroke-dasharray='0 3'/%3E%3C/svg%3E");
 	}
 
-	// A square of the series' colour, for a grouped bar or column chart.
 	&[data-swatch="box"]::before {
 		width: 0.7em;
 		height: 0.7em;
@@ -175,13 +153,11 @@
 	}
 }
 
-// One equal column per bar, matching the bands the plot uses, so a label is
-// under its own bar without either side knowing the other's width.
+// One equal column per bar, matching the plot's bands.
 .tablechart-categories :where(span[data-kind="total"]) {
 	display: none;
 }
 
-// Under a ring the names are a key, so each one wears its slice's ink.
 .tablechart-categories :where(span[data-kind="slice"])::before {
 	content: "";
 	display: inline-block;
@@ -192,7 +168,6 @@
 	background: #{$sliceink};
 }
 
-// The donut legend: the names in a centred row that wraps, each name on one line.
 .tablechart-categories[data-place="key"] {
 	@include legend-box;
 
@@ -202,8 +177,7 @@
 	}
 }
 
-// Beside the marks rather than under the plot: the chart places each name where
-// its bar is, so they stop being a row and become labels.
+// The chart places each name beside its bar.
 .tablechart-categories[data-place="beside"] {
 	position: absolute;
 	inset: 0;
@@ -211,9 +185,7 @@
 	margin: 0;
 	pointer-events: none;
 
-	// A long name wraps, within `--tablechart-name-max` of the chart's width. It
-	// breaks at a space, is hyphenated where the browser knows the language of the
-	// page, and a word that still does not fit is broken anyway.
+	// A long name wraps within `--tablechart-name-max`, hyphenated where the browser knows the language.
 	:where(span) {
 		position: absolute;
 		padding: 0;
@@ -236,8 +208,7 @@
 		text-align: center;
 		padding: var(--tablechart-category-padding, 0 0.2em);
 		font-size: calc(var(--tablechart-category-size, 0.95em) * var(--tablechart-name-fit, 1));
-		// `manual`, never `none`: the browser does not hyphenate on its own, but an
-		// author's soft hyphen still breaks. `none` would forbid that break too.
+		// `manual`, not `none`: an author's soft hyphen still breaks.
 		hyphens: manual;
 		overflow-wrap: normal;
 	}

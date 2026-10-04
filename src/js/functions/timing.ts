@@ -1,6 +1,2 @@
-/**
- * A mark's place in the build: `--i` for a mark of the data, `--after` for an
- * annotation, which lands after the data it is about. The stylesheet staggers the
- * marks by it.
- */
+/** `--i` staggers a mark of the data; `--after` lands an annotation after the data. */
 export const timing = (name: "--i" | "--after", slot: number): string => `${name}:${slot}`;

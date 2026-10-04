@@ -1,6 +1,6 @@
 {
   "name": "@martinomagnifico/tablechart",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Simple charts from an HTML or Markdown table: column, bar, line, area, waterfall and donut, with annotations. A chart builds when it scrolls into view.",
   "type": "module",
   "sideEffects": [
@@ -36,6 +36,7 @@
     "preview": "npm run docs:preview",
     "build": "npm run clean && npm run build:lib",
     "build:lib": "vite build",
+    "size": "node scripts/size.mjs",
     "prepack": "npm run build",
     "clean": "rm -rf dist",
     "setup": "cd docs && npm install"

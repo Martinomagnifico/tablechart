@@ -9,12 +9,7 @@ export interface Marker {
 	open: boolean;
 }
 
-/**
- * The point of line `s`: a filled circle, an open circle, a filled square, an
- * open square, a filled diamond, an open diamond, and then from the start again.
- * `data-marker` on the column header sets another, such as `square` or
- * `diamond open`.
- */
+/** Filled circle, open circle, filled square, and so on; `data-marker` on the column header sets another. */
 export const markerOf = (series: Series[], s: number): Marker => {
 	const own = series[s]?.marker?.toLowerCase().split(/\s+/) ?? [];
 	const asked = SHAPES.find((shape) => own.includes(shape));
@@ -24,10 +19,7 @@ export const markerOf = (series: Series[], s: number): Marker => {
 	};
 };
 
-/**
- * A point of the given shape, centred on x and y. `size` is the radius of a
- * circle; a square and a diamond are sized to look as large.
- */
+/** `size` is the radius of a circle; a square and a diamond are sized to look as large. */
 export const markerEl = (
 	shape: Shape,
 	x: number,

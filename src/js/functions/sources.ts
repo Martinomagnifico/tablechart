@@ -2,39 +2,26 @@ import { debug } from "./debug";
 import { BADGE_CAPTION_CLASS, PLUGIN_ID } from "../config";
 import { ANNOTATION_NAMES } from "../core";
 
-/**
- * Pass 0. Everything an author can write that is not yet the table Tablechart
- * reads is turned into one here, before keys are written or anything is built.
- * The rest of the plugin only ever sees the one shape of table, whether the chart
- * came from HTML, from Markdown or from a JSON file.
- */
+/** Pass 0: Markdown, JSON and HTML all become the same table before anything is built. */
 
-/** One row of a JSON source, as `data-chart-src` reads it. */
 interface SourceRow {
 	label: string;
-	/** A string keeps what is written around the number and its decimal places:
-	 * `"71.8%"`, `"1.0"`. A JSON number loses a trailing zero. */
+	/** A string keeps its decimal places and the text around the number: `"1.0"`, `"71.8%"`. */
 	value?: string | number | null;
-	/** One value per series, in place of `value`, for a chart with several. */
 	values?: (string | number | null)[];
 	kind?: "total";
 }
 
-// The attributes that make an element a chart, as opposed to a table's own.
 const isChartAttribute = (name: string): boolean =>
 	name === "id" || name === "style" || name.startsWith("data-chart");
 
-// `: ` starts a table's caption in Pandoc, and `Table: ` is its longer spelling.
+// `: ` starts a table's caption in Pandoc; `Table: ` is the longer spelling.
 const CAPTION_MARK = /^\s*(?:Table)?:\s+/;
 
 const isCaption = (el: Element | null): el is HTMLParagraphElement =>
 	el?.tagName === "P" && CAPTION_MARK.test(el.textContent ?? "");
 
-/**
- * A caption paragraph becomes the figcaption an HTML chart has. The mark is taken
- * off, and a hard line break parts the title from the subtitle, which is put in a
- * span as it is in HTML: `<b>Apple juice</b><br><span>thousands of litres</span>`.
- */
+/** A caption paragraph becomes a figcaption; a hard line break parts the title from the subtitle. */
 const captionFrom = (p: HTMLParagraphElement): HTMLElement => {
 	const caption = document.createElement("figcaption");
 	for (const { name, value } of Array.from(p.attributes)) caption.setAttribute(name, value);
@@ -55,13 +42,10 @@ const captionFrom = (p: HTMLParagraphElement): HTMLElement => {
 	return caption;
 };
 
-// An item starts with the name of an annotation and its options, and a colon
-// before what it says: `bracket from=1 to=3: +24%`. An item that says nothing,
-// `axis-break to=140`, needs no colon.
+// `bracket from=1 to=3: +24%`. An item that says nothing, such as `axis-break to=140`, needs no colon.
 const ANNOTATION_HEAD = /^\s*([a-z][\w-]*)((?:\s+[\w-]+=[^\s:]+)*)\s*(:\s*|$)/;
 
-// What an item is written in: the item itself, or the one paragraph Markdown puts
-// in it when the list has blank lines between its items.
+// Markdown puts an item's content in a paragraph when the list has blank lines between items.
 const contentOf = (li: Element): Element => {
 	const only = wrapperOf(li);
 	return only?.tagName === "P" ? only : li;
@@ -79,7 +63,6 @@ const headOf = (li: Element): ItemHead | null => {
 	if (text?.nodeType !== Node.TEXT_NODE) return null;
 	const match = ANNOTATION_HEAD.exec(text.textContent ?? "");
 	if (!match || !ANNOTATION_NAMES.includes(match[1])) return null;
-	// Without a colon the item has to end there, or what follows is not its content.
 	if (!match[3] && text.nextSibling) return null;
 	const options = match[2]
 		.trim()
@@ -89,15 +72,7 @@ const headOf = (li: Element): ItemHead | null => {
 	return { name: match[1], options, text: text as Text, length: match[0].length };
 };
 
-/**
- * A list right after a Markdown chart is its annotations, if every item in it is
- * one: either it starts with an annotation's name, or it already has a
- * `data-annotation`. Any other list is left on the page.
- *
- * Each item becomes the span an HTML annotation is. Its options become `data-`
- * attributes, an italic start becomes the word above the callout, and the rest is
- * the callout: `trend years=9: *CAGR* +11%`.
- */
+/** A list after a Markdown chart is its annotations if every item is one; an italic start becomes the caption. */
 const annotationsFrom = (list: Element | null): HTMLElement | null => {
 	if (list?.tagName !== "UL" && list?.tagName !== "OL") return null;
 	const items = Array.from(list.children);
@@ -114,8 +89,7 @@ const annotationsFrom = (list: Element | null): HTMLElement | null => {
 			for (const [key, value] of head.options) li.setAttribute(`data-${key}`, value);
 			head.text.textContent = (head.text.textContent ?? "").slice(head.length);
 		}
-		// The callout copies an item's elements and nothing else, so text beside an
-		// element is put in a span of its own, and an italic start is its caption.
+		// The callout copies elements only, so loose text goes in a span.
 		if (!li.children.length) return;
 		const nodes = Array.from(li.childNodes).filter(
 			(node) => node.nodeType === Node.ELEMENT_NODE || node.textContent?.trim()
@@ -136,7 +110,6 @@ const annotationsFrom = (list: Element | null): HTMLElement | null => {
 	return list as HTMLElement;
 };
 
-// Moves what makes an element a chart, and its classes, onto the figure for it.
 const moveChartAttributes = (from: Element, to: Element): void => {
 	for (const { name, value } of Array.from(from.attributes)) {
 		if (name === "class" || isChartAttribute(name)) {
@@ -146,20 +119,7 @@ const moveChartAttributes = (from: Element, to: Element): void => {
 	}
 };
 
-/**
- * Some Markdown tools put attributes on the table itself, so the table matches
- * the selector, such as `{data-chart=column}` with markdown-it-attrs. A chart draws into its
- * figure, and a table cannot hold a plot, so the table is wrapped in a `div` that
- * takes over its chart attributes and classes.
- *
- * Markdown has no way to put anything inside it, so what belongs to the chart is
- * taken in from beside the table: a caption paragraph just before or after it, and
- * after that a list of annotations or a `.chart-annotations` block.
- *
- * A chart that reads its rows from a file has no table, so the attributes go on
- * its caption instead. If they end up on the bold title inside the caption, the
- * caption is taken to be the chart.
- */
+/** A Markdown table, or a caption with chart attributes, is wrapped in a div with the caption and annotations beside it. */
 export const adoptTables = (figures: HTMLElement[]): HTMLElement[] =>
 	figures.map((found) => {
 		const inCaption = found.closest("p");
@@ -196,7 +156,6 @@ export const adoptTables = (figures: HTMLElement[]): HTMLElement[] =>
 
 const tableFrom = (rows: SourceRow[], series: string[] = []): HTMLTableElement => {
 	const table = document.createElement("table");
-	// A header only to name the series, over an empty corner above the labels.
 	if (series.length) {
 		const head = table.createTHead().insertRow();
 		head.append(document.createElement("th"));
@@ -219,17 +178,7 @@ const tableFrom = (rows: SourceRow[], series: string[] = []): HTMLTableElement =
 	return table;
 };
 
-/**
- * `data-chart-src` names a JSON file that holds the chart's rows. The file is the
- * whole of the data: a table written inside the figure is removed, so there is
- * never a question of which of the two is drawn. The file is either an array of
- * rows or an object with a `rows` array.
- *
- * The file becomes an ordinary table before anything else happens, so a screen
- * reader, a translation plugin and print all get the same table they would from
- * HTML. A file that cannot be read leaves its chart empty and says why; the rest
- * of the page goes on.
- */
+/** `data-chart-src` replaces any table in the figure with one made from a JSON file; a file that fails is reported. */
 export const loadSources = async (figures: HTMLElement[]): Promise<void> => {
 	await Promise.all(
 		figures
@@ -246,7 +195,6 @@ export const loadSources = async (figures: HTMLElement[]): Promise<void> => {
 					const series: string[] = Array.isArray(data?.series)
 						? data.series.map(String)
 						: [];
-					// After the caption, where the table of an authored chart would be.
 					const caption = figure.querySelector(":scope > figcaption");
 					const table = tableFrom(rows, series);
 					if (caption) caption.after(table);
@@ -265,9 +213,7 @@ export const loadSources = async (figures: HTMLElement[]): Promise<void> => {
 	);
 };
 
-// The one element a label is wrapped in, when nothing else is written beside it.
-// A label that is only partly bold is a label with some bold in it, not a total.
-// Comments do not count, such as an empty one that a Markdown tool leaves behind.
+// The one element a cell is wrapped in, ignoring comments; partly bold is not a total.
 const wrapperOf = (cell: Element): HTMLElement | null => {
 	const nodes = Array.from(cell.childNodes).filter(
 		(node) =>
@@ -279,17 +225,7 @@ const wrapperOf = (cell: Element): HTMLElement | null => {
 
 const TOTAL_MARKS = "strong, b, span.total";
 
-/**
- * A Markdown table has no header cells in its body and no attributes on its rows,
- * so it says the same things differently. The first cell of a row is its label,
- * and a label in **bold**, or in a `.total` span, makes the row a total, like
- * `data-kind="total"` in HTML. A total is set in bold in most tables of figures
- * already. The bold is taken off once read, so the label is plain text again.
- * Rows written in HTML already have their `th` and are left as they are.
- *
- * The header over the value columns names the series. A name in bold is the
- * series in focus, like `data-kind="focus"`.
- */
+/** In a Markdown table, a bold label makes the row a total, and a bold header puts that series in focus. */
 export const readMarkdownRows = (figures: HTMLElement[]): void => {
 	for (const figure of figures) {
 		for (const tr of figure.querySelectorAll<HTMLTableRowElement>("tbody tr")) {

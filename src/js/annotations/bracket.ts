@@ -6,25 +6,7 @@ import { checkAgainst, createBadge } from "./badge";
 
 const pctChange = (from: number, to: number): number => ((to - from) / Math.abs(from)) * 100;
 
-/**
- * A change from one bar to another: up the near side, across, and back down at
- * the far one with an arrowhead.
- *
- * It anchors to two categories by index rather than by label, because a label is
- * translated and an index is not. Both default to the first and last row, so on a
- * two-bar chart it needs no attributes at all.
- *
- * ```html
- * <div class="chart-annotations">
- *   <span data-annotation="bracket" data-i18n="juice-change">+11%</span>
- * </div>
- * ```
- */
-/**
- * The two rows a bracket spans, as positions from 0. `data-from` and `data-to` are
- * row numbers that start at 1, as people count. Without them, the first and the
- * last row.
- */
+/** `data-from` and `data-to` count rows from 1, by index because a label is translated. Default: first to last. */
 export const bracketRows = (spec: HTMLElement, count: number): [number, number] => {
 	const read = (name: string, fallback: number) => {
 		const asked = Number.parseInt(spec.getAttribute(name) ?? "", 10);
@@ -53,13 +35,11 @@ export const bracket: AnnotationType = {
 		const gap = 4 * unit;
 		const x1 = cx(i1);
 		const x2 = cx(i2);
-		// Clear of whichever bar is taller, and of the labels sitting above them.
 		const top = Math.min(y(a.value), y(b.value)) - labelHeight - gap - badgeHeight * 0.9;
 		const foot = (value: number) => y(value) - labelHeight - gap;
 
 		const d = `M ${x1} ${foot(a.value)} L ${x1} ${top} L ${x2} ${top} L ${x2} ${foot(b.value) - head}`;
-		// In pixels, for the same reason the trend's is: a stroke that does not scale
-		// is dashed in the space the figure is drawn at.
+		// In pixels: a stroke that does not scale is dashed at the size the figure is shown.
 		const len =
 			(foot(a.value) - top + Math.abs(x2 - x1) + (foot(b.value) - head - top)) / unit + 1;
 
@@ -72,7 +52,6 @@ export const bracket: AnnotationType = {
 			})
 		);
 
-		// The head points at the bar the change lands on.
 		const ty = foot(b.value);
 		svg.appendChild(
 			svgEl("polygon", {

@@ -5,12 +5,6 @@ import { fitTogether, tallEnough, tooWide } from "../functions/labels";
 import { placeAt, svgEl, withRow } from "../functions/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
 
-/**
- * One bar per row, standing on the baseline. With several value columns, each row
- * is a group with one bar per column, and the names of the columns go in a legend.
- * With `data-chart-stack`, the bars of a row are on top of each other instead, and
- * the total of the row is above them.
- */
 const segments = (rows: Row[]): Segment[] =>
 	rows.map((row) => ({ ...row, from: 0, to: row.value, kind: "bar" as const }));
 
@@ -21,11 +15,8 @@ export const column: ChartType = {
 	stackable: true,
 	totals: true,
 
-	// Every bar stands on the baseline, so a scale that skips a band still leaves
-	// each bar reading from zero to its own break.
 	breakable: true,
 
-	// Room for the value labels, and for a badge when something is annotated.
 	headroom: ({ labelHeight, badgeHeight, hasAnnotations, unit }) =>
 		labelHeight + 4 * unit + (hasAnnotations ? badgeHeight * 1.6 : 0),
 
@@ -44,8 +35,7 @@ export const column: ChartType = {
 					const top = y(to);
 					const bottom = y(from);
 					piece(s, { x, y: top, width: barWidth, height: Math.max(bottom - top, 1) });
-					// A number goes in the middle of its piece. If the piece is too small, it is
-					// left out, until its row is pointed at.
+					// A number too big for its piece is left out until its row is pointed at.
 					label.dataset.place = "inside";
 					label.toggleAttribute(
 						"data-left-out",
@@ -96,7 +86,6 @@ export const column: ChartType = {
 							...seriesMark(geo, row, s),
 						})
 					);
-					// If the numbers do not fit, they are left out, until a row is pointed at.
 					label.dataset.place = "outside";
 					label.toggleAttribute("data-left-out", !fit);
 					placeAt(label, x + layout.size / 2, top - 4 * unit, VIEWBOX_WIDTH, height);
@@ -108,14 +97,12 @@ export const column: ChartType = {
 			return;
 		}
 
-		// If any number is wider than its bar, every number goes above, so a narrow
-		// chart does not mix the two.
+		// If any number is wider than its bar, every number goes above, so a narrow chart does not mix the two.
 		const narrow = tooWide(values, barWidth, unit);
 
 		segs.forEach((seg, i) => {
 			const top = y(seg.value);
-			// A value that is not there has no bar, and its label, which says what the
-			// cell does, stands where the bar would.
+			// A missing value has no bar; its label stands where the bar would.
 			if (seg.missing) {
 				placeAt(values[i], cx(i), baseline - 4 * unit, VIEWBOX_WIDTH, height);
 				values[i].dataset.place = "outside";
@@ -125,7 +112,6 @@ export const column: ChartType = {
 				svgEl("rect", {
 					class: withRow(BAR_CLASS, seg),
 					"data-kind": seg.kind,
-					// Its row in the table, counted from 1.
 					"data-row": i + 1,
 					x: cx(i) - barWidth / 2,
 					y: top,
@@ -134,8 +120,6 @@ export const column: ChartType = {
 					style: timing("--i", seg.slot),
 				})
 			);
-			// Above the bar, as a column chart usually wants; or in its middle when the
-			// chart asks for that and the bar is tall and wide enough for the number.
 			const barHeight = baseline - top;
 			const inside = labels === "inside" && !narrow && tallEnough(values[i], barHeight, unit);
 			placeAt(

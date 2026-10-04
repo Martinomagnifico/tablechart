@@ -2,9 +2,7 @@ import { debug } from "./debug";
 import { PLUGIN_ID } from "../config";
 import type { Cell, Row, Series } from "../types";
 
-// The number, and whatever is written around it: "18.2*" is 18.2 with a footnote,
-// "71.8%" is 71.8 with its unit. A cell with no number in it at all, such as
-// "n/a", is a value that is not there rather than a zero.
+// "71.8%" is 71.8 with its unit; a cell with no number, such as "n/a", is missing rather than zero.
 const readCell = (td: Element | null): Cell => {
 	const raw = (td?.textContent || "").trim();
 	const parts = raw.match(/^(.*?)(-?\d+(?:[.,]\d+)?)(.*)$/);
@@ -18,14 +16,7 @@ const readCell = (td: Element | null): Cell => {
 	};
 };
 
-/**
- * A chart's data is a real table in the markup, not a blob of JSON. It is what a
- * screen reader reads, what a translation extractor finds, and what is on the
- * page when scripting is off. Tablechart only ever reads it.
- *
- * Every cell after the label is a value, one per series. The row's own value is
- * its first, which is all a chart with one series ever reads.
- */
+/** Every cell after the label is a value, one per series; the row's own value is its first. */
 export const readTable = (figure: HTMLElement, langattribute: string | false = "data-i18n"): Row[] =>
 	Array.from(figure.querySelectorAll("tbody tr")).map((tr, i) => {
 		const th = tr.querySelector("th");
@@ -42,17 +33,9 @@ export const readTable = (figure: HTMLElement, langattribute: string | false = "
 		};
 	});
 
-// The header cells over the value columns: every one but the first, which is over
-// the labels.
 const seriesHeads = (figure: HTMLElement): Element[] =>
 	Array.from(figure.querySelector("thead tr:last-child")?.children ?? []).slice(1);
 
-/**
- * The value columns, one series each. The header names them, and says which one
- * the chart is about. A table without a
- * header still has its columns; they are only unnamed.
- */
-// `data-line` on a column header: a dashed or dotted line instead of a solid one.
 const lineOf = (value: string | null | undefined): "dashed" | "dotted" | null =>
 	value === "dashed" || value === "dotted" ? value : null;
 
@@ -71,18 +54,7 @@ export const readSeries = (figure: HTMLElement, rows: Row[], langattribute: stri
 	});
 };
 
-/**
- * Translation keys, written onto the source table before anything is drawn, for
- * a figure with `data-chart-keys`. Its value starts each key: `harvest-row1` for
- * the name of the first row, `harvest-col1` for the header of the first value
- * column. A cell that has a key already keeps it.
- *
- * The value has to be unique on the page. If two figures use
- * the same value, the second one gets a number added, and a warning says so.
- *
- * Keys are written here, in a pass of its own, so that extraction never depends
- * on whether a chart has been drawn yet.
- */
+/** Writes translation keys such as `harvest-row1` onto a figure with `data-chart-keys`; a duplicate prefix gets a number. */
 export const assignKeys = (figures: HTMLElement[], langattribute: string | false): void => {
 	if (!langattribute) return;
 	const used = new Map<string, number>();
@@ -108,7 +80,6 @@ export const assignKeys = (figures: HTMLElement[], langattribute: string | false
 			if (!th.getAttribute(langattribute))
 				th.setAttribute(langattribute, `${prefix}-row${i + 1}`);
 		});
-		// A header is shown only when it names more than one series.
 		const heads = seriesHeads(figure);
 		if (heads.length > 1)
 			heads.forEach((head, i) => {
