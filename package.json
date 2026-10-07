@@ -37,9 +37,8 @@
     "build": "npm run clean && npm run build:lib",
     "build:lib": "vite build",
     "size": "node scripts/size.mjs",
-    "test": "npm run build && node test/layout.test.mjs",
+    "test": "npm run build && node test/speed.test.mjs",
     "test:layout": "node test/layout.test.mjs",
-    "bench": "npm run build && node test/bench.mjs",
     "prepack": "npm run build",
     "clean": "rm -rf dist",
     "setup": "cd docs && npm install"

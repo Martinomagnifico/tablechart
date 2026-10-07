@@ -1,7 +1,6 @@
 // What every kind of chart draws, before and after a resize, against a snapshot made on this machine (fonts differ per machine).
 //
-//   npm test                                 build, then test
-//   node test/layout.test.mjs                test the current build
+//   npm run test:layout                      test the current build (run npm run build first)
 //   node test/layout.test.mjs --update       save a new snapshot after an intended change
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
