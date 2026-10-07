@@ -29,7 +29,7 @@ import { stackTotal } from "./functions/groups";
 import { fitTogether } from "./functions/labels";
 import { readSeries, readTable } from "./functions/read-table";
 import { cutOut, htmlEl, svgEl } from "./functions/svg";
-import type { AnnotationType, ChartState, ChartType, Geometry, Row } from "./types";
+import type { AnnotationType, ChartState, ChartType, Geometry, Row, Shape } from "./types";
 
 const CHARTS: Record<string, ChartType> = { area, bar, column, donut, line, waterfall };
 const ANNOTATIONS: Record<string, AnnotationType> = { "axis-break": axisBreak, trend, bracket };
@@ -44,6 +44,15 @@ const textBefore = (node: Node): string => {
 		if (text.trim()) break;
 	}
 	return text.trim();
+};
+
+const SHAPES: readonly Shape[] = ["straight", "step", "smooth"];
+
+/** A figure's own `data-chart-shape`, or else the option. */
+const shapeOf = (figure: HTMLElement, config: Config): Shape => {
+	const asked = figure.dataset.chartShape as Shape | undefined;
+	if (asked && SHAPES.includes(asked)) return asked;
+	return SHAPES.includes(config.shape) ? config.shape : "straight";
 };
 
 /** A hidden full stop before each line break in the title, so a screen reader pauses there. */
@@ -216,7 +225,7 @@ export const build = (
 				if (swatch) node.dataset.swatch = swatch;
 				node.textContent = one.name;
 				// A step line has no points, so its legend sample has none.
-				if (!swatch && figure.dataset.chartShape !== "step") {
+				if (!swatch && shapeOf(figure, config) !== "step") {
 					const marker = markerOf(series, s);
 					node.dataset.marker = marker.shape;
 					node.toggleAttribute("data-open", marker.open);
@@ -534,7 +543,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 				: "outside",
 		breakAt,
 		stacked: state.stacked,
-		shape: state.figure.dataset.chartShape === "step" ? "step" : "straight",
+		shape: shapeOf(state.figure, config),
 		totals: state.totals,
 		svg,
 		plot,

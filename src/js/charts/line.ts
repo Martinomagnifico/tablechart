@@ -3,6 +3,7 @@ import { timing } from "../functions/timing";
 import { stackOf } from "../functions/groups";
 import { markerEl, markerOf } from "../functions/markers";
 import { spread } from "../functions/labels";
+import { curveLength, curveTo, fixed, tangentsWithGaps } from "../functions/smooth";
 import { cutOut, placeAt, svgEl } from "../functions/svg";
 import type { Cell, ChartType, Geometry, Row, Segment } from "../types";
 
@@ -28,6 +29,7 @@ const trend = (area: boolean): ChartType => ({
 	draw(geo: Geometry) {
 		const { rows, series, seriesValues, names, cx, y, height, unit, labelHeight, svg, stacked } = geo;
 		const step = geo.shape === "step";
+		const smooth = geo.shape === "smooth";
 		const baseline = y(0);
 		const several = series.length > 1;
 		const focused = series.some((one) => one.focus);
@@ -64,6 +66,13 @@ const trend = (area: boolean): ChartType => ({
 				.map((_row, i) => ({ i, next: i < last && !gone(s, i + 1) }))
 				.filter(({ i, next }) => !gone(s, i) && (step || next));
 
+		// The slope at each point, for the top of each line or area and the bottom of each area.
+		const tops = smooth ? series.map((_one, s) => tangentsWithGaps(rows.length, (i) => gone(s, i), (i) => at(s, i))) : [];
+		const bottoms =
+			smooth && area
+				? series.map((_one, s) => tangentsWithGaps(rows.length, (i) => gone(s, i), (i) => [cx(i), y(bottom(s, i))]))
+				: [];
+
 		// One group per series has the opacity, so two pieces of one area do not add up to a darker seam.
 		if (area) {
 			series.forEach((_one, s) => {
@@ -94,9 +103,24 @@ const trend = (area: boolean): ChartType => ({
 						const theirs = step ? nextEnd : own + slope(own, nextEnd, x2, cx(j)) * over;
 						return [mine, theirs];
 					};
-					const tOver = joined ? Math.max(...at2(t2, t1, y(top(s, j)))) : t2;
-					const bOver = joined ? Math.min(...at2(b2, b1, y(bottom(s, j)))) : b2;
+					// Smooth: along the curve's own slope, which the next piece starts with.
+					const tOver = !joined ? t2 : smooth ? t2 + tops[s][i + 1] * over : Math.max(...at2(t2, t1, y(top(s, j))));
+					const bOver = !joined ? b2 : smooth ? b2 + bottoms[s][i + 1] * over : Math.min(...at2(b2, b1, y(bottom(s, j))));
 					if (tOver >= bOver) over = 0;
+					if (smooth) {
+						const [mt1, mt2, mb1, mb2] = [tops[s][i], tops[s][i + 1], bottoms[s][i], bottoms[s][i + 1]];
+						const d = [
+							`M${fixed(x1)},${fixed(b1)}`,
+							`L${fixed(x1)},${fixed(t1)}`,
+							curveTo([x1, t1], [x2, t2], mt1, mt2),
+							...(over ? [`L${fixed(x2 + over)},${fixed(tOver)}`, `L${fixed(x2 + over)},${fixed(bOver)}`] : []),
+							`L${fixed(x2)},${fixed(b2)}`,
+							curveTo([x2, b2], [x1, b1], mb2, mb1),
+							"Z",
+						].join(" ");
+						fill.appendChild(svgEl("path", { d, "data-row": i + 2, style: when(s, i + 1) }));
+						continue;
+					}
 					const points = step
 						? [[x1, b1], [x1, t1], [x2, t1], [x2, tOver], [x2 + over, tOver], [x2 + over, bOver], [x2, bOver], [x2, b1]]
 						: [[x1, b1], [x1, t1], [x2, t2], [x2 + over, tOver], [x2 + over, bOver], [x2, b2]];
@@ -116,6 +140,22 @@ const trend = (area: boolean): ChartType => ({
 		series.forEach((one, s) => {
 			let along = 0;
 			for (const { i, next } of pieces(s)) {
+				if (smooth) {
+					const [a, b] = [at(s, i), at(s, i + 1)];
+					const length = 1 + curveLength(a, b, tops[s][i], tops[s][i + 1]) / unit;
+					svg.appendChild(
+						svgEl("path", {
+							class: SERIES_CLASS,
+							...marks[s].attrs,
+							d: `M${fixed(a[0])},${fixed(a[1])} ${curveTo(a, b, tops[s][i], tops[s][i + 1])}`,
+							...(one.line && { "data-line": one.line }),
+							"data-row": i + 2,
+							style: `${marks[s].ink}--len:${length.toFixed(1)}; --along:${(-along).toFixed(1)}; ${when(s, i + 1)}`,
+						})
+					);
+					along += length - 1;
+					continue;
+				}
 				const points: [number, number][] = step
 					? [
 							[cx(i) - band / 2, y(top(s, i))],

@@ -52,6 +52,8 @@ export interface Config {
 	animate: boolean;
 	/** Where a column's number goes: on the bar, or inside it. A figure overrides it with `data-chart-labels`. */
 	labels: "outside" | "inside";
+	/** How a line or area runs between points: `straight`, `step` or `smooth`. A figure overrides it with `data-chart-shape`. */
+	shape: "straight" | "step" | "smooth";
 	/** Names of several lines in a legend instead of at the end of each line. A figure overrides it with `data-chart-legend`. */
 	legend: boolean;
 	/** Pointing at a row shows numbers that were left out for lack of room. A figure turns it off with `data-chart-hover="false"`. */
@@ -75,6 +77,7 @@ export const defaultConfig: Config = {
 	ringfill: 0.42,
 	animate: true,
 	labels: "outside",
+	shape: "straight",
 	legend: false,
 	hover: true,
 	totallabel: "Total",

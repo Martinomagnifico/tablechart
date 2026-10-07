@@ -1,5 +1,8 @@
 import type { Config } from "./config";
 
+/** How a line or an area runs from one point to the next. */
+export type Shape = "straight" | "step" | "smooth";
+
 export interface Cell {
 	raw: string;
 	/** As written, so its decimal places survive. Empty when the cell holds no number. */
@@ -60,7 +63,7 @@ export interface Geometry {
 	breakAt: number | null;
 	labels: "outside" | "inside";
 	stacked: boolean;
-	shape: "straight" | "step";
+	shape: Shape;
 	/** Empty when the chart is not stacked or its kind shows no totals. */
 	totals: HTMLElement[];
 	svg: SVGSVGElement;

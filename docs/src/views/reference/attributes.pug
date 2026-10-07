@@ -2,6 +2,7 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Reference | Attributes"
+	- pagedescription = "Every data attribute in Tablechart, on a chart, a row and an annotation."
 
 block content
 	.lane
@@ -29,6 +30,9 @@ block content
 				tr
 					td: code data-chart-shape="step"
 					td Makes each value flat across its row, in a line or area chart
+				tr
+					td: code data-chart-shape="smooth"
+					td Makes a line or area chart a curve through every point. #[code data-chart-shape="straight"] makes it straight when the #[code shape] option is #[code "smooth"].
 				tr
 					td: code data-chart-legend
 					td Puts the names of the lines in a legend. #[code data-chart-legend="false"] turns it off.

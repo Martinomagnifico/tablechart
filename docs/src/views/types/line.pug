@@ -2,6 +2,7 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Chart types | Line"
+	- pagedescription = "Line charts in Tablechart: a line through the values, or several lines, each named at its end."
 
 block content
 	.lane
@@ -154,6 +155,24 @@ block content
 							tr
 								th= row[0]
 								td= row[1]
+
+	+section("Smooth")
+		p Add #[code data-chart-shape="smooth"] to the figure. The line is a curve through every point. It never goes higher or lower than the points on either side of it, so the curve shows no peak or dip that is not in the data, and a flat stretch stays flat.
+
+		+chart
+			figure(data-chart="line" data-chart-shape="smooth")
+				figcaption
+					b Apples picked per week
+					br
+					span thousands
+				table
+					tbody
+						each row in [['Week 1', '12'], ['Week 2', '14'], ['Week 3', '31'], ['Week 4', '15'], ['Week 5', '16'], ['Week 6', '16'], ['Week 7', '22']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		p To make every line and area smooth, set the #[code shape] option to #[code "smooth"]. Then #[code data-chart-shape="straight"] makes one chart straight again.
 
 	+section("Stacked lines")
 		p Add #[code data-chart-stack] to the figure. Each line starts on top of the one before it. For stacked lines, an #[a(href=url('/types/area.html')) area chart] is usually easier to read.

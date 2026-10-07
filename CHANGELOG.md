@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Smooth lines and areas: `data-chart-shape="smooth"`, or the `shape` option for every chart. The curve goes through every point and never overshoots them (monotone cubic interpolation), so it shows no peak or dip that is not in the data. A missing value still splits the line, and in a stack each area follows the curve of the one below it.
+- The `shape` option: `"straight"` (the default), `"step"` or `"smooth"`. `data-chart-shape` on a figure overrides it, so `data-chart-shape="straight"` turns a chart back.
+
 ## [0.1.1] - 2026-10-05
 
 ### Fixed

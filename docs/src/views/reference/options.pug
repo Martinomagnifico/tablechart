@@ -2,6 +2,7 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Reference | Options"
+	- pagedescription = "Every option that Tablechart's init() takes, with its default."
 
 block content
 	.lane
@@ -51,6 +52,10 @@ block content
 					td: code labels
 					td: code "outside"
 					td Where the number of a column goes: #[code "outside"], above the column, or #[code "inside"]. #[code data-chart-labels] on a figure sets it for one chart.
+				tr
+					td: code shape
+					td: code "straight"
+					td How a line or area chart runs from one point to the next: #[code "straight"], #[code "step"] or #[code "smooth"]. #[code data-chart-shape] on a figure sets it for one chart.
 				tr
 					td: code legend
 					td: code false

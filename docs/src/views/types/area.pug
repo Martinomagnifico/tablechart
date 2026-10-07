@@ -2,6 +2,7 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Chart types | Area"
+	- pagedescription = "Area charts in Tablechart: a line chart with the space under the line filled."
 
 block content
 	.lane
@@ -116,6 +117,28 @@ block content
 
 		p Stacked areas do not overlap, so their default opacity is #[code 0.5].
 		p A value below zero takes no room in a stack.
+
+	+section("Smooth")
+		p Add #[code data-chart-shape="smooth"] to the figure. The top of each area is a curve through every point, which never goes higher or lower than the points on either side of it. In a stack, each area follows the curve of the one below it.
+
+		+chart
+			figure(data-chart="area" data-chart-stack data-chart-shape="smooth" data-chart-legend)
+				figcaption
+					b Apples picked per year
+					br
+					span thousands
+				table
+					thead
+						tr
+							th Year
+							th North
+							th South
+					tbody
+						each row in [['2021', '10', '6'], ['2022', '18', '9'], ['2023', '14', '15'], ['2024', '22', '12'], ['2025', '19', '20']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
 
 	+section("Steps")
 		p Add #[code data-chart-shape="step"] to the figure. Each value is flat across the width of its row, and the line goes straight up or down to the next row. A number is shown only where the value changes, in the middle of the rows that have that value. If a number is wider than those rows, it is left out. If you point at the row, or tap it, the numbers of that row are shown.
