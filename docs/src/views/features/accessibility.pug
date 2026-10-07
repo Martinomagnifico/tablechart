@@ -32,6 +32,7 @@ block content
 
 	+section("Without JavaScript")
 		p If JavaScript does not run, there is no chart. The table is then shown instead, with its title.
+		p A chart with #[code data-chart-src] has no table until JavaScript has read the JSON file. If JavaScript does not run, or the file cannot be read, there is no table and no chart. If the chart must work without JavaScript, write the table in the HTML.
 
 	+section("Colour")
 		ul

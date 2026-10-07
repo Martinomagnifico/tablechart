@@ -74,7 +74,7 @@ block content
 					td Makes a line dashed or dotted
 
 	+section("A JSON file")
-		p Add #[code data-chart-src] with the address of a JSON file. Tablechart reads the file and makes a table from it, so the chart works as if you had written the table. A table in the figure is removed.
+		p Add #[code data-chart-src] with the address of a JSON file. Tablechart reads the file and makes a table from it, so the chart works as if you had written the table. A table in the figure is removed. The table is made by JavaScript, so without JavaScript there is no table: see #[a(href=url('/features/accessibility.html')) Accessibility].
 
 		+chart
 			figure(data-chart="column" data-chart-src=url('/data/apples.json'))
