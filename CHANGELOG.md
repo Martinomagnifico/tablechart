@@ -6,6 +6,14 @@
 
 - Smooth lines and areas: `data-chart-shape="smooth"`, or the `shape` option for every chart. The curve goes through every point and never overshoots them (monotone cubic interpolation), so it shows no peak or dip that is not in the data. A missing value still splits the line, and in a stack each area follows the curve of the one below it.
 - The `shape` option: `"straight"` (the default), `"step"` or `"smooth"`. `data-chart-shape` on a figure overrides it, so `data-chart-shape="straight"` turns a chart back.
+- Lines and areas that grow up from zero: `data-chart-animate="up"`, or `animate: "up"` for every chart. `data-chart-animate="across"` is the opposite. Other chart types are not affected.
+- The moment a chart builds inside an element that animates in can be set: `data-chart-entrance` on a figure, or the `entrance` option, from `0` (when the element starts to move) to `1` (when it is in). It is `0.5`, halfway, by default, as before.
+
+### Fixed
+
+- A step line (`data-chart-shape="step"`) takes as long to build as other lines. Its rises and drops are drawn quickly, so the line no longer stops moving to the right while it goes up or down.
+- A line or area with more than seven points takes no longer to build than one with seven: six stagger steps in all. It was one step per point, so a long line was much slower than a short one.
+- The fill of an area fades in at an even speed while its line builds, so it is no longer there before the line.
 
 ## [0.1.1] - 2026-10-05
 

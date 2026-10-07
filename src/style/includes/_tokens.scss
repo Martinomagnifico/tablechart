@@ -2,7 +2,7 @@
 
 $duration: var(--tablechart-duration, 0.5s);
 $stagger: var(--tablechart-stagger, 0.12s);
-$easing: var(--tablechart-easing, cubic-bezier(0.22, 0.75, 0.3, 1));
+$easing: var(--tablechart-easing, cubic-bezier(0.26, 0.86, 0.44, 0.985));
 
 // The background behind the chart; lighter colours are mixed with it.
 $surface: "var(--tablechart-surface, Canvas)";

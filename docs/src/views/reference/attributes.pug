@@ -34,6 +34,12 @@ block content
 					td: code data-chart-shape="smooth"
 					td Makes a line or area chart a curve through every point. #[code data-chart-shape="straight"] makes it straight when the #[code shape] option is #[code "smooth"].
 				tr
+					td: code data-chart-animate="up"
+					td Makes a line or area chart grow up from zero, instead of from left to right. #[code data-chart-animate="across"] makes it build from left to right when the #[code animate] option is #[code "up"].
+				tr
+					td: code data-chart-entrance="0.25"
+					td How far an element around the chart that animates in is in before the chart builds, from #[code 0] to #[code 1]. See #[a(href=url('/features/animated-parents.html')) Animated parents].
+				tr
 					td: code data-chart-legend
 					td Puts the names of the lines in a legend. #[code data-chart-legend="false"] turns it off.
 				tr

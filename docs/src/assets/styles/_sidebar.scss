@@ -211,6 +211,12 @@
 				opacity: 0.8;
 				padding: 1rem 0.75rem 0;
 				margin: 0;
+
+				// The first label in a section has nothing above it to divide from.
+				&:first-child {
+					border-top: 0;
+					padding-top: 0.25rem;
+				}
 			}
 		}
 	}

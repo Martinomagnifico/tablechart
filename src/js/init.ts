@@ -35,8 +35,15 @@ const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matc
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/** Resolves when an animation around the chart is halfway, so it builds in a panel that can already be seen. */
-const entrance = async (figure: HTMLElement): Promise<void> => {
+/** How far an animated parent is in before the chart builds: the figure's `data-chart-entrance`, or else the option. */
+export const entranceOf = (figure: HTMLElement, config: Config): number => {
+	const own = Number.parseFloat(figure.dataset.chartEntrance ?? "");
+	const share = Number.isFinite(own) ? own : config.entrance;
+	return Math.min(Math.max(share, 0), 1);
+};
+
+/** Resolves when an animation around the chart is far enough in, by default halfway, so it builds in a panel that can already be seen. */
+const entrance = async (figure: HTMLElement, share: number): Promise<void> => {
 	if (reduced()) return;
 	await new Promise(requestAnimationFrame);
 	const animations: Animation[] = figure
@@ -54,8 +61,8 @@ const entrance = async (figure: HTMLElement): Promise<void> => {
 		const timing = animation.effect?.getComputedTiming();
 		const duration = Number(timing?.activeDuration ?? 0);
 		if (!timing || !Number.isFinite(duration)) continue;
-		const half = Number(timing.delay ?? 0) + duration / 2;
-		left = Math.max(left, half - Number(animation.currentTime ?? 0));
+		const moment = Number(timing.delay ?? 0) + duration * share;
+		left = Math.max(left, moment - Number(animation.currentTime ?? 0));
 	}
 	if (left > 0) await wait(left);
 };
@@ -137,7 +144,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 			waiting = true;
 			const hidden = reduced() ? null : hiddenAround(state.figure);
 			if (hidden) await startOf(hidden);
-			await entrance(state.figure);
+			await entrance(state.figure, entranceOf(state.figure, config));
 			waiting = false;
 			if (inView || !config.replay) setShown(state, true);
 		} else if (!inView && config.replay && shown) {

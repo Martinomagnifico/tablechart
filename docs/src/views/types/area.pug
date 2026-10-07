@@ -22,10 +22,44 @@ block content
 					span thousands
 				table
 					tbody
-						each row in [['2021', '12'], ['2022', '19'], ['2023', '24'], ['2024', '31'], ['2025', '38']]
+						each row in [['2021', '12'], ['2022', '18'], ['2023', '15'], ['2024', '24'], ['2025', '29']]
 							tr
 								th= row[0]
 								td= row[1]
+
+	+section("Smooth")
+		p Add #[code data-chart-shape="smooth"] to the figure. The top of each area is a curve through every point, which never goes higher or lower than the points on either side of it. In a stack, each area follows the curve of the one below it.
+
+		+chart
+			figure(data-chart="area" data-chart-shape="smooth")
+				figcaption
+					b Visitors to the orchard
+					br
+					span thousands
+				table
+					tbody
+						each row in [['2021', '12'], ['2022', '18'], ['2023', '15'], ['2024', '24'], ['2025', '29']]
+							tr
+								th= row[0]
+								td= row[1]
+
+	+section("Grow up")
+		p Add #[code data-chart-animate="up"] to the figure. The area grows up from zero instead of from left to right. The points rise with it, and the numbers appear when it is done.
+
+		+chart
+			figure(data-chart="area" data-chart-shape="smooth" data-chart-animate="up")
+				figcaption
+					b Visitors to the orchard
+					br
+					span thousands
+				table
+					tbody
+						each row in [['2021', '12'], ['2022', '18'], ['2023', '15'], ['2024', '24'], ['2025', '29']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		p To make every line and area grow up, set the #[code animate] option to #[code "up"]. A chart with triggered steps (like from Reveal.js fragments) still builds from left to right. See #[a(href=url('/styling/animation.html')) Animation].
 
 	+section("Several areas")
 		p Each value column is an area. The column header is the name of the area, shown at the end of its line. The areas overlap, so each one is see-through.
@@ -88,7 +122,7 @@ block content
 			figure(data-chart="area" style="--tablechart-area-opacity: 0.5")
 				table
 					tbody
-						each row in [['2021', '12'], ['2022', '19'], ['2023', '24'], ['2024', '31'], ['2025', '38']]
+						each row in [['2021', '12'], ['2022', '18'], ['2023', '15'], ['2024', '24'], ['2025', '29']]
 							tr
 								th= row[0]
 								td= row[1]
@@ -117,28 +151,6 @@ block content
 
 		p Stacked areas do not overlap, so their default opacity is #[code 0.5].
 		p A value below zero takes no room in a stack.
-
-	+section("Smooth")
-		p Add #[code data-chart-shape="smooth"] to the figure. The top of each area is a curve through every point, which never goes higher or lower than the points on either side of it. In a stack, each area follows the curve of the one below it.
-
-		+chart
-			figure(data-chart="area" data-chart-stack data-chart-shape="smooth" data-chart-legend)
-				figcaption
-					b Apples picked per year
-					br
-					span thousands
-				table
-					thead
-						tr
-							th Year
-							th North
-							th South
-					tbody
-						each row in [['2021', '10', '6'], ['2022', '18', '9'], ['2023', '14', '15'], ['2024', '22', '12'], ['2025', '19', '20']]
-							tr
-								th= row[0]
-								td= row[1]
-								td= row[2]
 
 	+section("Steps")
 		p Add #[code data-chart-shape="step"] to the figure. Each value is flat across the width of its row, and the line goes straight up or down to the next row. A number is shown only where the value changes, in the middle of the rows that have that value. If a number is wider than those rows, it is left out. If you point at the row, or tap it, the numbers of that row are shown.

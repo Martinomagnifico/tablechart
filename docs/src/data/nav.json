@@ -16,7 +16,16 @@
     "sections": [
         {
             "title": "Chart types",
+            "linksLabel": "Overview",
             "links": [
+                {
+                    "text": "Chart types | All types",
+                    "label": "All types",
+                    "href": "/types/index.html"
+                }
+            ],
+            "examplesLabel": "Types",
+            "examples": [
                 {
                     "text": "Chart types | Area",
                     "label": "Area",

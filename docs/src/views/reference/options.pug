@@ -47,7 +47,11 @@ block content
 				tr
 					td: code animate
 					td: code true
-					td If #[code false], a chart is shown whole, without animation
+					td How a chart builds. #[code false] shows it whole, without animation. #[code "up"] makes lines and areas grow up from zero, instead of from left to right. #[code data-chart-animate] on a figure sets it for one chart.
+				tr
+					td: code entrance
+					td: code 0.5
+					td How far an element that animates in is in before its chart builds: #[code 0] when it starts moving, #[code 1] when it is in. #[code data-chart-entrance] on a figure sets it for one chart.
 				tr
 					td: code labels
 					td: code "outside"

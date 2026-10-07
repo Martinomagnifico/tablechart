@@ -22,10 +22,46 @@ block content
 					span millimetres
 				table
 					tbody
-						each row in [['Jan', '88'], ['Feb', '74'], ['Mar', '61'], ['Apr', '49']]
+						each row in [['Jan', '84'], ['Feb', '71'], ['Mar', '76'], ['Apr', '58'], ['May', '61'], ['Jun', '47'], ['Jul', '39'], ['Aug', '52']]
 							tr(data-kind=row[2])
 								th= row[0]
 								td= row[1]
+
+	+section("Smooth")
+		p Add #[code data-chart-shape="smooth"] to the figure. The line is a curve through every point. It never goes higher or lower than the points on either side of it, so the curve shows no peak or dip that is not in the data, and a flat stretch stays flat.
+
+		+chart
+			figure(data-chart="line" data-chart-shape="smooth")
+				figcaption
+					b Rainfall at the orchard
+					br
+					span millimetres
+				table
+					tbody
+						each row in [['Jan', '84'], ['Feb', '71'], ['Mar', '76'], ['Apr', '58'], ['May', '61'], ['Jun', '47'], ['Jul', '39'], ['Aug', '52']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		p To make every line and area smooth, set the #[code shape] option to #[code "smooth"]. Then #[code data-chart-shape="straight"] makes one chart straight again.
+
+	+section("Grow up")
+		p Add #[code data-chart-animate="up"] to the figure. The line grows up from zero instead of from left to right. The points rise with it, and the numbers appear when it is done.
+
+		+chart
+			figure(data-chart="line" data-chart-shape="smooth" data-chart-animate="up")
+				figcaption
+					b Rainfall at the orchard
+					br
+					span millimetres
+				table
+					tbody
+						each row in [['Jan', '84'], ['Feb', '71'], ['Mar', '76'], ['Apr', '58'], ['May', '61'], ['Jun', '47'], ['Jul', '39'], ['Aug', '52']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		p To make every line and area grow up, set the #[code animate] option to #[code "up"]. A chart with triggered steps (like from Reveal.js fragments) still builds from left to right. See #[a(href=url('/styling/animation.html')) Animation].
 
 	+section("Several lines")
 		p Each value column is a line. The column header is the name of the line, shown at the end of the line.
@@ -155,24 +191,6 @@ block content
 							tr
 								th= row[0]
 								td= row[1]
-
-	+section("Smooth")
-		p Add #[code data-chart-shape="smooth"] to the figure. The line is a curve through every point. It never goes higher or lower than the points on either side of it, so the curve shows no peak or dip that is not in the data, and a flat stretch stays flat.
-
-		+chart
-			figure(data-chart="line" data-chart-shape="smooth")
-				figcaption
-					b Apples picked per week
-					br
-					span thousands
-				table
-					tbody
-						each row in [['Week 1', '12'], ['Week 2', '14'], ['Week 3', '31'], ['Week 4', '15'], ['Week 5', '16'], ['Week 6', '16'], ['Week 7', '22']]
-							tr
-								th= row[0]
-								td= row[1]
-
-		p To make every line and area smooth, set the #[code shape] option to #[code "smooth"]. Then #[code data-chart-shape="straight"] makes one chart straight again.
 
 	+section("Stacked lines")
 		p Add #[code data-chart-stack] to the figure. Each line starts on top of the one before it. For stacked lines, an #[a(href=url('/types/area.html')) area chart] is usually easier to read.

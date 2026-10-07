@@ -48,8 +48,10 @@ export interface Config {
 	ringfill: number;
 	/** Locale for numbers. Unset, the document's language is used and followed when it changes. */
 	locale?: string;
-	/** Animate a chart when it builds. */
-	animate: boolean;
+	/** Animate a chart when it builds. `"up"` grows lines and areas from zero instead of across; a figure overrides it with `data-chart-animate`. */
+	animate: boolean | "across" | "up";
+	/** How far an animated parent is in before its chart builds: 0 when it starts moving, 1 when it is in. A figure overrides it with `data-chart-entrance`. */
+	entrance: number;
 	/** Where a column's number goes: on the bar, or inside it. A figure overrides it with `data-chart-labels`. */
 	labels: "outside" | "inside";
 	/** How a line or area runs between points: `straight`, `step` or `smooth`. A figure overrides it with `data-chart-shape`. */
@@ -76,6 +78,7 @@ export const defaultConfig: Config = {
 	barfill: 0.58,
 	ringfill: 0.42,
 	animate: true,
+	entrance: 0.5,
 	labels: "outside",
 	shape: "straight",
 	legend: false,

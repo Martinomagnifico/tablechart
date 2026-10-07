@@ -10,22 +10,99 @@
 	--tablechart-surface: var(--demo-surface-tint);
 }
 
-// The three charts on the start page, each in a box of its own.
+// The charts on the start page, each in a box of its own, with the donut in the middle.
 .hero-charts {
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 1.5em;
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	gap: 1em;
 	margin: 2em 0;
+	font-size: 0.85em;
 
+	@media (max-width: 1100px) {
+		gap: 0.6em;
+	}
+
+	// Where five do not fit well, the three in the middle stay.
+	@media (max-width: 1100px) {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+
+		[data-chart].hero-extra {
+			display: none;
+		}
+	}
+
+	// One below the other, with the same space between the boxes as beside them.
 	@media (max-width: 640px) {
-		grid-template-columns: 1fr;
+		--hero-space: clamp(1.5rem, 9vw, 3.5rem);
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--hero-space);
+		// The page and its container each have the standard padding already.
+		margin-inline: calc(var(--hero-space) - 2 * var(--standard-padding));
 	}
 
 	[data-chart] {
 		margin: 0;
-		padding: 1em;
+		padding: 0.75em;
+		// Lower than a chart on its own may be, so the row stays low.
+		--tablechart-min-height: 120px;
+
+		@media (max-width: 1100px) {
+			padding: 0.5em;
+		}
+
+		// As tall as the donut, so the boxes are about the same height.
+		@media (max-width: 640px) {
+			--tablechart-min-height: 85%;
+		}
 		border: 1px solid color-mix(in oklab, currentColor 25%, transparent);
 		border-radius: 1rem;
+		// One after the other, border and all. Tablechart waits until a box is halfway in, then builds its chart.
+		animation: hero-chart-in 1s ease both;
+
+		&:nth-child(2) {
+			animation-delay: 0.25s;
+		}
+
+		&:nth-child(3) {
+			animation-delay: 0.5s;
+		}
+
+		&:nth-child(4) {
+			animation-delay: 0.75s;
+		}
+
+		&:nth-child(5) {
+			animation-delay: 1s;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			animation: none;
+		}
+	}
+
+	// After the first entrance, a box that is shown again on a resize does not come in again.
+	&.is-settled [data-chart] {
+		animation: none;
+	}
+
+	// The boxes in a row are as tall as the tallest, so each chart sits in the middle of its box.
+	[data-chart] {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+
+	// The key under the donut stays on one line in a narrow box.
+	.tablechart-categories[data-place="key"] {
+		gap: 0.2em 0.6em;
+		flex-wrap: nowrap;
+	}
+}
+
+@keyframes hero-chart-in {
+	from {
+		opacity: 0;
+		transform: translateY(2rem);
 	}
 }
 
@@ -109,4 +186,36 @@
 .type-box,
 .text-box {
 	margin-inline: auto;
+}
+
+// The overview of chart types: each type in a card of its own, with a link to its page.
+.overview-charts {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1.5rem;
+
+	@media (max-width: 900px) {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.card {
+		gap: 0.75rem;
+	}
+
+	// Side by side, the pink areas fill their card, so the two in a row are as tall as each other.
+	.demo {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+
+		> [data-chart] {
+			width: 100%;
+		}
+	}
+
+	h3 a {
+		color: var(--text-heading-3);
+		text-decoration: none;
+	}
 }

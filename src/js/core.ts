@@ -313,7 +313,13 @@ export const build = (
 		})
 		.filter((a): a is NonNullable<typeof a> => a !== null);
 
-	if (config.animate) figure.setAttribute("data-animate", "");
+	if (config.animate) {
+		// The figure's own `data-chart-animate`, or else the option. Only a line or area can grow "up".
+		const own = figure.getAttribute("data-chart-animate");
+		const direction = own === "up" || own === "across" ? own : config.animate;
+		const growsUp = direction === "up" && (kind === "line" || kind === "area");
+		figure.setAttribute("data-animate", growsUp ? "up" : "");
+	}
 
 	const state: ChartState = {
 		figure,

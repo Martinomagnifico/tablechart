@@ -21,7 +21,7 @@ block content
 
 		
 		.hero-charts
-			figure(data-chart="column" data-chart-aspect="0.8")
+			figure.hero-extra(data-chart="column" data-chart-aspect="0.6", data-chart-entrance="0")
 				table
 					tbody
 						tr
@@ -33,7 +33,19 @@ block content
 						tr
 							th Three
 							td 3
-			figure(data-chart="donut" data-chart-aspect="0.8")
+			figure(data-chart="line" data-chart-shape="smooth" data-chart-animate="up" data-chart-aspect="0.6", data-chart-entrance="0")
+				table
+					tbody
+						tr
+							th One
+							td 1
+						tr
+							th Two
+							td 3
+						tr
+							th Three
+							td 2
+			figure(data-chart="donut" data-chart-aspect="0.85", data-chart-entrance="0")
 				table
 					tbody
 						tr
@@ -45,7 +57,7 @@ block content
 						tr
 							th Three
 							td 1
-			figure(data-chart="waterfall" data-chart-aspect="0.8")
+			figure(data-chart="waterfall" data-chart-aspect="0.6", data-chart-entrance="0")
 				table
 					tbody
 						tr(data-kind="total")
@@ -57,6 +69,26 @@ block content
 						tr(data-kind="total")
 							th Three
 							td 3
+			figure.hero-extra(data-chart="bar" data-chart-aspect="0.6", data-chart-entrance="0")
+				table
+					tbody
+						tr
+							th One
+							td 1
+						tr
+							th Two
+							td 2
+						tr
+							th Three
+							td 3
+
+		//- The boxes come in once. A box that is hidden and shown again, on a resize, would otherwise come in again.
+		script.
+			window.addEventListener("load", () => {
+				const row = document.querySelector(".hero-charts");
+				const entrances = row.getAnimations({ subtree: true }).filter((animation) => animation.animationName === "hero-chart-in");
+				Promise.all(entrances.map((animation) => animation.finished)).then(() => row.classList.add("is-settled"));
+			});
 
 
 	footer

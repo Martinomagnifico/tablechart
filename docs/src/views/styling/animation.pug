@@ -43,10 +43,33 @@ block content
 					td The time between one bar and the next: 0.12s by default.
 				tr
 					td: code --tablechart-easing
-					td The easing of bars and slices.
+					td The easing of bars, slices, and lines and areas that grow upwards: #[code cubic-bezier(.26, .86, .44, .985)] by default. A line that builds from left to right does so at an even speed.
 				tr
 					td: code --tablechart-annotation-duration
 					td How long an annotation line takes: 0.6s by default.
+
+	+section("Lines and areas from below")
+		p A line or area chart builds from left to right. Add #[code data-chart-animate="up"] to the figure to make it grow up from zero instead. The points rise with the line, and the numbers appear when it is done.
+
+		+chart
+			figure(data-chart="area" data-chart-stack data-chart-shape="smooth" data-chart-animate="up" data-chart-legend)
+				table
+					thead
+						tr
+							th
+							th North
+							th South
+					tbody
+						each row in [['2020', '42', '18'], ['2021', '55', '26'], ['2022', '38', '31'], ['2023', '61', '24'], ['2024', '49', '35']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+		p To make every line and area grow up, set the #[code animate] option to #[code "up"]. Then #[code data-chart-animate="across"] makes one chart build from left to right again. Other chart types build as they always do.
+
+		+codeblock('JS').
+			init({ animate: "up" });
 
 	+section("No animation")
 		p To show charts without animation, set #[code animate] to #[code false]. If the visitor prefers reduced motion, charts build without animation anyway.

@@ -355,7 +355,7 @@ mixin installWizard(name, imports)
 //- same block. For code that shows only part of the markup, use codeblock on its own.
 mixin chart(label)
 	.card
-		.demo
+		.demo&attributes(attributes)
 			block
 		+codeblock('HTML', label)
 			block

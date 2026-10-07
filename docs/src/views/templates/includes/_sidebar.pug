@@ -30,6 +30,8 @@ aside.docs-sidebar
 						div(id=sectionId, data-panel, class=isActive ? 'is-open' : '')
 							.panel-wrapper
 								.section-links
+									if section.linksLabel
+										p.nav-examples-label= section.linksLabel
 									ul
 										each link in section.links
 											- let active = (link.text === pagetitle);
@@ -37,7 +39,7 @@ aside.docs-sidebar
 												a(class=(active ? "active" : "") href=url(link.href) tabindex=(active ? "-1" : false)) #{link.label || link.text}
 									
 									if section.examples
-										p.nav-examples-label Examples
+										p.nav-examples-label= section.examplesLabel || 'Examples'
 										ul.nav-examples
 											each link in section.examples
 												- let active = (link.text === pagetitle);

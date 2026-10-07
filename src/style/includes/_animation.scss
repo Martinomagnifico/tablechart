@@ -20,24 +20,24 @@
 		transform-origin: left;
 	}
 
-	// Linear, and each piece takes one step, so a line grows continuously instead of pulsing at every join.
+	// Linear, and each piece takes its share of the line, so a line grows continuously instead of pulsing at every join.
 	:where(.tablechart-series) {
 		stroke-dasharray: var(--len);
 		stroke-dashoffset: var(--len);
-		transition: stroke-dashoffset #{$stagger} linear;
+		transition: stroke-dashoffset calc(var(--d, 1) * #{$stagger}) linear;
 		transition-delay: calc(max(var(--i) - 1, 0) * #{$stagger});
 	}
 
 	// A dashed line uses its dashes for its pattern, so each piece is revealed from left to right instead.
 	:where(.tablechart-series[data-line]) {
 		clip-path: inset(-20px 100% -20px 0);
-		transition: clip-path #{$stagger} linear;
+		transition: clip-path calc(var(--d, 1) * #{$stagger}) linear;
 		transition-delay: calc(max(var(--i) - 1, 0) * #{$stagger});
 	}
 
 	:where(.tablechart-area-fill) {
 		opacity: 0;
-		transition: opacity calc(max(var(--rows) - 1, 1) * #{$stagger}) ease;
+		transition: opacity calc(max(var(--rows) - 1, 1) * #{$stagger}) linear;
 		transition-delay: calc(max(var(--i) - 1, 0) * #{$stagger});
 	}
 
@@ -148,6 +148,44 @@
 	}
 	:where(.tablechart-line) {
 		stroke-dashoffset: 0;
+	}
+}
+
+// `up`: a line or area grows from zero as a whole, its points rise with it, and the numbers follow.
+$rise: calc(#{$duration} * 1.6);
+
+:where([data-animate="up"]) {
+	:where(.tablechart-series, .tablechart-area) {
+		stroke-dasharray: none;
+		clip-path: none;
+		transform: scaleY(0);
+		transform-box: view-box;
+		transform-origin: 0 var(--tablechart-base);
+		transition: transform #{$rise} #{$easing};
+		transition-delay: 0s;
+	}
+	:where(.tablechart-area-fill) {
+		opacity: 1;
+		transition: none;
+	}
+	:where(.tablechart-point, .tablechart-hole:not([data-for])) {
+		opacity: 0;
+		transform: translateY(var(--rise, 0));
+		transition: transform #{$rise} #{$easing}, opacity 0.15s ease;
+		transition-delay: 0s;
+	}
+	:where(.tablechart-value, .tablechart-name) {
+		transition-delay: #{$rise};
+	}
+}
+
+:where([data-animate="up"].is-shown) {
+	:where(.tablechart-series, .tablechart-area) {
+		transform: scaleY(1);
+	}
+	:where(.tablechart-point, .tablechart-hole:not([data-for])) {
+		opacity: 1;
+		transform: none;
 	}
 }
 

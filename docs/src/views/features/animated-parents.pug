@@ -48,16 +48,15 @@ block content
 			document.querySelectorAll(".slide-in").forEach((block) => observer.observe(block));
 
 		.slide-in-area
-			.slide-in
-				+chart
-					figure(data-chart="column")
-						figcaption: b Apples picked
-						table
-							tbody
-								each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '31']]
-									tr
-										th= row[0]
-										td= row[1]
+			+chart()(class="slide-in")
+				figure(data-chart="column")
+					figcaption: b Apples picked
+					table
+						tbody
+							each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '31']]
+								tr
+									th= row[0]
+									td= row[1]
 
 		script.
 			(function () {
@@ -68,6 +67,17 @@ block content
 				}, { threshold: 0.5 });
 				document.querySelectorAll('.slide-in').forEach(function (block) { observer.observe(block); });
 			})();
+
+	+section("Earlier or later")
+		p By default, the chart builds when the element around it is halfway. Add #[code data-chart-entrance] to the figure to choose another moment, from #[code 0] to #[code 1]. With #[code 0], the chart builds as soon as the element starts to move. With #[code 1], it builds when the element is in.
+
+		+codeblock('HTML').
+			<figure data-chart="column" data-chart-entrance="0.25">
+
+		p To set it for every chart, use the #[code entrance] option.
+
+		+codeblock('JS').
+			init({ entrance: 0.25 });
 
 	+section("A parent that is still hidden")
 		p A parent can be invisible, with an opacity of 0, until its own script starts the animation. If the chart comes into view before that, Tablechart waits until the parent starts to animate in, or becomes visible.

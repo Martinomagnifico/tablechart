@@ -1,0 +1,75 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Chart types | All types"
+	- pagedescription = "All Tablechart chart types on one page: area, bar, column, donut, line and waterfall."
+
+mixin type(name, href)
+	.card
+		h3: a(href=url(href))= name
+		.demo
+			block
+		a(href=url(href)) #{name} charts →
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 All chart types
+				p.lead Every chart type on one page. Each one has a page of its own with the code and the options.
+
+	+section("", "charts")
+		.overview-charts
+			+type("Area", "/types/area.html")
+				figure(data-chart="area" data-chart-shape="smooth" data-chart-animate="up" aria-label="Visitors to the orchard, in thousands")
+					table
+						tbody
+							each row in [['2021', '12'], ['2022', '18'], ['2023', '15'], ['2024', '24'], ['2025', '29']]
+								tr
+									th= row[0]
+									td= row[1]
+
+			+type("Bar", "/types/bar.html")
+				figure(data-chart="bar" aria-label="Juice pressed by variety, in thousands of litres")
+					table
+						tbody
+							each row in [['Bramley seedling', '31.4'], ['Cox’s orange pippin', '27.8'], ['Egremont russet', '18.2'], ['Discovery', '12.6'], ['Worcester pearmain', '9.1']]
+								tr
+									th= row[0]
+									td= row[1]
+
+			+type("Column", "/types/column.html")
+				figure(data-chart="column" data-chart-aspect="0.6" aria-label="Apples picked per season")
+					table
+						tbody
+							each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70']]
+								tr
+									th= row[0]
+									td= row[1]
+
+			+type("Donut", "/types/donut.html")
+				figure(data-chart="donut" aria-label="Where the crop went, in thousands of apples")
+					table
+						tbody
+							each row in [['Juiced', '38.2'], ['Eaten fresh', '18.1'], ['Sold whole', '12.4'], ['Composted', '5.8']]
+								tr
+									th= row[0]
+									td= row[1]
+
+			+type("Line", "/types/line.html")
+				figure(data-chart="line" data-chart-shape="smooth" data-chart-animate="up" aria-label="Rainfall at the orchard, in millimetres")
+					table
+						tbody
+							each row in [['Jan', '84'], ['Feb', '71'], ['Mar', '76'], ['Apr', '58'], ['May', '61'], ['Jun', '47'], ['Jul', '39'], ['Aug', '52']]
+								tr
+									th= row[0]
+									td= row[1]
+
+			+type("Waterfall", "/types/waterfall.html")
+				figure(data-chart="waterfall" aria-label="What happened to the crop, in thousands of apples")
+					table
+						tbody
+							each row in [['Picked', '74.5', 'total'], ['Windfalls', '28.2'], ['Bruised', '-16.1'], ['Peelings', '-13.3'], ['Pressed', '73.3', 'total']]
+								tr(data-kind=row[2])
+									th= row[0]
+									td= row[1]
