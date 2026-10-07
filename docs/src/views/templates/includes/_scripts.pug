@@ -1,19 +1,21 @@
 block scripts
-	script(src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js")
-	script(src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.6.0/highlightjs-line-numbers.min.js")
+	- const highlighter = isProd ? `${basePath}lib/highlight.min.js` : '/node_modules/@highlightjs/cdn-assets/highlight.min.js'
+	- const lineNumbers = isProd ? `${basePath}lib/highlightjs-line-numbers.min.js` : '/node_modules/highlightjs-line-numbers.js/dist/highlightjs-line-numbers.min.js'
 
 	if isProd
-		script(src=`${basePath}assets/scripts/copybutton.js` vite-ignore)
-		script(src=`${basePath}assets/scripts/anchorlink.js` vite-ignore)
-		script(src=`${basePath}assets/scripts/install-wizard.js` vite-ignore)
-		script(src=`${basePath}assets/scripts/main.js` vite-ignore)
-		script(src=`${basePath}lib/panelset.js` vite-ignore)
-		script(src=`${basePath}lib/tablechart.js` vite-ignore)
+		script(src=`${basePath}assets/scripts/copybutton.js` vite-ignore defer)
+		script(src=`${basePath}assets/scripts/anchorlink.js` vite-ignore defer)
+		script(src=`${basePath}assets/scripts/install-wizard.js` vite-ignore defer)
+		script(src=`${basePath}assets/scripts/main.js` vite-ignore defer)
+		script(src=`${basePath}lib/panelset.js` vite-ignore defer)
+		script(src=`${basePath}lib/tablechart.js` vite-ignore defer)
 		script.
-			Panel.init('.docs-sidebar [data-panel]', { returnFocus: false });
-			PanelSet.init();
-			PanelControl.init();
-			Tablechart.init();
+			document.addEventListener('DOMContentLoaded', function () {
+				Panel.init('.docs-sidebar [data-panel]', { returnFocus: false });
+				PanelSet.init();
+				PanelControl.init();
+				Tablechart.init();
+			});
 
 	else
 		script(type="module" src="/src/assets/scripts/copybutton.js")
@@ -61,11 +63,28 @@ block scripts
 			});
 		});
 
-	script.
-		// Highlight. Exclude the install wizard, and any block JS writes itself (.live-code): hljs rebuilds a block from its text, which would throw away the <mark> elements the static demo puts there.
-		hljs.configure({ cssSelector: 'pre code:not(.iw-code):not(.live-code)' });
-		hljs.highlightAll();
-		hljs.initLineNumbersOnLoad();
+	//- Highlighting, loaded only on a page with code, and after the page, so it holds nothing up.
+	script(data-highlighter=highlighter data-line-numbers=lineNumbers).
+		(function () {
+			if (!document.querySelector('pre code')) return;
+			var urls = document.currentScript.dataset;
+			var load = function (src) {
+				return new Promise(function (done) {
+					var script = document.createElement('script');
+					script.src = src;
+					script.onload = done;
+					document.head.appendChild(script);
+				});
+			};
+			load(urls.highlighter).then(function () { return load(urls.lineNumbers); }).then(function () {
+				// Exclude the install wizard, and any block JS writes itself (.live-code): hljs rebuilds a block from its text, which would throw away the <mark> elements the static demo puts there.
+				hljs.configure({ cssSelector: 'pre code:not(.iw-code):not(.live-code)' });
+				hljs.highlightAll();
+				hljs.initLineNumbersOnLoad();
+				// The install wizard writes its code before this is loaded.
+				document.querySelectorAll('pre code.iw-code:not([data-highlighted])').forEach(function (code) { hljs.highlightElement(code); });
+			});
+		})();
 
 		// Highlight the lines a code block asks for with data-lines, such as "2-8", once
 		// the line numbers have made a row of each line.

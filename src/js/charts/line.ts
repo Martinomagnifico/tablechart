@@ -1,3 +1,4 @@
+import { sizeOf } from "../functions/measure";
 import { AREA_CLASS, AREA_FILL_CLASS, HOLE_CLASS, POINT_CLASS, RULE_CLASS, SERIES_CLASS, VIEWBOX_WIDTH } from "../config";
 import { stackOf } from "../functions/groups";
 import { markerEl, markerOf } from "../functions/markers";
@@ -257,7 +258,7 @@ const trend = (area: boolean): ChartType => ({
 		// A number with no room is still placed, so it can be shown when its row is pointed at.
 		const leftOut = (s: number, i: number): boolean => {
 			if (!stacked && !step) return several && !focused && series.length > 2;
-			const width = seriesValues[s][i].offsetWidth * unit;
+			const width = sizeOf(seriesValues[s][i]).width * unit;
 			const rowsWide = step ? runEnd(s, i) - i + 1 : 1;
 			if (width > rowsWide * band - 4 * unit) return true;
 			return stacked && y(bottomValue(s, i)) - y(topValue(s, i)) < labelHeight * 1.2;
@@ -275,7 +276,7 @@ const trend = (area: boolean): ChartType => ({
 				if (place === "none") return;
 
 				// On a step chart, in the middle of the rows with this value. In a stack, a number at an end is moved inwards, clear of the names.
-				const inwards = (label.offsetWidth * unit) / 2 + 4 * unit;
+				const inwards = (sizeOf(label).width * unit) / 2 + 4 * unit;
 				let x = cx(i);
 				if (step) x = (cx(i) + cx(runEnd(s, i))) / 2;
 				else if (place === "middle" && i === 0) x += inwards;
@@ -299,7 +300,7 @@ const trend = (area: boolean): ChartType => ({
 			const end = step ? px + band / 2 : px;
 			return { name, x: end + 10 * unit, y: stacked ? (py + y(bottomValue(s, i))) / 2 : py };
 		});
-		const nameHeight = (names[0]?.offsetHeight || 0) * unit;
+		const nameHeight = (names[0] ? sizeOf(names[0]).height : 0) * unit;
 		for (const end of spread(ends, nameHeight)) placeAt(end.name, end.x, end.y, VIEWBOX_WIDTH, height);
 
 		// With numbers under the lower line, the rule is the foot of the plot rather than zero.

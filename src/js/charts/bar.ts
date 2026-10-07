@@ -1,3 +1,5 @@
+import { largest } from "../functions/format";
+import { sizeOf } from "../functions/measure";
 import { BAR_CLASS, RULE_CLASS, VIEWBOX_WIDTH } from "../config";
 import { timing } from "../functions/timing";
 import { groupLayout, inkOf, seriesMark, stackMarks, stackOf, stackTotal } from "../functions/groups";
@@ -32,22 +34,22 @@ export const bar: ChartType = {
 		const { segments: segs, height, unit, svg, values, categories, config, barMax } = geo;
 		const several = geo.series.length > 1;
 		// The widest name decides where every bar starts.
-		const names = Math.max(...categories.map((name) => name.offsetWidth * unit), 0);
+		const names = Math.max(largest(categories.map((name) => sizeOf(name).width * unit)), 0);
 		const left = Math.min(names + 10 * unit, VIEWBOX_WIDTH * 0.42);
 		const right = VIEWBOX_WIDTH - 4 * unit;
 
 		const extent = geo.stacked
-			? Math.max(...geo.rows.map((row) => stackTotal(row, geo.series.length)), 0) || 1
+			? Math.max(largest(geo.rows.map((row) => stackTotal(row, geo.series.length))), 0) || 1
 			: Math.max(
-				...geo.rows.flatMap((row) =>
+				largest(geo.rows.flatMap((row) =>
 					row.cells.slice(0, geo.series.length).map((cell) => Math.abs(cell.value))
-				),
+				)),
 				0
 			) || 1;
 		// Room at the end for numbers after their bar; if every number fits inside, the bars take the whole width.
-		const widthOf = (label: HTMLElement) => label.offsetWidth * unit;
+		const widthOf = (label: HTMLElement) => sizeOf(label).width * unit;
 		const roomFor = (labels: HTMLElement[]) =>
-			labels.length ? Math.max(...labels.map(widthOf)) + 9 * unit : 0;
+			labels.length ? largest(labels.map(widthOf)) + 9 * unit : 0;
 		let room = geo.stacked ? roomFor(geo.totals) : several ? roomFor(geo.seriesValues.flat()) : 0;
 		if (!several) {
 			// A narrower span can push another number out of its bar, so this repeats until the room stays the same.
@@ -85,7 +87,7 @@ export const bar: ChartType = {
 					label.dataset.place = "inside";
 					label.toggleAttribute(
 						"data-left-out",
-						!fitsLength(label, end - start, unit) || label.offsetHeight * unit > thickness
+						!fitsLength(label, end - start, unit) || sizeOf(label).height * unit > thickness
 					);
 					inkOf(label, geo, s);
 					placeAt(label, (start + end) / 2, cy(i), VIEWBOX_WIDTH, height);
@@ -109,7 +111,7 @@ export const bar: ChartType = {
 			geo.plot.dataset.grouped = "";
 			// All numbers shrink together to fit beside their bars, or all are left out.
 			const shown = geo.seriesValues.flat().filter((label) => label.dataset.missing === undefined);
-			const fit = fitTogether(geo.plot, shown, (label) => ({ size: label.offsetHeight * unit, room: layout.size + layout.gap * 0.5 }), "--tablechart-fit");
+			const fit = fitTogether(geo.plot, shown, (label) => ({ size: sizeOf(label).height * unit, room: layout.size + layout.gap * 0.5 }), "--tablechart-fit");
 			geo.rows.forEach((row, i) => {
 				geo.series.forEach((_one, s) => {
 					const cell = row.cells[s] ?? row.cells[0];
@@ -171,7 +173,7 @@ export const bar: ChartType = {
 			label.dataset.kind = seg.kind;
 			placeAt(
 				label,
-				inside ? end - 6 * unit - (label.offsetWidth * unit) / 2 : end + 5 * unit,
+				inside ? end - 6 * unit - (sizeOf(label).width * unit) / 2 : end + 5 * unit,
 				middle,
 				VIEWBOX_WIDTH,
 				height

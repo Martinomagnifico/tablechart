@@ -155,7 +155,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 	const switchKind = (): void => {
 		const wanted = kindFor(state.figure);
 		if (!wanted || wanted === kind) return;
-		const next = build(state.figure, config, wanted);
+		const next = debug.timed("Building", state.figure, () => build(state.figure, config, wanted));
 		if (!next) return;
 		unbuild(state);
 		state = next;
@@ -167,7 +167,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		switchKind();
 		const width = state.plot.clientWidth;
 		if (!width || width === placed) return;
-		if (!layout(state, config)) return;
+		if (!debug.timed("Layout", state.figure, () => layout(state, config))) return;
 		placed = width;
 		void show();
 	};
@@ -233,7 +233,7 @@ export const prepare = async (found: HTMLElement[], config: Config): Promise<HTM
 };
 
 const make = (figure: HTMLElement, config: Config): TablechartChart | null => {
-	const state = build(figure, config);
+	const state = debug.timed("Building", figure, () => build(figure, config));
 	if (!state) return null;
 	figure.setAttribute(MADE, "");
 	return watch(state, config);

@@ -23,10 +23,11 @@ import {
 	VALUE_CLASS,
 	VIEWBOX_WIDTH,
 } from "./config";
-import { decimalsIn, formatValue } from "./functions/format";
+import { decimalsIn, formatValue, largest } from "./functions/format";
 import { markerOf } from "./functions/markers";
 import { stackTotal } from "./functions/groups";
 import { fitTogether } from "./functions/labels";
+import { measureAll, sizeOf } from "./functions/measure";
 import { readSeries, readTable } from "./functions/read-table";
 import { cutOut, htmlEl, svgEl } from "./functions/svg";
 import type { AnnotationType, ChartState, ChartType, Geometry, Row, Shape } from "./types";
@@ -120,6 +121,7 @@ export const build = (
 		console.warn(
 			`[${PLUGIN_ID}] Unknown chart type "${kind}". Known types: ${Object.keys(CHARTS).join(", ")}.`
 		);
+		figure.setAttribute("data-chart-empty", "");
 		return null;
 	}
 
@@ -128,6 +130,7 @@ export const build = (
 		console.warn(
 			`[${PLUGIN_ID}] A chart has no rows in its table, so there is nothing to draw.`
 		);
+		figure.setAttribute("data-chart-empty", "");
 		return null;
 	}
 
@@ -168,7 +171,7 @@ export const build = (
 	const marked = type.centre ? rows.filter((r) => !r.isTotal) : rows;
 	const decimals = Math.max(
 		0,
-		...marked.flatMap((r) => r.cells.slice(0, series.length).map((c) => decimalsIn(c.number)))
+		largest(marked.flatMap((r) => r.cells.slice(0, series.length).map((c) => decimalsIn(c.number))))
 	);
 
 	const seriesValues = series.map((_one, s) =>
@@ -382,17 +385,20 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	const shaped = VIEWBOX_WIDTH * (ownAspect > 0 ? ownAspect : (type.aspect ?? config.aspect));
 
 	plot.classList.add(PLACED_CLASS);
-	const labelHeight = (values[0]?.offsetHeight || 0) * unit;
-	const badgeHeight = annotations[0]?.badge
-		? (annotations[0].badge as HTMLElement).offsetHeight * unit
-		: 0;
+	// Undo what the last layout did to the size of the text, then read every size at once, before anything is placed.
+	for (const node of [...seriesValues.flat(), ...state.totals]) delete node.dataset.place;
+	plot.style.removeProperty("--tablechart-fit");
+	measureAll([...seriesValues.flat(), ...state.totals, ...names, ...state.categories, ...annotations.map((a) => a.badge)]);
+
+	const labelHeight = (values[0] ? sizeOf(values[0]).height : 0) * unit;
+	const badgeHeight = annotations[0]?.badge ? sizeOf(annotations[0].badge).height * unit : 0;
 	// Never less than `--tablechart-min-height` (200px), or what the kind needs.
 	const height = Math.max(
 		shaped,
 		cssLength(state.figure, unit, "--tablechart-min-height", "200px") ?? 0,
 		type.minHeight?.({
 			labelHeight,
-			nameHeight: Math.max(0, ...state.categories.map((name) => name.offsetHeight)) * unit,
+			nameHeight: Math.max(0, largest(state.categories.map((name) => sizeOf(name).height))) * unit,
 			unit,
 			rows: rows.length,
 			series: series.length,
@@ -426,10 +432,10 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	const top = headroom;
 
 	const extent = state.stacked
-		? Math.max(...stackedRows.map((row) => row.value), 0)
+		? Math.max(largest(stackedRows.map((row) => row.value)), 0)
 		: Math.max(
-				...segments.flatMap((s) => [s.from, s.to, s.value]),
-				...rows.flatMap((row) => row.cells.slice(0, series.length).map((cell) => cell.value))
+				largest(segments.flatMap((s) => [s.from, s.to, s.value])),
+				largest(rows.flatMap((row) => row.cells.slice(0, series.length).map((cell) => cell.value)))
 			);
 	const plotHeight = height - top - floor;
 	const ceiling = extent * 1.02;
@@ -505,7 +511,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	}
 	// The bands give up the room the widest series name needs.
 	const gutter = names.length
-		? Math.max(...names.map((name) => name.offsetWidth)) * unit + 12 * unit
+		? largest(names.map((name) => sizeOf(name).width)) * unit + 12 * unit
 		: 0;
 	const under = state.categories[0]?.parentElement;
 	if (under) under.style.paddingRight = gutter ? `${(gutter / VIEWBOX_WIDTH) * 100}%` : "";

@@ -1,3 +1,4 @@
+import { sizeOf } from "../functions/measure";
 import { BAR_CLASS, CONNECTOR_CLASS, RULE_CLASS, VIEWBOX_WIDTH } from "../config";
 import { timing } from "../functions/timing";
 import { tallEnough, tooWide } from "../functions/labels";
@@ -86,7 +87,7 @@ export const waterfall: ChartType = {
 			const ly = inside
 				? top + barHeight / 2
 				: seg.kind === "down"
-					? top + barHeight + label.offsetHeight * unit + 3 * unit
+					? top + barHeight + sizeOf(label).height * unit + 3 * unit
 					: top - 3 * unit;
 			placeAt(label, cx(i), ly, VIEWBOX_WIDTH, height);
 		});

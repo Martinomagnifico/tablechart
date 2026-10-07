@@ -1,3 +1,4 @@
+import { sizeOf } from "../functions/measure";
 import { DIVIDE_CLASS, LEADER_CLASS, SLICE_CLASS, VIEWBOX_WIDTH } from "../config";
 import { timing } from "../functions/timing";
 import { placeAt, svgEl, withRow } from "../functions/svg";
@@ -85,7 +86,7 @@ export const donut: ChartType = {
 
 			// Pushed out by its half-width or half-height, depending on how it leans, so it clears the ring.
 			const reach = outer + 9 * unit;
-			const half = (label.offsetWidth * unit) / 2;
+			const half = (sizeOf(label).width * unit) / 2;
 			placeAt(
 				label,
 				middleX + cos * (reach + Math.abs(cos) * half),

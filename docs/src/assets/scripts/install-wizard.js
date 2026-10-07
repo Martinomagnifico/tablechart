@@ -50,9 +50,10 @@
 
 		if (codeEl) codeEl.textContent = data.code;
 		if (langEl) langEl.textContent = data.lang.toUpperCase();
+		if (codeEl) codeEl.className = 'iw-code language-' + data.lang;
+		// Highlighting may still be loading; it highlights this block itself when it is in.
 		if (window.hljs && codeEl) {
 			codeEl.removeAttribute('data-highlighted');
-			codeEl.className = 'iw-code language-' + data.lang;
 			hljs.highlightElement(codeEl);
 		}
 	}

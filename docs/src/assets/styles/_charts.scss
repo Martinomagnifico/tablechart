@@ -214,7 +214,13 @@
 		}
 	}
 
-	h3 a {
+	// An h2, so the headings follow the page title in order, but as small as a heading in a card.
+	h2 {
+		font-size: 1.33rem;
+		color: var(--text-heading-3);
+	}
+
+	h2 a {
 		color: var(--text-heading-3);
 		text-decoration: none;
 	}

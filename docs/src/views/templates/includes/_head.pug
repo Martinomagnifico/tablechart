@@ -32,9 +32,13 @@ head
 			meta(name="twitter:description" content=pagedesc)
 			meta(name="twitter:image" content=pageimg)
 
+		//- The text font, before anything asks for it, so it is there for the first drawing of the page.
+		link(rel="preload" href=`${basePath}fonts/source-sans-3-latin-wght-normal.woff2` as="font" type="font/woff2" crossorigin)
+
 		block styles
-			link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css" media="(prefers-color-scheme: light)")
-			link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css" media="(prefers-color-scheme: dark)")
+			- const vendor = isProd ? `${basePath}lib/` : '/node_modules/@highlightjs/cdn-assets/styles/'
+			link(rel="stylesheet" href=`${vendor}github.min.css` media="(prefers-color-scheme: light)")
+			link(rel="stylesheet" href=`${vendor}github-dark.min.css` media="(prefers-color-scheme: dark)")
 			link(rel="stylesheet" href="/src/assets/styles/docs.scss")
 			//- PanelSet's stylesheet, from npm: its copy in lib/ in the build.
 			if isProd

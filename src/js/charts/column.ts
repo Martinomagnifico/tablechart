@@ -1,3 +1,4 @@
+import { sizeOf } from "../functions/measure";
 import { BAR_CLASS, RULE_CLASS, VIEWBOX_WIDTH } from "../config";
 import { timing } from "../functions/timing";
 import { groupLayout, inkOf, seriesMark, stackMarks, stackOf } from "../functions/groups";
@@ -39,7 +40,7 @@ export const column: ChartType = {
 					label.dataset.place = "inside";
 					label.toggleAttribute(
 						"data-left-out",
-						!tallEnough(label, bottom - top, unit) || label.offsetWidth * unit > barWidth - 4 * unit
+						!tallEnough(label, bottom - top, unit) || sizeOf(label).width * unit > barWidth - 4 * unit
 					);
 					inkOf(label, geo, s);
 					placeAt(label, cx(i), (top + bottom) / 2, VIEWBOX_WIDTH, height);
@@ -63,7 +64,7 @@ export const column: ChartType = {
 			geo.plot.dataset.grouped = "";
 			// All numbers shrink together to fit above their bars, or all are left out.
 			const shown = geo.seriesValues.flat().filter((label) => label.dataset.missing === undefined);
-			const fit = fitTogether(geo.plot, shown, (label) => ({ size: label.offsetWidth * unit, room: layout.size + layout.gap * 0.5 }), "--tablechart-fit");
+			const fit = fitTogether(geo.plot, shown, (label) => ({ size: sizeOf(label).width * unit, room: layout.size + layout.gap * 0.5 }), "--tablechart-fit");
 			geo.rows.forEach((row, i) => {
 				geo.series.forEach((_one, s) => {
 					const cell = row.cells[s] ?? row.cells[0];

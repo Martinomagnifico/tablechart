@@ -1,3 +1,4 @@
+import { largest } from "./format";
 import { debug } from "./debug";
 import { PLUGIN_ID } from "../config";
 import type { Cell, Row, Series } from "../types";
@@ -41,7 +42,7 @@ const lineOf = (value: string | null | undefined): "dashed" | "dotted" | null =>
 
 export const readSeries = (figure: HTMLElement, rows: Row[], langattribute: string | false = "data-i18n"): Series[] => {
 	const heads = seriesHeads(figure);
-	const count = Math.max(1, ...rows.map((row) => row.cells.length));
+	const count = Math.max(1, largest(rows.map((row) => row.cells.length)));
 	return Array.from({ length: count }, (_, i) => {
 		const head = heads[i];
 		return {

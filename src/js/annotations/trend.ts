@@ -1,3 +1,4 @@
+import { sizeOf } from "../functions/measure";
 import { HEAD_CLASS, LINE_CLASS, VIEWBOX_WIDTH } from "../config";
 import { timing } from "../functions/timing";
 import { placeAt, svgEl } from "../functions/svg";
@@ -52,11 +53,11 @@ export const trend: AnnotationType = {
 		if (badge) {
 			const bx = x1 + (x2 - x1) * t;
 			const by = y1 + (y2 - y1) * t;
-			const halfWidth = (badge.offsetWidth * unit) / 2;
-			const bottom = by + (badge.offsetHeight * unit) / 2 + 8 * unit;
+			const halfWidth = (sizeOf(badge).width * unit) / 2;
+			const bottom = by + (sizeOf(badge).height * unit) / 2 + 8 * unit;
 			let raise = 0;
 			rows.forEach((row, i) => {
-				const halfLabel = ((values[i]?.offsetWidth || 0) * unit) / 2;
+				const halfLabel = ((values[i] ? sizeOf(values[i]).width : 0) * unit) / 2;
 				if (Math.abs(cx(i) - bx) >= halfWidth + halfLabel) return;
 				const labelTop = y(row.value) - 7 * unit - labelHeight;
 				raise = Math.max(raise, bottom - labelTop);

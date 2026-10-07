@@ -38,6 +38,32 @@
 			clip-path: none;
 		}
 	}
+
+	// Until a chart is laid out, it keeps about the room it will take, so the page does not move when it appears.
+	@media (scripting: enabled) {
+		&:where(:not([data-chart-empty]):not(:has(> .tablechart-plot)))::after {
+			content: "";
+			display: block;
+			aspect-ratio: 1 / var(--_room, 0.38);
+			min-height: var(--tablechart-min-height, 200px);
+			// And a line for the names under the plot.
+			padding-bottom: 1.5em;
+		}
+
+		:where(.tablechart-plot:not(.is-placed)) {
+			aspect-ratio: 1 / var(--_room, 0.38);
+			min-height: var(--tablechart-min-height, 200px);
+			overflow: hidden;
+		}
+	}
+}
+
+:where([data-chart="donut"]) {
+	--_room: 0.66;
+}
+
+:where([data-chart="bar"]) {
+	--_room: 0.5;
 }
 
 .tablechart-plot {

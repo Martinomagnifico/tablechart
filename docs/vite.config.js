@@ -78,7 +78,11 @@ export default defineConfig(({ mode }) => {
                 { src: '../dist/tablechart.js', dest: 'lib' },
                 { src: '../dist/tablechart.css', dest: 'lib' },
                 { src: 'node_modules/panelset/dist/panelset.js', dest: 'lib' },
-                { src: 'node_modules/panelset/dist/panelset.css', dest: 'lib' }
+                { src: 'node_modules/panelset/dist/panelset.css', dest: 'lib' },
+                { src: 'node_modules/@highlightjs/cdn-assets/highlight.min.js', dest: 'lib' },
+                { src: 'node_modules/@highlightjs/cdn-assets/styles/github.min.css', dest: 'lib' },
+                { src: 'node_modules/@highlightjs/cdn-assets/styles/github-dark.min.css', dest: 'lib' },
+                { src: 'node_modules/highlightjs-line-numbers.js/dist/highlightjs-line-numbers.min.js', dest: 'lib' }
                 ]
             }),
 			vituum({
