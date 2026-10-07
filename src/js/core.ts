@@ -269,7 +269,7 @@ export const build = (
 	else if (type.centre) categories.dataset.place = "key";
 	categories.style.setProperty("--tablechart-columns", String(rows.length));
 	let slice = 0;
-	for (const row of rows) {
+	for (const [i, row] of rows.entries()) {
 		const span = document.createElement("span");
 		span.classList.add(...row.classes);
 		span.textContent = row.label;
@@ -284,7 +284,7 @@ export const build = (
 			}
 		}
 		span.style.setProperty("--i", String(row.slot));
-		span.dataset.row = String(rows.indexOf(row) + 1);
+		span.dataset.row = String(i + 1);
 		categories.appendChild(span);
 	}
 	(beside ? plot : figure).appendChild(categories);

@@ -40,19 +40,22 @@
 	}
 
 	// Until a chart is laid out, it keeps about the room it will take, so the page does not move when it appears.
+	// A padding in percent, rather than `aspect-ratio`: with a minimum height, an aspect ratio
+	// also gives a minimum width, which widens a grid column or a flex item before the chart is laid out.
+	$room: max(var(--tablechart-min-height, 200px), calc(var(--_room, 0.38) * 100%));
 	@media (scripting: enabled) {
 		&:where(:not([data-chart-empty]):not(:has(> .tablechart-plot)))::after {
 			content: "";
 			display: block;
-			aspect-ratio: 1 / var(--_room, 0.38);
-			min-height: var(--tablechart-min-height, 200px);
+			height: 0;
+			padding-top: $room;
 			// And a line for the names under the plot.
 			padding-bottom: 1.5em;
 		}
 
 		:where(.tablechart-plot:not(.is-placed)) {
-			aspect-ratio: 1 / var(--_room, 0.38);
-			min-height: var(--tablechart-min-height, 200px);
+			height: 0;
+			padding-top: $room;
 			overflow: hidden;
 		}
 	}

@@ -1,6 +1,6 @@
 {
   "name": "@martinomagnifico/tablechart",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Simple charts from an HTML or Markdown table: column, bar, line, area, waterfall and donut, with annotations. A chart builds when it scrolls into view.",
   "type": "module",
   "sideEffects": [

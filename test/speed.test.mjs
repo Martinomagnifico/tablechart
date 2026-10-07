@@ -41,10 +41,21 @@ for (const rows of ${JSON.stringify(counts)}) {
 window.done = results;
 `;
 
+// A dot every half second while Chrome works, so the wait shows. It stops before the results are printed.
+const listed = counts.map((n) => n.toLocaleString("en"));
+process.stdout.write(`\nTesting charts with ${listed.length > 1 ? `${listed.slice(0, -1).join(", ")} and ${listed.at(-1)}` : listed[0]} rows `);
+const dots = setInterval(() => process.stdout.write("."), 500);
+const stopDots = () => {
+	clearInterval(dots);
+	process.stdout.write(" done\n");
+};
+
 let results;
 try {
 	results = await run(page("", script), { port: 4612, cdpPort: 9612, timeout: 900_000 });
+	stopDots();
 } catch (error) {
+	stopDots();
 	console.error(`\n✗ ${error.message}\n`);
 	process.exit(1);
 }

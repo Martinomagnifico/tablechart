@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.3] - 2026-10-07
+
+### Fixed
+
+- Fixed a layout issue with aspect ratio, 
+
+
+
 ## [0.1.2] - 2026-10-07
 
 ### Added
