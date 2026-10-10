@@ -1,0 +1,125 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Features | Scale break"
+	- pagedescription = "A break in the scale of a Tablechart chart: part of the scale shown smaller, so small values have more room next to a very large one."
+
+mixin regions(kind, mark)
+	figure(data-chart=kind)
+		table
+			tbody
+				each row in [['North', '12'], ['South', '15'], ['East', '14'], ['West', '140']]
+					tr
+						th= row[0]
+						td= row[1]
+		.chart-annotations
+			span(data-annotation="axis-break" data-from="20" data-mark=mark)
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Scale break
+				p.lead Part of the scale shown smaller, so the small values have room next to a very large one.
+
+	+section("Which charts")
+		p If one value is much larger than the others, the other bars are very short. Add a break: part of the scale is then shown smaller, and the small values get more room. The bars that run through the break are cut, so you can see they are not to scale there. Every bar shows its number.
+		p A break works on column, bar and waterfall charts. With several bars per row, each bar is cut, and a stack is cut as a whole. On a line or area chart a break would cut through nothing, so there, and on a donut, it is left out, and the console says so.
+
+	+section("Column")
+		p The break is a #[code span] with #[code data-annotation="axis-break"], in a #[code div] with the class #[code chart-annotations] inside the chart. #[code data-from="20"] shows the scale above 20 smaller.
+
+		+chart
+			+regions("column")
+
+	+section("Bar")
+		p On a bar chart the scale runs to the right, so the bars are cut from top to bottom.
+
+		+chart
+			+regions("bar")
+
+	+section("Waterfall")
+		p On a waterfall, the totals stand on the baseline and can be cut. A break may not cut a step that floats, because its height would then be wrong. So put the break below the steps, such as between the baseline and the lowest step. Otherwise it is left out, and the console says why.
+
+		+chart
+			figure(data-chart="waterfall")
+				table
+					tbody
+						each row in [['Picked', '174.5', 'total'], ['Windfalls', '8.2'], ['Bruised', '-6.1'], ['Peelings', '-3.3'], ['Pressed', '173.3', 'total']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+				.chart-annotations
+					span(data-annotation="axis-break" data-from="20" data-to="160")
+
+	+section("Straight or zigzag")
+		p The cut is two slanted lines by default, as in the charts above. Add #[code data-mark="zigzag"] to draw it as a zigzag: up, down and up again across a column, and right, left and right again down a bar.
+
+		+chart
+			+regions("column", "zigzag")
+
+		+chart
+			+regions("bar", "zigzag")
+
+	+section("Attributes")
+		table
+			thead
+				tr
+					th Attribute
+					th Sets
+			tbody
+				tr
+					td: code data-from
+					td Where the smaller part of the scale starts. The baseline if not set.
+				tr
+					td: code data-to
+					td Where it ends. The end of the scale if not set.
+				tr
+					td: code data-size
+					td The share of the length the smaller part gets, as a percentage. 22% at the end of the scale, 30% otherwise.
+				tr
+					td: code data-mark
+					td How the cut is drawn: two slanted lines by default, or #[code zigzag].
+
+	+section("Colour and width")
+		p The lines of the cut have CSS variables of their own.
+
+		table
+			thead
+				tr
+					th Variable
+					th Sets
+			tbody
+				tr
+					td: code --tablechart-break-color
+					td The colour of the lines: the text colour by default
+				tr
+					td: code --tablechart-break-width
+					td The width of the lines: 1px by default
+				tr
+					td: code --tablechart-break-opacity
+					td The opacity of the lines: 1 by default
+				tr
+					td: code --tablechart-break-gap
+					td The empty space between the two lines, in #[code px], #[code %] of the chart width, #[code em] or #[code rem]: 1.3% by default
+
+		p For a quieter cut, give its lines the colour of the bars:
+
+		+style.
+			.soft-break {
+				--tablechart-break-color: var(--tablechart-bar-color, currentColor);
+				--tablechart-break-width: 2px;
+			}
+
+		+chart
+			figure.soft-break(data-chart="column")
+				table
+					tbody
+						each row in [['North', '12'], ['South', '15'], ['East', '14'], ['West', '140']]
+							tr
+								th= row[0]
+								td= row[1]
+				.chart-annotations
+					span(data-annotation="axis-break" data-from="20" data-mark="zigzag")
+
+		p The other variables of lines and marks are on #[a(href=url('/styling/lines.html')) Lines and marks].

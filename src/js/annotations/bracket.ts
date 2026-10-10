@@ -1,4 +1,4 @@
-import { HEAD_CLASS, LINE_CLASS, PLUGIN_ID, VIEWBOX_WIDTH } from "../config";
+import { HEAD_CLASS, LINE_CLASS, LIBRARY_NAME, VIEWBOX_WIDTH } from "../config";
 import { timing } from "../functions/timing";
 import { placeAt, svgEl } from "../functions/svg";
 import type { AnnotationType, Geometry } from "../types";
@@ -26,7 +26,7 @@ export const bracket: AnnotationType = {
 		const b = rows[i2];
 		if (!a || !b) {
 			console.warn(
-				`[${PLUGIN_ID}] A bracket points at a row that is not there (row ${i1 + 1} to ${i2 + 1}, of ${rows.length}).`
+				`[${LIBRARY_NAME}] A bracket points at a row that is not there (row ${i1 + 1} to ${i2 + 1}, of ${rows.length}).`
 			);
 			return;
 		}

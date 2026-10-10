@@ -16,20 +16,23 @@ import {
 	PLACED_CLASS,
 	PLOT_CLASS,
 	HOLE_CLASS,
-	PLUGIN_ID,
+	LIBRARY_NAME,
 	POINTER_CLASS,
 	SR_CLASS,
+	MINUS_CLASS,
 	SHOWN_CLASS,
 	VALUE_CLASS,
 	VIEWBOX_WIDTH,
 } from "./config";
-import { decimalsIn, formatValue, largest } from "./functions/format";
+import { decimalsIn, largest, splitSign } from "./functions/format";
 import { markerOf } from "./functions/markers";
 import { stackTotal } from "./functions/groups";
 import { fitTogether } from "./functions/labels";
 import { measureAll, sizeOf } from "./functions/measure";
+import type { Squeeze } from "./functions/scale";
 import { readSeries, readTable } from "./functions/read-table";
 import { cutOut, htmlEl, svgEl } from "./functions/svg";
+import { applySteps, makeControls, planSteps, stepTo } from "./steps";
 import type { AnnotationType, ChartState, ChartType, Geometry, Row, Shape } from "./types";
 
 const CHARTS: Record<string, ChartType> = { area, bar, column, donut, line, waterfall };
@@ -119,7 +122,7 @@ export const build = (
 	const type = CHARTS[kind];
 	if (!type) {
 		console.warn(
-			`[${PLUGIN_ID}] Unknown chart type "${kind}". Known types: ${Object.keys(CHARTS).join(", ")}.`
+			`[${LIBRARY_NAME}] Unknown chart type "${kind}". Known types: ${Object.keys(CHARTS).join(", ")}.`
 		);
 		figure.setAttribute("data-chart-empty", "");
 		return null;
@@ -128,7 +131,7 @@ export const build = (
 	const rows = readTable(figure, config.langattribute);
 	if (!rows.length) {
 		console.warn(
-			`[${PLUGIN_ID}] A chart has no rows in its table, so there is nothing to draw.`
+			`[${LIBRARY_NAME}] A chart has no rows in its table, so there is nothing to draw.`
 		);
 		figure.setAttribute("data-chart-empty", "");
 		return null;
@@ -139,7 +142,7 @@ export const build = (
 	let series = readSeries(figure, rows, config.langattribute);
 	if (series.length > 1 && !type.series) {
 		console.warn(
-			`[${PLUGIN_ID}] A ${kind} chart draws one series; only the first of the table's ${series.length} value columns is used.`
+			`[${LIBRARY_NAME}] A ${kind} chart draws one series; only the first of the table's ${series.length} value columns is used.`
 		);
 		series = series.slice(0, 1);
 	}
@@ -149,14 +152,14 @@ export const build = (
 
 	const stackAsked = figure.hasAttribute("data-chart-stack");
 	if (stackAsked && !type.stackable)
-		console.warn(`[${PLUGIN_ID}] A ${kind} chart cannot be stacked.`);
+		console.warn(`[${LIBRARY_NAME}] A ${kind} chart cannot be stacked.`);
 	const stacked = stackAsked && !!type.stackable && several;
 	if (
 		stacked &&
 		rows.some((row) => row.cells.slice(0, series.length).some((cell) => cell.value < 0))
 	)
 		console.warn(
-			`[${PLUGIN_ID}] A stacked chart has a value below zero. It takes no room in the stack.`
+			`[${LIBRARY_NAME}] A stacked chart has a value below zero. It takes no room in the stack.`
 		);
 
 	// Hidden from screen readers: they read the table, which has the same numbers and names.
@@ -290,13 +293,30 @@ export const build = (
 	(beside ? plot : figure).appendChild(categories);
 	if (legend) figure.appendChild(legend);
 
+	// A chart that steps (`data-fragment`) builds a step at a time, from left to right. Without animation it is shown whole.
+	const plan = config.animate ? planSteps(figure) : null;
+	if (plan) {
+		figure.setAttribute("data-steps", "");
+		figure.setAttribute("data-chart-animate", "across");
+	}
+	const keys = figure.getAttribute("data-chart-keys");
+	const controls =
+		plan && config.controls
+			? makeControls(
+					{ previous: config.previouslabel, next: config.nextlabel, hint: config.stephint },
+					{ previous: keys && `${keys}-previous`, next: keys && `${keys}-next`, hint: keys && `${keys}-step` },
+					config.langattribute
+				)
+			: null;
+	if (controls) figure.appendChild(controls);
+
 	const annotations = Array.from(figure.querySelectorAll<HTMLElement>("[data-annotation]"))
 		.map((spec) => {
 			const name = spec.getAttribute("data-annotation") as string;
 			const annotationType = ANNOTATIONS[name];
 			if (!annotationType) {
 				console.warn(
-					`[${PLUGIN_ID}] Unknown annotation "${name}". Known annotations: ${Object.keys(ANNOTATIONS).join(", ")}.`
+					`[${LIBRARY_NAME}] Unknown annotation "${name}". Known annotations: ${Object.keys(ANNOTATIONS).join(", ")}.`
 				);
 				return null;
 			}
@@ -304,7 +324,7 @@ export const build = (
 			const index = asked >= 1 && asked <= series.length ? asked - 1 : 0;
 			if (asked !== index + 1)
 				console.warn(
-					`[${PLUGIN_ID}] An annotation reads line ${asked}, which the chart does not have; it reads the first.`
+					`[${LIBRARY_NAME}] An annotation reads line ${asked}, which the chart does not have; it reads the first.`
 				);
 			return {
 				spec,
@@ -344,13 +364,26 @@ export const build = (
 		rowBox: null,
 		annotations,
 		checks: [],
+		plan,
+		step: 0,
+		controls,
 	};
+	controls?.addEventListener("click", (event) => {
+		const go = (event.target as Element).closest("button")?.dataset.go;
+		if (go) stepTo(state, state.step + (go === "next" ? 1 : -1));
+	});
+	stepTo(state, 0, true);
 	if (config.hover && figure.getAttribute("data-chart-hover") !== "false") pointAt(state);
 	relabel(state, config);
 	return state;
 };
 
 // A CSS length in viewBox units, or null if it is not a length, such as `none`.
+const insideAlign = (figure: HTMLElement): Geometry["insideAlign"] => {
+	const asked = getComputedStyle(figure).getPropertyValue("--tablechart-inside-align").trim();
+	return asked === "start" || asked === "center" || asked === "end" ? asked : null;
+};
+
 const cssLength = (figure: HTMLElement, unit: number, name: string, fallback: string) => {
 	const style = getComputedStyle(figure);
 	const raw = style.getPropertyValue(name).trim() || fallback;
@@ -451,7 +484,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	const fromAsked = read("data-from") ?? read("data-at");
 	const toAsked = read("data-to");
 
-	let compress: { lo: number; hi: number; gap: number; share: number } | null = null;
+	let compress: Squeeze | null = null;
 	if (breakSpec && (fromAsked !== null || toAsked !== null)) {
 		const lo = fromAsked ?? 0;
 		const hi = toAsked ?? ceiling;
@@ -462,7 +495,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		const sizeMatch = sizeAsked?.match(/^\s*(\d+(?:\.\d+)?)\s*%\s*$/);
 		if (sizeAsked !== null && !sizeMatch) {
 			console.warn(
-				`[${PLUGIN_ID}] data-size="${sizeAsked}" is not a percentage, such as 30%. Using the default.`
+				`[${LIBRARY_NAME}] data-size="${sizeAsked}" is not a percentage, such as 30%. Using the default.`
 			);
 		}
 		const share = Math.min(
@@ -479,14 +512,14 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		);
 
 		if (!type.breakable) {
-			console.warn(`[${PLUGIN_ID}] This kind of chart cannot break its scale.`);
+			console.warn(`[${LIBRARY_NAME}] This kind of chart cannot break its scale.`);
 		} else if (lo < 0 || hi <= lo || hi > ceiling || (lo === 0 && hi === ceiling)) {
 			console.warn(
-				`[${PLUGIN_ID}] A break from ${lo} to ${hi} does not fit a scale that runs from 0 to ${extent}.`
+				`[${LIBRARY_NAME}] A break from ${lo} to ${hi} does not fit a scale that runs from 0 to ${extent}.`
 			);
 		} else if (floats.length) {
 			console.warn(
-				`[${PLUGIN_ID}] A break from ${lo} to ${hi} would cut a step that floats. Keep it below or above the steps.`
+				`[${LIBRARY_NAME}] A break from ${lo} to ${hi} would cut a step that floats. Keep it below or above the steps.`
 			);
 		} else {
 			compress = { lo, hi, gap, share };
@@ -494,19 +527,21 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	}
 	const breakAt = compress ? compress.gap : null;
 
+	// The empty space where the scale jumps: `--tablechart-break-gap`, or 1.3% of the width if not set.
+	const breakGap = (compress && cssLength(state.figure, unit, "--tablechart-break-gap", "")) ?? BREAK_GAP;
 	// Full scale below and above the break, compressed through it.
 	const base = height - floor;
 	let y: (value: number) => number = (value) => base - (value / ceiling) * plotHeight;
 	if (compress) {
 		const { lo, hi, gap, share } = compress;
 		const squeezed = plotHeight * share;
-		const density = (plotHeight - squeezed - BREAK_GAP) / (lo + (ceiling - hi));
+		const density = (plotHeight - squeezed - breakGap) / (lo + (ceiling - hi));
 		const perValue = squeezed / (hi - lo);
 		y = (value) => {
 			if (value <= lo) return base - value * density;
 			if (value <= gap) return base - lo * density - (value - lo) * perValue;
-			if (value <= hi) return base - lo * density - (value - lo) * perValue - BREAK_GAP;
-			return base - lo * density - squeezed - BREAK_GAP - (value - hi) * density;
+			if (value <= hi) return base - lo * density - (value - lo) * perValue - breakGap;
+			return base - lo * density - squeezed - breakGap - (value - hi) * density;
 		};
 	}
 	// The bands give up the room the widest series name needs.
@@ -553,7 +588,11 @@ export const layout = (state: ChartState, config: Config): boolean => {
 			(state.figure.dataset.chartLabels !== "outside" && config.labels === "inside")
 				? "inside"
 				: "outside",
+		closing: (state.figure.dataset.chartClosing ?? config.closing) === "up" ? "up" : "down",
+		insideAlign: insideAlign(state.figure),
 		breakAt,
+		squeeze: compress,
+		breakGap,
 		stacked: state.stacked,
 		shape: shapeOf(state.figure, config),
 		totals: state.totals,
@@ -571,16 +610,6 @@ export const layout = (state: ChartState, config: Config): boolean => {
 
 	type.draw(geo);
 
-	// Names under the plot shrink together, down to 70%, if one is wider than its column.
-	const nameRow = state.categories[0]?.parentElement;
-	if (nameRow && type.categories !== "beside" && !type.centre) {
-		fitTogether(
-			nameRow,
-			state.categories.filter((name) => name.offsetParent !== null),
-			(name) => ({ size: name.scrollWidth, room: name.clientWidth }),
-			"--tablechart-name-fit"
-		);
-	}
 	for (const [n, annotation] of annotations.entries()) {
 		annotation.badge?.setAttribute("data-note", String(n + 1));
 		// An annotation on another series reads that series as if it were the only one.
@@ -606,6 +635,20 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		});
 	}
 
+	// Before anything reads styles, so new marks start at their step and do not transition to it.
+	applySteps(state);
+
+	// Names under the plot shrink together, down to 70%, if one is wider than its column.
+	const nameRow = state.categories[0]?.parentElement;
+	if (nameRow && type.categories !== "beside" && !type.centre) {
+		fitTogether(
+			nameRow,
+			state.categories.filter((name) => name.offsetParent !== null),
+			(name) => ({ size: name.scrollWidth, room: name.clientWidth }),
+			"--tablechart-name-fit"
+		);
+	}
+
 	// A callout is a hole in the marks under it, so the background shows through.
 	const holes = annotations.flatMap(({ badge }) => {
 		if (!(badge instanceof HTMLElement) || !badge.offsetWidth) return [];
@@ -627,7 +670,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 				height: tall,
 				rx: share === null ? px : width * share,
 				ry: share === null ? px : tall * share,
-				style: ["--after"]
+				style: ["--after", "--step"]
 					.map((name) => badge.style.getPropertyValue(name) && `${name}:${badge.style.getPropertyValue(name)}`)
 					.filter(Boolean)
 					.join("; "),
@@ -650,7 +693,15 @@ export const relabel = (state: ChartState, config: Config): void => {
 		}
 		const value = Number.parseFloat(node.dataset.value || "0");
 		const places = node.dataset.decimals ? Number(node.dataset.decimals) : state.decimals;
-		node.textContent = prefix + formatValue(value, places, config.locale) + suffix;
+		const [sign, rest] = splitSign(value, places, config.locale);
+		node.textContent = prefix + (prefix ? sign : "") + rest + suffix;
+		// A leading minus is set apart, so it can hang outside a centred number.
+		if (sign && !prefix) {
+			const minus = document.createElement("span");
+			minus.className = MINUS_CLASS;
+			minus.textContent = sign;
+			node.prepend(minus);
+		}
 	}
 };
 
@@ -659,6 +710,7 @@ export const unbuild = (state: ChartState): void => {
 	state.plot.remove();
 	state.categories[0]?.parentElement?.remove();
 	state.figure.querySelector(`:scope > .${LEGEND_CLASS}`)?.remove();
+	state.controls?.remove();
 };
 
 /** One class, `is-shown`, starts the whole build. */

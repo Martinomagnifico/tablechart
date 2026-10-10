@@ -1,10 +1,10 @@
-import { PLUGIN_ID } from "../config";
+import { LIBRARY_NAME } from "../config";
 
 /** Messages for whoever is working on a page, shown only with `debug: true`. */
 export const debug = {
 	enabled: false,
 	log(...args: unknown[]): void {
-		if (debug.enabled) console.log(`[${PLUGIN_ID}]`, ...args);
+		if (debug.enabled) console.log(`[${LIBRARY_NAME}]`, ...args);
 	},
 	/** Runs `work`, and with `debug: true` says how long it took, with a warning above 50 ms. */
 	timed<T>(what: string, figure: HTMLElement, work: () => T): T {
@@ -13,7 +13,7 @@ export const debug = {
 		const result = work();
 		const ms = performance.now() - start;
 		const rows = figure.querySelectorAll("tbody tr").length;
-		if (ms > 50) console.warn(`[${PLUGIN_ID}] ${what} took ${ms.toFixed(1)} ms for ${rows} rows, more than 50 ms.`, figure);
+		if (ms > 50) console.warn(`[${LIBRARY_NAME}] ${what} took ${ms.toFixed(1)} ms for ${rows} rows, more than 50 ms.`, figure);
 		else debug.log(`${what} took ${ms.toFixed(1)} ms for ${rows} rows.`, figure);
 		return result;
 	},

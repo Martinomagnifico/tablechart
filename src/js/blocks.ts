@@ -1,5 +1,6 @@
 /** Building blocks under `init()`: `prepare`, `build`, `layout`, then `setShown`. Imported as `@martinomagnifico/tablechart/core`. */
 export { build, layout, relabel, setShown, unbuild } from "./core";
+export { stepTo, type StepPlan } from "./steps";
 export { entranceOf, prepare } from "./init";
 export { adoptTables, loadSources, readMarkdownRows } from "./functions/sources";
 export { assignKeys } from "./functions/read-table";

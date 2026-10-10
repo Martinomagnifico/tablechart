@@ -3,7 +3,7 @@ import { AREA_CLASS, AREA_FILL_CLASS, HOLE_CLASS, POINT_CLASS, RULE_CLASS, SERIE
 import { stackOf } from "../functions/groups";
 import { markerEl, markerOf } from "../functions/markers";
 import { spread } from "../functions/labels";
-import { curveLength, curveTo, fixed, tangentsWithGaps } from "../functions/smooth";
+import { curveTo, fixed, tangentsWithGaps } from "../functions/smooth";
 import { cutOut, placeAt, svgEl } from "../functions/svg";
 import type { Cell, ChartType, Geometry, Row, Segment } from "../types";
 
@@ -16,7 +16,6 @@ const segments = (rows: Row[]): Segment[] =>
 
 const trend = (area: boolean): ChartType => ({
 	segments,
-	breakable: true,
 	series: true,
 	stackable: true,
 	swatch: area ? "box" : undefined,
@@ -67,13 +66,24 @@ const trend = (area: boolean): ChartType => ({
 		// When the line reaches point i, or the start of row i on a step chart.
 		const reach = (i: number): number => i * stepsPerRow;
 		const pointTiming = (i: number): string => `--i:${fixed(reach(i))}`;
-		const pieceTiming = (i: number): string => `--i:${fixed(reach(i) + 1)}; --d:${fixed(reach(i + 1) - reach(i))}`;
 
-		// The pieces of a line: one per interval from point i to the next, or one per row on a step chart.
-		const pieces = (s: number): { i: number; next: boolean }[] =>
-			rows
-				.map((_row, i) => ({ i, next: i < last && !missing(s, i + 1) }))
-				.filter(({ i, next }) => !missing(s, i) && (step || next));
+		// A line runs from point to point until a value is missing; on a step chart a run can be one row.
+		const runsOf = (s: number): [number, number][] => {
+			const runs: [number, number][] = [];
+			let first = -1;
+			rows.forEach((_row, i) => {
+				if (missing(s, i)) return;
+				if (first < 0) first = i;
+				if (i === last || missing(s, i + 1)) {
+					if (step || i > first) runs.push([first, i]);
+					first = -1;
+				}
+			});
+			return runs;
+		};
+		// A run is revealed from left to right while the line reaches its points: on a step chart, to the end of its last row.
+		const runTiming = (a: number, b: number): string => `--i:${fixed(reach(a) + 1)}; --d:${fixed(reach(step ? b + 1 : b) - reach(a))}`;
+		const runAttrs = (a: number, b: number) => ({ "data-from": a + 1, "data-to": b + 1, ...(step && { "data-flat": "" }) });
 
 		// For a smooth chart, the slope at each point: of the top of each line, and of the bottom of each area.
 		const topSlopes = smooth ? series.map((_one, s) => tangentsWithGaps(rows.length, (i) => missing(s, i), (i) => pointAt(s, i))) : [];
@@ -82,114 +92,75 @@ const trend = (area: boolean): ChartType => ({
 				? series.map((_one, s) => tangentsWithGaps(rows.length, (i) => missing(s, i), (i) => [cx(i), y(bottomValue(s, i))]))
 				: [];
 
+		// The path commands through `points` after a path that is at the first one (on a step chart, at its left edge).
+		// `direction` is -1 for the way back, from right to left.
+		const through = (points: Point[], slopes: number[] | null, direction: 1 | -1): string[] => {
+			const commands: string[] = [];
+			points.forEach(([x, py], k) => {
+				if (step) {
+					commands.push(`H${fixed(x + (direction * band) / 2)}`);
+					if (k < points.length - 1) commands.push(`V${fixed(points[k + 1][1])}`);
+				} else if (k > 0) {
+					commands.push(slopes ? curveTo(points[k - 1], [x, py], slopes[k - 1], slopes[k]) : `L${fixed(x)},${fixed(py)}`);
+				}
+			});
+			return commands;
+		};
+		const pointsOf = (s: number, a: number, b: number, value: (s: number, i: number) => number): Point[] =>
+			rows.slice(a, b + 1).map((_row, k) => [cx(a + k), y(value(s, a + k))]);
+		const slopesOf = (slopes: number[][], s: number, a: number, b: number): number[] | null => (smooth ? slopes[s].slice(a, b + 1) : null);
+		// Where a run starts and ends across the plot: on a step chart, at the edges of its first and last row.
+		const leftOf = (a: number) => cx(a) - (step ? band / 2 : 0);
+		const rightOf = (b: number) => cx(b) + (step ? band / 2 : 0);
+
 		const drawArea = (s: number) => {
-			// The opacity is on the group, so two pieces of one area do not add up to a darker seam.
 			const group = svgEl("g", {
 				class: AREA_CLASS,
 				...marks[s].attrs,
 				...(stacked && { "data-stacked": "" }),
 				style: marks[s].ink,
 			});
-			const all = pieces(s);
+			const runs = runsOf(s);
 			const fill = svgEl("g", {
 				class: AREA_FILL_CLASS,
-				style: `--rows:${fixed(totalSteps + 1)}; ${all.length ? pieceTiming(all[0].i) : ""}`,
+				style: `--rows:${fixed(totalSteps + 1)}; ${runs.length ? runTiming(...runs[0]) : ""}`,
 			});
 			group.appendChild(fill);
 
-			for (const { i, next } of all) {
-				const x1 = step ? cx(i) - band / 2 : cx(i);
-				const x2 = step ? cx(i) + band / 2 : cx(i + 1);
-				const [top1, bottom1] = [y(topValue(s, i)), y(bottomValue(s, i))];
-				const [top2, bottom2] = step ? [top1, bottom1] : [y(topValue(s, i + 1)), y(bottomValue(s, i + 1))];
-
-				// Each piece reaches a little past its right edge, under the next piece, so no seam shows between them.
-				const nextEnd = step ? i + 1 : i + 2;
-				const joined = step ? next : i + 1 < last && !missing(s, i + 2);
-				let overlap = joined ? 1.5 * unit : 0;
-				// Where an edge is at the end of the overlap, kept within both this piece and the next one.
-				const reachAt = (start: number, end: number, endOfNext: number, slope: number, within: (a: number, b: number) => number) => {
-					if (!joined) return end;
-					if (smooth) return end + slope * overlap;
-					if (step) return within(end, endOfNext);
-					const ownSlope = (end - start) / (x2 - x1);
-					const nextSlope = (endOfNext - end) / (cx(nextEnd) - x2);
-					return within(end + ownSlope * overlap, end + nextSlope * overlap);
-				};
-				const topOver = reachAt(top1, top2, y(topValue(s, nextEnd)), topSlopes[s]?.[i + 1], Math.max);
-				const bottomOver = reachAt(bottom1, bottom2, y(bottomValue(s, nextEnd)), bottomSlopes[s]?.[i + 1], Math.min);
-				if (topOver >= bottomOver) overlap = 0;
-				const overlapEdge = overlap ? [`L${fixed(x2 + overlap)},${fixed(topOver)}`, `L${fixed(x2 + overlap)},${fixed(bottomOver)}`] : [];
-
-				if (smooth) {
-					const d = [
-						`M${fixed(x1)},${fixed(bottom1)}`,
-						`L${fixed(x1)},${fixed(top1)}`,
-						curveTo([x1, top1], [x2, top2], topSlopes[s][i], topSlopes[s][i + 1]),
-						...overlapEdge,
-						`L${fixed(x2)},${fixed(bottom2)}`,
-						curveTo([x2, bottom2], [x1, bottom1], bottomSlopes[s][i + 1], bottomSlopes[s][i]),
-						"Z",
-					].join(" ");
-					fill.appendChild(svgEl("path", { d, "data-row": i + 2, style: pieceTiming(i) }));
-					continue;
-				}
-
-				const corners = step
-					? [[x1, bottom1], [x1, top1], [x2, top1], [x2, topOver], [x2 + overlap, topOver], [x2 + overlap, bottomOver], [x2, bottomOver], [x2, bottom1]]
-					: [[x1, bottom1], [x1, top1], [x2, top2], [x2 + overlap, topOver], [x2 + overlap, bottomOver], [x2, bottom2]];
-				fill.appendChild(
-					svgEl("polygon", {
-						points: corners.map((corner) => corner.join(",")).join(" "),
-						"data-row": (step ? i : i + 1) + 1,
-						style: pieceTiming(i),
-					})
-				);
+			// One shape per run: along the top from left to right, and back along the bottom.
+			for (const [a, b] of runs) {
+				const top = pointsOf(s, a, b, topValue);
+				const bottom = pointsOf(s, a, b, bottomValue);
+				const backSlopes = slopesOf(bottomSlopes, s, a, b)?.reverse() ?? null;
+				const d = [
+					`M${fixed(leftOf(a))},${fixed(bottom[0][1])}`,
+					`L${fixed(leftOf(a))},${fixed(top[0][1])}`,
+					...through(top, slopesOf(topSlopes, s, a, b), 1),
+					`L${fixed(rightOf(b))},${fixed(bottom[bottom.length - 1][1])}`,
+					...through(bottom.reverse(), backSlopes, -1),
+					"Z",
+				].join(" ");
+				fill.appendChild(svgEl("path", { d, ...runAttrs(a, b), style: runTiming(a, b) }));
 			}
 			svg.appendChild(group);
 		};
 
+		// One path per run, so a dashed line runs on without a break and a line is one element, however long.
 		const drawLine = (s: number) => {
 			const one = series[s];
-			// How far along its line each piece starts, so the dashes of a dashed line run on from piece to piece.
-			let along = 0;
-			const add = (shape: Record<string, string | number>, length: number, row: number, timing: string) => {
+			for (const [a, b] of runsOf(s)) {
+				const top = pointsOf(s, a, b, topValue);
+				const d = [`M${fixed(leftOf(a))},${fixed(top[0][1])}`, ...through(top, slopesOf(topSlopes, s, a, b), 1)].join(" ");
 				svg.appendChild(
-					svgEl(shape.d ? "path" : "polyline", {
+					svgEl("path", {
 						class: SERIES_CLASS,
 						...marks[s].attrs,
-						...shape,
+						d,
 						...(one.line && { "data-line": one.line }),
-						"data-row": row,
-						style: `${marks[s].ink}--len:${length.toFixed(1)}; --along:${(-along).toFixed(1)}; ${timing}`,
+						...runAttrs(a, b),
+						style: `${marks[s].ink}${runTiming(a, b)}`,
 					})
 				);
-				along += length - 1;
-			};
-			// In pixels: the stroke does not scale, so its dashes are measured at the size the figure is shown.
-			const straightLength = (a: Point, b: Point) => 1 + Math.hypot(b[0] - a[0], b[1] - a[1]) / unit;
-			const polyline = (a: Point, b: Point) => ({ points: `${a.join(",")} ${b.join(",")}` });
-
-			for (const { i, next } of pieces(s)) {
-				if (smooth) {
-					const [a, b] = [pointAt(s, i), pointAt(s, i + 1)];
-					const [slopeA, slopeB] = [topSlopes[s][i], topSlopes[s][i + 1]];
-					const d = `M${fixed(a[0])},${fixed(a[1])} ${curveTo(a, b, slopeA, slopeB)}`;
-					add({ d }, 1 + curveLength(a, b, slopeA, slopeB) / unit, i + 2, pieceTiming(i));
-				} else if (step) {
-					const level = y(topValue(s, i));
-					const [a, b]: Point[] = [[cx(i) - band / 2, level], [cx(i) + band / 2, level]];
-					add(polyline(a, b), straightLength(a, b), i + 1, pieceTiming(i));
-					// The rise or drop to the next row is a quick piece of its own, so the line does not stall on it.
-					const nextLevel = y(topValue(s, i + 1));
-					if (next && nextLevel !== level) {
-						const c: Point = [b[0], nextLevel];
-						add(polyline(b, c), straightLength(b, c), i + 2, `--i:${fixed(reach(i + 1) + 1)}; --d:0.25`);
-					}
-				} else {
-					const [a, b] = [pointAt(s, i), pointAt(s, i + 1)];
-					add(polyline(a, b), straightLength(a, b), i + 2, pieceTiming(i));
-				}
 			}
 		};
 

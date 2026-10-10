@@ -69,14 +69,11 @@
 	}
 }
 
-// Each piece starts its dashes where the piece before it ended.
 .tablechart-series[data-line="dashed"] {
 	stroke-dasharray: var(--tablechart-dash, 6 4);
-	stroke-dashoffset: var(--along, 0);
 }
 .tablechart-series[data-line="dotted"] {
 	stroke-dasharray: var(--tablechart-dot, 0 4);
-	stroke-dashoffset: var(--along, 0);
 }
 
 .tablechart-point {
@@ -126,7 +123,9 @@
 		fill: none;
 		stroke: var(--tablechart-break-color, currentColor);
 		stroke-width: var(--tablechart-break-width, 1px);
-		opacity: var(--tablechart-break-opacity, 0.55);
+		opacity: var(--tablechart-break-opacity, 1);
+		stroke-linecap: round;
+		stroke-linejoin: round;
 		vector-effect: non-scaling-stroke;
 	}
 }

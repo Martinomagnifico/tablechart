@@ -1,6 +1,6 @@
 import { largest } from "./format";
 import { debug } from "./debug";
-import { PLUGIN_ID } from "../config";
+import { LIBRARY_NAME } from "../config";
 import type { Cell, Row, Series } from "../types";
 
 // "71.8%" is 71.8 with its unit; a cell with no number, such as "n/a", is missing rather than zero.
@@ -68,7 +68,7 @@ export const assignKeys = (figures: HTMLElement[], langattribute: string | false
 			const n = (used.get(prefix) as number) + 1;
 			used.set(prefix, n);
 			console.warn(
-				`[${PLUGIN_ID}] Two charts on the page have data-chart-keys="${prefix}". ` +
+				`[${LIBRARY_NAME}] Two charts on the page have data-chart-keys="${prefix}". ` +
 					`If two charts use the same keys, they get the same translations. ` +
 					`This one uses "${prefix}-${n}".`
 			);

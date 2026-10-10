@@ -1,10 +1,11 @@
 import "../style/tablechart.scss";
 
-import { type Config, defaultConfig, PLUGIN_ID } from "./config";
+import { type Config, defaultConfig, LIBRARY_NAME } from "./config";
 import { build, layout, relabel, setShown, unbuild } from "./core";
 import { debug } from "./functions/debug";
 import { assignKeys } from "./functions/read-table";
 import { adoptTables, loadSources, readMarkdownRows } from "./functions/sources";
+import { stepTo } from "./steps";
 import type { ChartState } from "./types";
 
 export interface TablechartChart {
@@ -13,6 +14,16 @@ export interface TablechartChart {
 	refresh(): void;
 	/** Stops watching scroll, size and language. The chart stays as it is. */
 	destroy(): void;
+	/** On a chart that steps (`data-fragment`): shows one step more. */
+	next(): void;
+	/** On a chart that steps: shows one step less. */
+	previous(): void;
+	/** On a chart that steps: shows the chart up to `step`, from 0 to `steps`. */
+	stepTo(step: number): void;
+	/** How many steps are shown. */
+	readonly step: number;
+	/** How many steps the chart has; 0 for a chart that does not step. */
+	readonly steps: number;
 }
 
 export interface TablechartInstance {
@@ -158,6 +169,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		const next = debug.timed("Building", state.figure, () => build(state.figure, config, wanted));
 		if (!next) return;
 		unbuild(state);
+		stepTo(next, state.step, true);
 		state = next;
 		kind = wanted;
 		placed = null;
@@ -211,6 +223,15 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 	const chart: TablechartChart = {
 		figure: state.figure,
 		refresh,
+		next: () => stepTo(state, state.step + 1),
+		previous: () => stepTo(state, state.step - 1),
+		stepTo: (step) => stepTo(state, step),
+		get step() {
+			return state.step;
+		},
+		get steps() {
+			return state.plan?.count ?? 0;
+		},
 		destroy() {
 			resizer.disconnect();
 			scroll.disconnect();
@@ -276,4 +297,4 @@ export const init = async (
 	};
 };
 
-export { PLUGIN_ID };
+export { LIBRARY_NAME };

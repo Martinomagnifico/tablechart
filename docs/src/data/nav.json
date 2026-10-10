@@ -62,24 +62,9 @@
             "title": "Features",
             "links": [
                 {
-                    "text": "Features | Data",
-                    "label": "Data",
-                    "href": "/features/data.html"
-                },
-                {
-                    "text": "Features | Numbers",
-                    "label": "Numbers",
-                    "href": "/features/numbers.html"
-                },
-                {
-                    "text": "Features | Annotations",
-                    "label": "Annotations",
-                    "href": "/features/annotations.html"
-                },
-                {
-                    "text": "Features | Legends",
-                    "label": "Legends",
-                    "href": "/features/legends.html"
+                    "text": "Features | Accessibility",
+                    "label": "Accessibility",
+                    "href": "/features/accessibility.html"
                 },
                 {
                     "text": "Features | Animated parents",
@@ -87,24 +72,63 @@
                     "href": "/features/animated-parents.html"
                 },
                 {
+                    "text": "Features | Annotations",
+                    "label": "Annotations",
+                    "href": "/features/annotations.html"
+                },
+                {
+                    "text": "Features | Data",
+                    "label": "Data",
+                    "href": "/features/data.html"
+                },
+                {
+                    "text": "Features | Legends",
+                    "label": "Legends",
+                    "href": "/features/legends.html"
+                },
+                {
+                    "text": "Features | Numbers",
+                    "label": "Numbers",
+                    "href": "/features/numbers.html"
+                },
+                {
+                    "text": "Features | Scale break",
+                    "label": "Scale break",
+                    "href": "/features/scale-break.html"
+                },
+                {
+                    "text": "Features | Step by step",
+                    "label": "Step by step",
+                    "href": "/features/steps.html"
+                },
+                {
                     "text": "Features | Translation",
                     "label": "Translation",
                     "href": "/features/translation.html"
-                },
-                {
-                    "text": "Features | Accessibility",
-                    "label": "Accessibility",
-                    "href": "/features/accessibility.html"
                 }
             ]
         },
         {
             "title": "Styling",
+            "linksLabel": "Overview",
             "links": [
                 {
                     "text": "Styling | Getting started",
                     "label": "Getting started",
                     "href": "/styling/index.html"
+                }
+            ],
+            "examplesLabel": "Topics",
+            "examples": [
+                {
+                    "text": "Styling | Animation",
+                    "label": "Animation",
+                    "href": "/styling/animation.html"
+                },
+                {
+                    "text": "Styling | Background",
+                    "label": "Background",
+                    "href": "/styling/background.html"
                 },
                 {
                     "text": "Styling | Colours",
@@ -117,24 +141,14 @@
                     "href": "/styling/light-dark.html"
                 },
                 {
-                    "text": "Styling | Background",
-                    "label": "Background",
-                    "href": "/styling/background.html"
-                },
-                {
-                    "text": "Styling | Text",
-                    "label": "Text",
-                    "href": "/styling/text.html"
-                },
-                {
                     "text": "Styling | Lines and marks",
                     "label": "Lines and marks",
                     "href": "/styling/lines.html"
                 },
                 {
-                    "text": "Styling | Animation",
-                    "label": "Animation",
-                    "href": "/styling/animation.html"
+                    "text": "Styling | Text",
+                    "label": "Text",
+                    "href": "/styling/text.html"
                 }
             ]
         },
@@ -142,9 +156,9 @@
             "title": "Reference",
             "links": [
                 {
-                    "text": "Reference | Options",
-                    "label": "Options",
-                    "href": "/reference/options.html"
+                    "text": "Reference | API",
+                    "label": "API",
+                    "href": "/reference/api.html"
                 },
                 {
                     "text": "Reference | Attributes",
@@ -157,9 +171,9 @@
                     "href": "/reference/variables.html"
                 },
                 {
-                    "text": "Reference | API",
-                    "label": "API",
-                    "href": "/reference/api.html"
+                    "text": "Reference | Options",
+                    "label": "Options",
+                    "href": "/reference/options.html"
                 }
             ]
         }

@@ -1,4 +1,6 @@
 import type { Config } from "./config";
+import type { Squeeze } from "./functions/scale";
+import type { StepPlan } from "./steps";
 
 /** How a line or an area runs from one point to the next. */
 export type Shape = "straight" | "step" | "smooth";
@@ -61,7 +63,16 @@ export interface Geometry {
 	note: number;
 	/** Where the break's mark goes, as a value. Null when the scale runs straight through. */
 	breakAt: number | null;
+	/** The break itself, for a chart that makes a scale of its own, such as a bar chart. */
+	squeeze: Squeeze | null;
+	/** The empty space where the scale jumps, in viewBox units. */
+	breakGap: number;
+	/** Where a bar chart is cut across, in viewBox units; set by its drawing. */
+	breakX?: number;
 	labels: "outside" | "inside";
+	closing: "down" | "up";
+	/** Where a number inside its bar goes, from `--tablechart-inside-align`; null for the chart's own default. */
+	insideAlign: "start" | "center" | "end" | null;
 	stacked: boolean;
 	shape: Shape;
 	/** Empty when the chart is not stacked or its kind shows no totals. */
@@ -163,5 +174,11 @@ export interface ChartState {
 		series: number;
 		after: number;
 	}[];
+	/** The steps of a chart that steps (`data-fragment`); null for one that does not. */
+	plan: StepPlan | null;
+	/** How many steps are shown. */
+	step: number;
+	/** The Previous and Next buttons, if Tablechart made them. */
+	controls: HTMLElement | null;
 	checks: Check[];
 }

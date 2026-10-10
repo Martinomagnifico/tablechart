@@ -37,6 +37,12 @@ block content
 					td: code data-chart-animate="up"
 					td Makes a line or area chart grow up from zero, instead of from left to right. #[code data-chart-animate="across"] makes it build from left to right when the #[code animate] option is #[code "up"].
 				tr
+					td: code data-fragment
+					td On the figure, every row is a step; on a row, a column header or an annotation, that one is. See #[a(href=url('/features/steps.html')) Step by step].
+				tr
+					td: code data-fragment-index
+					td Rows with the same index arrive on the same step
+				tr
 					td: code data-chart-entrance="0.25"
 					td How far an element around the chart that animates in is in before the chart builds, from #[code 0] to #[code 1]. See #[a(href=url('/features/animated-parents.html')) Animated parents].
 				tr
@@ -45,6 +51,9 @@ block content
 				tr
 					td: code data-chart-labels
 					td Puts the numbers of a column chart #[code inside] or #[code outside] the columns
+				tr
+					td: code data-chart-closing
+					td How the closing total of a waterfall grows: #[code down] from the step before it, or #[code up] from the baseline
 				tr
 					td: code data-chart-aspect
 					td Sets the height of the chart as a share of its width, such as #[code 0.5]
@@ -119,7 +128,7 @@ block content
 				tr
 					td: code axis-break
 					td: code data-mark
-					td How the break is shown: two slanted lines by default, or #[code zigzag]
+					td How the break is shown: two slanted lines by default, or #[code zigzag]. See #[a(href=url('/features/scale-break.html')) Scale break].
 				tr
 					td All
 					td: code data-series

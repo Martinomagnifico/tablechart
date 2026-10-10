@@ -1,4 +1,4 @@
-export const PLUGIN_ID = "tablechart";
+export const LIBRARY_NAME = "tablechart";
 
 // The stylesheet uses these names only, so a renamed `selector` keeps its styling.
 export const PLOT_CLASS = "tablechart-plot";
@@ -27,14 +27,16 @@ export const BREAK_CLASS = "tablechart-break";
 export const PLACED_CLASS = "is-placed";
 export const POINTER_CLASS = "tablechart-pointer";
 export const SR_CLASS = "tablechart-sr";
+export const MINUS_CLASS = "tablechart-minus";
 export const SHOWN_CLASS = "is-shown";
 // A chart in a sequence that has not had its turn: the whole figure waits hidden.
 export const QUEUED_CLASS = "tablechart-queued";
+export const CONTROLS_CLASS = "tablechart-controls";
 
 // The plot is drawn in these units and scaled by the viewBox.
 export const VIEWBOX_WIDTH = 1000;
 
-// The gap a broken scale leaves where it jumps, in viewBox units; the scale and the mark both use it.
+// The empty space where a broken scale jumps, in viewBox units: 1.3% of the width. `--tablechart-break-gap` sets another.
 export const BREAK_GAP = 13;
 
 export interface Config {
@@ -56,12 +58,22 @@ export interface Config {
 	labels: "outside" | "inside";
 	/** How a line or area runs between points: `straight`, `step` or `smooth`. A figure overrides it with `data-chart-shape`. */
 	shape: "straight" | "step" | "smooth";
+	/** How the closing total of a waterfall grows: `down` from the step before it to the baseline, or `up` from the baseline. A figure overrides it with `data-chart-closing`. */
+	closing: "down" | "up";
 	/** Names of several lines in a legend instead of at the end of each line. A figure overrides it with `data-chart-legend`. */
 	legend: boolean;
 	/** Pointing at a row shows numbers that were left out for lack of room. A figure turns it off with `data-chart-hover="false"`. */
 	hover: boolean;
 	/** The name of the total that a donut without a total row works out, for screen readers. */
 	totallabel: string;
+	/** Previous and Next buttons under a chart that steps (`data-fragment`). `false` leaves them out, for buttons of your own. */
+	controls: boolean;
+	/** The text of the Previous button. */
+	previouslabel: string;
+	/** The text of the Next button. */
+	nextlabel: string;
+	/** Read by screen readers after the text of each button, so they know it only changes the chart. */
+	stephint: string;
 	/** How much of a chart must be in view before it builds, from 0 to 1. */
 	threshold: number;
 	/** Build again each time a chart scrolls back into view, not only the first time. */
@@ -81,9 +93,14 @@ export const defaultConfig: Config = {
 	entrance: 0.5,
 	labels: "outside",
 	shape: "straight",
+	closing: "down",
 	legend: false,
 	hover: true,
 	totallabel: "Total",
+	controls: true,
+	previouslabel: "Previous",
+	nextlabel: "Next",
+	stephint: "step of the chart",
 	threshold: 0.5,
 	replay: false,
 	langattribute: "data-i18n",

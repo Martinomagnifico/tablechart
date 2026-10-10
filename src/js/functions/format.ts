@@ -8,11 +8,18 @@ export const largest = (values: number[]): number => {
 /** Decimal places come from what the author wrote, so "1.0" keeps its zero. */
 export const decimalsIn = (raw: string): number => (raw.split(/[.,]/)[1] || "").length;
 
-export const formatValue = (value: number, decimals: number, locale?: string): string =>
+const formatter = (decimals: number, locale?: string) =>
 	new Intl.NumberFormat(locale || document.documentElement.lang || undefined, {
 		minimumFractionDigits: decimals,
 		maximumFractionDigits: decimals,
-	}).format(value);
+	});
+
+/** The minus sign in front of a number, if the locale puts it there, and the rest of the number. */
+export const splitSign = (value: number, decimals: number, locale?: string): [string, string] => {
+	const parts = formatter(decimals, locale).formatToParts(value);
+	const sign = parts[0]?.type === "minusSign" ? parts[0].value : "";
+	return [sign, parts.slice(sign ? 1 : 0).map((part) => part.value).join("")];
+};
 
 export const numberIn = (text: string): number =>
 	Number.parseFloat((text.match(/-?[\d.,]+/) || ["NaN"])[0].replace(",", "."));

@@ -51,7 +51,7 @@ block content
 							// …one row per column
 
 	+section("Numbers inside the columns")
-		p Add #[code data-chart-labels="inside"] to show each number inside its column. If a column is too short for its number, the number is shown above it.
+		p Add #[code data-chart-labels="inside"] to show each number inside its column, at the top. To move it, see #[a(href=url('/styling/text.html')) Text]. If a column is too short for its number, the number is shown above it.
 
 		.card
 			.demo
@@ -192,6 +192,20 @@ block content
 			});
 
 		p #[code --tablechart-type] works for column and bar charts. It can also turn a bar chart into a column chart, with #[code --tablechart-type: column].
+
+	+section("Scale break")
+		p If one column is much taller than the others, a break in the scale shows part of the scale smaller, so the other columns have room. See #[a(href=url('/features/scale-break.html')) Scale break].
+
+		+chart
+			figure(data-chart="column")
+				table
+					tbody
+						each row in [['Elstar', '12'], ['Jonagold', '15'], ['Braeburn', '14'], ['Gala', '140']]
+							tr
+								th= row[0]
+								td= row[1]
+				.chart-annotations
+					span(data-annotation="axis-break" data-from="20")
 
 	+section("Next")
 		p #[a(href=url('/features/annotations.html')) Annotations] add a bracket or a trend arrow to a column chart.

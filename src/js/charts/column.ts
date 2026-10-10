@@ -22,7 +22,7 @@ export const column: ChartType = {
 		labelHeight + 4 * unit + (hasAnnotations ? badgeHeight * 1.6 : 0),
 
 	draw(geo: Geometry) {
-		const { segments: segs, cx, y, barWidth, height, unit, svg, values, labels } = geo;
+		const { segments: segs, cx, y, barWidth, height, unit, svg, values, labels, insideAlign } = geo;
 		const baseline = y(0);
 
 		if (geo.stacked) {
@@ -100,6 +100,14 @@ export const column: ChartType = {
 
 		// If any number is wider than its bar, every number goes above, so a narrow chart does not mix the two.
 		const narrow = tooWide(values, barWidth, unit);
+		const inside = segs.map(
+			(seg, i) => labels === "inside" && !narrow && !seg.missing && tallEnough(values[i], baseline - y(seg.value), unit)
+		);
+		// A number inside is at the end of its column, as far from it as the widest number is from the sides.
+		// Digits are about 56% of the line height; a column too short for that has its number in the middle.
+		const digits = values[0] ? sizeOf(values[0]).height * unit * 0.56 : 0;
+		let side = Number.POSITIVE_INFINITY;
+		for (const [i, label] of values.entries()) if (inside[i]) side = Math.min(side, (barWidth - sizeOf(label).width * unit) / 2);
 
 		segs.forEach((seg, i) => {
 			const top = y(seg.value);
@@ -121,16 +129,11 @@ export const column: ChartType = {
 					style: timing("--i", seg.slot),
 				})
 			);
-			const barHeight = baseline - top;
-			const inside = labels === "inside" && !narrow && tallEnough(values[i], barHeight, unit);
-			placeAt(
-				values[i],
-				cx(i),
-				inside ? top + barHeight / 2 : top - 4 * unit,
-				VIEWBOX_WIDTH,
-				height
-			);
-			values[i].dataset.place = inside ? "inside" : "outside";
+			const pad = Math.min(side, (baseline - top - digits) / 2);
+			const along =
+				insideAlign === "center" ? (top + baseline) / 2 : insideAlign === "start" ? baseline - pad - digits / 2 : top + pad + digits / 2;
+			placeAt(values[i], cx(i), inside[i] ? along : top - 4 * unit, VIEWBOX_WIDTH, height);
+			values[i].dataset.place = inside[i] ? "inside" : "outside";
 		});
 
 		svg.appendChild(

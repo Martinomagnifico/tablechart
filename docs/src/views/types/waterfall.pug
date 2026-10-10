@@ -39,8 +39,34 @@ block content
 								th= row[0]
 								td= row[1]
 
+	+section("The closing total")
+		p If the last row is a total, it grows down from the step before it to the baseline. To have it grow up from the baseline, like the other totals, add #[code data-chart-closing="up"] to the figure, or set the #[code closing] option to #[code "up"].
+
+		+chart
+			figure(data-chart="waterfall" data-chart-closing="up")
+				table
+					tbody
+						each row in [['Picked', '74.5', 'total'], ['Windfalls', '28.2'], ['Bruised', '-16.1'], ['Peelings', '-13.3'], ['Pressed', '73.3', 'total']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
 	+section("Numbers")
 		p If a step is tall enough, its number is shown inside it. If not, the number is shown next to it.
+
+	+section("Scale break")
+		p If the totals are much taller than the steps, a break in the scale below the steps shows part of the scale smaller, so the steps have room. See #[a(href=url('/features/scale-break.html')) Scale break].
+
+		+chart
+			figure(data-chart="waterfall")
+				table
+					tbody
+						each row in [['Picked', '174.5', 'total'], ['Windfalls', '8.2'], ['Bruised', '-6.1'], ['Peelings', '-3.3'], ['Pressed', '173.3', 'total']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+				.chart-annotations
+					span(data-annotation="axis-break" data-from="20" data-to="160")
 
 	+section("Next")
 		p To set the colours of rising steps, falling steps and totals, see #[a(href=url('/styling/colours.html')) Colours].

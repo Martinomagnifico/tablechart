@@ -85,6 +85,23 @@ block content
 				tr
 					td: code destroy()
 					td Stops watching scroll, size and language for this chart. The chart stays as it is, and #[code tablechart] is removed from the element.
+				tr
+					td: code next()
+					td On a chart that steps: shows one step more. See #[a(href=url('/features/steps.html')) Step by step].
+				tr
+					td: code previous()
+					td On a chart that steps: shows one step less
+				tr
+					td: code stepTo(step)
+					td On a chart that steps: shows it up to #[code step], from #[code 0] to #[code steps]
+				tr
+					td: code step
+					td How many steps are shown
+				tr
+					td: code steps
+					td How many steps the chart has: #[code 0] for a chart that does not step
+
+		p A chart that steps sends a #[code tablechart:step] event from its figure at each step, with #[code step] and #[code steps] in #[code event.detail].
 
 	+section("Building blocks")
 		p For a script or a plugin that decides itself when a chart is built and shown, #[code @martinomagnifico/tablechart/core] has the steps that #[code init()] and #[code create()] take.
@@ -124,6 +141,9 @@ block content
 				tr
 					td: code unbuild()
 					td Removes what #[code build()] made, so the chart can be built again.
+				tr
+					td: code stepTo()
+					td Shows a chart that steps up to a step. A presentation plugin calls it for its own steps, with #[code controls] set to #[code false].
 
 	+section("With a script tag")
 		p Without a build tool, load #[code tablechart.js] and #[code tablechart.css]. #[code Tablechart.init()] and #[code Tablechart.create()] work the same as #[code init()] and #[code create()].

@@ -1,4 +1,4 @@
-import { BADGE_CLASS, PLUGIN_ID } from "../config";
+import { BADGE_CLASS, LIBRARY_NAME } from "../config";
 import { numberIn } from "../functions/format";
 import type { Check, Geometry } from "../types";
 
@@ -35,7 +35,7 @@ export const checkAgainst = (
 
 	if (!agrees) {
 		console.warn(
-			`[${PLUGIN_ID}] An annotation reads ${stated}%, but ${description} is ` +
+			`[${LIBRARY_NAME}] An annotation reads ${stated}%, but ${description} is ` +
 				`${computed.toFixed(1)}%. The chart shows what you wrote; this is only a check.`
 		);
 	}

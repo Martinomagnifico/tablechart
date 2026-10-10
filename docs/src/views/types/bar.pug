@@ -80,5 +80,19 @@ block content
 
 		p A number is shown inside its part of the bar if it fits. If not, it is left out. If you point at the row, or tap it, the numbers of that row are shown.
 
+	+section("Scale break")
+		p If one bar is much longer than the others, a break in the scale shows part of the scale smaller, so the other bars have room. See #[a(href=url('/features/scale-break.html')) Scale break].
+
+		+chart
+			figure(data-chart="bar")
+				table
+					tbody
+						each row in [['Bramley seedling', '140'], ['Cox’s orange pippin', '15'], ['Egremont russet', '14'], ['Discovery', '12']]
+							tr
+								th= row[0]
+								td= row[1]
+				.chart-annotations
+					span(data-annotation="axis-break" data-from="20")
+
 	+section("Next")
 		p For short names, a #[a(href=url('/types/column.html')) column chart] uses less height.

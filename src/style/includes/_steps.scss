@@ -1,0 +1,106 @@
+@use "tokens" as *;
+
+// A chart that steps (`data-fragment`). Each mark has its step, `--step`, and the figure how many are shown,
+// `--tablechart-step`: `$shown` is 1 once a mark's step is shown and 0 before. A mark without a step is always shown.
+$shown: "clamp(0, var(--tablechart-step, 0) - var(--step, -1), 1)";
+
+// A line and its area are revealed together, up to the last row shown (`--reveal`).
+$reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px -10px)";
+
+:where([data-animate][data-steps]) {
+	:where(.tablechart-series),
+	:where(.tablechart-area-fill > *) {
+		clip-path: inset(-10px calc(100% + 10px) -10px -10px);
+		transition: clip-path #{$duration} ease;
+	}
+	:where(.tablechart-area-fill) {
+		opacity: 1;
+		transition: none;
+	}
+}
+
+:where([data-animate][data-steps].is-shown) {
+	:where(.tablechart-bar) {
+		transform: scaleY(#{$shown});
+	}
+	:where(.tablechart-bar[data-grow="right"]) {
+		transform: scaleX(#{$shown});
+	}
+	:where(.tablechart-value),
+	:where(.tablechart-name),
+	:where(.tablechart-head),
+	:where(.tablechart-badge),
+	:where(.tablechart-centre),
+	:where(.tablechart-point),
+	:where(.tablechart-hole) {
+		opacity: #{$shown};
+	}
+	:where(.tablechart-leader),
+	:where(.tablechart-break[data-part="edge"]) {
+		stroke-opacity: #{$shown};
+	}
+	:where(.tablechart-line) {
+		stroke-dashoffset: calc(var(--len) * (1 - #{$shown}));
+	}
+	:where(.tablechart-connector) {
+		clip-path: inset(-10px calc((1 - #{$shown}) * (100% + 20px) - 10px) -10px -10px);
+	}
+	:where(.tablechart-series),
+	:where(.tablechart-area-fill > *) {
+		clip-path: #{$reveal};
+	}
+	:where(.tablechart-slice) {
+		stroke-dasharray: calc(var(--arc) * #{$shown}) calc(var(--circ) - var(--arc) * #{$shown});
+	}
+}
+
+// The Previous and Next buttons, under the chart, one at each end.
+:where(.tablechart-controls) {
+	display: flex;
+	justify-content: var(--tablechart-controls-justify, space-between);
+	align-items: center;
+	gap: 0.5em;
+	margin-top: var(--tablechart-controls-gap, 0.75em);
+
+	:where(button) {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35em;
+		padding: var(--tablechart-control-padding, 0.3em 0.7em);
+		border: var(--tablechart-control-border, 1px solid color-mix(in oklab, currentColor 30%, transparent));
+		border-radius: var(--tablechart-control-radius, 0.4em);
+		background: var(--tablechart-control-surface, none);
+		color: inherit;
+		font: inherit;
+		cursor: pointer;
+	}
+
+	:where(button:disabled) {
+		opacity: 0.35;
+		cursor: default;
+	}
+
+	:where(.tablechart-control-icon svg) {
+		display: block;
+		width: 0.8em;
+		height: 0.8em;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+}
+
+// On paper every step is shown, and there is nothing to press.
+@media print {
+	:where([data-steps]) {
+		--tablechart-step: 999 !important;
+	}
+	:where([data-steps] [data-from]) {
+		--reveal: 1 !important;
+	}
+	:where(.tablechart-controls) {
+		display: none;
+	}
+}

@@ -20,17 +20,9 @@
 		transform-origin: left;
 	}
 
-	// Linear, and each piece takes its share of the line, so a line grows continuously instead of pulsing at every join.
+	// Revealed from left to right by a clip, at an even speed, so a dashed or dotted line keeps its pattern while it grows.
 	:where(.tablechart-series) {
-		stroke-dasharray: var(--len);
-		stroke-dashoffset: var(--len);
-		transition: stroke-dashoffset calc(var(--d, 1) * #{$stagger}) linear;
-		transition-delay: calc(max(var(--i) - 1, 0) * #{$stagger});
-	}
-
-	// A dashed line uses its dashes for its pattern, so each piece is revealed from left to right instead.
-	:where(.tablechart-series[data-line]) {
-		clip-path: inset(-20px 100% -20px 0);
+		clip-path: inset(-10px calc(100% + 10px) -10px -10px);
 		transition: clip-path calc(var(--d, 1) * #{$stagger}) linear;
 		transition-delay: calc(max(var(--i) - 1, 0) * #{$stagger});
 	}
@@ -58,12 +50,12 @@
 		transition-delay: calc((var(--i) + 0.4) * #{$stagger});
 	}
 
-	// A dotted connector fades instead of drawing on; the dash offset would only slide its dots.
+	// A connector is revealed from left to right by a clip, so its dots stay in place.
 	:where(.tablechart-connector) {
-		stroke-opacity: 0;
-		transition: stroke-opacity #{$duration} ease;
+		clip-path: inset(-10px calc(100% + 10px) -10px -10px);
+		transition: clip-path calc(2 * #{$stagger}) ease-out;
 		// Arrives just ahead of the column it leads into, never before its own step.
-		transition-delay: max(0s, calc((var(--i) - 0.45) * #{$stagger}));
+		transition-delay: max(0s, calc((var(--i) - 0.6) * #{$stagger}));
 	}
 
 	:where(.tablechart-slice) {
@@ -119,10 +111,7 @@
 		transform: scaleX(1);
 	}
 	:where(.tablechart-series) {
-		stroke-dashoffset: 0;
-	}
-	:where(.tablechart-series[data-line]) {
-		clip-path: inset(-20px);
+		clip-path: inset(-10px);
 	}
 	:where(.tablechart-point),
 	:where(.tablechart-hole),
@@ -144,7 +133,7 @@
 		stroke-dasharray: var(--arc) calc(var(--circ) - var(--arc));
 	}
 	:where(.tablechart-connector) {
-		stroke-opacity: 1;
+		clip-path: inset(-10px);
 	}
 	:where(.tablechart-line) {
 		stroke-dashoffset: 0;
@@ -156,7 +145,6 @@ $rise: calc(#{$duration} * 1.6);
 
 :where([data-animate="up"]) {
 	:where(.tablechart-series, .tablechart-area) {
-		stroke-dasharray: none;
 		clip-path: none;
 		transform: scaleY(0);
 		transform-box: view-box;

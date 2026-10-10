@@ -1,10 +1,46 @@
 # Changelog
 
+## [1.0.1] - 2026-10-10
+
+### Fixed
+- In a donut with steps, the number no longer shows in the beginning.
+
+
+
+## [1.0.0] - 2026-10-10
+
+Now at version 1!
+
+### Added
+
+- Scale break on bar charts.
+- `--tablechart-break-gap` for the space between the lines of a scale break.
+- Step by step charts with `data-fragment`, with Previous and Next buttons and a small API. Moved from reveal.js-tablechart.
+- The `closing` option and `data-chart-closing` for the last total of a waterfall.
+- `--tablechart-inside-align` for numbers inside bars: `start`, `center` or `end`.
+
+### Changed
+
+- The last total of a waterfall grows down from the step before it.
+- Some styling changes for bar and column values.
+- Waterfall connectors draw from left to right, and wait for both columns they join.
+- A line or area is now a single path, revealed by a clip. Dashes keep their pattern, areas have no seams.
+- Scale break lines are solid by default, with round ends.
+- The zigzag of a scale break is now one up-down-up across each column, and right-left-right for bars.
+- No scale break on line and area charts. Those were uncomprehensible.
+
+### Fixed
+
+- Scale breaks on grouped column charts cut each column at its own width.
+
+
+
+
 ## [0.1.3] - 2026-10-07
 
 ### Fixed
 
-- Fixed a layout issue with aspect ratio, 
+- Fixed a layout issue with aspect ratio.
 
 
 

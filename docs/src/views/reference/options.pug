@@ -57,6 +57,10 @@ block content
 					td: code "outside"
 					td Where the number of a column goes: #[code "outside"], above the column, or #[code "inside"]. #[code data-chart-labels] on a figure sets it for one chart.
 				tr
+					td: code closing
+					td: code "down"
+					td How the last total of a waterfall grows: #[code "down"], from the step before it to the baseline, or #[code "up"], from the baseline. #[code data-chart-closing] on a figure sets it for one chart.
+				tr
 					td: code shape
 					td: code "straight"
 					td How a line or area chart runs from one point to the next: #[code "straight"], #[code "step"] or #[code "smooth"]. #[code data-chart-shape] on a figure sets it for one chart.
@@ -72,6 +76,22 @@ block content
 					td: code totallabel
 					td: code "Total"
 					td The name of the total of a donut without a total row, for screen readers
+				tr
+					td: code controls
+					td: code true
+					td Previous and Next buttons under a chart that steps. #[code false] leaves them out. See #[a(href=url('/features/steps.html')) Step by step].
+				tr
+					td: code previouslabel
+					td: code "Previous"
+					td The text of the Previous button
+				tr
+					td: code nextlabel
+					td: code "Next"
+					td The text of the Next button
+				tr
+					td: code stephint
+					td: code "step of the chart"
+					td Text for screen readers after the text of each button, so they hear "Next step of the chart"
 				tr
 					td: code threshold
 					td: code 0.5

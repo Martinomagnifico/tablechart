@@ -58,7 +58,13 @@ figures.push(
 	figure('data-chart="donut"', table(donut)),
 	figure('data-chart="column"', table(seasons) + notes('<span data-annotation="bracket" data-from="1" data-to="3">+24%</span>')),
 	figure('data-chart="line"', table(seasons) + notes('<span data-annotation="trend" data-years="3"><span class="tablechart-caption">A year</span><span>+5%</span></span>')),
-	figure('data-chart="column"', table([["a", "10"], ["b", "200"], ["c", "30"]]) + notes('<span data-annotation="axis-break" data-to="40"></span>'))
+	figure('data-chart="column"', table([["a", "10"], ["b", "200"], ["c", "30"]]) + notes('<span data-annotation="axis-break" data-to="40"></span>')),
+	figure('data-chart="column"', table([["a", "12", "9"], ["b", "15", "11"], ["c", "140", "120"]], ["A", "B"]) + notes('<span data-annotation="axis-break" data-from="20"></span>')),
+	figure('data-chart="column"', table([["a", "12"], ["b", "140"]]) + notes('<span data-annotation="axis-break" data-from="20" data-mark="zigzag"></span>')),
+	figure('data-chart="bar"', table([["North", "12"], ["South", "15"], ["West", "140"]]) + notes('<span data-annotation="axis-break" data-from="20"></span>')),
+	figure('data-chart="bar"', table([["North", "12"], ["South", "15"], ["West", "140"]]) + notes('<span data-annotation="axis-break" data-from="20" data-mark="zigzag"></span>')),
+	figure('data-chart="bar" data-chart-stack', table([["a", "12", "9"], ["b", "15", "11"], ["c", "140", "120"]], ["A", "B"]) + notes('<span data-annotation="axis-break" data-from="30"></span>')),
+	figure('data-chart="bar"', table([["a", "12", "9"], ["b", "15", "11"], ["c", "140", "120"]], ["A", "B"]) + notes('<span data-annotation="axis-break" data-from="20"></span>'))
 );
 
 const script = `

@@ -60,6 +60,23 @@ block content
 					td: code --tablechart-caption-gap
 					td The space under the title: 0.5em by default.
 
+	+section("Numbers inside the bars")
+		p #[code --tablechart-inside-align] sets where a number inside its bar goes: #[code start], where the bar starts, #[code center], or #[code end], where it ends. On a waterfall, a step down ends at the bottom. The number is as far from the start or end as the widest number is from the sides. Columns and bars use #[code end] by default, a waterfall #[code center].
+
+		+style.
+			.inside-start {
+				--tablechart-inside-align: start;
+			}
+
+		+chart
+			figure.inside-start(data-chart="column" data-chart-labels="inside")
+				table
+					tbody
+						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '91']]
+							tr
+								th= row[0]
+								td= row[1]
+
 	+section("Smaller text on narrow charts")
 		p With many columns on a narrow screen, smaller text lets more numbers fit. Make the element around the chart a container, and set #[code --tablechart-font-size] with #[code clamp()] and #[code cqi], a share of the width of the container. In this example, the text is full size from 500px wide, and gets smaller below that, down to 75%.
 

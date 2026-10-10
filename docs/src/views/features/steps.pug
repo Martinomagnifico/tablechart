@@ -1,0 +1,138 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Features | Step by step"
+	- pagedescription = "A Tablechart chart that shows its rows a step at a time, with Previous and Next buttons."
+
+mixin seasons(attrs)
+	figure(data-chart="column")&attributes(attrs)
+		table
+			tbody
+				each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '41']]
+					tr
+						th= row[0]
+						td= row[1]
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Step by step
+				p.lead A chart that shows its rows one step at a time.
+
+	+section("Steps")
+		p Add #[code data-fragment] to the figure. The chart then starts empty, and each step shows one more row. Tablechart puts a Previous and a Next button under the chart.
+
+		+chart
+			+seasons({ "data-fragment": "" })
+
+		p The table stays complete, so screen readers read every row, whatever step the chart is at. Without animation, or on paper, a chart shows all its steps at once.
+
+	+section("Rows that are there from the start")
+		p Add #[code data-fragment] to some rows instead of the figure. Rows without it are there from the start, and the others arrive one step each.
+
+		+chart
+			figure(data-chart="waterfall")
+				table
+					tbody
+						each row in [['Picked', '74.5', 'total', false], ['Windfalls', '28.2', null, true], ['Bruised', '-16.1', null, true], ['Peelings', '-13.3', null, true], ['Pressed', '73.3', 'total', false]]
+							tr(data-kind=row[2] data-fragment=row[3] ? '' : false)
+								th= row[0]
+								td= row[1]
+
+	+section("Several rows on one step")
+		p Rows with the same #[code data-fragment-index] arrive on the same step.
+
+		+chart
+			figure(data-chart="column")
+				table
+					tbody
+						each row in [['North', '58', '1'], ['South', '72', '1'], ['East', '70', '2'], ['West', '41', '2']]
+							tr(data-fragment data-fragment-index=row[2])
+								th= row[0]
+								td= row[1]
+
+	+section("A column on its own step")
+		p On a chart with several value columns, add #[code data-fragment] to a column header. That column arrives whole, on a step of its own. An annotation can have #[code data-fragment] too; otherwise it arrives with the rows it is about.
+
+		+chart
+			figure(data-chart="line")
+				table
+					thead
+						tr
+							th
+							th North
+							th(data-fragment) South
+					tbody
+						each row in [['2022', '58', '41'], ['2023', '72', '50'], ['2024', '70', '63'], ['2025', '81', '70']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+	+section("Your own buttons")
+		p Set the #[code controls] option to #[code false] to leave the buttons out, and step the chart from your own script. Each chart has #[code next()], #[code previous()] and #[code stepTo(step)], and #[code step] and #[code steps] say where it is. The figure sends a #[code tablechart:step] event at each step.
+
+		+codeblock('JS').
+			const { charts } = await init({ controls: false });
+			const chart = charts[0];
+
+			document.querySelector("#more").addEventListener("click", () => chart.next());
+			chart.figure.addEventListener("tablechart:step", (event) => {
+				console.log(`Step ${event.detail.step} of ${event.detail.steps}`);
+			});
+
+	+section("Change the buttons")
+		p The buttons are in a #[code div] with the class #[code tablechart-controls], under the chart. Each button has an icon, #[code .tablechart-control-icon], and a text, #[code .tablechart-control-label], so either can be changed or hidden with CSS.
+
+		table
+			thead
+				tr
+					th Variable
+					th Sets
+			tbody
+				tr
+					td: code --tablechart-controls-justify
+					td Where the buttons are: #[code space-between] by default, one at each end
+				tr
+					td: code --tablechart-controls-gap
+					td The space above the buttons: 0.75em by default
+				tr
+					td: code --tablechart-control-padding / -border / -radius / -surface
+					td The padding, border, corners and background of a button
+
+		p For only icons, at the sides of the chart and in the middle of it, as on a carousel, place the buttons over the chart and hide the text from sight. Screen readers still read it.
+
+		+style.
+			.carousel {
+				padding-inline: 2.5em;
+			}
+			.carousel .tablechart-controls {
+				position: absolute;
+				inset: 0;
+				margin: 0;
+				align-items: center;
+				pointer-events: none;
+			}
+			.carousel .tablechart-controls button {
+				pointer-events: auto;
+				border-radius: 50%;
+				padding: 0.5em;
+			}
+			.carousel .tablechart-control-label {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				overflow: hidden;
+				clip-path: inset(50%);
+				white-space: nowrap;
+			}
+
+		+chart
+			+seasons({ class: "carousel", "data-fragment": "" })
+
+	+section("The text of the buttons")
+		p The #[code previouslabel] and #[code nextlabel] options set the text: #[code "Previous"] and #[code "Next"] by default. Screen readers also hear the #[code stephint] text after each one, #[code "step of the chart"] by default, so they know a button changes only the chart and not the table. With #[code data-chart-keys] on the figure, the texts get translation keys too, such as #[code harvest-previous], #[code harvest-next] and #[code harvest-step]. See #[a(href=url('/features/translation.html')) Translation].
+
+	+section("In a presentation")
+		p In reveal.js-tablechart, Reveal's fragments step the chart, so the same #[code data-fragment] works there, and the chart has no buttons of its own.

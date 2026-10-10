@@ -1,5 +1,5 @@
 import { debug } from "./debug";
-import { BADGE_CAPTION_CLASS, PLUGIN_ID } from "../config";
+import { BADGE_CAPTION_CLASS, LIBRARY_NAME } from "../config";
 import { ANNOTATION_NAMES } from "../core";
 
 /** Pass 0: Markdown, JSON and HTML all become the same table before anything is built. */
@@ -203,7 +203,7 @@ export const loadSources = async (figures: HTMLElement[]): Promise<void> => {
 				} catch (error) {
 					const local = window.location.protocol === "file:";
 					console.warn(
-						`[${PLUGIN_ID}] Could not read the chart data in "${src}": ${(error as Error).message}.` +
+						`[${LIBRARY_NAME}] Could not read the chart data in "${src}": ${(error as Error).message}.` +
 							(local
 								? " A page opened from the file system cannot fetch files; open the page from a server instead."
 								: "")
