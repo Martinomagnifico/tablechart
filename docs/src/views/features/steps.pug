@@ -70,6 +70,41 @@ block content
 								td= row[1]
 								td= row[2]
 
+	+section("Point by point")
+		p Add #[code data-fragment] to cells. Each cell arrives on a step of its own, and cells without it are there from the start. The steps go down each column of the table: one line point by point, then the next.
+
+		+chart
+			figure(data-chart="line")
+				table
+					thead
+						tr
+							th
+							th North
+							th South
+					tbody
+						each row in [['2022', '58', '41'], ['2023', '72', '50'], ['2024', '70', '63'], ['2025', '81', '70']]
+							tr
+								th= row[0]
+								td(data-fragment)= row[1]
+								td(data-fragment)= row[2]
+
+		p This works on any chart with several value columns. Grouped columns and bars arrive one at a time, and a stack is built piece by piece: first the bottom layer, then the next layer on top. The total above a stack arrives with its last piece. For another order, give the cells a #[code data-fragment-index].
+
+		+chart
+			figure(data-chart="column" data-chart-stack)
+				table
+					thead
+						tr
+							th
+							th Farm shop
+							th Market
+					tbody
+						each row in [['2023', '64', '38'], ['2024', '71', '45'], ['2025', '69', '57']]
+							tr
+								th= row[0]
+								td(data-fragment)= row[1]
+								td(data-fragment)= row[2]
+
 	+section("Your own buttons")
 		p Set the #[code controls] option to #[code false] to leave the buttons out, and step the chart from your own script. Each chart has #[code next()], #[code previous()] and #[code stepTo(step)], and #[code step] and #[code steps] say where it is. The figure sends a #[code tablechart:step] event at each step.
 

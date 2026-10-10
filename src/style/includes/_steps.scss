@@ -17,6 +17,16 @@ $reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px 
 		opacity: 1;
 		transition: none;
 	}
+	// A piece of a stack on a step of its own grows from the piece under it.
+	:where(.tablechart-piece) {
+		transform-box: fill-box;
+		transform-origin: bottom;
+		transition: transform #{$duration} #{$easing};
+		transition-delay: calc(var(--i, 0) * #{$stagger});
+	}
+	:where(.tablechart-piece[data-grow="right"]) {
+		transform-origin: left;
+	}
 }
 
 :where([data-animate][data-steps].is-shown) {
@@ -24,6 +34,12 @@ $reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px 
 		transform: scaleY(#{$shown});
 	}
 	:where(.tablechart-bar[data-grow="right"]) {
+		transform: scaleX(#{$shown});
+	}
+	:where(.tablechart-piece) {
+		transform: scaleY(#{$shown});
+	}
+	:where(.tablechart-piece[data-grow="right"]) {
 		transform: scaleX(#{$shown});
 	}
 	:where(.tablechart-value),

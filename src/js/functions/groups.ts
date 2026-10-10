@@ -71,6 +71,10 @@ export const stackMarks = (
 	const group = svgEl("g", { ...bar, "data-stack": "", style: timing("--i", row.slot) });
 	geo.svg.appendChild(group);
 	return (s: number, shape: Record<string, string | number>) => {
-		group.appendChild(svgEl("rect", { ...shape, class: withRow(PIECE_CLASS, row), ...seriesMark(geo, row, s) }));
+		// Its row and direction too, so a piece can grow on a step of its own.
+		const grow: Record<string, string | number> = attrs["data-grow"] !== undefined ? { "data-grow": attrs["data-grow"] } : {};
+		group.appendChild(
+			svgEl("rect", { ...shape, class: withRow(PIECE_CLASS, row), "data-row": i + 1, ...grow, ...seriesMark(geo, row, s) })
+		);
 	};
 };

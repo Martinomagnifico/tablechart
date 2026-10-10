@@ -31,7 +31,7 @@ import { fitTogether } from "./functions/labels";
 import { measureAll, sizeOf } from "./functions/measure";
 import type { Squeeze } from "./functions/scale";
 import { readSeries, readTable } from "./functions/read-table";
-import { cutOut, htmlEl, svgEl } from "./functions/svg";
+import { cutOut, htmlEl, short, svgEl } from "./functions/svg";
 import { applySteps, makeControls, planSteps, stepTo } from "./steps";
 import type { AnnotationType, ChartState, ChartType, Geometry, Row, Shape } from "./types";
 
@@ -566,7 +566,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 			? (i) => [0, i * down, 100, down]
 			: (i) => [i * across, 0, across, 100];
 
-	svg.setAttribute("viewBox", `0 0 ${VIEWBOX_WIDTH} ${height}`);
+	svg.setAttribute("viewBox", `0 0 ${VIEWBOX_WIDTH} ${short(height)}`);
 	svg.textContent = ""; // geometry only; no text lives in here
 
 	state.checks = [];

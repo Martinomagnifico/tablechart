@@ -1,11 +1,17 @@
 const SVGNS = "http://www.w3.org/2000/svg";
 
+/** Two decimals: a hundredth of a viewBox unit is far less than a pixel. */
+export const short = (value: number): number => Math.round(value * 100) / 100;
+
 export const svgEl = <K extends keyof SVGElementTagNameMap>(
 	name: K,
 	attrs: Record<string, string | number> = {}
 ): SVGElementTagNameMap[K] => {
 	const node = document.createElementNS(SVGNS, name);
-	for (const key in attrs) node.setAttribute(key, String(attrs[key]));
+	for (const key in attrs) {
+		const value = attrs[key];
+		node.setAttribute(key, String(typeof value === "number" ? short(value) : value));
+	}
 	return node;
 };
 

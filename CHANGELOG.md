@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.2] - 2026-10-10
+
+### Added
+
+- Point by point steps: `data-fragment` on a cell. Cells go column by column, so one line is shown point by point before the next.
+- This works on any chart with several value columns. Stacks are built piece by piece, and the total comes with the last piece.
+
+### Fixed
+
+- In a chart with steps, the legend is shown from the start.
+
+### Changed
+- Coordinates in the drawing now have at most two decimals.
+
+
 ## [1.0.1] - 2026-10-10
 
 ### Fixed
