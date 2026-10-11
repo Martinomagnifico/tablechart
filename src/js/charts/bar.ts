@@ -3,7 +3,7 @@ import { largest } from "../functions/format";
 import { sizeOf } from "../functions/measure";
 import { BAR_CLASS, RULE_CLASS, VIEWBOX_WIDTH } from "../config";
 import { timing } from "../functions/timing";
-import { groupLayout, inkOf, seriesMark, stackMarks, stackOf, stackTotal } from "../functions/groups";
+import { groupLayout, inkOf, seriesMark, stackMarks, stackOf, stackReach } from "../functions/groups";
 import { fitsLength, fitTogether } from "../functions/labels";
 import { placeAt, svgEl, withRow } from "../functions/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
@@ -41,15 +41,19 @@ export const bar: ChartType = {
 		const right = VIEWBOX_WIDTH - 4 * unit;
 
 		const extent = geo.stacked
-			? Math.max(largest(geo.rows.map((row) => stackTotal(row, geo.series.length))), 0) || 1
+			? Math.max(largest(geo.rows.map((row) => stackReach(row, geo.series.length).top)), 0) || 1
 			: Math.max(
 				largest(geo.rows.flatMap((row) =>
 					row.cells.slice(0, geo.series.length).map((cell) => Math.abs(cell.value))
 				)),
 				0
 			) || 1;
+		// Bars below zero go left from the zero line, which moves right to make room for them.
+		const depth = geo.stacked
+			? Math.max(largest(geo.rows.map((row) => -stackReach(row, geo.series.length).bottom)), 0)
+			: Math.max(largest(geo.rows.flatMap((row) => row.cells.slice(0, geo.series.length).map((cell) => -cell.value))), 0);
 		// A break squeezes part of the scale, as on a column chart, and leaves its cut empty.
-		const ceiling = Math.max(extent, geo.squeeze?.hi ?? 0);
+		const ceiling = Math.max(extent, geo.squeeze?.hi ?? 0) + depth;
 		const lengthOf = (value: number, span: number) => along(Math.abs(value), ceiling, span, geo.squeeze, geo.breakGap);
 		const band = height / segs.length;
 		const cy = (i: number) => (i + 0.5) * band;
@@ -64,36 +68,56 @@ export const bar: ChartType = {
 		const widthOf = (label: HTMLElement) => sizeOf(label).width * unit;
 		const roomFor = (labels: HTMLElement[]) =>
 			labels.length ? largest(labels.map(widthOf)) + gap + 4 * unit : 0;
-		let room = geo.stacked ? roomFor(geo.totals) : several ? roomFor(geo.seriesValues.flat()) : 0;
-		if (!several) {
+		const valueOf = (s: number, i: number) => (geo.rows[i].cells[s] ?? geo.rows[i].cells[0]).value;
+		const grouped = geo.seriesValues.flatMap((labels, s) => labels.map((label, i) => ({ label, value: valueOf(s, i) })));
+		// A stack wholly below zero has its total before it.
+		const backwards = (i: number) => {
+			const reach = stackReach(geo.rows[i], geo.series.length);
+			return reach.top === 0 && reach.bottom < 0;
+		};
+		let room = geo.stacked
+			? roomFor(geo.totals.filter((_total, i) => !backwards(i)))
+			: several
+				? roomFor(grouped.filter((one) => one.value >= 0).map((one) => one.label))
+				: 0;
+		// Room before the zero line for the numbers of bars below zero.
+		let before = geo.stacked
+			? roomFor(geo.totals.filter((_total, i) => backwards(i)))
+			: several
+				? roomFor(grouped.filter((one) => one.value < 0).map((one) => one.label))
+				: 0;
+		if (!several && !geo.stacked) {
 			// A narrower span can push another number out of its bar, so this repeats until the room stays the same.
 			for (let tries = 0; tries < 3; tries++) {
-				const span = right - left - room;
+				const span = right - left - room - before;
 				const outside = segs
 					.map((seg, i) => ({ seg, label: values[i] }))
-					.filter(({ seg, label }) => !fitsLength(label, lengthOf(seg.value, span), unit))
-					.map(({ label }) => label);
-				const needed = roomFor(outside);
-				if (needed <= room) break;
-				room = needed;
+					.filter(({ seg, label }) => !fitsLength(label, lengthOf(seg.value, span), unit));
+				const after = roomFor(outside.filter(({ seg }) => seg.value >= 0).map(({ label }) => label));
+				const ahead = roomFor(outside.filter(({ seg }) => seg.value < 0).map(({ label }) => label));
+				if (after <= room && ahead <= before) break;
+				room = Math.max(room, after);
+				before = Math.max(before, ahead);
 			}
 		}
-		const span = right - left - room;
-		const x = (value: number) => left + lengthOf(value, span);
+		const span = right - left - room - before;
+		const zero = left + before + lengthOf(depth, span);
+		const x = (value: number) => (value < 0 ? zero - lengthOf(value, span) : zero + lengthOf(value, span));
 		if (geo.squeeze) geo.breakX = x(geo.squeeze.gap);
 
 		if (geo.stacked) {
 			geo.rows.forEach((row, i) => {
-				const piece = stackMarks(geo, row, i, { "data-grow": "right" });
+				const reach = stackReach(row, geo.series.length);
+				const piece = stackMarks(geo, row, i, { "data-grow": "right" }, reach.bottom < 0 ? `${zero - x(reach.bottom)}px center` : "");
 				const top = cy(i) - thickness / 2;
 				const pieces = stackOf(row, geo.series.length);
 				pieces.forEach(({ from, to, cell }, s) => {
 					const label = geo.seriesValues[s][i];
 					label.dataset.place = "none";
 					if (cell.missing || to === from) return;
-					const start = x(from);
-					const end = x(to);
-					piece(s, { x: start, y: top, width: Math.max(end - start, 1), height: thickness });
+					const start = Math.min(x(from), x(to));
+					const end = Math.max(x(from), x(to));
+					piece(s, { x: start, y: top, width: Math.max(end - start, 1), height: thickness, ...(to < from && { "data-grow": "left" }) });
 					// A number too big for its piece is left out until its row is pointed at.
 					label.dataset.place = "inside";
 					label.toggleAttribute(
@@ -105,14 +129,14 @@ export const bar: ChartType = {
 				});
 				const total = geo.totals[i];
 				if (total) {
-					total.dataset.place = "after";
-					placeAt(total, x(pieces.at(-1)?.to ?? 0) + gap, cy(i), VIEWBOX_WIDTH, height);
+					total.dataset.place = backwards(i) ? "before" : "after";
+					placeAt(total, backwards(i) ? x(reach.bottom) - gap : x(reach.top) + gap, cy(i), VIEWBOX_WIDTH, height);
 				}
 				const name = categories[i];
 				if (name) placeAt(name, left - 8 * unit, cy(i), VIEWBOX_WIDTH, height);
 			});
 			svg.appendChild(
-				svgEl("line", { class: RULE_CLASS, x1: left, x2: left, y1: 0, y2: height })
+				svgEl("line", { class: RULE_CLASS, x1: zero, x2: zero, y1: 0, y2: height })
 			);
 			return;
 		}
@@ -131,67 +155,73 @@ export const bar: ChartType = {
 						return;
 					}
 					const end = x(cell.value);
+					const back = cell.value < 0;
 					const top = cy(i) + layout.offset(s);
 					svg.appendChild(
 						svgEl("rect", {
 							class: withRow(BAR_CLASS, row),
 							"data-kind": "bar",
 							"data-row": i + 1,
-							"data-grow": "right",
-							x: left,
+							"data-grow": back ? "left" : "right",
+							x: Math.min(end, zero),
 							y: top,
-							width: Math.max(end - left, 1),
+							width: Math.max(Math.abs(end - zero), 1),
 							height: layout.size,
 							...seriesMark(geo, row, s),
 						})
 					);
-					label.dataset.place = "after";
+					label.dataset.place = back ? "before" : "after";
 					label.toggleAttribute("data-left-out", !fit);
-					placeAt(label, end + gap, top + layout.size / 2, VIEWBOX_WIDTH, height);
+					placeAt(label, back ? end - gap : end + gap, top + layout.size / 2, VIEWBOX_WIDTH, height);
 				});
 				const name = categories[i];
 				if (name) placeAt(name, left - 8 * unit, cy(i), VIEWBOX_WIDTH, height);
 			});
 			svg.appendChild(
-				svgEl("line", { class: RULE_CLASS, x1: left, x2: left, y1: 0, y2: height })
+				svgEl("line", { class: RULE_CLASS, x1: zero, x2: zero, y1: 0, y2: height })
 			);
 			return;
 		}
 
 		// A number inside its bar is as far from the end, or start, as from the top and bottom, if its bar is long enough.
-		const inside = segs.map((seg, i) => fitsLength(values[i], x(seg.value) - left, unit));
+		const inside = segs.map((seg, i) => fitsLength(values[i], Math.abs(x(seg.value) - zero), unit));
 
 		segs.forEach((seg, i) => {
 			const end = x(seg.value);
 			const middle = cy(i);
+			// A bar below zero runs left from the zero line, with its number before it.
+			const back = seg.value < 0;
+			const length = Math.abs(end - zero);
 
 			svg.appendChild(
 				svgEl("rect", {
 					class: withRow(BAR_CLASS, seg),
 					"data-kind": seg.kind,
 					"data-row": i + 1,
-					"data-grow": "right",
-					x: left,
+					"data-grow": back ? "left" : "right",
+					x: Math.min(end, zero),
 					y: middle - thickness / 2,
-					width: Math.max(end - left, 1),
+					width: Math.max(length, 1),
 					height: thickness,
 					style: timing("--i", seg.slot),
 				})
 			);
 
 			const label = values[i];
-			const pad = Math.max(Math.min(gap, end - left - widthOf(label) - 6 * unit), 6 * unit);
-			label.dataset.place = inside[i] ? "inside" : "after";
+			const pad = Math.max(Math.min(gap, length - widthOf(label) - 6 * unit), 6 * unit);
+			// Measured from the end of the bar towards the zero line, left or right.
+			const toward = back ? 1 : -1;
+			label.dataset.place = inside[i] ? "inside" : back ? "before" : "after";
 			label.dataset.kind = seg.kind;
 			placeAt(
 				label,
 				!inside[i]
-					? end + gap
+					? end - toward * gap
 					: geo.insideAlign === "center"
-						? (left + end) / 2
+						? (zero + end) / 2
 						: geo.insideAlign === "start"
-							? left + pad + widthOf(label) / 2
-							: end - pad - widthOf(label) / 2,
+							? zero - toward * (pad + widthOf(label) / 2)
+							: end + toward * (pad + widthOf(label) / 2),
 				middle,
 				VIEWBOX_WIDTH,
 				height
@@ -202,7 +232,7 @@ export const bar: ChartType = {
 		});
 
 		svg.appendChild(
-			svgEl("line", { class: RULE_CLASS, x1: left, x2: left, y1: 0, y2: height })
+			svgEl("line", { class: RULE_CLASS, x1: zero, x2: zero, y1: 0, y2: height })
 		);
 	},
 };

@@ -27,19 +27,25 @@ $reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px 
 	:where(.tablechart-piece[data-grow="right"]) {
 		transform-origin: left;
 	}
+	:where(.tablechart-piece[data-grow="down"]) {
+		transform-origin: top;
+	}
+	:where(.tablechart-piece[data-grow="left"]) {
+		transform-origin: right;
+	}
 }
 
 :where([data-animate][data-steps].is-shown) {
 	:where(.tablechart-bar) {
 		transform: scaleY(#{$shown});
 	}
-	:where(.tablechart-bar[data-grow="right"]) {
+	:where(.tablechart-bar:is([data-grow="right"], [data-grow="left"])) {
 		transform: scaleX(#{$shown});
 	}
 	:where(.tablechart-piece) {
 		transform: scaleY(#{$shown});
 	}
-	:where(.tablechart-piece[data-grow="right"]) {
+	:where(.tablechart-piece:is([data-grow="right"], [data-grow="left"])) {
 		transform: scaleX(#{$shown});
 	}
 	:where(.tablechart-value),

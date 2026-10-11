@@ -1,7 +1,7 @@
 import { sizeOf } from "../functions/measure";
 import { BAR_CLASS, RULE_CLASS, VIEWBOX_WIDTH } from "../config";
 import { timing } from "../functions/timing";
-import { groupLayout, inkOf, seriesMark, stackMarks, stackOf } from "../functions/groups";
+import { groupLayout, inkOf, seriesMark, stackMarks, stackOf, stackReach } from "../functions/groups";
 import { fitTogether, tallEnough, tooWide } from "../functions/labels";
 import { placeAt, svgEl, withRow } from "../functions/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
@@ -27,15 +27,16 @@ export const column: ChartType = {
 
 		if (geo.stacked) {
 			geo.rows.forEach((row, i) => {
-				const piece = stackMarks(geo, row, i);
+				const reach = stackReach(row, geo.series.length);
+				const piece = stackMarks(geo, row, i, {}, reach.bottom < 0 ? `center ${baseline - y(reach.top)}px` : "");
 				const x = cx(i) - barWidth / 2;
 				stackOf(row, geo.series.length).forEach(({ from, to, cell }, s) => {
 					const label = geo.seriesValues[s][i];
 					label.dataset.place = "none";
 					if (cell.missing || to === from) return;
-					const top = y(to);
-					const bottom = y(from);
-					piece(s, { x, y: top, width: barWidth, height: Math.max(bottom - top, 1) });
+					const top = Math.min(y(to), y(from));
+					const bottom = Math.max(y(to), y(from));
+					piece(s, { x, y: top, width: barWidth, height: Math.max(bottom - top, 1), ...(to < from && { "data-grow": "down" }) });
 					// A number too big for its piece is left out until its row is pointed at.
 					label.dataset.place = "inside";
 					label.toggleAttribute(
@@ -45,11 +46,12 @@ export const column: ChartType = {
 					inkOf(label, geo, s);
 					placeAt(label, cx(i), (top + bottom) / 2, VIEWBOX_WIDTH, height);
 				});
+				// The total goes above the stack, or under it if the whole stack is below zero.
 				const total = geo.totals[i];
-				const sum = stackOf(row, geo.series.length).at(-1)?.to ?? 0;
 				if (total) {
-					total.dataset.place = "outside";
-					placeAt(total, cx(i), y(sum) - 4 * unit, VIEWBOX_WIDTH, height);
+					const under = reach.top === 0 && reach.bottom < 0;
+					total.dataset.place = under ? "below" : "outside";
+					placeAt(total, cx(i), under ? y(reach.bottom) + 4 * unit : y(reach.top) - 4 * unit, VIEWBOX_WIDTH, height);
 				}
 			});
 			svg.appendChild(
@@ -74,22 +76,24 @@ export const column: ChartType = {
 						label.dataset.place = "none";
 						return;
 					}
-					const top = y(cell.value);
+					const end = y(cell.value);
+					const below = cell.value < 0;
 					svg.appendChild(
 						svgEl("rect", {
 							class: withRow(BAR_CLASS, row),
 							"data-kind": "bar",
 							"data-row": i + 1,
+							...(below && { "data-grow": "down" }),
 							x,
-							y: top,
+							y: Math.min(end, baseline),
 							width: layout.size,
-							height: Math.max(baseline - top, 1),
+							height: Math.max(Math.abs(baseline - end), 1),
 							...seriesMark(geo, row, s),
 						})
 					);
-					label.dataset.place = "outside";
+					label.dataset.place = below ? "below" : "outside";
 					label.toggleAttribute("data-left-out", !fit);
-					placeAt(label, x + layout.size / 2, top - 4 * unit, VIEWBOX_WIDTH, height);
+					placeAt(label, x + layout.size / 2, below ? end + 4 * unit : end - 4 * unit, VIEWBOX_WIDTH, height);
 				});
 			});
 			svg.appendChild(
@@ -101,7 +105,7 @@ export const column: ChartType = {
 		// If any number is wider than its bar, every number goes above, so a narrow chart does not mix the two.
 		const narrow = tooWide(values, barWidth, unit);
 		const inside = segs.map(
-			(seg, i) => labels === "inside" && !narrow && !seg.missing && tallEnough(values[i], baseline - y(seg.value), unit)
+			(seg, i) => labels === "inside" && !narrow && !seg.missing && tallEnough(values[i], Math.abs(baseline - y(seg.value)), unit)
 		);
 		// A number inside is at the end of its column, as far from it as the widest number is from the sides.
 		// Digits are about 56% of the line height; a column too short for that has its number in the middle.
@@ -110,7 +114,9 @@ export const column: ChartType = {
 		for (const [i, label] of values.entries()) if (inside[i]) side = Math.min(side, (barWidth - sizeOf(label).width * unit) / 2);
 
 		segs.forEach((seg, i) => {
-			const top = y(seg.value);
+			const end = y(seg.value);
+			// A column below zero hangs from the baseline, with its number under it.
+			const below = seg.value < 0;
 			// A missing value has no bar; its label stands where the bar would.
 			if (seg.missing) {
 				placeAt(values[i], cx(i), baseline - 4 * unit, VIEWBOX_WIDTH, height);
@@ -122,18 +128,26 @@ export const column: ChartType = {
 					class: withRow(BAR_CLASS, seg),
 					"data-kind": seg.kind,
 					"data-row": i + 1,
+					...(below && { "data-grow": "down" }),
 					x: cx(i) - barWidth / 2,
-					y: top,
+					y: Math.min(end, baseline),
 					width: barWidth,
-					height: Math.max(baseline - top, 1),
+					height: Math.max(Math.abs(baseline - end), 1),
 					style: timing("--i", seg.slot),
 				})
 			);
-			const pad = Math.min(side, (baseline - top - digits) / 2);
+			// Measured from the end of the column towards the baseline, up or down.
+			const toward = below ? -1 : 1;
+			const pad = Math.min(side, (Math.abs(baseline - end) - digits) / 2);
 			const along =
-				insideAlign === "center" ? (top + baseline) / 2 : insideAlign === "start" ? baseline - pad - digits / 2 : top + pad + digits / 2;
-			placeAt(values[i], cx(i), inside[i] ? along : top - 4 * unit, VIEWBOX_WIDTH, height);
-			values[i].dataset.place = inside[i] ? "inside" : "outside";
+				insideAlign === "center"
+					? (end + baseline) / 2
+					: insideAlign === "start"
+						? baseline - toward * (pad + digits / 2)
+						: end + toward * (pad + digits / 2);
+			const outside = below ? end + 4 * unit : end - 4 * unit;
+			placeAt(values[i], cx(i), inside[i] ? along : outside, VIEWBOX_WIDTH, height);
+			values[i].dataset.place = inside[i] ? "inside" : below ? "below" : "outside";
 		});
 
 		svg.appendChild(

@@ -5,6 +5,15 @@
 ### Added
 
 - Changes to handling of JSON data sources. A header row written in the figure table markup, if missing from the data source, is then used.
+- Values below zero on column, bar, line, area and waterfall charts, also in stacks.
+
+### Changed
+
+- A waterfall builds one step at a time: a column grows, then its connector draws, then the next column.
+
+### Removed
+
+- The `closing` option and `data-chart-closing`. The last total of a waterfall always grows from the last connector to the baseline.
 
 ### Fixed
 

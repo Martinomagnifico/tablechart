@@ -38,19 +38,46 @@ export interface StackPiece {
 	cell: Cell;
 }
 
-/** A missing value, or one below zero, takes no room. */
-export const stackOf = (row: Row, count: number): StackPiece[] => {
-	let sum = 0;
+/**
+ * Values above zero stack up from zero, values below zero stack down from it. A missing value takes no room.
+ * A running stack adds each value to the one before it instead, so a line never jumps to the other side.
+ */
+export const stackOf = (row: Row, count: number, running = false): StackPiece[] => {
+	let up = 0;
+	let down = 0;
 	return Array.from({ length: count }, (_, s) => {
 		const cell = row.cells[s] ?? row.cells[0];
-		const from = sum;
-		if (!cell.missing && cell.value > 0) sum += cell.value;
-		return { from, to: sum, cell };
+		const value = cell.missing ? 0 : cell.value;
+		if (running) {
+			const from = up;
+			up += value;
+			return { from, to: up, cell };
+		}
+		if (value < 0) {
+			const from = down;
+			down += value;
+			return { from, to: down, cell };
+		}
+		const from = up;
+		up += value;
+		return { from, to: up, cell };
 	});
 };
 
-export const stackTotal = (row: Row, count: number): number =>
-	stackOf(row, count).at(-1)?.to ?? 0;
+/** How far a stack reaches above and below zero. */
+export const stackReach = (row: Row, count: number, running = false): { top: number; bottom: number } => {
+	const pieces = stackOf(row, count, running);
+	return {
+		top: Math.max(0, ...pieces.map((piece) => piece.to)),
+		bottom: Math.min(0, ...pieces.map((piece) => piece.to)),
+	};
+};
+
+/** The sum of a stack: its parts above zero less its parts below. */
+export const stackTotal = (row: Row, count: number): number => {
+	const { top, bottom } = stackReach(row, count);
+	return top + bottom;
+};
 
 /** The colour of a series on a number inside one of its pieces, so its ink follows the fill. */
 export const inkOf = (label: HTMLElement, geo: Geometry, s: number): void => {
@@ -65,16 +92,19 @@ export const stackMarks = (
 	geo: Geometry,
 	row: Row,
 	i: number,
-	attrs: Record<string, string | number> = {}
+	attrs: Record<string, string | number> = {},
+	origin = ""
 ) => {
 	const bar = { class: withRow(BAR_CLASS, row), "data-kind": "bar", "data-row": i + 1, ...attrs };
-	const group = svgEl("g", { ...bar, "data-stack": "", style: timing("--i", row.slot) });
+	// A stack with parts on both sides of zero grows from zero, not from its end.
+	const style = timing("--i", row.slot) + (origin ? `; transform-origin: ${origin}` : "");
+	const group = svgEl("g", { ...bar, "data-stack": "", style });
 	geo.svg.appendChild(group);
 	return (s: number, shape: Record<string, string | number>) => {
 		// Its row and direction too, so a piece can grow on a step of its own.
 		const grow: Record<string, string | number> = attrs["data-grow"] !== undefined ? { "data-grow": attrs["data-grow"] } : {};
 		group.appendChild(
-			svgEl("rect", { ...shape, class: withRow(PIECE_CLASS, row), "data-row": i + 1, ...grow, ...seriesMark(geo, row, s) })
+			svgEl("rect", { ...grow, ...shape, class: withRow(PIECE_CLASS, row), "data-row": i + 1, ...seriesMark(geo, row, s) })
 		);
 	};
 };

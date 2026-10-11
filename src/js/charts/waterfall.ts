@@ -50,7 +50,7 @@ export const waterfall: ChartType = {
 	headroom: ({ labelHeight, badgeHeight, hasAnnotations, unit }) =>
 		labelHeight + 6 * unit + (hasAnnotations ? badgeHeight * 1.6 : 0),
 
-	draw({ segments: segs, cx, y, barWidth, height, unit, svg, values, breakAt, closing, insideAlign }: Geometry) {
+	draw({ segments: segs, cx, y, barWidth, height, unit, svg, values, breakAt, insideAlign }: Geometry) {
 		const baseline = y(0);
 		// If any number is wider than its bar, every number goes outside, so a narrow chart does not mix the two.
 		const narrow = tooWide(values, barWidth, unit);
@@ -61,8 +61,9 @@ export const waterfall: ChartType = {
 			const length = Math.abs(y(seg.from) - y(seg.to));
 			// A bar cut by a break has its number on top, clear of the cut.
 			const cut = breakAt !== null && Math.min(seg.from, seg.to) < breakAt && Math.max(seg.from, seg.to) > breakAt;
-			// The closing total drops from the connector to the baseline, unless `closing` is `up`.
-			const down = seg.kind === "down" || (seg.kind === "total" && i > 0 && i === segs.length - 1 && closing === "down");
+			// A total grows away from the baseline, but the closing total grows from the last connector to the baseline.
+			const closing = seg.kind === "total" && i > 0 && i === segs.length - 1;
+			const down = seg.kind === "down" || (seg.kind === "total" && (closing ? seg.to >= 0 : seg.to < 0));
 			return { top, length, down, inside: !cut && !narrow && tallEnough(values[i], length, unit) };
 		});
 		// At the start or end, a number is as far from it as the widest number is from the sides.

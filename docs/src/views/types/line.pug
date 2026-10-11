@@ -63,6 +63,22 @@ block content
 
 		p To make every line and area grow up, set the #[code animate] option to #[code "up"]. A chart with triggered steps (like from Reveal.js fragments) still builds from left to right. See #[a(href=url('/styling/animation.html')) Animation].
 
+	+section("Below zero")
+		p A line can cross zero. A number below zero is shown under its point, and a grey line marks zero.
+
+		+chart
+			figure(data-chart="line" data-chart-shape="smooth" data-chart-animate="up")
+				figcaption
+					b Monthly result
+					br
+					span thousands of euros
+				table
+					tbody
+						each row in [['Jan', '12.6'], ['Feb', '28.7'], ['Mar', '-11.7'], ['Apr', '-36.3'], ['May', '19.8'], ['Jun', '-4.1']]
+							tr
+								th= row[0]
+								td= row[1]
+
 	+section("Several lines")
 		p Each value column is a line. The column header is the name of the line, shown at the end of the line.
 

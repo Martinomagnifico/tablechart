@@ -61,6 +61,22 @@ block content
 
 		p To make every line and area grow up, set the #[code animate] option to #[code "up"]. A chart with triggered steps (like from Reveal.js fragments) still builds from left to right. See #[a(href=url('/styling/animation.html')) Animation].
 
+	+section("Below zero")
+		p Below zero, the area hangs down from the zero line, and a number is shown under its point.
+
+		+chart
+			figure(data-chart="area" data-chart-shape="smooth" data-chart-animate="up")
+				figcaption
+					b Monthly result
+					br
+					span thousands of euros
+				table
+					tbody
+						each row in [['Jan', '12.6'], ['Feb', '28.7'], ['Mar', '-11.7'], ['Apr', '-36.3'], ['May', '19.8'], ['Jun', '-4.1']]
+							tr
+								th= row[0]
+								td= row[1]
+
 	+section("Several areas")
 		p Each value column is an area. The column header is the name of the area, shown at the end of its line. The areas overlap, so each one is see-through.
 
@@ -128,7 +144,7 @@ block content
 								td= row[1]
 
 	+section("Stacked areas")
-		p Add #[code data-chart-stack] to the figure. Each area starts on top of the one before it, the first value column at the bottom. Each number is shown in the middle of its area, if there is room for it. If you point at the row, or tap it, the numbers of that row are shown.
+		p Add #[code data-chart-stack] to the figure. Each area starts on top of the one before it, the first value column at the bottom. A value below zero takes its area down from the one before it. Each number is shown in the middle of its area, if there is room for it. If you point at the row, or tap it, the numbers of that row are shown.
 
 		+chart
 			figure(data-chart="area" data-chart-stack)
@@ -150,7 +166,26 @@ block content
 								td= row[2]
 
 		p Stacked areas do not overlap, so their default opacity is #[code 0.5].
-		p A value below zero takes no room in a stack.
+		p In a stack, each area adds its value to the one before it, also below zero. The top line is the total. A number of a part below zero is shown when you point at its row, so it does not cover the number of the area under it.
+
+		+chart
+			figure(data-chart="area" data-chart-stack)
+				figcaption
+					b Monthly result
+					br
+					span thousands of euros
+				table
+					thead
+						tr
+							th Month
+							th Shop
+							th Market
+					tbody
+						each row in [['Jan', '12', '-4'], ['Feb', '8', '-9'], ['Mar', '-6', '3'], ['Apr', '-14', '-7'], ['May', '4', '-2'], ['Jun', '10', '5']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
 
 	+section("Steps")
 		p Add #[code data-chart-shape="step"] to the figure. Each value is flat across the width of its row, and the line goes straight up or down to the next row. A number is shown only where the value changes, in the middle of the rows that have that value. If a number is wider than those rows, it is left out. If you point at the row, or tap it, the numbers of that row are shown.

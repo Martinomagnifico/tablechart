@@ -18,6 +18,7 @@ const trend = (area: boolean): ChartType => ({
 	segments,
 	series: true,
 	stackable: true,
+	running: true,
 	swatch: area ? "box" : undefined,
 
 	headroom: ({ labelHeight, unit }) => labelHeight * 1.6 + 6 * unit,
@@ -44,7 +45,7 @@ const trend = (area: boolean): ChartType => ({
 		// In the helpers below, `s` is a series and `i` a row.
 		const cellAt = (s: number, i: number): Cell | undefined => rows[i]?.cells[s] ?? rows[i]?.cells[0];
 		const missing = (s: number, i: number): boolean => !cellAt(s, i) || !!cellAt(s, i)?.missing;
-		const stacks = rows.map((row) => (stacked ? stackOf(row, series.length) : null));
+		const stacks = rows.map((row) => (stacked ? stackOf(row, series.length, true) : null));
 		// Where a line is, as a value: on zero, or in a stack on the line before it.
 		const topValue = (s: number, i: number): number => stacks[i]?.[s].to ?? cellAt(s, i)?.value ?? 0;
 		const bottomValue = (s: number, i: number): number => stacks[i]?.[s].from ?? 0;
@@ -216,13 +217,15 @@ const trend = (area: boolean): ChartType => ({
 			if (step && i > 0 && !missing(s, i - 1) && cellAt(s, i - 1)?.value === cell.value) return "none";
 			if (focused && !series[s].focus) return "none";
 			if (stacked) return "middle";
-			if (!several || focused || series.length > 2) return "above";
+			// Below zero, a number goes under its point, away from the zero line.
+			const alone = cell.value < 0 ? "below" : "above";
+			if (!several || focused || series.length > 2) return alone;
 			const other = cellAt(1 - s, i);
-			if (!other || other.missing) return "above";
+			if (!other || other.missing) return alone;
 			// The higher of two goes above its point; on a tie, the first does.
 			if (cell.value > other.value || (cell.value === other.value && s === 0)) return "above";
 			// In an area chart, a number under its point may not cross zero.
-			if (area && pointAt(s, i)[1] + 7 * unit + labelHeight > baseline) return "above";
+			if (area && cell.value >= 0 && pointAt(s, i)[1] + 7 * unit + labelHeight > baseline) return "above";
 			return "below";
 		};
 
@@ -232,7 +235,9 @@ const trend = (area: boolean): ChartType => ({
 			const width = sizeOf(seriesValues[s][i]).width * unit;
 			const rowsWide = step ? runEnd(s, i) - i + 1 : 1;
 			if (width > rowsWide * band - 4 * unit) return true;
-			return stacked && y(bottomValue(s, i)) - y(topValue(s, i)) < labelHeight * 1.2;
+			// A part below zero lies over the part under it, so its number would cover that one's.
+			if (stacked && s > 0 && topValue(s, i) < bottomValue(s, i)) return true;
+			return stacked && Math.abs(y(bottomValue(s, i)) - y(topValue(s, i))) < labelHeight * 1.2;
 		};
 
 		seriesValues.forEach((labels, s) => {
@@ -274,8 +279,9 @@ const trend = (area: boolean): ChartType => ({
 		const nameHeight = (names[0] ? sizeOf(names[0]).height : 0) * unit;
 		for (const end of spread(ends, nameHeight)) placeAt(end.name, end.x, end.y, VIEWBOX_WIDTH, height);
 
-		// With numbers under the lower line, the rule is the foot of the plot rather than zero.
-		const rule = !area && !stacked && series.length === 2 && !focused ? height - 2 * unit : baseline;
+		// With numbers under the lower line, the rule is the foot of the plot rather than zero, unless values go below zero.
+		const belowZero = rows.some((row) => row.cells.some((cell) => !cell.missing && cell.value < 0));
+		const rule = !area && !stacked && series.length === 2 && !focused && !belowZero ? height - 2 * unit : baseline;
 		svg.appendChild(
 			svgEl("line", {
 				class: RULE_CLASS,

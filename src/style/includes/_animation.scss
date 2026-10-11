@@ -20,6 +20,11 @@
 		transform-origin: left;
 	}
 
+	:where(.tablechart-bar[data-grow="left"]) {
+		transform: scaleX(0);
+		transform-origin: right;
+	}
+
 	// Revealed from left to right by a clip, at an even speed, so a dashed or dotted line keeps its pattern while it grows.
 	:where(.tablechart-series) {
 		clip-path: inset(-10px calc(100% + 10px) -10px -10px);
@@ -103,11 +108,38 @@
 	}
 }
 
+// A waterfall builds one step at a time: a column grows, then its connector draws, and only then the next column starts.
+// A connector starts when the column is at 98%, three quarters of its time with this easing, and draws a little faster.
+$step-grow: calc(#{$duration} * 0.8);
+$step-ready: calc(#{$duration} * 0.6);
+$step-link: calc(#{$duration} * 0.4);
+$step-time: calc(#{$duration} * 1);
+
+:where([data-animate][data-chart="waterfall"]) {
+	:where(.tablechart-bar) {
+		transition-duration: #{$step-grow};
+		transition-delay: calc(var(--i) * #{$step-time});
+	}
+
+	:where(.tablechart-connector) {
+		transition: clip-path #{$step-link} linear;
+		transition-delay: calc((var(--i) - 1) * #{$step-time} + #{$step-ready});
+	}
+
+	:where(.tablechart-value) {
+		transition-delay: calc(var(--i) * #{$step-time} + #{$step-grow} * 0.5);
+	}
+
+	:where(.tablechart-badge, .tablechart-hole[data-for="badge"]) {
+		transition-delay: calc(var(--after) * #{$step-time} + 0.2s);
+	}
+}
+
 :where([data-animate].is-shown) {
 	:where(.tablechart-bar) {
 		transform: scaleY(1);
 	}
-	:where(.tablechart-bar[data-grow="right"]) {
+	:where(.tablechart-bar:is([data-grow="right"], [data-grow="left"])) {
 		transform: scaleX(1);
 	}
 	:where(.tablechart-series) {

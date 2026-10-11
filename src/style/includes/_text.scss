@@ -13,7 +13,7 @@
 		color: var(--tablechart-value-color, currentColor);
 	}
 	// Outside a bar, the minus hangs to the left, so the digits are centred under it.
-	&[data-place="outside"] :where(.tablechart-minus) {
+	&:where([data-place="outside"], [data-place="below"]) :where(.tablechart-minus) {
 		position: absolute;
 		right: 100%;
 	}
@@ -39,6 +39,11 @@
 
 	&[data-place="after"] {
 		transform: translate(0, -50%);
+		color: var(--tablechart-value-color, currentColor);
+	}
+
+	&[data-place="before"] {
+		transform: translate(-100%, -50%);
 		color: var(--tablechart-value-color, currentColor);
 	}
 

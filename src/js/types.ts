@@ -70,7 +70,6 @@ export interface Geometry {
 	/** Where a bar chart is cut across, in viewBox units; set by its drawing. */
 	breakX?: number;
 	labels: "outside" | "inside";
-	closing: "down" | "up";
 	/** Where a number inside its bar goes, from `--tablechart-inside-align`; null for the chart's own default. */
 	insideAlign: "start" | "center" | "end" | null;
 	stacked: boolean;
@@ -107,6 +106,8 @@ export interface ChartType {
 	/** A break in the scale works here; a waterfall keeps its floating steps clear of it. */
 	breakable?: boolean;
 	stackable?: boolean;
+	/** A stack is a running sum, so each line follows the one under it; otherwise values below zero stack down from zero. */
+	running?: boolean;
 	totals?: boolean;
 	/** The sample in front of a legend name when it is not a line; the legend shows only when asked. */
 	swatch?: "box";

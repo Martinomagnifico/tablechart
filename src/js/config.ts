@@ -58,8 +58,6 @@ export interface Config {
 	labels: "outside" | "inside";
 	/** How a line or area runs between points: `straight`, `step` or `smooth`. A figure overrides it with `data-chart-shape`. */
 	shape: "straight" | "step" | "smooth";
-	/** How the closing total of a waterfall grows: `down` from the step before it to the baseline, or `up` from the baseline. A figure overrides it with `data-chart-closing`. */
-	closing: "down" | "up";
 	/** Names of several lines in a legend instead of at the end of each line. A figure overrides it with `data-chart-legend`. */
 	legend: boolean;
 	/** Pointing at a row shows numbers that were left out for lack of room. A figure turns it off with `data-chart-hover="false"`. */
@@ -93,7 +91,6 @@ export const defaultConfig: Config = {
 	entrance: 0.5,
 	labels: "outside",
 	shape: "straight",
-	closing: "down",
 	legend: false,
 	hover: true,
 	totallabel: "Total",

@@ -26,7 +26,7 @@ import {
 } from "./config";
 import { decimalsIn, largest, splitSign } from "./functions/format";
 import { markerOf } from "./functions/markers";
-import { stackTotal } from "./functions/groups";
+import { stackReach, stackTotal } from "./functions/groups";
 import { fitTogether } from "./functions/labels";
 import { measureAll, sizeOf } from "./functions/measure";
 import type { Squeeze } from "./functions/scale";
@@ -154,13 +154,6 @@ export const build = (
 	if (stackAsked && !type.stackable)
 		console.warn(`[${LIBRARY_NAME}] A ${kind} chart cannot be stacked.`);
 	const stacked = stackAsked && !!type.stackable && several;
-	if (
-		stacked &&
-		rows.some((row) => row.cells.slice(0, series.length).some((cell) => cell.value < 0))
-	)
-		console.warn(
-			`[${LIBRARY_NAME}] A stacked chart has a value below zero. It takes no room in the stack.`
-		);
 
 	// Hidden from screen readers: they read the table, which has the same numbers and names.
 	const plot = document.createElement("div");
@@ -460,18 +453,31 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		focused: series.some((one) => one.focus),
 		stacked: state.stacked,
 	};
+	const reach = (pick: (list: number[]) => number) =>
+		state.stacked
+			? pick(rows.map((row) => stackReach(row, series.length, type.running).top))
+			: pick([
+					...segments.flatMap((s) => [s.from, s.to, s.value]),
+					...rows.flatMap((row) => row.cells.slice(0, series.length).map((cell) => cell.value)),
+				]);
+	const extent = Math.max(reach(largest), 0);
+	// Below zero the scale goes as far down as the lowest value, with room under it for its number.
+	// A step of a waterfall is a size, not a place, so there only where the steps start and end counts.
+	const steps = segments.some((s) => s.kind === "up" || s.kind === "down");
+	const places = steps
+		? segments.flatMap((s) => [s.from, s.to])
+		: state.stacked
+			? rows.map((row) => stackReach(row, series.length, type.running).bottom)
+			: rows.flatMap((row) => row.cells.slice(0, series.length).map((cell) => cell.value));
+	const depth = Math.min(-largest(places.map((value) => -value)), 0);
+
 	const headroom = type.headroom?.(room) ?? labelHeight;
-	const floor = 2 * unit + (type.footroom?.(room) ?? 0);
+	const floor = 2 * unit + (type.footroom?.(room) ?? 0) + (depth < 0 ? labelHeight + 4 * unit : 0);
 	const top = headroom;
 
-	const extent = state.stacked
-		? Math.max(largest(stackedRows.map((row) => row.value)), 0)
-		: Math.max(
-				largest(segments.flatMap((s) => [s.from, s.to, s.value])),
-				largest(rows.flatMap((row) => row.cells.slice(0, series.length).map((cell) => cell.value)))
-			);
 	const plotHeight = height - top - floor;
 	const ceiling = extent * 1.02;
+	const bottom = depth * 1.02;
 
 	// The break squeezes `data-from` to `data-to` into `data-size` of the plot; `data-at` is the old spelling of `data-from`.
 	const breakSpec = annotations.find(
@@ -513,6 +519,8 @@ export const layout = (state: ChartState, config: Config): boolean => {
 
 		if (!type.breakable) {
 			console.warn(`[${LIBRARY_NAME}] This kind of chart cannot break its scale.`);
+		} else if (depth < 0) {
+			console.warn(`[${LIBRARY_NAME}] A chart with values below zero cannot break its scale.`);
 		} else if (lo < 0 || hi <= lo || hi > ceiling || (lo === 0 && hi === ceiling)) {
 			console.warn(
 				`[${LIBRARY_NAME}] A break from ${lo} to ${hi} does not fit a scale that runs from 0 to ${extent}.`
@@ -531,7 +539,8 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	const breakGap = (compress && cssLength(state.figure, unit, "--tablechart-break-gap", "")) ?? BREAK_GAP;
 	// Full scale below and above the break, compressed through it.
 	const base = height - floor;
-	let y: (value: number) => number = (value) => base - (value / ceiling) * plotHeight;
+	const span = ceiling - bottom || 1;
+	let y: (value: number) => number = (value) => base - ((value - bottom) / span) * plotHeight;
 	if (compress) {
 		const { lo, hi, gap, share } = compress;
 		const squeezed = plotHeight * share;
@@ -588,7 +597,6 @@ export const layout = (state: ChartState, config: Config): boolean => {
 			(state.figure.dataset.chartLabels !== "outside" && config.labels === "inside")
 				? "inside"
 				: "outside",
-		closing: (state.figure.dataset.chartClosing ?? config.closing) === "up" ? "up" : "down",
 		insideAlign: insideAlign(state.figure),
 		breakAt,
 		squeeze: compress,

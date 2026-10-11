@@ -34,6 +34,43 @@ block content
 		p A name beside a bar takes at most 40% of the width of the chart. A longer name wraps onto more lines, and the chart gets taller if it needs to. To change the width, set #[code --tablechart-name-max], such as #[code 30%].
 		p A long word is hyphenated if the page has a #[code lang] attribute, such as #[code lang="en"].
 
+	+section("Below zero")
+		p A bar with a value below zero goes to the left of the zero line, with its number before it.
+
+		+chart
+			figure(data-chart="bar")
+				figcaption
+					b Monthly result
+					br
+					span thousands of euros
+				table
+					tbody
+						each row in [['Jan', '12.6'], ['Feb', '28.7'], ['Mar', '-11.7'], ['Apr', '-36.3'], ['May', '19.8'], ['Jun', '-4.1']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		p With several value columns, each bar of a group goes left or right on its own.
+
+		+chart
+			figure(data-chart="bar")
+				figcaption
+					b Monthly result
+					br
+					span thousands of euros
+				table
+					thead
+						tr
+							th Month
+							th 2024
+							th 2025
+					tbody
+						each row in [['Jan', '12.6', '-2.6'], ['Feb', '28.7', '-12.2'], ['Mar', '-11.7', '12.0'], ['Apr', '-36.3', '26.8'], ['May', '19.8', '-6.9'], ['Jun', '-4.1', '7.5']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
 	+section("Grouped bars")
 		p If the table has more than one value column, each row is a group, with one bar for each value column. The column headers are the names in the legend under the chart.
 
@@ -57,7 +94,7 @@ block content
 								td= row[2]
 
 	+section("Stacked bars")
-		p Add #[code data-chart-stack] to the figure. The values of a row are shown one after the other in one bar, the first value column on the left. The total of the row is after the bar.
+		p Add #[code data-chart-stack] to the figure. The values of a row are shown one after the other in one bar, the first value column on the left. Values below zero are stacked to the left of the zero line. The total of the row is after the bar.
 
 		+chart
 			figure(data-chart="bar" data-chart-stack)
@@ -79,6 +116,26 @@ block content
 								td= row[2]
 
 		p A number is shown inside its part of the bar if it fits. If not, it is left out. If you point at the row, or tap it, the numbers of that row are shown.
+		p Below zero, the parts of a stack go left from the zero line. The total is the sum of all parts, after the bar, or before it if the whole stack is below zero.
+
+		+chart
+			figure(data-chart="bar" data-chart-stack)
+				figcaption
+					b Monthly result
+					br
+					span thousands of euros
+				table
+					thead
+						tr
+							th Month
+							th Shop
+							th Market
+					tbody
+						each row in [['Jan', '12', '-4'], ['Feb', '8', '-9'], ['Mar', '-6', '3'], ['Apr', '-14', '-7'], ['May', '4', '-2'], ['Jun', '10', '5']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
 
 	+section("Scale break")
 		p If one bar is much longer than the others, a break in the scale shows part of the scale smaller, so the other bars have room. See #[a(href=url('/features/scale-break.html')) Scale break].

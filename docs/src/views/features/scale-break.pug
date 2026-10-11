@@ -24,7 +24,7 @@ block content
 
 	+section("Which charts")
 		p If one value is much larger than the others, the other bars are very short. Add a break: part of the scale is then shown smaller, and the small values get more room. The bars that run through the break are cut, so you can see they are not to scale there. Every bar shows its number.
-		p A break works on column, bar and waterfall charts. With several bars per row, each bar is cut, and a stack is cut as a whole. On a line or area chart a break would cut through nothing, so there, and on a donut, it is left out, and the console says so.
+		p A break works on column, bar and waterfall charts. With several bars per row, each bar is cut, and a stack is cut as a whole. On a line or area chart a break would cut through nothing, so there, and on a donut, it is left out, and the console says so. A chart with values below zero cannot have a break either.
 
 	+section("Column")
 		p The break is a #[code span] with #[code data-annotation="axis-break"], in a #[code div] with the class #[code chart-annotations] inside the chart. #[code data-from="20"] shows the scale above 20 smaller.
