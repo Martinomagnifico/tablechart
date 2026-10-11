@@ -154,18 +154,22 @@ export const adoptTables = (figures: HTMLElement[]): HTMLElement[] =>
 		return wrapper;
 	});
 
-const tableFrom = (rows: SourceRow[], series: string[] = []): HTMLTableElement => {
-	const table = document.createElement("table");
-	if (series.length) {
+// An author's header row is kept; otherwise the file's names make one, if it has them.
+const tableFrom = (rows: SourceRow[], series: string[], label: string, table = document.createElement("table")): HTMLTableElement => {
+	for (const old of table.querySelectorAll(":scope > tbody, :scope > tfoot, :scope > tr")) old.remove();
+	if (!table.tHead && (series.length || label)) {
 		const head = table.createTHead().insertRow();
-		head.append(document.createElement("th"));
+		const corner = document.createElement("th");
+		corner.textContent = label;
+		head.append(corner);
 		for (const name of series) {
 			const th = document.createElement("th");
 			th.textContent = name;
 			head.append(th);
 		}
 	}
-	const body = table.createTBody();
+	const body = document.createElement("tbody");
+	table.append(body);
 	for (const row of rows) {
 		const tr = body.insertRow();
 		if (row.kind === "total") tr.dataset.kind = "total";
@@ -178,27 +182,43 @@ const tableFrom = (rows: SourceRow[], series: string[] = []): HTMLTableElement =
 	return table;
 };
 
-/** `data-chart-src` replaces any table in the figure with one made from a JSON file; a file that fails is reported. */
+type Value = string | number | null;
+
+// `{ "Spring": "58" }` or `{ "Elstar": ["118", "131"] }`: each name with its value or values.
+const namedRows = (data: unknown): SourceRow[] | undefined => {
+	if (!data || typeof data !== "object") return undefined;
+	const entries = Object.entries(data as Record<string, unknown>);
+	const isValue = (value: unknown): value is Value => value === null || typeof value === "string" || typeof value === "number";
+	if (!entries.length || !entries.every(([, value]) => isValue(value) || (Array.isArray(value) && value.every(isValue)))) return undefined;
+	return entries.map(([label, value]) => (Array.isArray(value) ? { label, values: value as Value[] } : { label, value: value as Value }));
+};
+
+/** `data-chart-src` fills the figure's table with the rows of a JSON file, keeping a header row the author wrote; a file that fails is reported. */
 export const loadSources = async (figures: HTMLElement[]): Promise<void> => {
 	await Promise.all(
 		figures
 			.filter((figure) => figure.hasAttribute("data-chart-src"))
 			.map(async (figure) => {
 				const src = figure.getAttribute("data-chart-src") as string;
-				for (const table of figure.querySelectorAll("table")) table.remove();
+				const authored = Array.from(figure.querySelectorAll("table")).find((one) => one.tHead) ?? null;
+				for (const table of figure.querySelectorAll("table")) if (table !== authored) table.remove();
 				try {
 					const response = await fetch(src);
 					if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
 					const data = await response.json();
-					const rows: SourceRow[] = Array.isArray(data) ? data : data?.rows;
-					if (!Array.isArray(rows)) throw new Error("no array of rows in it");
+					const rows: SourceRow[] | undefined = Array.isArray(data) ? data : data?.rows ? (Array.isArray(data.rows) ? data.rows : namedRows(data.rows)) : namedRows(data);
+					if (!Array.isArray(rows)) throw new Error("no rows in it: a list of rows, an object with rows, or names with their values");
 					const series: string[] = Array.isArray(data?.series)
 						? data.series.map(String)
 						: [];
-					const caption = figure.querySelector(":scope > figcaption");
-					const table = tableFrom(rows, series);
-					if (caption) caption.after(table);
-					else figure.prepend(table);
+					const label = typeof data?.label === "string" ? data.label : "";
+					const table = tableFrom(rows, series, label, authored ?? undefined);
+					if (!authored) {
+						const caption = figure.querySelector(":scope > figcaption");
+						if (caption) caption.after(table);
+						else figure.prepend(table);
+					}
+					if (!table.tHead) debug?.log?.(`The table from "${src}" has no header row, so a screen reader cannot name its columns.`);
 					debug?.log?.(`Read ${rows.length} rows from "${src}"`);
 				} catch (error) {
 					const local = window.location.protocol === "file:";

@@ -1,0 +1,6 @@
+// In print, a table hidden from sight would only take empty pages: text that is only clipped does not reach a PDF.
+@media print {
+	:where(.tablechart, [data-chart]) :where(table, .chart-annotations) {
+		display: none;
+	}
+}

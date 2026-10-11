@@ -59,6 +59,10 @@
             ]
         },
         {
+            "text": "Data",
+            "href": "/data.html"
+        },
+        {
             "title": "Features",
             "links": [
                 {
@@ -75,11 +79,6 @@
                     "text": "Features | Annotations",
                     "label": "Annotations",
                     "href": "/features/annotations.html"
-                },
-                {
-                    "text": "Features | Data",
-                    "label": "Data",
-                    "href": "/features/data.html"
                 },
                 {
                     "text": "Features | Legends",

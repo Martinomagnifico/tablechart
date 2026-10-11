@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Changes to handling of JSON data sources. A header row written in the figure table markup, if missing from the data source, is then used.
+
+### Fixed
+
+- A chart's hidden table no longer adds empty pages in print.
+
+
 ## [1.0.2] - 2026-10-10
 
 ### Added

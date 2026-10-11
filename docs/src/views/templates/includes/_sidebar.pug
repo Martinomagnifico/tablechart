@@ -18,6 +18,11 @@ aside.docs-sidebar
 
 
 				each section in sections
+					if !section.title
+						//- A page of its own between the groups, such as Data.
+						.nav-section
+							a(class=(section.text === pagetitle ? "active" : "") href=url(section.href) tabindex=(section.text === pagetitle ? "-1" : false)) #{section.text}
+						- continue
 					- const sectionId = 'nav-' + section.title.toLowerCase().replace(/\s+/g, '-')
 					- const allLinks = [...(section.links || []), ...(section.examples || []), ...(section.integrations || [])]
 					- const isActive = allLinks.some(link => link.text === pagetitle)

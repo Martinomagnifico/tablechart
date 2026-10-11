@@ -1,7 +1,7 @@
 extends /views/templates/layouts/_base
 
 append variables
-	- pagetitle = "Features | Data"
+	- pagetitle = "Data"
 	- pagedescription = "Where a chart's data comes from in Tablechart: a table in your HTML, a table from Markdown, or a JSON file."
 
 block content
@@ -27,11 +27,11 @@ block content
 								th= row[0]
 								td= row[1]
 
-		p The table stays in the page, but it is hidden. Screen readers, search engines and translation scripts can still read it. If JavaScript does not run, the table is all there is.
+		p The table stays on the page, but it is hidden for sighted users. Screen readers, search engines and translation scripts can still read it. If JavaScript does not run, the table is all there is.
 		p The #[code figcaption] is the title of the chart. Text after a #[code br] is shown as its subtitle. A #[code figcaption] is not needed: you can also put a heading above the figure, and style it like the other headings on your page.
 
 	+section("Several value columns")
-		p If the table has more than one value column, each column is a line, or a bar in each group. The table needs a #[code thead]: its headers are the names of the columns.
+		p If the table has more than 1 value column, each column is a line, or a bar in each group. The table then needs a #[code thead]: its headers are the names of the columns.
 
 		+codeblock('HTML').
 			<table>
@@ -74,17 +74,38 @@ block content
 					td A column header
 					td Makes a line dashed or dotted
 
-	+section("A JSON file")
-		p Add #[code data-chart-src] with the address of a JSON file. Tablechart reads the file and makes a table from it, so the chart works as if you had written the table. A table in the figure is removed. The table is made by JavaScript, so without JavaScript there is no table: see #[a(href=url('/features/accessibility.html')) Accessibility].
+	+section("A JSON file or endpoint")
+		p Add #[code data-chart-src] with the address of a JSON file. Tablechart reads the file and makes a table from it, and then Tablechart creates the chart from that table. If you #[strong also] had an HTML table in there, that is then replaced, unless it has a #[em header row]: see #[a(href="#missing-names") Missing names]. The table is made by JavaScript, so without JavaScript there is no table: see #[a(href=url('/features/accessibility.html')) Accessibility].
 
 		+chart
 			figure(data-chart="column" data-chart-src=url('/data/apples.json'))
 				figcaption: b Apples sold by variety
 
-		p The file is a list of rows, or an object with #[code rows] and the names of the value columns in #[code series]. Write a value as a string, such as #[code "1.0"], to keep its decimals.
+		p A browser cannot read a file from a page that is opened from your computer, with an address that starts with #[code file://]. Open the page from a server.
+
+		h3#json-structure JSON structure
+		p The rows can be written in two ways. As a list of rows, each with its #[code label] and its #[code value], or its #[code values] if there are more value columns:
+
+		+codeblock('JSON').
+			[
+				{ "label": "Jan 2025", "value": "12.4" },
+				{ "label": "Feb 2025", "value": "-3.1" },
+				{ "label": "Mar 2025", "value": "8.7" }
+			]
+
+		p Or as names with their value, or their values:
+
+		+codeblock('JSON').
+			{ "Spring": "58", "Summer": "72", "Autumn": "70" }
+
+		+codeblock('JSON').
+			{ "Elstar": ["118", "131"], "Jonagold": ["140", "135"], "Braeburn": ["109", "121"] }
+
+		p To name the columns too, put the rows, in either way, in an object with #[code rows]. #[code series] has the names of the value columns, and #[code label] the name of the first column:
 
 		+codeblock('JSON').
 			{
+				"label": "Variety",
 				"series": ["2022", "2026"],
 				"rows": [
 					{ "label": "Elstar", "values": ["118", "131"] },
@@ -93,8 +114,23 @@ block content
 				]
 			}
 
-		p A row with one value uses #[code value] instead of #[code values]. A row with #[code "kind": "total"] is a total.
-		p A browser cannot read a file from a page that is opened from your computer, with an address that starts with #[code file://]. Open the page from a server.
+		p Write a value as a string, such as #[code "1.0"], to keep its decimals. A row in a list with #[code "kind": "total"] is a total. In names with values, names that are whole numbers, such as #[code "2022"], come first and from low to high, whatever their order in the file. Other names keep their order.
+
+		h3#missing-names Missing names
+
+		p If the file has only rows (so data only, like the top 3 examples above), without #[code label] and #[code series], the table has no header row, and screen readers cannot say what the columns are.
+
+		p Then write just the header row in the figure yourself, in a table with only a #[code thead]. Tablechart keeps it and adds the rows from the file. A header row in the figure goes before the names in the file. Screen readers use the header row to name the columns, and with #[code data-i18n] on a #[code th], a translation script translates it.
+
+		+codeblock('HTML').
+			<figure data-chart="column" data-chart-src="/api/profit-per-month/">
+				<figcaption><b>Profit per month</b></figcaption>
+				<table>
+					<thead>
+						<tr><th>Month</th><th>Profit</th></tr>
+					</thead>
+				</table>
+			</figure>
 
 	+section("A table from Markdown")
 		p If your Markdown tool can add attributes to a table, add #[code data-chart] to the table. This example uses #[a(href="https://github.com/arve0/markdown-it-attrs") markdown-it-attrs], which reads the attributes from the line after the table.
