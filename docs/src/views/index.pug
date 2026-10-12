@@ -6,6 +6,21 @@ append variables
 	- page.class = 'index'
 	- ee = true
 
+
+mixin indextable(totals, values)
+	- const [one, two, three] = values || [1, 2, 3]
+	table
+		tbody
+			tr(data-kind=totals ? "total" : false)
+				th One
+				td= one
+			tr
+				th Two
+				td= two
+			tr(data-kind=totals ? "total" : false)
+				th Three
+				td= three
+
 block content
 	.container
 		h1 
@@ -22,65 +37,20 @@ block content
 		
 		.hero-charts
 			figure.hero-extra(data-chart="column" data-chart-aspect="0.6", data-chart-entrance="0")
-				table
-					tbody
-						tr
-							th One
-							td 1
-						tr
-							th Two
-							td 2
-						tr
-							th Three
-							td 3
+				+indextable
+
 			figure(data-chart="line" data-chart-shape="smooth" data-chart-animate="up" data-chart-aspect="0.6", data-chart-entrance="0")
-				table
-					tbody
-						tr
-							th One
-							td 1
-						tr
-							th Two
-							td 3
-						tr
-							th Three
-							td 2
+				+indextable(false, [1, 3, 2])
+
 			figure(data-chart="donut" data-chart-aspect="0.85", data-chart-entrance="0")
-				table
-					tbody
-						tr
-							th One
-							td 1
-						tr
-							th Two
-							td 1
-						tr
-							th Three
-							td 1
-			figure(data-chart="waterfall" data-chart-aspect="0.6", data-chart-entrance="0")
-				table
-					tbody
-						tr(data-kind="total")
-							th One
-							td 1
-						tr
-							th Two
-							td 2
-						tr(data-kind="total")
-							th Three
-							td 3
+				+indextable
+
 			figure.hero-extra(data-chart="bar" data-chart-aspect="0.6", data-chart-entrance="0")
-				table
-					tbody
-						tr
-							th One
-							td 1
-						tr
-							th Two
-							td 2
-						tr
-							th Three
-							td 3
+				+indextable
+				
+			figure(data-chart="waterfall" data-chart-aspect="0.6", data-chart-entrance="0")
+				+indextable(true)
+
 
 		//- The boxes come in once. A box that is hidden and shown again, on a resize, would otherwise come in again.
 		script.
