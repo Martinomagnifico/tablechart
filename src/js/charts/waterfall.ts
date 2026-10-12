@@ -1,6 +1,6 @@
 import { sizeOf } from "../functions/measure";
 import { BAR_CLASS, CONNECTOR_CLASS, LIBRARY_NAME, RULE_CLASS, VIEWBOX_WIDTH } from "../config";
-import { timing } from "../functions/timing";
+import { STOP, timing } from "../functions/timing";
 import { tallEnough, tooWide } from "../functions/labels";
 import { placeAt, svgEl, withRow } from "../functions/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
@@ -71,6 +71,12 @@ export const waterfall: ChartType = {
 		let side = Number.POSITIVE_INFINITY;
 		for (const [i, bar] of bars.entries()) if (bar.inside) side = Math.min(side, (barWidth - sizeOf(values[i]).width * unit) / 2);
 
+		// The columns grow one after the other at one speed, with no pause between them, and the last slows to a stop.
+		// A connector draws while the next column starts, in a third of its time.
+		const total = segs.length;
+		const part = (from: number, share: number, last = false) =>
+			`--start:${(from / total).toFixed(4)}; --span:${(share / total).toFixed(4)}; --ease:${last ? STOP : "linear"};`;
+
 		// A connector spans only the gap to the next column, and arrives with that column.
 		segs.forEach((seg, i) => {
 			const next = segs[i + 1];
@@ -86,7 +92,7 @@ export const waterfall: ChartType = {
 					y1: level,
 					y2: level,
 					"data-row": i + 2,
-					style: timing("--i", next.slot),
+					style: `${timing("--i", next.slot)}; ${part(i + 1, 1 / 3)}`,
 				})
 			);
 		});
@@ -103,11 +109,13 @@ export const waterfall: ChartType = {
 					y: top,
 					width: barWidth,
 					height: Math.max(barHeight, 1),
-					style: timing("--i", seg.slot),
+					style: `${timing("--i", seg.slot)}; ${part(i, 1, i === segs.length - 1)}`,
 				})
 			);
 
 			const label = values[i];
+			label.style.setProperty("--start", (i / total).toFixed(4));
+			label.style.setProperty("--span", (1 / total).toFixed(4));
 			// The end is where the bar grows to: the top of a step up, the bottom of a step down.
 			// A step too short for the full space has its number in the middle.
 			const pad = Math.min(side, (barHeight - digits) / 2);

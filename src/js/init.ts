@@ -272,6 +272,26 @@ export const create = async (
 	return figure ? make(figure, config) : null;
 };
 
+// Once per page: the old timing variables still work until the next minor version.
+const OLD_NAMES: [string, string][] = [
+	["--tablechart-duration", "--tablechart-element-duration"],
+	["--tablechart-stagger", "--tablechart-stagger-ratio, a share of the element time"],
+];
+let warned = false;
+const warnOldNames = (figures: HTMLElement[]): void => {
+	if (warned) return;
+	for (const figure of figures) {
+		const style = getComputedStyle(figure);
+		const used = OLD_NAMES.filter(([old]) => style.getPropertyValue(old).trim());
+		if (!used.length) continue;
+		warned = true;
+		console.warn(
+			`[${LIBRARY_NAME}] ${used.map(([old, now]) => `${old} is now ${now}`).join("; ")}. The old names work until the next minor version.`
+		);
+		return;
+	}
+};
+
 /** Makes a chart of every element in `root` that matches the selector, skipping existing charts. */
 export const init = async (
 	options: Partial<Config> = {},
@@ -281,6 +301,7 @@ export const init = async (
 	if (config.debug) debug.enabled = true;
 
 	const figures = await prepare(Array.from(root.querySelectorAll<HTMLElement>(config.selector)), config);
+	warnOldNames(figures);
 	const charts = figures
 		.map((figure) => make(figure, config))
 		.filter((chart): chart is TablechartChart => chart !== null);

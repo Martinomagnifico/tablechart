@@ -6,7 +6,7 @@ import type { AnnotationType, Geometry } from "../types";
 let masks = 0;
 
 type Corner = [number, number];
-type Box = { row: number; x: number; y: number; width: number; height: number; sideways: boolean };
+type Box = { row: number; x: number; y: number; width: number; height: number; sideways: boolean; part: string };
 
 /** The box of every bar as drawn; a stack of pieces counts as one bar. */
 const barsIn = (svg: SVGSVGElement): Box[] =>
@@ -17,7 +17,9 @@ const barsIn = (svg: SVGSVGElement): Box[] =>
 		const y = Math.min(...rects.map((rect) => read(rect, "y")));
 		const right = Math.max(...rects.map((rect) => read(rect, "x") + read(rect, "width")));
 		const bottom = Math.max(...rects.map((rect) => read(rect, "y") + read(rect, "height")));
-		return { row: Number(bar.dataset.row), x, y, width: right - x, height: bottom - y, sideways: bar.dataset.grow === "right" };
+		// A bar with its own part of a waterfall's motion: its cut appears when the bar is done.
+		const part = ["--start", "--span"].map((name) => bar.style.getPropertyValue(name) && `${name}:${bar.style.getPropertyValue(name)}`).filter(Boolean).join("; ");
+		return { row: Number(bar.dataset.row), x, y, width: right - x, height: bottom - y, sideways: bar.dataset.grow === "right", part };
 	});
 
 /** A break in the scale. `layout` breaks the scale; this masks the gap out of each bar it runs through and draws its two edges. */
@@ -80,7 +82,7 @@ export const axisBreak: AnnotationType = {
 			const [first, second] = box.sideways ? [edge(box, across), edge(box, across + geo.breakGap)] : [edge(box, level - geo.breakGap), edge(box, level)];
 			mask.appendChild(svgEl("path", { d: path([...first, ...second.slice().reverse()], true), fill: "black" }));
 			cuts.push(first, second);
-			const when = timing("--after", rows[box.row - 1]?.slot ?? 0);
+			const when = [timing("--after", rows[box.row - 1]?.slot ?? 0), box.part].filter(Boolean).join("; ");
 
 			for (const corners of [first, second]) {
 				svg.appendChild(

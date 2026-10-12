@@ -28,13 +28,13 @@ block content
 								td= row[1]
 
 	+section("Totals are not calculated")
-		p Tablechart shows the total you write. It does not add up the steps. If your numbers are rounded, the total stays as you wrote it. Here the steps add up to 73.3, and the total is 73.4.
+		p See that the last column does not line up? That is not Tablechart. That is your data. The combined totals should be 73.3, not 70.3. Tablechart just takes #[em your] values, it does #[em not] check if those add up correctly and adjust the chart. The console will show a warning if there is a mismatch, because it might be hard to see it in the chart itself.
 
 		+chart
 			figure(data-chart="waterfall")
 				table
 					tbody
-						each row in [['Picked', '74.5', 'total'], ['Windfalls', '28.2'], ['Bruised', '-16.1'], ['Peelings', '-13.3'], ['Pressed', '73.4', 'total']]
+						each row in [['Picked', '74.5', 'total'], ['Windfalls', '28.2'], ['Bruised', '-16.1'], ['Peelings', '-13.3'], ['Pressed', '70.3', 'total']]
 							tr(data-kind=row[2])
 								th= row[0]
 								td= row[1]

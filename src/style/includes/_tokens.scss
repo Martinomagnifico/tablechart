@@ -1,7 +1,20 @@
 // Shared values: timing, background, ink, palette and legend box.
 
-$duration: var(--tablechart-duration, 0.5s);
-$stagger: var(--tablechart-stagger, 0.12s);
+// The time of one element. `--tablechart-duration` is its old name, kept until the next minor version.
+$element: var(--tablechart-element-duration, var(--tablechart-duration, 0.5s));
+
+
+// A ceiling on the build of one chart, never a target: four elements by default.
+$max: var(--tablechart-max-duration, calc(4 * #{$element}));
+$duration: min(#{$element}, #{$max});
+$ratio: var(--tablechart-stagger-ratio, 0.24);
+
+
+// The gap between the starts of two elements. Under the maximum only this gives, for `--count` elements set by the chart.
+// The old `--tablechart-stagger`, in seconds, still wins if it is set.
+$stagger: min(var(--tablechart-stagger, calc(#{$ratio} * #{$element})), max(0s, calc((#{$max} - #{$duration}) / max(var(--count, 1) - 1, 1))));
+// How long a number or point takes to fade in: never more than a quarter of the maximum.
+$fade: min(#{$duration}, calc(#{$max} / 4));
 $easing: var(--tablechart-easing, cubic-bezier(0.26, 0.86, 0.44, 0.985));
 
 // The background behind the chart; lighter colours are mixed with it.
@@ -39,3 +52,8 @@ $seriesink: "var(--tablechart-series-ink, color-mix(in oklab, #{$seriesown} calc
 	border-radius: var(--tablechart-legend-radius, 0);
 	background: var(--tablechart-legend-surface, none);
 }
+
+// A donut: the time of a full circle, and how far apart the slices start, as a share of it.
+// It leaves room for the numbers to fade in before the maximum.
+$circle: min(var(--tablechart-circle-duration, 1.5s), calc(#{$max} - #{$fade}));
+$sweep: calc(min(var(--tablechart-stagger-ratio, 1), 1) * #{$circle});

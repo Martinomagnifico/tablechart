@@ -63,6 +63,8 @@ const trend = (area: boolean): ChartType => ({
 
 		// The line builds at an even speed, in stagger steps, and a long line takes no more than six in all.
 		const totalSteps = Math.min(last, 6);
+		// A line builds in at most seven steps, however many rows it has.
+		geo.plot.style.setProperty("--count", String(totalSteps + 1));
 		const stepsPerRow = last > 0 ? totalSteps / (step ? rows.length : last) : 1;
 		// When the line reaches point i, or the start of row i on a step chart.
 		const reach = (i: number): number => i * stepsPerRow;

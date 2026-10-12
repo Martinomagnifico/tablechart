@@ -1,5 +1,23 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `--tablechart-element-duration`, `--tablechart-stagger-ratio` and `--tablechart-max-duration`: the time of one element, when the next one starts, and a ceiling for a whole chart, 2s by default.
+- `--tablechart-circle-duration`: how long a donut takes for a full circle, 1.5s by default.
+
+### Changed
+
+- A large chart builds within 2s: the starts of its elements move closer together.
+- A waterfall builds as one motion at one speed: each column starts when the one before it ends, its connector draws meanwhile, and the last column slows to a stop. With steps, each step builds on its own.
+- A donut draws its ring in one sweep with the bar easing. With a stagger ratio below 1, its slices overlap and each eases on its own.
+
+### Deprecated
+
+- `--tablechart-duration` and `--tablechart-stagger`, removed in the next minor version. The console says so.
+
+
 ## [1.0.3] - 2026-10-11
 
 ### Added

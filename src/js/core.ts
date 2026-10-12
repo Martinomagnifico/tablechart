@@ -616,6 +616,8 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		checks: state.checks,
 	};
 
+	// How many elements start one after the other, so the stagger can shrink under `--tablechart-max-duration`.
+	plot.style.setProperty("--count", String(Math.max(1, ...rows.map((row) => row.slot + 1))));
 	type.draw(geo);
 
 	for (const [n, annotation] of annotations.entries()) {

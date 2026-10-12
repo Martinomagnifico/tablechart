@@ -1,6 +1,7 @@
 @use "tokens" as *;
 
 // `is-shown` starts the build; `--after` is how many stagger steps the data takes, so commentary lands after it.
+// What follows an element starts a fraction of the element time after it, so it never lands with it when the stagger shrinks.
 
 :where([data-animate]) {
 	:where(.tablechart-bar) {
@@ -40,8 +41,8 @@
 
 	:where(.tablechart-point, .tablechart-hole) {
 		opacity: 0;
-		transition: opacity #{$duration} ease;
-		transition-delay: calc((var(--i) + 0.2) * #{$stagger});
+		transition: opacity #{$fade} ease;
+		transition-delay: calc(var(--i) * #{$stagger} + 0.048 * #{$duration});
 	}
 
 	:where(.tablechart-hole[data-for="badge"]) {
@@ -51,8 +52,8 @@
 
 	:where(.tablechart-value, .tablechart-name) {
 		opacity: 0;
-		transition: opacity #{$duration} ease;
-		transition-delay: calc((var(--i) + 0.4) * #{$stagger});
+		transition: opacity #{$fade} ease;
+		transition-delay: calc(var(--i) * #{$stagger} + 0.096 * #{$duration});
 	}
 
 	// A connector is revealed from left to right by a clip, so its dots stay in place.
@@ -63,23 +64,29 @@
 		transition-delay: max(0s, calc((var(--i) - 0.6) * #{$stagger}));
 	}
 
+	// At a stagger ratio of 1, the default for a donut, the ring is one sweep with the chart's easing: each slice has its piece of it.
+	// Lower, the slices start sooner and overlap, and each eases on its own.
 	:where(.tablechart-slice) {
 		stroke-dasharray: 0 var(--circ);
-		transition: stroke-dasharray #{$duration} #{$easing};
-		transition-delay: calc(var(--i) * #{$stagger});
+		transition: stroke-dasharray calc(var(--span, 1) * #{$circle}) var(--ease, linear);
+		transition-delay: calc(#{$sweep} * var(--start, 0));
 	}
 
 	:where(.tablechart-centre) {
 		opacity: 0;
-		transition: opacity #{$duration} ease;
-		transition-delay: calc((var(--i, 0) + 0.5) * #{$stagger});
+		transition: opacity #{$fade} ease;
+		transition-delay: calc(0.5 * #{$circle});
 	}
 
-	// On `stroke-opacity`, so the element's own opacity token still holds.
+	// On `stroke-opacity`, so the element's own opacity token still holds. It comes when its slice has arrived.
 	:where(.tablechart-leader) {
 		stroke-opacity: 0;
-		transition: stroke-opacity #{$duration} ease;
-		transition-delay: calc((var(--i, 0) + 0.5) * #{$stagger});
+		transition: stroke-opacity #{$fade} ease;
+		transition-delay: calc(#{$sweep} * var(--start, 0) + var(--span, 0) * #{$circle});
+	}
+
+	:where([data-chart="donut"] .tablechart-value) {
+		transition-delay: calc(#{$sweep} * var(--start, 0) + var(--span, 0) * #{$circle});
 	}
 
 	:where(.tablechart-break[data-part="edge"]) {
@@ -108,14 +115,38 @@
 	}
 }
 
-// A waterfall builds one step at a time: a column grows, then its connector draws, and only then the next column starts.
-// A connector starts when the column is at 98%, three quarters of its time with this easing, and draws a little faster.
-$step-grow: calc(#{$duration} * 0.8);
-$step-ready: calc(#{$duration} * 0.6);
-$step-link: calc(#{$duration} * 0.4);
-$step-time: calc(#{$duration} * 1);
+// A waterfall builds as one motion: each column starts when the one before it ends, and its connector draws meanwhile.
+// The parts come from the chart. A column takes 0.6 of the element time, and the whole ends a fade-in before the maximum.
+$build: min(calc(0.6 * var(--count, 1) * #{$duration}), calc(#{$max} - #{$fade}));
 
-:where([data-animate][data-chart="waterfall"]) {
+:where([data-animate][data-chart="waterfall"]:not([data-steps])) {
+	:where(.tablechart-bar, .tablechart-connector) {
+		transition-duration: calc(var(--span, 1) * #{$build});
+		transition-timing-function: var(--ease, linear);
+		transition-delay: calc(var(--start, 0) * #{$build});
+	}
+
+	:where(.tablechart-value) {
+		transition-delay: calc((var(--start, 0) + 0.5 * var(--span, 0)) * #{$build});
+	}
+
+	:where(.tablechart-badge, .tablechart-hole[data-for="badge"]) {
+		transition-delay: calc(#{$build} + 0.2s);
+	}
+
+	:where(.tablechart-break[data-part="edge"]) {
+		transition-delay: calc((var(--start, 0) + var(--span, 1)) * #{$build});
+	}
+}
+
+// With steps, each step builds on its own: a column grows, then its connector draws, and only then the next column starts.
+// A step is 0.65 of the element time; its column takes 0.6, and its connector starts when the column is at 98%.
+$step-time: min(calc(0.65 * #{$duration}), calc(#{$max} / (var(--count, 1) - 0.08)));
+$step-grow: calc(0.923 * #{$step-time});
+$step-ready: calc(0.692 * #{$step-time});
+$step-link: calc(0.308 * #{$step-time});
+
+:where([data-animate][data-chart="waterfall"][data-steps]) {
 	:where(.tablechart-bar) {
 		transition-duration: #{$step-grow};
 		transition-delay: calc(var(--i) * #{$step-time});
@@ -173,7 +204,7 @@ $step-time: calc(#{$duration} * 1);
 }
 
 // `up`: a line or area grows from zero as a whole, its points rise with it, and the numbers follow.
-$rise: calc(#{$duration} * 1.6);
+$rise: min(calc(#{$element} * 1.6), calc(#{$max} - #{$fade}));
 
 :where([data-animate="up"]) {
 	:where(.tablechart-series, .tablechart-area) {

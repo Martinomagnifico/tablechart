@@ -1,4 +1,5 @@
-import { CENTRE_CLASS, CONNECTOR_CLASS, CONTROLS_CLASS, PIECE_CLASS, SR_CLASS } from "./config";
+import { CENTRE_CLASS, CONNECTOR_CLASS, CONTROLS_CLASS, PIECE_CLASS, SLICE_CLASS, SR_CLASS } from "./config";
+import { donutTiming } from "./functions/ease";
 import { svgEl } from "./functions/svg";
 import type { ChartState } from "./types";
 
@@ -195,6 +196,34 @@ export const applySteps = (state: ChartState): void => {
 		const step = Math.max(-1, ...steps);
 		if (step < 0) set(centre, null, "--i", 0);
 		else set(centre, step, "--i", steps.filter((one) => one === step).length);
+	}
+	// The stagger shrinks for the most elements that arrive on one step.
+	const slots = [...plan.rows, ...plan.cells.flat()].map((one) => one.slot + 1);
+	const whole = plan.series.some((one) => one.step !== null) ? plan.rows.length : 1;
+	state.plot.style.setProperty("--count", String(Math.max(whole, ...slots)));
+	// A donut slice starts after the slices of its own step only, so a slice that comes later leaves no pause.
+	const slices = state.figure.querySelectorAll<SVGElement>(`.${SLICE_CLASS}`);
+	if (slices.length) {
+		// The slices of one step draw as one sweep of their own.
+		const timingOf = donutTiming(state.figure);
+		const stepOf = (slice: SVGElement) => slice.style.getPropertyValue("--step") || "none";
+		const shareOf = (slice: SVGElement) => Number(slice.style.getPropertyValue("--share") || 0);
+		const together = new Map<string, number>();
+		for (const slice of slices) together.set(stepOf(slice), (together.get(stepOf(slice)) ?? 0) + shareOf(slice));
+		const before = new Map<string, number>();
+		const timings = new Map<string, ReturnType<typeof timingOf>>();
+		for (const slice of slices) {
+			const from = before.get(stepOf(slice)) ?? 0;
+			timings.set(slice.dataset.row ?? "", timingOf(from, shareOf(slice), together.get(stepOf(slice))));
+			before.set(stepOf(slice), from + shareOf(slice));
+		}
+		for (const element of state.figure.querySelectorAll<HTMLElement | SVGElement>("[data-row]")) {
+			const own = timings.get(element.dataset.row ?? "");
+			if (!own || !element.style.getPropertyValue("--start")) continue;
+			element.style.setProperty("--start", own.start.toFixed(4));
+			element.style.setProperty("--span", own.span.toFixed(4));
+			if (element.classList.contains(SLICE_CLASS)) element.style.setProperty("--ease", own.easing);
+		}
 	}
 	reveal(state);
 };

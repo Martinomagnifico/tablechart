@@ -1,5 +1,6 @@
 import { sizeOf } from "../functions/measure";
 import { DIVIDE_CLASS, LEADER_CLASS, SLICE_CLASS, VIEWBOX_WIDTH } from "../config";
+import { donutTiming } from "../functions/ease";
 import { timing } from "../functions/timing";
 import { placeAt, svgEl, withRow } from "../functions/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
@@ -39,6 +40,9 @@ export const donut: ChartType = {
 
 		let run = 0;
 		let part = 0;
+		// One eased sweep round the ring, or with a lower stagger ratio, slices that overlap and ease on their own.
+		const timingOf = donutTiming(svg);
+		let before = 0;
 		rows.forEach((row, i) => {
 			const label = values[i];
 
@@ -48,6 +52,8 @@ export const donut: ChartType = {
 			}
 
 			const share = Math.abs(row.value) / whole;
+			const own = timingOf(before, share);
+			const timed = `--share:${share.toFixed(4)}; --start:${own.start.toFixed(4)}; --span:${own.span.toFixed(4)};`;
 			const arc = share * circumference;
 			const angle = (run / circumference) * 2 * Math.PI - Math.PI / 2;
 			partings.push(angle);
@@ -65,7 +71,7 @@ export const donut: ChartType = {
 					transform: `rotate(-90 ${middleX} ${middleY})`,
 					"stroke-dasharray": `${arc.toFixed(1)} ${(circumference - arc).toFixed(1)}`,
 					"stroke-dashoffset": (-run).toFixed(1),
-					style: `--n:${part}; --palette:var(--tablechart-color-${part + 1}); --arc:${arc.toFixed(1)}; --circ:${circumference.toFixed(1)}; ${timing("--i", row.slot)}`,
+					style: `--n:${part}; --palette:var(--tablechart-color-${part + 1}); --arc:${arc.toFixed(1)}; --circ:${circumference.toFixed(1)}; ${timed} --ease:${own.easing}; ${timing("--i", row.slot)}`,
 				})
 			);
 
@@ -80,9 +86,11 @@ export const donut: ChartType = {
 					x2: middleX + cos * (outer + 7 * unit),
 					y2: middleY + sin * (outer + 7 * unit),
 					"data-row": i + 1,
-					style: timing("--i", row.slot),
+					style: `${timed} ${timing("--i", row.slot)}`,
 				})
 			);
+			label.style.setProperty("--start", own.start.toFixed(4));
+			label.style.setProperty("--span", own.span.toFixed(4));
 
 			// Pushed out by its half-width or half-height, depending on how it leans, so it clears the ring.
 			const reach = outer + 9 * unit;
@@ -97,6 +105,7 @@ export const donut: ChartType = {
 			label.dataset.place = "around";
 
 			run += arc;
+			before += share;
 			part += 1;
 		});
 

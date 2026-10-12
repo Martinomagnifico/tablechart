@@ -2,7 +2,7 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Styling | Animation"
-	- pagedescription = "How fast a Tablechart chart builds: duration, stagger and easing, or no animation at all."
+	- pagedescription = "How fast a Tablechart chart builds: element time, stagger, a maximum and easing, or no animation at all."
 
 block content
 	.lane
@@ -12,20 +12,20 @@ block content
 				p.lead How fast a chart builds.
 
 	+section("Speed")
-		p #[code --tablechart-duration] sets how long each bar takes to grow. #[code --tablechart-stagger] sets the time between one bar and the next. #[code --tablechart-easing] sets the easing.
+		p Each element takes #[code --tablechart-element-duration], the next one starts after #[code --tablechart-stagger-ratio] of that time, and if the whole chart would take longer than #[code --tablechart-max-duration], the starts move closer together.
 
 		+style.
 			.slow {
-				--tablechart-duration: 0.9s;
-				--tablechart-stagger: 0.22s;
+				--tablechart-element-duration: 0.9s;
+				--tablechart-stagger-ratio: 0.5;
 			}
 
 		+chart
-			figure.slow(data-chart="waterfall")
+			figure.slow(data-chart="column")
 				table
 					tbody
-						each row in [['Picked', '74.5', 'total'], ['Windfalls', '28.2'], ['Bruised', '-16.1'], ['Peelings', '-13.3'], ['Pressed', '73.3', 'total']]
-							tr(data-kind=row[2])
+						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '41']]
+							tr
 								th= row[0]
 								td= row[1]
 
@@ -36,17 +36,69 @@ block content
 					th Sets
 			tbody
 				tr
-					td: code --tablechart-duration
-					td How long a bar or slice takes: 0.5s by default.
+					td: code --tablechart-element-duration
+					td The time that one element (a bar, column or point) transitions: 0.5s by default.
 				tr
-					td: code --tablechart-stagger
-					td The time between one bar and the next: 0.12s by default.
+					td: code --tablechart-stagger-ratio
+					td When the next element starts. It is a ratio of the #[code --tablechart-element-duration]: 0.24 of it by default. At 1, each element starts when the one before it is finished. At 0, all elements start together.
+				tr
+					td: code --tablechart-max-duration
+					td The longest a whole chart may take to build: four times the element time by default, 2s. It is a ceiling, never a target: a small chart is not slowed down. Above it, the starts move closer together; each element keeps its own time. Numbers fade in for at most a quarter of the maximum.
+				tr
+					td: code --tablechart-circle-duration
+					td How long a donut takes for a full circle: 1.5s by default. A slice takes its share of that.
 				tr
 					td: code --tablechart-easing
-					td The easing of bars, slices, and lines and areas that grow upwards: #[code cubic-bezier(.26, .86, .44, .985)] by default. A line that builds from left to right does so at an even speed.
+					td The easing of bars, donuts, and lines and areas that grow upwards: #[code cubic-bezier(.26, .86, .44, .985)] by default. A line that builds from left to right does so at an even speed.
 				tr
 					td: code --tablechart-annotation-duration
 					td How long an annotation line takes: 0.6s by default.
+
+		p These are CSS variables, so they can be set on a chart, a section or a whole page. Set on a section, the maximum holds for each chart in it.
+
+	+section("Waterfalls")
+		p A waterfall builds as one motion at one speed: each column starts when the one before it ends, its connector draws meanwhile, and the last column slows to a stop. With steps, each step builds on its own. Under the maximum, the whole motion gets shorter.
+
+		+chart
+			figure.slow(data-chart="waterfall")
+				table
+					tbody
+						each row in [['Picked', '74.5', 'total'], ['Windfalls', '28.2'], ['Bruised', '-16.1'], ['Peelings', '-13.3'], ['Pressed', '73.3', 'total']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+	+section("Donuts")
+		p A donut draws its ring in one sweep, with the same easing as a bar: fast at the start, settling at the end. A full circle takes #[code --tablechart-circle-duration], 1.5s by default, and each slice takes its own part of the sweep. With a stagger ratio below 1, the slices start sooner and overlap, and each slice eases on its own.
+
+
+
+		+chart
+			figure(data-chart="donut")
+				table
+					tbody
+						each row in [['Elstar', '42'], ['Jonagold', '28'], ['Braeburn', '18'], ['Gala', '12']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		p A lower ratio starts the slices sooner, so they grow at the same time.
+		+style.
+			.together {
+				--tablechart-stagger-ratio: 0.6;
+			}
+
+		+chart
+			figure.together(data-chart="donut")
+				table
+					tbody
+						each row in [['Elstar', '42'], ['Jonagold', '28'], ['Braeburn', '18'], ['Gala', '12']]
+							tr
+								th= row[0]
+								td= row[1]
+
+	+section("Old names")
+		p #[code --tablechart-duration] and #[code --tablechart-stagger] still work until the next minor version, and the console says so. #[code --tablechart-duration] is now #[code --tablechart-element-duration]. #[code --tablechart-stagger] was a time, such as #[code 0.12s]; #[code --tablechart-stagger-ratio] is a share of the element time, such as #[code 0.24].
 
 	+section("Lines and areas from below")
 		p A line or area chart builds from left to right. Add #[code data-chart-animate="up"] to the figure to make it grow up from zero instead. The points rise with the line, and the numbers appear when it is done.
