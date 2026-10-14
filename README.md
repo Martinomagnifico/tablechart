@@ -1,6 +1,7 @@
 # Tablechart
 
 [![Version](https://img.shields.io/npm/v/@martinomagnifico/tablechart)](https://www.npmjs.com/package/@martinomagnifico/tablechart)
+[![Downloads](https://img.shields.io/npm/dt/@martinomagnifico/tablechart)]()
 
 [<img src="screenshot.png" width="100%" alt="Tablechart: a column chart, a donut and a waterfall">](https://martinomagnifico.github.io/tablechart/)
 
