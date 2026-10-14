@@ -19,7 +19,7 @@ block content
 				--tablechart-bar-color: #e4572e;
 			}
 
-		+chart
+		+chart(null, '1')
 			figure.orange(data-chart="column")
 				table
 					tbody
@@ -38,7 +38,7 @@ block content
 				--tablechart-total-color: #cfc4b4;
 			}
 
-		+chart
+		+chart(null, '1')
 			figure.warm(data-chart="waterfall")
 				table
 					tbody
@@ -58,7 +58,7 @@ block content
 				--tablechart-color-4: #cfc4b4;
 			}
 
-		+chart
+		+chart(null, '1')
 			figure.fruity(data-chart="donut")
 				table
 					tbody
@@ -69,7 +69,7 @@ block content
 
 		p If a line chart has several lines, the lines use the palette too.
 
-		+chart
+		+chart(null, '1')
 			figure.fruity(data-chart="line")
 				table
 					thead
@@ -114,8 +114,8 @@ block content
 					td: code --tablechart-series-min
 					td The lightest a line gets: 40% of its colour by default.
 				tr
-					td: code --tablechart-muted-share
+					td: code --tablechart-series-muted-share
 					td The strength of a line next to a highlighted line: 45% by default.
 				tr
-					td: code --tablechart-series-ink
+					td: code --tablechart-series-own-color
 					td The colour of one line, set on [data-series="2"] and so on.

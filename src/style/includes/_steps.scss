@@ -1,8 +1,8 @@
 @use "tokens" as *;
 
 // A chart that steps (`data-fragment`). Each mark has its step, `--step`, and the figure how many are shown,
-// `--tablechart-step`: `$shown` is 1 once a mark's step is shown and 0 before. A mark without a step is always shown.
-$shown: "clamp(0, var(--tablechart-step, 0) - var(--step, -1), 1)";
+// `--_step`: `$shown` is 1 once a mark's step is shown and 0 before. A mark without a step is always shown.
+$shown: "clamp(0, var(--_step, 0) - var(--step, -1), 1)";
 
 // A line and its area are revealed together, up to the last row shown (`--reveal`).
 $reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px -10px)";
@@ -79,10 +79,10 @@ $reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px 
 // The Previous and Next buttons, under the chart, one at each end.
 :where(.tablechart-controls) {
 	display: flex;
-	justify-content: var(--tablechart-controls-justify, space-between);
+	justify-content: var(--tablechart-control-justify, var(--tablechart-controls-justify, space-between));
 	align-items: center;
 	gap: 0.5em;
-	margin-top: var(--tablechart-controls-gap, 0.75em);
+	margin-top: var(--tablechart-control-gap, var(--tablechart-controls-gap, 0.75em));
 
 	:where(button) {
 		display: inline-flex;
@@ -117,7 +117,7 @@ $reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px 
 // On paper every step is shown, and there is nothing to press.
 @media print {
 	:where([data-steps]) {
-		--tablechart-step: 999 !important;
+		--_step: 999 !important;
 	}
 	:where([data-steps] [data-from]) {
 		--reveal: 1 !important;

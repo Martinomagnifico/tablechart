@@ -353,11 +353,11 @@ mixin installWizard(name, imports)
 
 //- A live chart in a demo card, with its markup below it as code, both from the
 //- same block. For code that shows only part of the markup, use codeblock on its own.
-mixin chart(label)
+mixin chart(label, lines)
 	.card
 		.demo&attributes(attributes)
 			block
-		+codeblock('HTML', label)
+		+codeblock('HTML', label, lines)
 			block
 
 

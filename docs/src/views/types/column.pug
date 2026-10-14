@@ -78,7 +78,7 @@ block content
 		p The height of a chart is a share of its width. Set it with #[code data-chart-aspect]. The default is #[code 0.38].
 		p On a narrow screen, a chart is never less high than #[code --tablechart-min-height]: #[code 200px] by default. Below that width, the height stays the same. Use #[code px], #[code em] or #[code rem], or #[code none] for no minimum.
 
-		+chart
+		+chart(null, '1')
 			figure(data-chart="column" data-chart-aspect="0.6")
 				table
 					tbody
@@ -95,7 +95,7 @@ block content
 	+section("Below zero")
 		p A column with a value below zero hangs down from the baseline, with its number under it. The baseline moves up to make room.
 
-		+chart
+		+chart(null, '7-8,10')
 			figure(data-chart="column")
 				figcaption
 					b Monthly result
@@ -132,7 +132,7 @@ block content
 	+section("Grouped columns")
 		p If the table has more than one value column, each row is a group, with one column for each value column. The column headers are the names in the legend under the chart.
 
-		+chart
+		+chart(null, '5')
 			figure(data-chart="column")
 				figcaption
 					b Apples sold by variety
@@ -163,7 +163,7 @@ block content
 	+section("Stacked columns")
 		p Add #[code data-chart-stack] to the figure. The values of a row are shown on top of each other, the first value column at the bottom. Values below zero are stacked down from the baseline. The total of the row is above the column.
 
-		+chart
+		+chart(null, '1')
 			figure(data-chart="column" data-chart-stack)
 				figcaption
 					b Apples sold
@@ -222,7 +222,7 @@ block content
 		.width-toggle.lang-toggle(role="group" aria-label="Width of the example")
 			button(type="button" data-width="" aria-pressed="true") Wide
 			button(type="button" data-width="360px" aria-pressed="false") Narrow
-		+chart
+		+chart(null, '1')
 			.type-box
 				figure(data-chart="column")
 					figcaption: b Visitors per month
@@ -252,7 +252,7 @@ block content
 	+section("Scale break")
 		p If one column is much taller than the others, a break in the scale shows part of the scale smaller, so the other columns have room. See #[a(href=url('/features/scale-break.html')) Scale break].
 
-		+chart
+		+chart(null, '10')
 			figure(data-chart="column")
 				table
 					tbody

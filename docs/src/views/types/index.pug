@@ -21,7 +21,7 @@ block content
 	+section("", "charts")
 		.overview-charts
 			+type("Area", "/types/area.html")
-				figure(data-chart="area" data-chart-shape="smooth" data-chart-animate="up" aria-label="Visitors to the orchard, in thousands")
+				figure(data-chart="area" data-chart-shape="smooth" data-chart-animate="grow" aria-label="Visitors to the orchard, in thousands")
 					table
 						tbody
 							each row in [['2021', '12'], ['2022', '18'], ['2023', '15'], ['2024', '24'], ['2025', '29']]
@@ -57,7 +57,7 @@ block content
 									td= row[1]
 
 			+type("Line", "/types/line.html")
-				figure(data-chart="line" data-chart-shape="smooth" data-chart-animate="up" aria-label="Rainfall at the orchard, in millimetres")
+				figure(data-chart="line" data-chart-shape="smooth" data-chart-animate="grow" aria-label="Rainfall at the orchard, in millimetres")
 					table
 						tbody
 							each row in [['Jan', '84'], ['Feb', '71'], ['Mar', '76'], ['Apr', '58'], ['May', '61'], ['Jun', '47'], ['Jul', '39'], ['Aug', '52']]

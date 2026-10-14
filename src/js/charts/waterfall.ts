@@ -13,7 +13,7 @@ const checkTotal = (stated: number, computed: number): void => {
 	if (Math.abs(stated - computed) <= Math.abs(computed) / 100) return;
 	const message =
 		`[${LIBRARY_NAME}] A total reads ${stated}, but the steps before it add up to ` +
-		`${Number(computed.toFixed(6))}. The chart shows what you wrote; this is only a check.`;
+		`${Number(computed.toFixed(6))}. The chart shows your number.`;
 	if (reported.has(message)) return;
 	reported.add(message);
 	console.warn(message);

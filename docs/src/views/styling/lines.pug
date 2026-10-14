@@ -2,14 +2,14 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Styling | Lines and marks"
-	- pagedescription = "Styling the baseline, waterfall connectors, callouts and bar width in Tablechart."
+	- pagedescription = "Styling the baseline, waterfall connectors, badges and bar width in Tablechart."
 
 block content
 	.lane
 		.container
 			.page-header
 				h1 Lines and marks
-				p.lead The baseline, connectors, the callout and the bar width.
+				p.lead The baseline, connectors, the badge and the bar width.
 
 	+section("Baseline and connectors")
 		p The baseline and the connectors between waterfall steps each have a colour, width and opacity. #[code --tablechart-connector-dash] sets the dashes.
@@ -19,15 +19,15 @@ block content
 				--tablechart-connector-width: 2.5px;
 				--tablechart-connector-dash: 0 6;
 				--tablechart-connector-opacity: 1;
-				--tablechart-rule-width: 2px;
-				--tablechart-rule-opacity: 1;
+				--tablechart-baseline-width: 2px;
+				--tablechart-baseline-opacity: 1;
 			}
 			/* A dash of 0 with round ends is a dot. */
 			.dotty .tablechart-connector {
 				stroke-linecap: round;
 			}
 
-		+chart
+		+chart(null, '1')
 			figure.dotty(data-chart="waterfall")
 				table
 					tbody
@@ -36,8 +36,8 @@ block content
 								th= row[0]
 								td= row[1]
 
-	+section("The callout")
-		p The callout of a bracket or trend arrow is an ellipse by default. These variables set its corners, padding and background.
+	+section("The badge")
+		p The badge of a bracket or trend arrow is an ellipse by default. These variables set its corners, padding and background.
 
 		+style.
 			.pill {
@@ -45,7 +45,7 @@ block content
 				--tablechart-badge-padding: 0.4em 0.8em;
 			}
 
-		+chart
+		+chart(null, '1')
 			figure.pill(data-chart="column")
 				table
 					tbody
@@ -59,7 +59,7 @@ block content
 	+section("Bar width")
 		p A bar is never wider than #[code --tablechart-bar-max]: #[code 60px] by default. Use #[code px], #[code %] of the chart width, #[code em] or #[code rem]. Set it to #[code none] for no maximum.
 
-		+chart
+		+chart(null, '1')
 			figure(data-chart="column" style="--tablechart-bar-max: 24px")
 				table
 					tbody
@@ -75,23 +75,23 @@ block content
 					th Sets
 			tbody
 				tr
-					td: code --tablechart-rule-color / -width / -opacity
+					td #[code --tablechart-baseline-color] / #[code -width] / #[code -opacity]
 					td The baseline
 				tr
-					td: code --tablechart-connector-color / -width / -dash / -opacity
+					td #[code --tablechart-connector-color] / #[code -width] / #[code -dash] / #[code -opacity]
 					td The connectors between waterfall steps
 				tr
-					td: code --tablechart-leader-color / -width / -opacity
+					td #[code --tablechart-leader-color] / #[code -width] / #[code -opacity]
 					td The line from a donut slice to its number
 				tr
-					td: code --tablechart-annotation-color / -width
+					td #[code --tablechart-annotation-color] / #[code -width]
 					td The lines and arrowheads of annotations
 				tr
-					td: code --tablechart-break-color / -width / -opacity
+					td #[code --tablechart-break-color] / #[code -width] / #[code -opacity]
 					td The lines of a break in the scale
 				tr
-					td: code --tablechart-badge-surface / -padding / -radius / -border-width
-					td The callout
+					td #[code --tablechart-badge-surface] / #[code -padding] / #[code -radius] / #[code -border-width]
+					td The badge
 				tr
 					td: code --tablechart-slice-gap
 					td The gap between donut slices, in the units of the plot: 4 by default

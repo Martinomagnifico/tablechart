@@ -89,7 +89,7 @@ const annotationsFrom = (list: Element | null): HTMLElement | null => {
 			for (const [key, value] of head.options) li.setAttribute(`data-${key}`, value);
 			head.text.textContent = (head.text.textContent ?? "").slice(head.length);
 		}
-		// The callout copies elements only, so loose text goes in a span.
+		// The badge copies elements only, so loose text goes in a span.
 		if (!li.children.length) return;
 		const nodes = Array.from(li.childNodes).filter(
 			(node) => node.nodeType === Node.ELEMENT_NODE || node.textContent?.trim()
@@ -225,7 +225,7 @@ export const loadSources = async (figures: HTMLElement[]): Promise<void> => {
 					console.warn(
 						`[${LIBRARY_NAME}] Could not read the chart data in "${src}": ${(error as Error).message}.` +
 							(local
-								? " A page opened from the file system cannot fetch files; open the page from a server instead."
+								? " A page opened as a file cannot fetch files; open it from a server."
 								: "")
 					);
 				}

@@ -1,5 +1,13 @@
 @use "tokens" as *;
 
+:where([data-animate], [data-animate] .tablechart-plot) {
+	@include timing;
+	--_build: min(calc(0.6 * var(--count, 1) * #{$duration}), calc(#{$max} - #{$fade}));
+	--_steptime: min(calc(0.65 * #{$duration}), calc(#{$max} / (var(--count, 1) - 0.08)));
+	--_rise: min(calc(#{$element} * 1.6), calc(#{$max} - #{$fade}));
+	--_ring: calc(#{$duration} + (var(--count, 1) - 1) * #{$stagger});
+}
+
 // `is-shown` starts the build; `--after` is how many stagger steps the data takes, so commentary lands after it.
 // What follows an element starts a fraction of the element time after it, so it never lands with it when the stagger shrinks.
 
@@ -57,36 +65,35 @@
 	}
 
 	// A connector is revealed from left to right by a clip, so its dots stay in place.
+	// It draws as the column it leads into starts, in a third of the element time, whatever the other columns do.
 	:where(.tablechart-connector) {
 		clip-path: inset(-10px calc(100% + 10px) -10px -10px);
-		transition: clip-path calc(2 * #{$stagger}) ease-out;
-		// Arrives just ahead of the column it leads into, never before its own step.
-		transition-delay: max(0s, calc((var(--i) - 0.6) * #{$stagger}));
+		transition: clip-path calc(#{$duration} / 3) linear;
+		transition-delay: calc(var(--i) * #{$stagger});
 	}
 
-	// At a stagger ratio of 1, the default for a donut, the ring is one sweep with the chart's easing: each slice has its piece of it.
-	// Lower, the slices start sooner and overlap, and each eases on its own.
+	// A slice is one element, like a bar: a big slice turns faster than a small one.
 	:where(.tablechart-slice) {
 		stroke-dasharray: 0 var(--circ);
-		transition: stroke-dasharray calc(var(--span, 1) * #{$circle}) var(--ease, linear);
-		transition-delay: calc(#{$sweep} * var(--start, 0));
+		transition: stroke-dasharray #{$duration} #{$easing};
+		transition-delay: calc(var(--i) * #{$stagger});
 	}
 
 	:where(.tablechart-centre) {
 		opacity: 0;
 		transition: opacity #{$fade} ease;
-		transition-delay: calc(0.5 * #{$circle});
+		transition-delay: calc(var(--i, 0) * #{$stagger} + 0.5 * #{$duration});
 	}
 
-	// On `stroke-opacity`, so the element's own opacity token still holds. It comes when its slice has arrived.
+	// On `stroke-opacity`, so the element's own opacity token still holds. It comes when its slice is mostly drawn.
 	:where(.tablechart-leader) {
 		stroke-opacity: 0;
 		transition: stroke-opacity #{$fade} ease;
-		transition-delay: calc(#{$sweep} * var(--start, 0) + var(--span, 0) * #{$circle});
+		transition-delay: calc(var(--i, 0) * #{$stagger} + 0.5 * #{$duration});
 	}
 
 	:where([data-chart="donut"] .tablechart-value) {
-		transition-delay: calc(#{$sweep} * var(--start, 0) + var(--span, 0) * #{$circle});
+		transition-delay: calc(var(--i, 0) * #{$stagger} + 0.5 * #{$duration});
 	}
 
 	:where(.tablechart-break[data-part="edge"]) {
@@ -115,11 +122,17 @@
 	}
 }
 
-// A waterfall builds as one motion: each column starts when the one before it ends, and its connector draws meanwhile.
-// The parts come from the chart. A column takes 0.6 of the element time, and the whole ends a fade-in before the maximum.
-$build: min(calc(0.6 * var(--count, 1) * #{$duration}), calc(#{$max} - #{$fade}));
+// A waterfall grows column by column: the next starts when the one before it is at 95%. Under the maximum its columns get shorter too.
+:where([data-chart="waterfall"]:not([data-animate="sweep"])) {
+	--_ratio: 0.6;
+	--_keep: 1;
+}
 
-:where([data-animate][data-chart="waterfall"]:not([data-steps])) {
+// `sweep` on a waterfall: one motion at one speed. Each column starts when the one before it ends, and its connector draws meanwhile.
+// The parts come from the chart. A column takes 0.6 of the element time, and the whole ends a fade-in before the maximum.
+$build: var(--_build);
+
+:where([data-animate="sweep"][data-chart="waterfall"]:not([data-steps])) {
 	:where(.tablechart-bar, .tablechart-connector) {
 		transition-duration: calc(var(--span, 1) * #{$build});
 		transition-timing-function: var(--ease, linear);
@@ -141,7 +154,7 @@ $build: min(calc(0.6 * var(--count, 1) * #{$duration}), calc(#{$max} - #{$fade})
 
 // With steps, each step builds on its own: a column grows, then its connector draws, and only then the next column starts.
 // A step is 0.65 of the element time; its column takes 0.6, and its connector starts when the column is at 98%.
-$step-time: min(calc(0.65 * #{$duration}), calc(#{$max} / (var(--count, 1) - 0.08)));
+$step-time: var(--_steptime);
 $step-grow: calc(0.923 * #{$step-time});
 $step-ready: calc(0.692 * #{$step-time});
 $step-link: calc(0.308 * #{$step-time});
@@ -203,15 +216,15 @@ $step-link: calc(0.308 * #{$step-time});
 	}
 }
 
-// `up`: a line or area grows from zero as a whole, its points rise with it, and the numbers follow.
-$rise: min(calc(#{$element} * 1.6), calc(#{$max} - #{$fade}));
+// `grow` on a line or area: it grows from zero as a whole, its points rise with it, and the numbers follow.
+$rise: var(--_rise);
 
-:where([data-animate="up"]) {
+:where([data-animate="grow"]:is([data-chart="line"], [data-chart="area"])) {
 	:where(.tablechart-series, .tablechart-area) {
 		clip-path: none;
 		transform: scaleY(0);
 		transform-box: view-box;
-		transform-origin: 0 var(--tablechart-base);
+		transform-origin: 0 var(--_base);
 		transition: transform #{$rise} #{$easing};
 		transition-delay: 0s;
 	}
@@ -230,13 +243,30 @@ $rise: min(calc(#{$element} * 1.6), calc(#{$max} - #{$fade}));
 	}
 }
 
-:where([data-animate="up"].is-shown) {
+:where([data-animate="grow"]:is([data-chart="line"], [data-chart="area"]).is-shown) {
 	:where(.tablechart-series, .tablechart-area) {
 		transform: scaleY(1);
 	}
 	:where(.tablechart-point, .tablechart-hole:not([data-for])) {
 		opacity: 1;
 		transform: none;
+	}
+}
+
+// `sweep` on a donut: one motion round the ring at one speed, as long as the slices would take one after the other.
+// Each slice has its piece of it (`--start`, `--span`, `--ease`); its leader and number come when it has arrived.
+$ring: var(--_ring);
+
+:where([data-animate="sweep"][data-chart="donut"]) {
+	:where(.tablechart-slice) {
+		transition: stroke-dasharray calc(var(--span, 1) * #{$ring}) var(--ease, linear);
+		transition-delay: calc(var(--start, 0) * #{$ring});
+	}
+	:where(.tablechart-leader, .tablechart-value) {
+		transition-delay: calc((var(--start, 0) + var(--span, 0)) * #{$ring});
+	}
+	:where(.tablechart-centre) {
+		transition-delay: calc(0.5 * #{$ring});
 	}
 }
 

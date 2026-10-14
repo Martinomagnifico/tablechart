@@ -1,5 +1,6 @@
 // Report the gzipped, tree-shaken size of each package entry on its own, the
 // script-tag build, and the stylesheet. Uses Vite's build API (already a devDep).
+// The numbers are also saved in docs/src/data/size.json, for the docs as `size.js`, `size.css` and `size.total`.
 //
 //   npm run size
 //
@@ -10,6 +11,7 @@ import { gzipSync } from 'node:zlib';
 import { writeFileSync, readFileSync, rmSync, mkdtempSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // Entries use paths relative to the repo root (the cwd of `npm run`), so Vite
 // bundles the source instead of treating it as an external import.
@@ -61,6 +63,18 @@ for (const [label, { code, file, iife }] of Object.entries(entries)) {
 }
 if (css) rows.push(css);
 
+// In kB with two decimals, gzipped, so the docs can round once. The JavaScript is the full `tablechart` entry.
+const round = (n) => Math.round((n / 1024) * 100) / 100;
+const gzipOf = (label) => rows.find((r) => r.label === label)?.gzip ?? 0;
+const size = {
+	js: round(gzipOf('tablechart')),
+	css: round(css?.gzip ?? 0),
+	total: round(gzipOf('tablechart') + (css?.gzip ?? 0)),
+	entries: Object.fromEntries(rows.map((r) => [r.label, round(r.gzip)])),
+};
+const data = fileURLToPath(new URL('../docs/src/data/size.json', import.meta.url));
+writeFileSync(data, JSON.stringify({ size }, null, '\t') + '\n');
+
 const kb = (n) => (n / 1024).toFixed(1) + ' kB';
 console.log('\ngzipped size (tree-shaken, terser):\n');
 for (const r of rows) {
@@ -68,3 +82,4 @@ for (const r of rows) {
 }
 console.log('\nThe entries share most of their code, so standalone sizes overlap and');
 console.log('do not add up.\n');
+console.log('Saved in docs/src/data/size.json.\n');

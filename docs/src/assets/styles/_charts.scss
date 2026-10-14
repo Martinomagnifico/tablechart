@@ -151,24 +151,42 @@
 	gap: 0.25em;
 
 	button {
-		padding: 0.3em 0.9em;
-		border: 1px solid light-dark(#c9d4da, #4a5c66);
+		padding: calc(0.3em - 1px) calc(0.9em - 1px);
+		border: 2px solid var(--chart-accent);
 		border-radius: 0.4em;
-		background: light-dark(#ffffff, #2a3a44);
-		color: light-dark(#16323f, #e9eef1);
+		background: transparent;
+		color: light-dark(var(--chart-accent), var(--color-tint-200));
 		font: inherit;
 		font-size: 0.85em;
+		font-weight: 600;
 		cursor: pointer;
+		transition: background-color 0.125s, border-color 0.125s, color 0.125s;
+
+		&:hover {
+			border-color: light-dark(var(--btn-primary-bg-hover), var(--chart-accent));
+			color: light-dark(var(--btn-primary-bg-hover), #ffffff);
+			background: light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.08));
+		}
 
 		&[aria-pressed="true"] {
 			background: var(--chart-accent);
 			border-color: var(--chart-accent);
 			color: #ffffff;
+
+			&:hover {
+				background: var(--btn-primary-bg-hover);
+				border-color: var(--btn-primary-bg-hover);
+			}
 		}
 	}
 }
 
 .lang-toggle {
+	margin-bottom: 0.8em;
+}
+
+// A button that does something to an example, such as building it again.
+.demo-actions {
 	margin-bottom: 0.8em;
 }
 

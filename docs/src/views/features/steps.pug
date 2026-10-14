@@ -23,7 +23,7 @@ block content
 	+section("Steps")
 		p Add #[code data-fragment] to the figure. The chart then starts empty, and each step shows one more row. Tablechart puts a Previous and a Next button under the chart.
 
-		+chart
+		+chart(null, '1')
 			+seasons({ "data-fragment": "" })
 
 		p The table stays complete, so screen readers read every row, whatever step the chart is at. Without animation, or on paper, a chart shows all its steps at once.
@@ -31,7 +31,7 @@ block content
 	+section("Rows that are there from the start")
 		p Add #[code data-fragment] to some rows instead of the figure. Rows without it are there from the start, and the others arrive one step each.
 
-		+chart
+		+chart(null, '5-7')
 			figure(data-chart="waterfall")
 				table
 					tbody
@@ -43,7 +43,7 @@ block content
 	+section("Several rows on one step")
 		p Rows with the same #[code data-fragment-index] arrive on the same step.
 
-		+chart
+		+chart(null, '4-7')
 			figure(data-chart="column")
 				table
 					tbody
@@ -55,7 +55,7 @@ block content
 	+section("A column on its own step")
 		p On a chart with several value columns, add #[code data-fragment] to a column header. That column arrives whole, on a step of its own. An annotation can have #[code data-fragment] too; otherwise it arrives with the rows it is about.
 
-		+chart
+		+chart(null, '4')
 			figure(data-chart="line")
 				table
 					thead
@@ -73,7 +73,7 @@ block content
 	+section("Point by point")
 		p Add #[code data-fragment] to cells. Each cell arrives on a step of its own, and cells without it are there from the start. The steps go down each column of the table: one line point by point, then the next.
 
-		+chart
+		+chart(null, '7-10')
 			figure(data-chart="line")
 				table
 					thead
@@ -90,7 +90,7 @@ block content
 
 		p This works on any chart with several value columns. Grouped columns and bars arrive one at a time, and a stack is built piece by piece: first the bottom layer, then the next layer on top. The total above a stack arrives with its last piece. For another order, give the cells a #[code data-fragment-index].
 
-		+chart
+		+chart(null, '7-9')
 			figure(data-chart="column" data-chart-stack)
 				table
 					thead
@@ -127,13 +127,13 @@ block content
 					th Sets
 			tbody
 				tr
-					td: code --tablechart-controls-justify
+					td: code --tablechart-control-justify
 					td Where the buttons are: #[code space-between] by default, one at each end
 				tr
-					td: code --tablechart-controls-gap
+					td: code --tablechart-control-gap
 					td The space above the buttons: 0.75em by default
 				tr
-					td: code --tablechart-control-padding / -border / -radius / -surface
+					td #[code --tablechart-control-padding] / #[code -border] / #[code -radius] / #[code -surface]
 					td The padding, border, corners and background of a button
 
 		p For only icons, at the sides of the chart and in the middle of it, as on a carousel, place the buttons over the chart and hide the text from sight. Screen readers still read it.
@@ -163,7 +163,7 @@ block content
 				white-space: nowrap;
 			}
 
-		+chart
+		+chart(null, '1')
 			+seasons({ class: "carousel", "data-fragment": "" })
 
 	+section("The text of the buttons")

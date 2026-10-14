@@ -53,7 +53,7 @@ for (const kind of ["line", "area"]) {
 figures.push(
 	figure('data-chart="line"', table(three, ["X", "Y", "Z"])),
 	figure('data-chart="line" data-chart-legend', table(two, ["N", "S"])),
-	figure('data-chart="line" data-chart-animate="up"', table(two, ["N", "<b>S</b>"])),
+	figure('data-chart="line" data-chart-animate="grow"', table(two, ["N", "<b>S</b>"])),
 	figure('data-chart="waterfall"', table(water)),
 	figure('data-chart="donut"', table(donut)),
 	figure('data-chart="column"', table(seasons) + notes('<span data-annotation="bracket" data-from="1" data-to="3">+24%</span>')),

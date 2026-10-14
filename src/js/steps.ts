@@ -1,5 +1,5 @@
-import { CENTRE_CLASS, CONNECTOR_CLASS, CONTROLS_CLASS, PIECE_CLASS, SLICE_CLASS, SR_CLASS } from "./config";
-import { donutTiming } from "./functions/ease";
+import { BAR_CLASS, CENTRE_CLASS, CONNECTOR_CLASS, CONTROLS_CLASS, PIECE_CLASS, SLICE_CLASS, SR_CLASS } from "./config";
+import { sweepTiming } from "./functions/timing";
 import { svgEl } from "./functions/svg";
 import type { ChartState } from "./types";
 
@@ -201,21 +201,38 @@ export const applySteps = (state: ChartState): void => {
 	const slots = [...plan.rows, ...plan.cells.flat()].map((one) => one.slot + 1);
 	const whole = plan.series.some((one) => one.step !== null) ? plan.rows.length : 1;
 	state.plot.style.setProperty("--count", String(Math.max(whole, ...slots)));
-	// A donut slice starts after the slices of its own step only, so a slice that comes later leaves no pause.
-	const slices = state.figure.querySelectorAll<SVGElement>(`.${SLICE_CLASS}`);
+	// The closing total of a waterfall grows from the last connector down to the baseline, if that connector is there.
+	// If the column before it comes on a later step, the total grows from the baseline instead, like the first one.
+	const bars = state.figure.querySelectorAll<SVGElement>(`.${BAR_CLASS}`);
+	const closing = bars[bars.length - 1];
+	if (state.figure.dataset.chart === "waterfall" && closing?.dataset.kind === "total" && bars.length > 1) {
+		const row = Number(closing.dataset.row) - 1;
+		if ((plan.rows[row - 1]?.step ?? -1) > (plan.rows[row]?.step ?? -1))
+			closing.dataset.grow = closing.dataset.grow === "down" ? "up" : "down";
+	}
+	// A donut that sweeps: neighbouring slices of one step sweep as one, and groups apart on the ring start together.
+	const slices = Array.from(state.figure.querySelectorAll<SVGElement>(`.${SLICE_CLASS}`));
 	if (slices.length) {
-		// The slices of one step draw as one sweep of their own.
-		const timingOf = donutTiming(state.figure);
 		const stepOf = (slice: SVGElement) => slice.style.getPropertyValue("--step") || "none";
 		const shareOf = (slice: SVGElement) => Number(slice.style.getPropertyValue("--share") || 0);
-		const together = new Map<string, number>();
-		for (const slice of slices) together.set(stepOf(slice), (together.get(stepOf(slice)) ?? 0) + shareOf(slice));
-		const before = new Map<string, number>();
-		const timings = new Map<string, ReturnType<typeof timingOf>>();
-		for (const slice of slices) {
-			const from = before.get(stepOf(slice)) ?? 0;
-			timings.set(slice.dataset.row ?? "", timingOf(from, shareOf(slice), together.get(stepOf(slice))));
-			before.set(stepOf(slice), from + shareOf(slice));
+		const n = slices.length;
+		// Start at a slice whose neighbour before it on the ring is on another step, so no group is cut at the top.
+		const first = Math.max(0, slices.findIndex((slice, i) => stepOf(slice) !== stepOf(slices[(i - 1 + n) % n])));
+		const runs: SVGElement[][] = [];
+		for (let k = 0; k < n; k++) {
+			const slice = slices[(first + k) % n];
+			const run = runs[runs.length - 1];
+			if (run && stepOf(run[0]) === stepOf(slice)) run.push(slice);
+			else runs.push([slice]);
+		}
+		const timings = new Map<string, ReturnType<typeof sweepTiming>>();
+		for (const run of runs) {
+			const whole = run.reduce((sum, slice) => sum + shareOf(slice), 0);
+			let from = 0;
+			for (const slice of run) {
+				timings.set(slice.dataset.row ?? "", sweepTiming(from, shareOf(slice), whole));
+				from += shareOf(slice);
+			}
 		}
 		for (const element of state.figure.querySelectorAll<HTMLElement | SVGElement>("[data-row]")) {
 			const own = timings.get(element.dataset.row ?? "");
@@ -238,7 +255,7 @@ export const stepTo = (state: ChartState, step: number, quietly = false): void =
 	const next = Math.min(Math.max(Math.round(step), 0), plan.count);
 	const changed = next !== state.step;
 	state.step = next;
-	state.figure.style.setProperty("--tablechart-step", String(next));
+	state.figure.style.setProperty("--_step", String(next));
 	reveal(state);
 	const [previous, forward] = state.controls?.querySelectorAll("button") ?? [];
 	if (previous) previous.disabled = next === 0;

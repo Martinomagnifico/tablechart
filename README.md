@@ -14,7 +14,7 @@ Tablechart makes simple charts from a table: an HTML table, a Markdown table or 
 * **The table stays:** it is hidden from sight, but screen readers, search engines and translation scripts still read it. Without JavaScript, the table is all there is.
 * **Real text:** names and numbers are HTML, so they use the font of the page and do not scale with the drawing.
 * **CSS for the looks:** colours, sizes and animation are CSS variables. Light and dark mode follow the page.
-* **Annotations:** callouts, brackets, trend arrows and a break in the scale
+* **Annotations:** badges, brackets, trend arrows and a break in the scale
 * **Step by step:** show the rows one at a time, with Previous and Next buttons
 * **Animation:** a chart builds when it scrolls into view
 
@@ -70,7 +70,7 @@ Use `bar`, `line`, `area`, `waterfall` or `donut` for the other types. With more
 
 ```js
 init({
-	animate: true,      // Animate a chart when it builds: true, false, "across" or "up"
+	animate: true,      // Animate a chart when it builds: true, false, "grow" or "sweep"
 	threshold: 0.5,     // How much of a chart must be in view before it builds
 	replay: false,      // Build again each time a chart scrolls back into view
 	controls: true,     // Previous and Next buttons on a chart that steps

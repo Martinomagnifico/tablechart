@@ -30,7 +30,7 @@ block content
 	+section("Smooth")
 		p Add #[code data-chart-shape="smooth"] to the figure. The top of each area is a curve through every point, which never goes higher or lower than the points on either side of it. In a stack, each area follows the curve of the one below it.
 
-		+chart
+		+chart(null, '1')
 			figure(data-chart="area" data-chart-shape="smooth")
 				figcaption
 					b Visitors to the orchard
@@ -43,11 +43,11 @@ block content
 								th= row[0]
 								td= row[1]
 
-	+section("Grow up")
-		p Add #[code data-chart-animate="up"] to the figure. The area grows up from zero instead of from left to right. The points rise with it, and the numbers appear when it is done.
+	+section("Grow")
+		p Add #[code data-chart-animate="grow"] to the figure. The area grows from zero instead of from left to right. The points move with it, and the numbers appear when it is done.
 
-		+chart
-			figure(data-chart="area" data-chart-shape="smooth" data-chart-animate="up")
+		+chart(null, '1')
+			figure(data-chart="area" data-chart-shape="smooth" data-chart-animate="grow")
 				figcaption
 					b Visitors to the orchard
 					br
@@ -59,13 +59,13 @@ block content
 								th= row[0]
 								td= row[1]
 
-		p To make every line and area grow up, set the #[code animate] option to #[code "up"]. A chart with triggered steps (like from Reveal.js fragments) still builds from left to right. See #[a(href=url('/styling/animation.html')) Animation].
+		p To make every line and area grow, set the #[code animate] option to #[code "grow"]. A chart with triggered steps (like from Reveal.js fragments) still builds from left to right. See #[a(href=url('/styling/animation.html')) Animation].
 
 	+section("Below zero")
 		p Below zero, the area hangs down from the zero line, and a number is shown under its point.
 
-		+chart
-			figure(data-chart="area" data-chart-shape="smooth" data-chart-animate="up")
+		+chart(null, '7-8,10')
+			figure(data-chart="area" data-chart-shape="smooth" data-chart-animate="grow")
 				figcaption
 					b Monthly result
 					br
@@ -80,7 +80,7 @@ block content
 	+section("Several areas")
 		p Each value column is an area. The column header is the name of the area, shown at the end of its line. The areas overlap, so each one is see-through.
 
-		+chart
+		+chart(null, '5')
 			figure(data-chart="area")
 				figcaption: b Apples per tree
 				table
@@ -101,7 +101,7 @@ block content
 	+section("Highlight an area")
 		p Add #[code data-kind="focus"] to the header of a column. That area keeps its colour and shows its numbers. The other areas are shown fainter.
 
-		+chart
+		+chart(null, '4')
 			figure(data-chart="area")
 				table
 					thead
@@ -134,7 +134,7 @@ block content
 					td: code --tablechart-area-color
 					td The colour of the fill. By default, the colour of the line.
 
-		+chart
+		+chart(null, '1')
 			figure(data-chart="area" style="--tablechart-area-opacity: 0.5")
 				table
 					tbody
@@ -146,7 +146,7 @@ block content
 	+section("Stacked areas")
 		p Add #[code data-chart-stack] to the figure. Each area starts on top of the one before it, the first value column at the bottom. A value below zero takes its area down from the one before it. Each number is shown in the middle of its area, if there is room for it. If you point at the row, or tap it, the numbers of that row are shown.
 
-		+chart
+		+chart(null, '1')
 			figure(data-chart="area" data-chart-stack)
 				figcaption
 					b Apples sold
@@ -190,7 +190,7 @@ block content
 	+section("Steps")
 		p Add #[code data-chart-shape="step"] to the figure. Each value is flat across the width of its row, and the line goes straight up or down to the next row. A number is shown only where the value changes, in the middle of the rows that have that value. If a number is wider than those rows, it is left out. If you point at the row, or tap it, the numbers of that row are shown.
 
-		+chart
+		+chart(null, '1')
 			figure(data-chart="area" data-chart-stack data-chart-shape="step" data-chart-legend)
 				figcaption
 					b Land at the orchard
@@ -212,7 +212,7 @@ block content
 	+section("Missing values")
 		p If a cell has no number, such as #[code n/a], the area has a gap there.
 
-		+chart
+		+chart(null, '6')
 			figure(data-chart="area")
 				table
 					tbody

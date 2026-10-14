@@ -1,7 +1,6 @@
 import { sizeOf } from "../functions/measure";
 import { DIVIDE_CLASS, LEADER_CLASS, SLICE_CLASS, VIEWBOX_WIDTH } from "../config";
-import { donutTiming } from "../functions/ease";
-import { timing } from "../functions/timing";
+import { sweepTiming, timing } from "../functions/timing";
 import { placeAt, svgEl, withRow } from "../functions/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
 
@@ -40,8 +39,7 @@ export const donut: ChartType = {
 
 		let run = 0;
 		let part = 0;
-		// One eased sweep round the ring, or with a lower stagger ratio, slices that overlap and ease on their own.
-		const timingOf = donutTiming(svg);
+		// Where each slice is in a sweep round the ring; only a donut that sweeps uses it.
 		let before = 0;
 		rows.forEach((row, i) => {
 			const label = values[i];
@@ -52,7 +50,7 @@ export const donut: ChartType = {
 			}
 
 			const share = Math.abs(row.value) / whole;
-			const own = timingOf(before, share);
+			const own = sweepTiming(before, share);
 			const timed = `--share:${share.toFixed(4)}; --start:${own.start.toFixed(4)}; --span:${own.span.toFixed(4)};`;
 			const arc = share * circumference;
 			const angle = (run / circumference) * 2 * Math.PI - Math.PI / 2;
@@ -89,6 +87,7 @@ export const donut: ChartType = {
 					style: `${timed} ${timing("--i", row.slot)}`,
 				})
 			);
+
 			label.style.setProperty("--start", own.start.toFixed(4));
 			label.style.setProperty("--span", own.span.toFixed(4));
 

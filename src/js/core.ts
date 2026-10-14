@@ -33,7 +33,7 @@ import type { Squeeze } from "./functions/scale";
 import { readSeries, readTable } from "./functions/read-table";
 import { cutOut, htmlEl, short, svgEl } from "./functions/svg";
 import { applySteps, makeControls, planSteps, stepTo } from "./steps";
-import type { AnnotationType, ChartState, ChartType, Geometry, Row, Shape } from "./types";
+import type { AnnotationType, ChartState, ChartType, Geometry, Motion, Row, Shape } from "./types";
 
 const CHARTS: Record<string, ChartType> = { area, bar, column, donut, line, waterfall };
 const ANNOTATIONS: Record<string, AnnotationType> = { "axis-break": axisBreak, trend, bracket };
@@ -142,13 +142,13 @@ export const build = (
 	let series = readSeries(figure, rows, config.langattribute);
 	if (series.length > 1 && !type.series) {
 		console.warn(
-			`[${LIBRARY_NAME}] A ${kind} chart draws one series; only the first of the table's ${series.length} value columns is used.`
+			`[${LIBRARY_NAME}] A ${kind} chart uses only the first of its ${series.length} value columns.`
 		);
 		series = series.slice(0, 1);
 	}
 	const several = series.length > 1;
 	// How many lines or bars share the colour steps, so the last is not too light.
-	if (several) figure.style.setProperty("--tablechart-series-count", String(series.length));
+	if (several) figure.style.setProperty("--_series-count", String(series.length));
 
 	const stackAsked = figure.hasAttribute("data-chart-stack");
 	if (stackAsked && !type.stackable)
@@ -263,7 +263,7 @@ export const build = (
 	categories.inert = true;
 	if (beside) categories.dataset.place = "beside";
 	else if (type.centre) categories.dataset.place = "key";
-	categories.style.setProperty("--tablechart-columns", String(rows.length));
+	categories.style.setProperty("--_columns", String(rows.length));
 	let slice = 0;
 	for (const [i, row] of rows.entries()) {
 		const span = document.createElement("span");
@@ -288,10 +288,7 @@ export const build = (
 
 	// A chart that steps (`data-fragment`) builds a step at a time, from left to right. Without animation it is shown whole.
 	const plan = config.animate ? planSteps(figure) : null;
-	if (plan) {
-		figure.setAttribute("data-steps", "");
-		figure.setAttribute("data-chart-animate", "across");
-	}
+	if (plan) figure.setAttribute("data-steps", "");
 	const keys = figure.getAttribute("data-chart-keys");
 	const controls =
 		plan && config.controls
@@ -317,7 +314,7 @@ export const build = (
 			const index = asked >= 1 && asked <= series.length ? asked - 1 : 0;
 			if (asked !== index + 1)
 				console.warn(
-					`[${LIBRARY_NAME}] An annotation reads line ${asked}, which the chart does not have; it reads the first.`
+					`[${LIBRARY_NAME}] An annotation reads line ${asked}, which is not there; it reads line 1.`
 				);
 			return {
 				spec,
@@ -329,13 +326,7 @@ export const build = (
 		})
 		.filter((a): a is NonNullable<typeof a> => a !== null);
 
-	if (config.animate) {
-		// The figure's own `data-chart-animate`, or else the option. Only a line or area can grow "up".
-		const own = figure.getAttribute("data-chart-animate");
-		const direction = own === "up" || own === "across" ? own : config.animate;
-		const growsUp = direction === "up" && (kind === "line" || kind === "area");
-		figure.setAttribute("data-animate", growsUp ? "up" : "");
-	}
+	if (config.animate) figure.setAttribute("data-animate", motionOf(figure, kind, config, Boolean(plan)));
 
 	const state: ChartState = {
 		figure,
@@ -371,9 +362,27 @@ export const build = (
 	return state;
 };
 
+const MOTIONS: Record<string, Motion> = { grow: "grow", sweep: "sweep" };
+// `up` and `across` are the old names of `grow` and `sweep`, for lines and areas.
+const LINE_MOTIONS: Record<string, Motion> = { ...MOTIONS, up: "grow", across: "sweep" };
+
+/**
+ * How a chart builds: the figure's `data-chart-animate`, or else the option, or else the default of its kind.
+ * A line or area sweeps by default; a donut and a waterfall grow, and can sweep; columns and bars only grow.
+ * A line or area with steps sweeps. The old names `up` and `across` were only for lines and areas.
+ */
+const motionOf = (figure: HTMLElement, kind: string, config: Config, steps: boolean): Motion => {
+	const lines = kind === "line" || kind === "area";
+	const names = lines ? LINE_MOTIONS : MOTIONS;
+	const asked: Motion | undefined = names[figure.getAttribute("data-chart-animate") ?? ""] ?? names[String(config.animate)];
+	if (lines) return steps ? "sweep" : (asked ?? "sweep");
+	return kind === "donut" || kind === "waterfall" ? (asked ?? "grow") : "grow";
+};
+
 // A CSS length in viewBox units, or null if it is not a length, such as `none`.
 const insideAlign = (figure: HTMLElement): Geometry["insideAlign"] => {
-	const asked = getComputedStyle(figure).getPropertyValue("--tablechart-inside-align").trim();
+	const style = getComputedStyle(figure);
+	const asked = (style.getPropertyValue("--tablechart-value-align") || style.getPropertyValue("--tablechart-inside-align")).trim();
 	return asked === "start" || asked === "center" || asked === "end" ? asked : null;
 };
 
@@ -413,7 +422,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	plot.classList.add(PLACED_CLASS);
 	// Undo what the last layout did to the size of the text, then read every size at once, before anything is placed.
 	for (const node of [...seriesValues.flat(), ...state.totals]) delete node.dataset.place;
-	plot.style.removeProperty("--tablechart-fit");
+	plot.style.removeProperty("--_fit");
 	measureAll([...seriesValues.flat(), ...state.totals, ...names, ...state.categories, ...annotations.map((a) => a.badge)]);
 
 	const labelHeight = (values[0] ? sizeOf(values[0]).height : 0) * unit;
@@ -616,7 +625,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		checks: state.checks,
 	};
 
-	// How many elements start one after the other, so the stagger can shrink under `--tablechart-max-duration`.
+	// How many elements start one after the other, so the stagger can shrink under `--tablechart-animation-max`.
 	plot.style.setProperty("--count", String(Math.max(1, ...rows.map((row) => row.slot + 1))));
 	type.draw(geo);
 
@@ -655,11 +664,11 @@ export const layout = (state: ChartState, config: Config): boolean => {
 			nameRow,
 			state.categories.filter((name) => name.offsetParent !== null),
 			(name) => ({ size: name.scrollWidth, room: name.clientWidth }),
-			"--tablechart-name-fit"
+			"--_name-fit"
 		);
 	}
 
-	// A callout is a hole in the marks under it, so the background shows through.
+	// A badge is a hole in the marks under it, so the background shows through.
 	const holes = annotations.flatMap(({ badge }) => {
 		if (!(badge instanceof HTMLElement) || !badge.offsetWidth) return [];
 		const width = badge.offsetWidth * unit;

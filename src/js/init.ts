@@ -272,24 +272,48 @@ export const create = async (
 	return figure ? make(figure, config) : null;
 };
 
-// Once per page: the old timing variables still work until the next minor version.
+// Once per page: the old variable names still work until the next minor version.
 const OLD_NAMES: [string, string][] = [
-	["--tablechart-duration", "--tablechart-element-duration"],
-	["--tablechart-stagger", "--tablechart-stagger-ratio, a share of the element time"],
+	["--tablechart-duration", "--tablechart-animation-element-duration"],
+	["--tablechart-stagger", "--tablechart-animation-stagger, a share of the element time"],
+	["--tablechart-easing", "--tablechart-animation-ease"],
+	["--tablechart-category-size", "--tablechart-name-size"],
+	["--tablechart-category-padding", "--tablechart-name-padding"],
+	["--tablechart-categories-gap", "--tablechart-name-gap"],
+	["--tablechart-inside-align", "--tablechart-value-align"],
+	["--tablechart-bar-ink", "--tablechart-bar-value-color"],
+	["--tablechart-piece-ink", "--tablechart-piece-value-color"],
+	["--tablechart-up-ink", "--tablechart-up-value-color"],
+	["--tablechart-down-ink", "--tablechart-down-value-color"],
+	["--tablechart-total-ink", "--tablechart-total-value-color"],
+	["--tablechart-series-ink", "--tablechart-series-own-color"],
+	["--tablechart-dash", "--tablechart-series-dash"],
+	["--tablechart-dot", "--tablechart-series-dot"],
+	["--tablechart-muted-share", "--tablechart-series-muted-share"],
+	["--tablechart-rule-color", "--tablechart-baseline-color"],
+	["--tablechart-rule-width", "--tablechart-baseline-width"],
+	["--tablechart-rule-opacity", "--tablechart-baseline-opacity"],
+	["--tablechart-key-size", "--tablechart-legend-key-size"],
+	["--tablechart-controls-justify", "--tablechart-control-justify"],
+	["--tablechart-controls-gap", "--tablechart-control-gap"],
 ];
+const OLD_MOTIONS: Record<string, string> = { up: "grow", across: "sweep" };
 let warned = false;
-const warnOldNames = (figures: HTMLElement[]): void => {
+const warnOldNames = (figures: HTMLElement[], config: Config): void => {
 	if (warned) return;
+	const motion = (value: unknown) => {
+		const now = OLD_MOTIONS[String(value)];
+		return now ? [`"${value}" is now "${now}"`] : [];
+	};
+	const used = new Set(motion(config.animate));
 	for (const figure of figures) {
 		const style = getComputedStyle(figure);
-		const used = OLD_NAMES.filter(([old]) => style.getPropertyValue(old).trim());
-		if (!used.length) continue;
-		warned = true;
-		console.warn(
-			`[${LIBRARY_NAME}] ${used.map(([old, now]) => `${old} is now ${now}`).join("; ")}. The old names work until the next minor version.`
-		);
-		return;
+		for (const [old, now] of OLD_NAMES) if (style.getPropertyValue(old).trim()) used.add(`${old} is now ${now}`);
+		for (const one of motion(figure.getAttribute("data-chart-animate"))) used.add(one);
 	}
+	if (!used.size) return;
+	warned = true;
+	console.warn(`[${LIBRARY_NAME}] ${[...used].join("; ")}. The old names work until the next minor version.`);
 };
 
 /** Makes a chart of every element in `root` that matches the selector, skipping existing charts. */
@@ -301,7 +325,7 @@ export const init = async (
 	if (config.debug) debug.enabled = true;
 
 	const figures = await prepare(Array.from(root.querySelectorAll<HTMLElement>(config.selector)), config);
-	warnOldNames(figures);
+	warnOldNames(figures, config);
 	const charts = figures
 		.map((figure) => make(figure, config))
 		.filter((chart): chart is TablechartChart => chart !== null);

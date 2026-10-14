@@ -29,19 +29,19 @@ block content
 	+section("Column")
 		p The break is a #[code span] with #[code data-annotation="axis-break"], in a #[code div] with the class #[code chart-annotations] inside the chart. #[code data-from="20"] shows the scale above 20 smaller.
 
-		+chart
+		+chart(null, '10')
 			+regions("column")
 
 	+section("Bar")
 		p On a bar chart the scale runs to the right, so the bars are cut from top to bottom.
 
-		+chart
+		+chart(null, '10')
 			+regions("bar")
 
 	+section("Waterfall")
 		p On a waterfall, the totals stand on the baseline and can be cut. A break may not cut a step that floats, because its height would then be wrong. So put the break below the steps, such as between the baseline and the lowest step. Otherwise it is left out, and the console says why.
 
-		+chart
+		+chart(null, '11')
 			figure(data-chart="waterfall")
 				table
 					tbody
@@ -55,10 +55,10 @@ block content
 	+section("Straight or zigzag")
 		p The cut is two slanted lines by default, as in the charts above. Add #[code data-mark="zigzag"] to draw it as a zigzag: up, down and up again across a column, and right, left and right again down a bar.
 
-		+chart
+		+chart(null, '10')
 			+regions("column", "zigzag")
 
-		+chart
+		+chart(null, '10')
 			+regions("bar", "zigzag")
 
 	+section("Attributes")
@@ -111,7 +111,7 @@ block content
 				--tablechart-break-width: 2px;
 			}
 
-		+chart
+		+chart(null, '1')
 			figure.soft-break(data-chart="column")
 				table
 					tbody

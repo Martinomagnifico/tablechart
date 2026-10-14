@@ -4,6 +4,8 @@ import type { StepPlan } from "./steps";
 
 /** How a line or an area runs from one point to the next. */
 export type Shape = "straight" | "step" | "smooth";
+/** How a chart builds: each element grows from zero, or the chart is revealed in one movement. */
+export type Motion = "grow" | "sweep";
 
 export interface Cell {
 	raw: string;
@@ -70,7 +72,7 @@ export interface Geometry {
 	/** Where a bar chart is cut across, in viewBox units; set by its drawing. */
 	breakX?: number;
 	labels: "outside" | "inside";
-	/** Where a number inside its bar goes, from `--tablechart-inside-align`; null for the chart's own default. */
+	/** Where a number inside its bar goes, from `--tablechart-value-align`; null for the chart's own default. */
 	insideAlign: "start" | "center" | "end" | null;
 	stacked: boolean;
 	shape: Shape;

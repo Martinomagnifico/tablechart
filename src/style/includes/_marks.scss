@@ -23,14 +23,14 @@
 }
 
 .tablechart-plot[data-grouped] :where(.tablechart-value) {
-	font-size: calc(var(--tablechart-group-value-size, 0.95em) * var(--tablechart-fit, 1));
+	font-size: calc(var(--tablechart-value-group-size, 0.95em) * var(--_fit, 1));
 }
 
 // Strokes are in screen pixels, so a rule has the same weight at any size.
 .tablechart-rule {
-	stroke: var(--tablechart-rule-color, currentColor);
-	stroke-width: var(--tablechart-rule-width, 1px);
-	opacity: var(--tablechart-rule-opacity, 0.45);
+	stroke: var(--tablechart-baseline-color, var(--tablechart-rule-color, currentColor));
+	stroke-width: var(--tablechart-baseline-width, var(--tablechart-rule-width, 1px));
+	opacity: var(--tablechart-baseline-opacity, var(--tablechart-rule-opacity, 0.45));
 	vector-effect: non-scaling-stroke;
 }
 
@@ -70,10 +70,10 @@
 }
 
 .tablechart-series[data-line="dashed"] {
-	stroke-dasharray: var(--tablechart-dash, 6 4);
+	stroke-dasharray: var(--tablechart-series-dash, var(--tablechart-dash, 6 4));
 }
 .tablechart-series[data-line="dotted"] {
-	stroke-dasharray: var(--tablechart-dot, 0 4);
+	stroke-dasharray: var(--tablechart-series-dot, var(--tablechart-dot, 0 4));
 }
 
 .tablechart-point {

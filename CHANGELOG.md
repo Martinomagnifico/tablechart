@@ -1,21 +1,30 @@
 # Changelog
 
-## [Unreleased]
+## [1.0.4] - 2026-10-14
 
 ### Added
 
-- `--tablechart-element-duration`, `--tablechart-stagger-ratio` and `--tablechart-max-duration`: the time of one element, when the next one starts, and a ceiling for a whole chart, 2s by default.
-- `--tablechart-circle-duration`: how long a donut takes for a full circle, 1.5s by default.
+- `--tablechart-animation-element-duration`, `--tablechart-animation-stagger` and `--tablechart-animation-max`: the time of one element, when the next one starts, and a ceiling for a whole chart, which is 4x the standard element duration, so 2s by default.
+- `data-chart-animate="sweep"` on a donut draws the ring in one sweep, and on a waterfall builds it at one speed.
 
 ### Changed
 
 - A large chart builds within 2s: the starts of its elements move closer together.
-- A waterfall builds as one motion at one speed: each column starts when the one before it ends, its connector draws meanwhile, and the last column slows to a stop. With steps, each step builds on its own.
-- A donut draws its ring in one sweep with the bar easing. With a stagger ratio below 1, its slices overlap and each eases on its own.
+- A waterfall grows column by column, one after the other: its stagger is 0.6 by default. Under the maximum its columns get shorter.
+- CSS variables that set the same part of a chart now start there variable name in the same way, such as `--tablechart-animation-` and `--tablechart-name-`. See the list of old and new names on the CSS variables page.
+- `--tablechart-name-size` now sets all names, also those under the bars.
+- The callout of an annotation is now called the badge in the docs, like its variables.
+- `data-chart-animate` and the `animate` option take `grow` and `sweep`, the same on every chart type. `up` and `across` are the old names.
+- The types are now `tablechart.d.mts` and `tablechart-core.d.mts`, next to the ES modules, and share `tablechart-shared.d.mts` like the modules share their code. They are made with rolldown-plugin-dts instead of API Extractor.
+
+### Fixed
+
+- With steps, the closing total of a waterfall grows from the baseline if the column before it is not there yet.
+- Importing `@martinomagnifico/tablechart/core` in TypeScript no longer fails with "Cannot find name 'TablechartChart'".
 
 ### Deprecated
 
-- `--tablechart-duration` and `--tablechart-stagger`, removed in the next minor version. The console says so.
+- The old variable names and the animate values `up` and `across`, removed in the next minor version. The console lists the ones a page still uses.
 
 
 ## [1.0.3] - 2026-10-11

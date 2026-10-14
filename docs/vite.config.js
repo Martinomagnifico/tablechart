@@ -1,10 +1,13 @@
 import { defineConfig } from 'vite';
 import { resolve } from "path";
+import { readFileSync } from "fs";
 import vituum from "vituum";
 import pug from '@vituum/vite-plugin-pug';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 const SITE_URL = 'https://martinomagnifico.github.io/tablechart/';
+// The version of the library, for the docs as `version`.
+const { version } = JSON.parse(readFileSync(resolve(__dirname, '../package.json'), 'utf8'));
 
 export default defineConfig(({ mode }) => {
 	const isDev = mode === 'development';
@@ -97,6 +100,7 @@ export default defineConfig(({ mode }) => {
 					isProd: isProd,
 					basePath: isProd ? '/tablechart/' : '/',
 					siteUrl: SITE_URL, // absolute, for Open Graph: a relative og:image is ignored
+					version,
 					url: (h) => (isProd ? '/tablechart/' : '/') + String(h).replace(/^\//, ''),
 				},
 	            options: {

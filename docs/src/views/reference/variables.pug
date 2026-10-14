@@ -4,6 +4,20 @@ append variables
 	- pagetitle = "Reference | CSS variables"
 	- pagedescription = "Every CSS variable in Tablechart, and what it sets."
 
+mixin vars(rows)
+	table
+		thead
+			tr
+				th Variable
+				th Default
+				th Sets
+		tbody
+			each row in rows
+				tr
+					td: code= row[0]
+					td!= row[1]
+					td!= row[2]
+
 block content
 	.lane
 		.container
@@ -11,138 +25,165 @@ block content
 				h1 CSS variables
 				p.lead Every CSS variable, and what it sets.
 
-	+section("Variables")
-		p Every variable is optional. Set them on #[code :root], on a class or on a chart. See #[a(href=url('/styling/index.html')) Styling].
+	+section("Chart")
+		p Every variable is optional. Set them on #[code :root], on a class or on a chart. See #[a(href=url('/styling/index.html')) Styling]. Variables that set the same part of a chart start the same way, such as #[code --tablechart-name-] for all names.
+
+		+vars([
+			['--tablechart-color', 'The text colour', 'The colour of text and marks'],
+			['--tablechart-color-1', 'None', 'The palette, for donut slices and several lines. The numbers go on: <code>--tablechart-color-2</code>, <code>--tablechart-color-3</code> and so on'],
+			['--tablechart-font-size', '<code>1em</code>', 'All text in a chart. The other sizes are relative to it'],
+			['--tablechart-line-height', '<code>1.25</code>', 'The line height of all text in a chart'],
+			['--tablechart-margin', '<code>0</code>', 'The space around a chart'],
+			['--tablechart-min-height', '<code>200px</code>', 'The least height of a chart, on a narrow screen'],
+			['--tablechart-pointer-color', 'The text colour at 8%', 'The band behind a row that is pointed at'],
+			['--tablechart-surface', 'The page background', 'The background colour, for lighter lines and slices'],
+			['--tablechart-type', 'None', 'Shows a column chart as a bar chart, or a bar chart as a column chart: <code>bar</code> or <code>column</code>'],
+		])
+
+	+section("Title")
+		+vars([
+			['--tablechart-caption-align', '<code>left</code>', 'The alignment of the title'],
+			['--tablechart-caption-gap', '<code>0.5em</code>', 'The space under the title'],
+		])
+
+	+section("Names")
+		p A name is the name of a row: under a column, beside a bar or at the end of a line.
+
+		+vars([
+			['--tablechart-name-gap', '<code>0.45em</code>', 'The space between the columns and the names under them'],
+			['--tablechart-name-max', '<code>40%</code>', 'The widest a name beside a bar may be, as a share of the chart’s width. A longer name wraps'],
+			['--tablechart-name-padding', '<code>0 0.2em</code>', 'The padding of a name under a column'],
+			['--tablechart-name-size', '<code>0.95em</code>', 'All names'],
+		])
+
+	+section("Values")
+		p A value is the number on a bar, column or point.
+
+		+vars([
+			['--tablechart-value-align', '<code>end</code>, <code>center</code> on a waterfall', 'Where a number inside its bar goes: <code>start</code>, <code>center</code> or <code>end</code>'],
+			['--tablechart-value-color', 'The text colour', 'The numbers on the bars, outside the bars'],
+			['--tablechart-value-group-size', '<code>0.95em</code>', 'The numbers of columns or bars side by side'],
+			['--tablechart-value-size', '1.3 times the name size', 'The numbers on the bars'],
+		])
+
+	+section("Bars and columns")
+		+vars([
+			['--tablechart-bar-color', 'The text colour', 'All bars and a single line'],
+			['--tablechart-bar-max', '<code>60px</code>', 'The widest a bar may be'],
+			['--tablechart-bar-value-color', 'Dark or light, whichever reads on the bar', 'The number inside a bar'],
+			['--tablechart-piece-value-color', 'Dark or light, whichever reads on the part', 'The number inside a part of a stacked column or bar'],
+		])
+
+	+section("Waterfall")
+		+vars([
+			['--tablechart-connector-color', 'The text colour', 'The line between two columns'],
+			['--tablechart-connector-dash', '<code>2 3</code>', 'The dash pattern of that line, in pixels'],
+			['--tablechart-connector-opacity', '<code>0.55</code>', 'The opacity of that line'],
+			['--tablechart-connector-width', '<code>1px</code>', 'The width of that line'],
+			['--tablechart-down-color', 'The bar colour', 'Falling steps'],
+			['--tablechart-down-value-color', 'Dark or light, whichever reads on the step', 'The number inside a falling step'],
+			['--tablechart-total-color', 'The bar colour', 'Totals'],
+			['--tablechart-total-value-color', 'Dark or light, whichever reads on the total', 'The number inside a total'],
+			['--tablechart-up-color', 'The bar colour', 'Rising steps'],
+			['--tablechart-up-value-color', 'Dark or light, whichever reads on the step', 'The number inside a rising step'],
+		])
+
+	+section("Lines and areas")
+		+vars([
+			['--tablechart-area-color', 'The colour of its line', 'The fill under a line, in an area chart'],
+			['--tablechart-area-opacity', '<code>0.25</code>, <code>0.5</code> when stacked', 'The opacity of that fill'],
+			['--tablechart-point-color', 'The colour of its line', 'The points on a line'],
+			['--tablechart-series-color', 'The bar colour', 'Lines without a palette. Each next line is lighter'],
+			['--tablechart-series-dash', '<code>6 4</code>', 'The pattern of a dashed line, in pixels'],
+			['--tablechart-series-dot', '<code>0 4</code>', 'The pattern of a dotted line, in pixels'],
+			['--tablechart-series-fade', '<code>30%</code>', 'How much lighter each next line is'],
+			['--tablechart-series-min', '<code>40%</code>', 'The lightest a line may be'],
+			['--tablechart-series-muted-share', '<code>45%</code>', 'How much of its colour a line keeps next to a highlighted line'],
+			['--tablechart-series-own-color', 'From the palette or the series colour', 'The colour of one line, set on <code>[data-series="2"]</code> and so on'],
+			['--tablechart-series-width', '<code>2px</code>', 'The width of a line'],
+		])
+
+	+section("Donut")
+		+vars([
+			['--tablechart-centre-color', 'The text colour', 'The number in the middle of a donut'],
+			['--tablechart-centre-size', '<code>1.6em</code>', 'The size of that number'],
+			['--tablechart-leader-color', 'The text colour', 'The line from a slice to its number'],
+			['--tablechart-leader-opacity', '<code>0.45</code>', 'The opacity of that line'],
+			['--tablechart-leader-width', '<code>1px</code>', 'The width of that line'],
+			['--tablechart-slice-color', 'The text colour', 'Slices without a palette. Each next slice is lighter'],
+			['--tablechart-slice-fade', '<code>15%</code>', 'How much lighter each next slice is'],
+			['--tablechart-slice-gap', '<code>4</code>', 'The gap between slices. It grows with the ring'],
+			['--tablechart-slice-min', '<code>20%</code>', 'The lightest a slice may be'],
+		])
+
+	+section("Legend")
+		+vars([
+			['--tablechart-legend-border', '<code>none</code>', 'The border of the legend'],
+			['--tablechart-legend-gap', '<code>0.6em</code>', 'The space above the legend'],
+			['--tablechart-legend-key-size', '<code>0.6em</code>', 'The dot before each name in the legend'],
+			['--tablechart-legend-padding', '<code>0</code>', 'The padding of the legend'],
+			['--tablechart-legend-radius', '<code>0</code>', 'The corners of the legend'],
+			['--tablechart-legend-surface', '<code>none</code>', 'The background of the legend'],
+		])
+
+	+section("Annotations")
+		+vars([
+			['--tablechart-annotation-color', 'The text colour', 'Annotation lines, arrowheads and badges'],
+			['--tablechart-annotation-width', '<code>1.25px</code>', 'The width of annotation lines'],
+			['--tablechart-badge-border-width', '<code>1px</code>', 'The border of the badge'],
+			['--tablechart-badge-padding', '<code>0.5em 1.25em</code>', 'The padding of the badge'],
+			['--tablechart-badge-radius', '<code>50%</code>', 'The corners of the badge'],
+			['--tablechart-badge-surface', '<code>none</code>', 'The background of the badge'],
+		])
+
+	+section("Baseline and scale breaks")
+		+vars([
+			['--tablechart-baseline-color', 'The text colour', 'The baseline'],
+			['--tablechart-baseline-opacity', '<code>0.45</code>', 'The opacity of the baseline'],
+			['--tablechart-baseline-width', '<code>1px</code>', 'The width of the baseline'],
+			['--tablechart-break-color', 'The text colour', 'The lines of a break in the scale'],
+			['--tablechart-break-gap', '1.3% of the chart width', 'The empty space between the two lines of a break'],
+			['--tablechart-break-opacity', '<code>1</code>', 'The opacity of those lines'],
+			['--tablechart-break-width', '<code>1px</code>', 'The width of those lines'],
+		])
+
+	+section("Previous and Next buttons")
+		p See #[a(href=url('/features/steps.html')) Step by step].
+
+		+vars([
+			['--tablechart-control-border', 'A line in the text colour at 30%', 'The border of the buttons'],
+			['--tablechart-control-gap', '<code>0.75em</code>', 'The space above the buttons'],
+			['--tablechart-control-justify', '<code>space-between</code>', 'Where the buttons are'],
+			['--tablechart-control-padding', '<code>0.3em 0.7em</code>', 'The padding of the buttons'],
+			['--tablechart-control-radius', '<code>0.4em</code>', 'The corners of the buttons'],
+			['--tablechart-control-surface', '<code>none</code>', 'The background of the buttons'],
+		])
+
+	+section("Animation")
+		p See #[a(href=url('/styling/animation.html')) Animation].
+
+		+vars([
+			['--tablechart-animation-ease', 'Fast at the start, settling at the end', 'The easing of bars, donuts, and lines and areas that grow'],
+			['--tablechart-animation-element-duration', '<code>0.5s</code>', 'How long one bar, column, point or donut slice takes'],
+			['--tablechart-animation-max', 'Four times the element time: <code>2s</code>', 'The longest a chart may take to build'],
+			['--tablechart-animation-stagger', '<code>0.24</code>, <code>0.6</code> for a waterfall', 'When the next element starts, as a share of the element time'],
+			['--tablechart-annotation-duration', '<code>0.6s</code>', 'How long an annotation line takes'],
+			['--tablechart-queue-duration', '<code>0.4s</code>', 'How long a chart in a sequence takes to fade in'],
+		])
+
+	+section("Old names")
+		p These names still work until the next minor version. If a page uses one, the console lists it with its new name. If you set #[code --tablechart-name-size] before, it now also sets the names under the bars.
 
 		table
 			thead
 				tr
-					th Variable
-					th Sets
+					th Old
+					th New
 			tbody
+				each row in [['duration', 'animation-element-duration'], ['easing', 'animation-ease'], ['category-size', 'name-size'], ['category-padding', 'name-padding'], ['categories-gap', 'name-gap'], ['inside-align', 'value-align'], ['bar-ink', 'bar-value-color'], ['piece-ink', 'piece-value-color'], ['up-ink', 'up-value-color'], ['down-ink', 'down-value-color'], ['total-ink', 'total-value-color'], ['series-ink', 'series-own-color'], ['dash', 'series-dash'], ['dot', 'series-dot'], ['muted-share', 'series-muted-share'], ['rule-color', 'baseline-color'], ['rule-width', 'baseline-width'], ['rule-opacity', 'baseline-opacity'], ['key-size', 'legend-key-size'], ['controls-justify', 'control-justify'], ['controls-gap', 'control-gap']]
+					tr
+						td: code= '--tablechart-' + row[0]
+						td: code= '--tablechart-' + row[1]
 				tr
-					td: code --tablechart-color
-					td The colour of text and marks: the text colour by default
-				tr
-					td: code --tablechart-surface
-					td The background colour, for lighter lines and slices: the browser’s page background by default
-				tr
-					td: code --tablechart-bar-color / -bar-ink
-					td All bars and a single line, and the number inside a bar. The number is dark or light by default
-				tr
-					td: code --tablechart-up-color / -up-ink
-					td Rising waterfall steps, and the number inside them
-				tr
-					td: code --tablechart-down-color / -down-ink
-					td Falling waterfall steps, and the number inside them
-				tr
-					td: code --tablechart-total-color / -total-ink
-					td Totals, and the number inside them
-				tr
-					td: code --tablechart-color-1, -2 and on
-					td The palette, for donut slices and several lines
-				tr
-					td: code --tablechart-value-color
-					td The numbers on the bars
-				tr
-					td: code --tablechart-slice-color / -fade / -min
-					td Donut slices without a palette
-				tr
-					td: code --tablechart-slice-gap
-					td The gap between donut slices
-				tr
-					td: code --tablechart-centre-color / -size
-					td The number in the middle of a donut
-				tr
-					td: code --tablechart-key-size
-					td The dot in the donut legend
-				tr
-					td: code --tablechart-series-color / -width / -fade / -min
-					td Lines without a palette
-				tr
-					td: code --tablechart-series-ink
-					td The colour of one line
-				tr
-					td: code --tablechart-muted-share
-					td A line next to a highlighted line
-				tr
-					td: code --tablechart-point-color
-					td The points on a line
-				tr
-					td: code --tablechart-name-max
-					td The widest a name beside a bar may be, as a share of the chart's width: 40% by default. A longer name wraps.
-				tr
-					td: code --tablechart-type
-					td Shows a column chart as a bar chart, or a bar chart as a column chart: #[code bar] or #[code column]
-				tr
-					td: code --tablechart-dash / -dot
-					td The pattern of a dashed or dotted line, in pixels
-				tr
-					td: code --tablechart-area-color / -opacity
-					td The fill under a line, in an area chart
-				tr
-					td: code --tablechart-piece-ink
-					td A number inside a part of a stacked column or bar
-				tr
-					td: code --tablechart-pointer-color
-					td The band behind a row that is pointed at
-				tr
-					td: code --tablechart-name-size
-					td The names of lines
-				tr
-					td: code --tablechart-legend-surface / -border / -padding / -radius / -gap
-					td The legend
-				tr
-					td: code --tablechart-rule-color / -width / -opacity
-					td The baseline
-				tr
-					td: code --tablechart-connector-color / -width / -dash / -opacity
-					td Waterfall connectors
-				tr
-					td: code --tablechart-leader-color / -width / -opacity
-					td The line from a slice to its number
-				tr
-					td: code --tablechart-annotation-color / -width / -duration
-					td Annotation lines and arrowheads
-				tr
-					td: code --tablechart-break-color / -width / -opacity
-					td The lines of a break in the scale
-				tr
-					td: code --tablechart-break-gap
-					td The empty space between the two lines of a break in the scale: 1.3% of the chart width by default
-				tr
-					td: code --tablechart-controls-justify / -gap
-					td Where the Previous and Next buttons are, and the space above them. See #[a(href=url('/features/steps.html')) Step by step].
-				tr
-					td: code --tablechart-control-padding / -border / -radius / -surface
-					td The padding, border, corners and background of those buttons
-				tr
-					td: code --tablechart-badge-surface / -padding / -radius / -border-width
-					td The callout
-				tr
-					td: code --tablechart-bar-max
-					td The widest a bar may be
-				tr
-					td: code --tablechart-min-height
-					td The least height of a chart, on a narrow screen: 200px by default
-				tr
-					td: code --tablechart-font-size / -line-height
-					td All text in a chart
-				tr
-					td: code --tablechart-category-size / -category-padding / -categories-gap
-					td The names under the bars
-				tr
-					td: code --tablechart-value-size
-					td The numbers on the bars
-				tr
-					td: code --tablechart-inside-align
-					td Where a number inside its bar goes: #[code start], #[code center] or #[code end]
-				tr
-					td: code --tablechart-caption-align / -caption-gap
-					td The title
-				tr
-					td: code --tablechart-margin
-					td The space around a chart
-				tr
-					td: code --tablechart-element-duration / -stagger-ratio / -max-duration / -circle-duration / -easing
-					td Animation
+					td: code --tablechart-stagger
+					td #[code --tablechart-animation-stagger], now a share of the element time instead of seconds

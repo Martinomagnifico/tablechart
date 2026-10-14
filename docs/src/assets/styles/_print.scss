@@ -1,0 +1,38 @@
+// On paper: only the content, full width, without what only works on a screen.
+@media print {
+	.docs-layout {
+		display: block;
+	}
+
+	.docs-sidebar,
+	.github-corner,
+	button.copy,
+	.lang-toggle,
+	.scheme-toggle,
+	.demo-actions,
+	section.no-hr {
+		display: none !important;
+	}
+
+	// Less room around sections than on a screen; the line between them moves with it.
+	.lane,
+	section {
+		padding: 1.25rem 0;
+	}
+
+	section .container:first-child:before {
+		top: -1.25rem;
+	}
+
+	// A chart, a code block or a table row is not split over two pages. A whole card may be, so it leaves no large gap.
+	.demo,
+	.code-block,
+	tr {
+		break-inside: avoid;
+	}
+
+	h2,
+	h3 {
+		break-after: avoid;
+	}
+}

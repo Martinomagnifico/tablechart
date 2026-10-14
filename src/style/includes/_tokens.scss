@@ -1,21 +1,30 @@
 // Shared values: timing, background, ink, palette and legend box.
 
-// The time of one element. `--tablechart-duration` is its old name, kept until the next minor version.
-$element: var(--tablechart-element-duration, var(--tablechart-duration, 0.5s));
+// Timing, worked out once per chart by the `timing` mixin and read everywhere else as a variable.
+$element: var(--_el);
+$max: var(--_max);
+$ratio: var(--_r);
+$duration: var(--_dur);
+$stagger: var(--_stg);
+$fade: var(--_fade);
+$easing: var(--_ease);
 
-
-// A ceiling on the build of one chart, never a target: four elements by default.
-$max: var(--tablechart-max-duration, calc(4 * #{$element}));
-$duration: min(#{$element}, #{$max});
-$ratio: var(--tablechart-stagger-ratio, 0.24);
-
-
-// The gap between the starts of two elements. Under the maximum only this gives, for `--count` elements set by the chart.
-// The old `--tablechart-stagger`, in seconds, still wins if it is set.
-$stagger: min(var(--tablechart-stagger, calc(#{$ratio} * #{$element})), max(0s, calc((#{$max} - #{$duration}) / max(var(--count, 1) - 1, 1))));
-// How long a number or point takes to fade in: never more than a quarter of the maximum.
-$fade: min(#{$duration}, calc(#{$max} / 4));
-$easing: var(--tablechart-easing, cubic-bezier(0.26, 0.86, 0.44, 0.985));
+// On an animated figure and its plot: the plot sets `--count`, the number of elements that start one after the other.
+@mixin timing {
+	// The time of one element. `--tablechart-duration` is its old name, kept until the next minor version.
+	--_el: var(--tablechart-animation-element-duration, var(--tablechart-duration, 0.5s));
+	// A ceiling on the build of one chart, never a target: four elements by default.
+	--_max: var(--tablechart-animation-max, calc(4 * var(--_el)));
+	// The stagger as a share of the element time. A chart can set its own default with `--_ratio`.
+	--_r: var(--tablechart-animation-stagger, var(--_ratio, 0.24));
+	// Under the maximum, a chart with `--_keep: 1` shortens its elements too, so their starts keep the same share of their time.
+	--_dur: min(var(--_el), calc(var(--_max) / (1 + var(--_keep, 0) * (var(--count, 1) - 1) * var(--_r))));
+	// The gap between two starts; under the maximum only this gives. The old `--tablechart-stagger`, in seconds, still wins if set.
+	--_stg: min(var(--tablechart-stagger, calc(var(--_r) * var(--_el))), max(0s, calc((var(--_max) - var(--_dur)) / max(var(--count, 1) - 1, 1))));
+	// How long a number or point takes to fade in: never more than a quarter of the maximum.
+	--_fade: min(var(--_dur), calc(var(--_max) / 4));
+	--_ease: var(--tablechart-animation-ease, var(--tablechart-easing, cubic-bezier(0.26, 0.86, 0.44, 0.985)));
+}
 
 // The background behind the chart; lighter colours are mixed with it.
 $surface: "var(--tablechart-surface, Canvas)";
@@ -26,16 +35,19 @@ $surface: "var(--tablechart-surface, Canvas)";
 }
 $barfill: "var(--tablechart-bar-color, currentColor)";
 
+// The size of every name. `--tablechart-category-size` is its old name.
+$namesize: "var(--tablechart-name-size, var(--tablechart-category-size, 0.95em))";
+
 // A slice uses `--tablechart-color-n`, or the slice colour a step lighter per slice, down to a minimum.
 $sliceink: "var(--palette, color-mix(in oklab, var(--tablechart-slice-color, currentColor) max(var(--tablechart-slice-min, 20%), calc(100% - var(--n) * var(--tablechart-slice-fade, 15%))), #{$surface}))";
 
-// Lines do the same; a line out of focus is lighter still. `--tablechart-series-ink` sets one line's colour.
+// Lines do the same; a line out of focus is lighter still. `--tablechart-series-own-color` sets one line's colour.
 $seriesbase: "var(--tablechart-series-color, var(--tablechart-bar-color, currentColor))";
 // The last line is never lighter than `--tablechart-series-min`.
 $seriesmin: "var(--tablechart-series-min, 40%)";
-$seriesfade: "min(var(--tablechart-series-fade, 30%), calc((100% - #{$seriesmin}) / max(var(--tablechart-series-count, 2) - 1, 1)))";
+$seriesfade: "min(var(--tablechart-series-fade, 30%), calc((100% - #{$seriesmin}) / max(var(--_series-count, 2) - 1, 1)))";
 $seriesown: "var(--palette, color-mix(in oklab, #{$seriesbase} max(#{$seriesmin}, calc((100% - var(--n, 0) * #{$seriesfade}) * (1 - var(--m, 0)) + var(--m, 0) * 100%)), #{$surface}))";
-$seriesink: "var(--tablechart-series-ink, color-mix(in oklab, #{$seriesown} calc(100% - var(--m, 0) * (100% - var(--tablechart-muted-share, 45%))), #{$surface}))";
+$seriesink: "var(--tablechart-series-own-color, var(--tablechart-series-ink, color-mix(in oklab, #{$seriesown} calc(100% - var(--m, 0) * (100% - var(--tablechart-series-muted-share, var(--tablechart-muted-share, 45%)))), #{$surface})))";
 
 // A legend is as wide as its items and centred, and wraps when they do not fit.
 @mixin legend-box {
@@ -52,8 +64,3 @@ $seriesink: "var(--tablechart-series-ink, color-mix(in oklab, #{$seriesown} calc
 	border-radius: var(--tablechart-legend-radius, 0);
 	background: var(--tablechart-legend-surface, none);
 }
-
-// A donut: the time of a full circle, and how far apart the slices start, as a share of it.
-// It leaves room for the numbers to fade in before the maximum.
-$circle: min(var(--tablechart-circle-duration, 1.5s), calc(#{$max} - #{$fade}));
-$sweep: calc(min(var(--tablechart-stagger-ratio, 1), 1) * #{$circle});

@@ -14,7 +14,7 @@ block content
 	+section("Legend for several lines")
 		p On a line chart with several lines, the names are shown at the end of the lines. Add #[code data-chart-legend] to the figure to show them in a legend under the chart instead. Each name has a short sample of its line.
 
-		+chart
+		+chart(null, '1')
 			figure(data-chart="line" data-chart-legend)
 				figcaption: b Apples per tree
 				table
@@ -47,7 +47,7 @@ block content
 	+section("Style the legend")
 		p A legend is as wide as its items. These variables set its background, border, padding and corners. By default, there are none.
 
-		+chart
+		+chart(null, '1')
 			figure(data-chart="line" data-chart-legend style="--tablechart-legend-border: 1px solid currentColor; --tablechart-legend-padding: 0.3em 0.8em; --tablechart-legend-radius: 0.4em")
 				table
 					thead

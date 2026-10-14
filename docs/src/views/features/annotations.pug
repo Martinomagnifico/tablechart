@@ -23,7 +23,7 @@ block content
 	+section("Bracket")
 		p A bracket shows the change between two bars. If the chart has two bars, no other attributes are needed.
 
-		+chart
+		+chart(null, '9')
 			figure(data-chart="column")
 				figcaption
 					b Apple juice
@@ -41,7 +41,7 @@ block content
 	+section("Choose the bars")
 		p If the chart has more bars, set #[code data-from] and #[code data-to] to the row numbers. The first row is #[code 1].
 
-		+chart
+		+chart(null, '11')
 			figure(data-chart="column")
 				table
 					tbody
@@ -53,11 +53,11 @@ block content
 					span(data-annotation="bracket" data-from="2" data-to="5") +45%
 
 	+section("Trend")
-		p A trend arrow runs from the first value to the last. #[code data-at] sets where the callout is along the arrow, from #[code 0] to #[code 1].
+		p A trend arrow runs from the first value to the last. #[code data-at] sets where the badge is along the arrow, from #[code 0] to #[code 1].
 		p Set #[code data-years] to the number of years. Tablechart calculates the yearly rate, and shows a warning in the console if it is different from yours. Your number is always the one shown.
-		p A #[code span] with the class #[code tablechart-caption] is shown above the callout.
+		p A #[code span] with the class #[code tablechart-caption] is shown above the badge.
 
-		+chart
+		+chart(null, '12')
 			figure(data-chart="column")
 				figcaption
 					b Apples per tree

@@ -77,7 +77,7 @@ block content
 			.scheme-toggle(role="group" aria-label="Colour scheme of the example")
 				button(type="button" data-scheme="light" aria-pressed="true") Light
 				button(type="button" data-scheme="dark" aria-pressed="false") Dark
-			+chart
+			+chart(null, '6')
 				figure(data-chart="column")
 					figcaption
 						b Apples sold by variety
@@ -123,7 +123,7 @@ block content
 			}
 
 	+section("Numbers inside bars")
-		p The number inside a bar is dark or light, whichever reads on the colour of the bar. You do not need to set it for light and dark mode. To set it yourself, use #[code --tablechart-bar-ink], #[code --tablechart-up-ink], #[code --tablechart-down-ink] or #[code --tablechart-total-ink].
+		p The number inside a bar is dark or light, whichever reads on the colour of the bar. You do not need to set it for light and dark mode. To set it yourself, use #[code --tablechart-bar-value-color], #[code --tablechart-up-value-color], #[code --tablechart-down-value-color] or #[code --tablechart-total-value-color].
 
 	+section("Background")
 		p The background colour of a chart, #[code --tablechart-surface], is the background the browser uses for the page: white in light mode and dark in dark mode. Lighter lines and slices are mixed with it. If your page has another background, set #[code --tablechart-surface] with two values as well. See #[a(href=url('/styling/background.html')) Background].

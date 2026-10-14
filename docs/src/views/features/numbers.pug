@@ -14,7 +14,7 @@ block content
 	+section("Text around a number")
 		p Tablechart reads the first number in each cell. Text before or after the number is shown with it, such as a currency sign, a percent sign or a footnote mark.
 
-		+chart
+		+chart(null, '5-7')
 			figure(data-chart="column")
 				figcaption: b Price of a bag of apples
 				table
@@ -27,7 +27,7 @@ block content
 	+section("Decimals")
 		p All numbers on a chart have the same number of decimals: the most that any cell has. To show one decimal, write one in at least one cell, such as #[code 3.0].
 
-		+chart
+		+chart(null, '6')
 			figure(data-chart="column")
 				figcaption: b Rainfall in a day
 				table
@@ -42,7 +42,7 @@ block content
 	+section("Thousands")
 		p Write numbers without a thousands separator, such as #[code 12500]. Tablechart adds the separator of the language of the page. A comma or a point in a number is read as the decimal separator, so #[code 12,500] is read as 12.5.
 
-		+chart
+		+chart(null, '5-7')
 			figure(data-chart="bar")
 				figcaption: b Apples picked
 				table
@@ -90,7 +90,7 @@ block content
 	+section("Missing values")
 		p If a cell has no number, such as #[code n/a], the row has no bar. The text of the cell is shown where the bar would be. In a line chart, the line has a gap.
 
-		+chart
+		+chart(null, '6')
 			figure(data-chart="column")
 				figcaption: b Apples picked
 				table

@@ -486,11 +486,16 @@ hr {
 		font-weight: 600;
 	}
 
+	// A name never breaks on a wide screen: the first column wraps between names, so it does not crowd the descriptions.
 	td:first-child {
 		overflow-wrap: anywhere;
 
 		@media (min-width: 769px) {
-			white-space: nowrap;
+			overflow-wrap: normal;
+
+			code {
+				white-space: nowrap;
+			}
 		}
 	}
 }

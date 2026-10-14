@@ -68,9 +68,7 @@ export const assignKeys = (figures: HTMLElement[], langattribute: string | false
 			const n = (used.get(prefix) as number) + 1;
 			used.set(prefix, n);
 			console.warn(
-				`[${LIBRARY_NAME}] Two charts on the page have data-chart-keys="${prefix}". ` +
-					`If two charts use the same keys, they get the same translations. ` +
-					`This one uses "${prefix}-${n}".`
+				`[${LIBRARY_NAME}] Two charts have data-chart-keys="${prefix}", so this one uses "${prefix}-${n}" to keep their translations apart.`
 			);
 			prefix = `${prefix}-${n}`;
 		} else {

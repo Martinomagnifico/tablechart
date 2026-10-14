@@ -14,7 +14,7 @@
 	fill: var(--tablechart-annotation-color, currentColor);
 }
 
-// A 50% radius box, so the callout grows around translated text; the padding keeps the text clear of the curve.
+// A 50% radius box, so the badge grows around translated text; the padding keeps the text clear of the curve.
 .tablechart-badge {
 	position: absolute;
 	transform: translate(-50%, -50%);

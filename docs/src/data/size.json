@@ -1,0 +1,16 @@
+{
+	"size": {
+		"js": 20.72,
+		"css": 4.75,
+		"total": 25.46,
+		"entries": {
+			"init": 20.67,
+			"create": 20.2,
+			"tablechart": 20.72,
+			"tablechart/core": 19.31,
+			"Both entries": 20.92,
+			"Script tag (IIFE)": 20.7,
+			"Stylesheet (CSS)": 4.75
+		}
+	}
+}

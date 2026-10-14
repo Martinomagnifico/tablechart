@@ -31,7 +31,7 @@ block content
 		p If a row has #[code data-kind="total"], its value is shown in the middle, and it is not a slice. If there is no total row, the middle shows the sum of the slices.
 		p Screen readers read the table, not the middle of the ring. So if there is no total row, Tablechart adds a hidden row to the bottom of the table with the sum, named "Total". To use another name, set the #[code totallabel] option. With #[code data-chart-keys], the name gets a translation key that ends in #[code -total].
 
-		+chart
+		+chart(null, '4')
 			figure(data-chart="donut")
 				table
 					tbody
@@ -39,6 +39,35 @@ block content
 							tr(data-kind=row[2])
 								th= row[0]
 								td= row[1]
+
+	+section("A sweep, step by step")
+		p With #[code data-chart-animate="sweep"] and steps, the slices of one step start together, at the same speed. Slices of one step that are next to each other sweep as one. Here the first and third slice are there from the start, and the other two arrive together on the next step, with the same #[code data-fragment-index]. See #[a(href=url('/features/steps.html')) Step by step] and #[a(href=url('/styling/animation.html#grow-or-sweep')) Grow or sweep]. This example is slower, so you can follow it.
+
+		+style.
+			.slow-sweep {
+				--tablechart-animation-element-duration: 1.5s;
+			}
+
+		.card
+			.demo
+				figure.slow-sweep(data-chart="donut" data-chart-animate="sweep")
+					table
+						tbody
+							each row in [['Elstar', '42', false], ['Jonagold', '28', true], ['Braeburn', '18', false], ['Gala', '12', true]]
+								tr(data-fragment=row[2] ? '' : false data-fragment-index=row[2] ? '1' : false)
+									th= row[0]
+									td= row[1]
+			+codeblock('HTML', null, '1,5,7').
+				<figure class="slow-sweep" data-chart="donut" data-chart-animate="sweep">
+					<table>
+						<tbody>
+							<tr><th>Elstar</th><td>42</td></tr>
+							<tr data-fragment data-fragment-index="1"><th>Jonagold</th><td>28</td></tr>
+							<tr><th>Braeburn</th><td>18</td></tr>
+							<tr data-fragment data-fragment-index="1"><th>Gala</th><td>12</td></tr>
+						</tbody>
+					</table>
+				</figure>
 
 	+section("Next")
 		p By default, all slices use one colour, each one a bit lighter. To set a colour for each slice, see #[a(href=url('/styling/colours.html')) Colours].

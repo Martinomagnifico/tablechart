@@ -12,15 +12,15 @@ block content
 				p.lead How fast a chart builds.
 
 	+section("Speed")
-		p Each element takes #[code --tablechart-element-duration], the next one starts after #[code --tablechart-stagger-ratio] of that time, and if the whole chart would take longer than #[code --tablechart-max-duration], the starts move closer together.
+		p Each element takes #[code --tablechart-animation-element-duration], the next one starts after #[code --tablechart-animation-stagger] of that time, and if the whole chart would take longer than #[code --tablechart-animation-max], the starts move closer together.
 
 		+style.
 			.slow {
-				--tablechart-element-duration: 0.9s;
-				--tablechart-stagger-ratio: 0.5;
+				--tablechart-animation-element-duration: 0.9s;
+				--tablechart-animation-stagger: 0.5;
 			}
 
-		+chart
+		+chart(null, '1')
 			figure.slow(data-chart="column")
 				table
 					tbody
@@ -36,20 +36,17 @@ block content
 					th Sets
 			tbody
 				tr
-					td: code --tablechart-element-duration
+					td: code --tablechart-animation-element-duration
 					td The time that one element (a bar, column or point) transitions: 0.5s by default.
 				tr
-					td: code --tablechart-stagger-ratio
-					td When the next element starts. It is a ratio of the #[code --tablechart-element-duration]: 0.24 of it by default. At 1, each element starts when the one before it is finished. At 0, all elements start together.
+					td: code --tablechart-animation-stagger
+					td When the next element starts. It is a ratio of the #[code --tablechart-animation-element-duration]: 0.24 of it by default, 0.6 for a waterfall. At 1, each element starts when the one before it is finished. At 0, all elements start together.
 				tr
-					td: code --tablechart-max-duration
-					td The longest a whole chart may take to build: four times the element time by default, 2s. It is a ceiling, never a target: a small chart is not slowed down. Above it, the starts move closer together; each element keeps its own time. Numbers fade in for at most a quarter of the maximum.
+					td: code --tablechart-animation-max
+					td The longest a whole chart may take to build: four times the element time by default, 2s. It is a ceiling, never a target: a small chart is not slowed down. Above it, the starts move closer together; each element keeps its own time. A waterfall shortens its columns instead, so they keep their order. Numbers fade in for at most a quarter of the maximum.
 				tr
-					td: code --tablechart-circle-duration
-					td How long a donut takes for a full circle: 1.5s by default. A slice takes its share of that.
-				tr
-					td: code --tablechart-easing
-					td The easing of bars, donuts, and lines and areas that grow upwards: #[code cubic-bezier(.26, .86, .44, .985)] by default. A line that builds from left to right does so at an even speed.
+					td: code --tablechart-animation-ease
+					td The easing of bars, donuts, and lines and areas that grow: #[code cubic-bezier(.26, .86, .44, .985)] by default. A line that sweeps does so at an even speed.
 				tr
 					td: code --tablechart-annotation-duration
 					td How long an annotation line takes: 0.6s by default.
@@ -57,10 +54,10 @@ block content
 		p These are CSS variables, so they can be set on a chart, a section or a whole page. Set on a section, the maximum holds for each chart in it.
 
 	+section("Waterfalls")
-		p A waterfall builds as one motion at one speed: each column starts when the one before it ends, its connector draws meanwhile, and the last column slows to a stop. With steps, each step builds on its own. Under the maximum, the whole motion gets shorter.
+		p A waterfall grows column by column, like a column chart, but its stagger is 0.6 by default: each column starts when the one before it is nearly done, so they come one after the other without a pause. Its connector draws as the next column starts. If the whole chart would take longer than the maximum, the columns get shorter, so they keep coming one after the other.
 
 		+chart
-			figure.slow(data-chart="waterfall")
+			figure(data-chart="waterfall")
 				table
 					tbody
 						each row in [['Picked', '74.5', 'total'], ['Windfalls', '28.2'], ['Bruised', '-16.1'], ['Peelings', '-13.3'], ['Pressed', '73.3', 'total']]
@@ -68,10 +65,26 @@ block content
 								th= row[0]
 								td= row[1]
 
+		p With a lower stagger, the columns overlap more. At 1, each column waits until the one before it is finished.
+
+		+style.
+			.overlap {
+				--tablechart-animation-stagger: 0.25;
+			}
+
+		+chart(null, '1')
+			figure.overlap(data-chart="waterfall")
+				table
+					tbody
+						each row in [['Picked', '74.5', 'total'], ['Windfalls', '28.2'], ['Bruised', '-16.1'], ['Peelings', '-13.3'], ['Pressed', '73.3', 'total']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+		p To build a waterfall at one speed instead, see #[a(href="#grow-or-sweep") Grow or sweep].
+
 	+section("Donuts")
-		p A donut draws its ring in one sweep, with the same easing as a bar: fast at the start, settling at the end. A full circle takes #[code --tablechart-circle-duration], 1.5s by default, and each slice takes its own part of the sweep. With a stagger ratio below 1, the slices start sooner and overlap, and each slice eases on its own.
-
-
+		p A donut slice is one element, like a bar: it takes the element time, and the next slice starts after the stagger. So a big slice turns faster than a small one.
 
 		+chart
 			figure(data-chart="donut")
@@ -82,13 +95,13 @@ block content
 								th= row[0]
 								td= row[1]
 
-		p A lower ratio starts the slices sooner, so they grow at the same time.
+		p With a stagger of 1, each slice starts when the one before it is finished.
 		+style.
 			.together {
-				--tablechart-stagger-ratio: 0.6;
+				--tablechart-animation-stagger: 1;
 			}
 
-		+chart
+		+chart(null, '1')
 			figure.together(data-chart="donut")
 				table
 					tbody
@@ -97,29 +110,195 @@ block content
 								th= row[0]
 								td= row[1]
 
+		p To draw the ring in one sweep instead, see #[a(href="#grow-or-sweep") Grow or sweep].
 
-	+section("Lines and areas from below")
-		p A line or area chart builds from left to right. Add #[code data-chart-animate="up"] to the figure to make it grow up from zero instead. The points rise with the line, and the numbers appear when it is done.
+	+section("Grow or sweep")
+		p #[code data-chart-animate] on a figure sets how the chart builds:
 
-		+chart
-			figure(data-chart="area" data-chart-stack data-chart-shape="smooth" data-chart-animate="up" data-chart-legend)
-				table
-					thead
-						tr
-							th
-							th North
-							th South
-					tbody
-						each row in [['2020', '42', '18'], ['2021', '55', '26'], ['2022', '38', '31'], ['2023', '61', '24'], ['2024', '49', '35']]
-							tr
-								th= row[0]
-								td= row[1]
-								td= row[2]
+		table
+			thead
+				tr
+					th Value
+					th What it does
+			tbody
+				tr
+					td: code grow
+					td Each element grows from zero, one after the other. The default for columns, bars, waterfalls and donuts. A waterfall's columns come one after the other.
+				tr
+					td: code sweep
+					td The chart is revealed in one movement. The default for lines and areas. A donut draws its ring in one sweep, and a waterfall builds at one speed. Columns and bars always grow.
 
-		p To make every line and area grow up, set the #[code animate] option to #[code "up"]. Then #[code data-chart-animate="across"] makes one chart build from left to right again. Other chart types build as they always do.
+		h3 Lines
+		p A line sweeps from left to right by default. With #[code grow], it grows from zero as a whole, also below zero. The points move with the line, and the numbers appear when it is done.
+
+		.grid-2
+			div
+				.card
+					.demo
+						figure(data-chart="line" data-chart-shape="smooth")
+							figcaption: b Sweep
+							table
+								tbody
+									each row in [['Jan', '12'], ['Feb', '18'], ['Mar', '-6'], ['Apr', '-11'], ['May', '4'], ['Jun', '15']]
+										tr
+											th= row[0]
+											td= row[1]
+					+codeblock('HTML', null, '1').
+						<figure data-chart="line" data-chart-shape="smooth">
+							<figcaption><b>Sweep</b></figcaption>
+							<table>…</table>
+						</figure>
+			div
+				.card
+					.demo
+						figure(data-chart="line" data-chart-shape="smooth" data-chart-animate="grow")
+							figcaption: b Grow
+							table
+								tbody
+									each row in [['Jan', '12'], ['Feb', '18'], ['Mar', '-6'], ['Apr', '-11'], ['May', '4'], ['Jun', '15']]
+										tr
+											th= row[0]
+											td= row[1]
+					+codeblock('HTML', null, '1').
+						<figure data-chart="line" data-chart-shape="smooth" data-chart-animate="grow">
+							<figcaption><b>Grow</b></figcaption>
+							<table>…</table>
+						</figure>
+
+		h3 Areas
+		p An area works the same way. Stacked areas grow together.
+
+		.grid-2
+			div
+				.card
+					.demo
+						figure(data-chart="area" data-chart-stack data-chart-shape="smooth" data-chart-legend)
+							figcaption: b Sweep
+							table
+								thead
+									tr
+										th
+										th North
+										th South
+								tbody
+									each row in [['2020', '42', '18'], ['2021', '55', '26'], ['2022', '38', '31'], ['2023', '61', '24'], ['2024', '49', '35']]
+										tr
+											th= row[0]
+											td= row[1]
+											td= row[2]
+					+codeblock('HTML', null, '1').
+						<figure data-chart="area" data-chart-stack data-chart-shape="smooth" data-chart-legend>
+							<figcaption><b>Sweep</b></figcaption>
+							<table>…</table>
+						</figure>
+			div
+				.card
+					.demo
+						figure(data-chart="area" data-chart-stack data-chart-shape="smooth" data-chart-animate="grow" data-chart-legend)
+							figcaption: b Grow
+							table
+								thead
+									tr
+										th
+										th North
+										th South
+								tbody
+									each row in [['2020', '42', '18'], ['2021', '55', '26'], ['2022', '38', '31'], ['2023', '61', '24'], ['2024', '49', '35']]
+										tr
+											th= row[0]
+											td= row[1]
+											td= row[2]
+					+codeblock('HTML', null, '1').
+						<figure data-chart="area" data-chart-stack data-chart-shape="smooth" data-chart-animate="grow" data-chart-legend>
+							<figcaption><b>Grow</b></figcaption>
+							<table>…</table>
+						</figure>
+
+		h3 Donuts
+		p A donut grows slice by slice by default. With #[code sweep], the ring is drawn in one movement at one speed, and the last slice slows to a stop. It takes as long as the slices would take one after the other.
+
+		.grid-2
+			div
+				.card
+					.demo
+						figure(data-chart="donut")
+							figcaption: b Grow
+							table
+								tbody
+									each row in [['Elstar', '42'], ['Jonagold', '28'], ['Braeburn', '18'], ['Gala', '12']]
+										tr
+											th= row[0]
+											td= row[1]
+					+codeblock('HTML', null, '1').
+						<figure data-chart="donut">
+							<figcaption><b>Grow</b></figcaption>
+							<table>…</table>
+						</figure>
+			div
+				.card
+					.demo
+						figure(data-chart="donut" data-chart-animate="sweep")
+							figcaption: b Sweep
+							table
+								tbody
+									each row in [['Elstar', '42'], ['Jonagold', '28'], ['Braeburn', '18'], ['Gala', '12']]
+										tr
+											th= row[0]
+											td= row[1]
+					+codeblock('HTML', null, '1').
+						<figure data-chart="donut" data-chart-animate="sweep">
+							<figcaption><b>Sweep</b></figcaption>
+							<table>…</table>
+						</figure>
+
+		h3 Waterfalls
+		p A waterfall grows column by column by default, each column eased. With #[code sweep], it builds at one speed: only the last one slows to a stop. The difference is small: the left example has easing for every column, the right one has the columns grow at an even speed, and only the last one slows down. Both examples are slower than the default, so this is easier to see.
+
+		+style.
+			.slow-waterfall {
+				--tablechart-animation-element-duration: 1.5s;
+			}
+
+		.grid-2
+			div
+				.card
+					.demo
+						figure.slow-waterfall(data-chart="waterfall")
+							figcaption: b Grow
+							table
+								tbody
+									each row in [['Picked', '74.5', 'total'], ['Windfalls', '28.2'], ['Bruised', '-16.1'], ['Peelings', '-13.3'], ['Pressed', '73.3', 'total']]
+										tr(data-kind=row[2])
+											th= row[0]
+											td= row[1]
+					+codeblock('HTML', null, '1').
+						<figure class="slow-waterfall" data-chart="waterfall">
+							<figcaption><b>Grow</b></figcaption>
+							<table>…</table>
+						</figure>
+			div
+				.card
+					.demo
+						figure.slow-waterfall(data-chart="waterfall" data-chart-animate="sweep")
+							figcaption: b Sweep
+							table
+								tbody
+									each row in [['Picked', '74.5', 'total'], ['Windfalls', '28.2'], ['Bruised', '-16.1'], ['Peelings', '-13.3'], ['Pressed', '73.3', 'total']]
+										tr(data-kind=row[2])
+											th= row[0]
+											td= row[1]
+					+codeblock('HTML', null, '1').
+						<figure class="slow-waterfall" data-chart="waterfall" data-chart-animate="sweep">
+							<figcaption><b>Sweep</b></figcaption>
+							<table>…</table>
+						</figure>
+
+		p To set it for every chart, use the #[code animate] option. Then #[code data-chart-animate] on a figure sets it for that one chart. A line or area with triggered steps (like from Reveal.js fragments) always sweeps.
 
 		+codeblock('JS').
-			init({ animate: "up" });
+			init({ animate: "grow" });
+
+		p #[code "up"] and #[code "across"] are the old names of #[code "grow"] and #[code "sweep"], and still work until the next minor version.
 
 	+section("No animation")
 		p To show charts without animation, set #[code animate] to #[code false]. If the visitor prefers reduced motion, charts build without animation anyway.

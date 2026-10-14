@@ -39,7 +39,7 @@ const trend = (area: boolean): ChartType => ({
 		const band = rows.length > 1 ? cx(1) - cx(0) : cx(0) * 2;
 
 		// Where an "up" animation grows from, and how far each point rises.
-		svg.style.setProperty("--tablechart-base", `${fixed(baseline)}px`);
+		svg.style.setProperty("--_base", `${fixed(baseline)}px`);
 		const riseFrom = (pointY: number) => `--rise:${fixed(baseline - pointY)}px; `;
 
 		// In the helpers below, `s` is a series and `i` a row.

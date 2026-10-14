@@ -66,7 +66,7 @@ export const column: ChartType = {
 			geo.plot.dataset.grouped = "";
 			// All numbers shrink together to fit above their bars, or all are left out.
 			const shown = geo.seriesValues.flat().filter((label) => label.dataset.missing === undefined);
-			const fit = fitTogether(geo.plot, shown, (label) => ({ size: sizeOf(label).width * unit, room: layout.size + layout.gap * 0.5 }), "--tablechart-fit");
+			const fit = fitTogether(geo.plot, shown, (label) => ({ size: sizeOf(label).width * unit, room: layout.size + layout.gap * 0.5 }), "--_fit");
 			geo.rows.forEach((row, i) => {
 				geo.series.forEach((_one, s) => {
 					const cell = row.cells[s] ?? row.cells[0];

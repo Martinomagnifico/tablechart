@@ -2,7 +2,7 @@ import { BADGE_CLASS, LIBRARY_NAME } from "../config";
 import { numberIn } from "../functions/format";
 import type { Check, Geometry } from "../types";
 
-/** HTML rather than SVG, so the callout grows around its text in any language. */
+/** HTML rather than SVG, so the badge grows around its text in any language. */
 export const createBadge = (spec: HTMLElement, plot: HTMLElement): HTMLElement => {
 	const badge = document.createElement("span");
 	badge.className = BADGE_CLASS;
@@ -36,7 +36,7 @@ export const checkAgainst = (
 	if (!agrees) {
 		console.warn(
 			`[${LIBRARY_NAME}] An annotation reads ${stated}%, but ${description} is ` +
-				`${computed.toFixed(1)}%. The chart shows what you wrote; this is only a check.`
+				`${computed.toFixed(1)}%. The chart shows your number.`
 		);
 	}
 };

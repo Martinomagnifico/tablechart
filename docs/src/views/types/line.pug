@@ -30,7 +30,7 @@ block content
 	+section("Smooth")
 		p Add #[code data-chart-shape="smooth"] to the figure. The line is a curve through every point. It never goes higher or lower than the points on either side of it, so the curve shows no peak or dip that is not in the data, and a flat stretch stays flat.
 
-		+chart
+		+chart(null, '1')
 			figure(data-chart="line" data-chart-shape="smooth")
 				figcaption
 					b Rainfall at the orchard
@@ -45,11 +45,11 @@ block content
 
 		p To make every line and area smooth, set the #[code shape] option to #[code "smooth"]. Then #[code data-chart-shape="straight"] makes one chart straight again.
 
-	+section("Grow up")
-		p Add #[code data-chart-animate="up"] to the figure. The line grows up from zero instead of from left to right. The points rise with it, and the numbers appear when it is done.
+	+section("Grow")
+		p Add #[code data-chart-animate="grow"] to the figure. The line grows from zero instead of from left to right. The points move with it, and the numbers appear when it is done.
 
-		+chart
-			figure(data-chart="line" data-chart-shape="smooth" data-chart-animate="up")
+		+chart(null, '1')
+			figure(data-chart="line" data-chart-shape="smooth" data-chart-animate="grow")
 				figcaption
 					b Rainfall at the orchard
 					br
@@ -61,13 +61,13 @@ block content
 								th= row[0]
 								td= row[1]
 
-		p To make every line and area grow up, set the #[code animate] option to #[code "up"]. A chart with triggered steps (like from Reveal.js fragments) still builds from left to right. See #[a(href=url('/styling/animation.html')) Animation].
+		p To make every line and area grow, set the #[code animate] option to #[code "grow"]. A chart with triggered steps (like from Reveal.js fragments) still builds from left to right. See #[a(href=url('/styling/animation.html')) Animation].
 
 	+section("Below zero")
 		p A line can cross zero. A number below zero is shown under its point, and a grey line marks zero.
 
-		+chart
-			figure(data-chart="line" data-chart-shape="smooth" data-chart-animate="up")
+		+chart(null, '7-8,10')
+			figure(data-chart="line" data-chart-shape="smooth" data-chart-animate="grow")
 				figcaption
 					b Monthly result
 					br
@@ -82,7 +82,7 @@ block content
 	+section("Several lines")
 		p Each value column is a line. The column header is the name of the line, shown at the end of the line.
 
-		+chart
+		+chart(null, '5')
 			figure(data-chart="line")
 				figcaption: b Apples per tree
 				table
@@ -129,7 +129,7 @@ block content
 
 		p To choose the point of a line, add #[code data-marker] to its column header: #[code circle], #[code square] or #[code diamond]. Add #[code open] for an open point, such as #[code data-marker="diamond open"].
 
-		+chart
+		+chart(null, '4')
 			figure(data-chart="line" data-chart-legend)
 				table
 					thead
@@ -149,7 +149,7 @@ block content
 	+section("Dashed and dotted lines")
 		p Add #[code data-line="dashed"] or #[code data-line="dotted"] to the column header of a line. The legend shows the same line.
 
-		+chart
+		+chart(null, '5')
 			figure(data-chart="line" data-chart-legend)
 				figcaption: b Apples per tree
 				table
@@ -169,13 +169,13 @@ block content
 								td= row[3]
 								td= row[4]
 
-		p #[code --tablechart-dash] and #[code --tablechart-dot] set the pattern, in pixels: #[code 6 4] and #[code 0 4] by default.
+		p #[code --tablechart-series-dash] and #[code --tablechart-series-dot] set the pattern, in pixels: #[code 6 4] and #[code 0 4] by default.
 		p To give each line its own colour, use a #[a(href=url('/styling/colours.html')) palette].
 
 	+section("Highlight a line")
 		p Add #[code data-kind="focus"] to the header of a line. That line keeps its colour and shows its numbers. The other lines are shown fainter.
 
-		+chart
+		+chart(null, '4')
 			figure(data-chart="line")
 				table
 					thead
@@ -195,7 +195,7 @@ block content
 	+section("Steps")
 		p Add #[code data-chart-shape="step"] to the figure. Each value is a flat line across the width of its row, and the line goes straight up or down to the next row. A step line has no points. A number is shown only where the value changes, in the middle of the rows that have that value.
 
-		+chart
+		+chart(null, '1')
 			figure(data-chart="line" data-chart-shape="step")
 				figcaption
 					b Price of a bag of apples
@@ -214,7 +214,7 @@ block content
 	+section("Missing values")
 		p If a cell has no number, such as #[code n/a], the line has a gap there.
 
-		+chart
+		+chart(null, '6')
 			figure(data-chart="line")
 				table
 					tbody

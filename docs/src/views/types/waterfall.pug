@@ -14,7 +14,7 @@ block content
 	+section("Steps and totals")
 		p Add #[code data-kind="total"] to a row to make it a total. A total starts at the baseline. The other rows are steps up or down from the running total. A negative number is a step down.
 
-		+chart
+		+chart(null, '5,9')
 			figure(data-chart="waterfall")
 				figcaption
 					b What happened to the crop
@@ -30,7 +30,7 @@ block content
 	+section("Totals are not calculated")
 		p See that the last column does not line up? That is not Tablechart. That is your data. The combined totals should be 73.3, not 70.3. Tablechart just takes #[em your] values, it does #[em not] check if those add up correctly and adjust the chart. The console will show a warning if there is a mismatch, because it might be hard to see it in the chart itself.
 
-		+chart
+		+chart(null, '8')
 			figure(data-chart="waterfall")
 				table
 					tbody
@@ -45,7 +45,7 @@ block content
 	+section("Below zero")
 		p A waterfall can go below zero. The baseline moves up, and steps and totals below it hang down from it.
 
-		+chart
+		+chart(null, '6,8-9')
 			figure(data-chart="waterfall")
 				figcaption
 					b Result of the year
@@ -64,7 +64,7 @@ block content
 	+section("Scale break")
 		p If the totals are much taller than the steps, a break in the scale below the steps shows part of the scale smaller, so the steps have room. See #[a(href=url('/features/scale-break.html')) Scale break].
 
-		+chart
+		+chart(null, '11')
 			figure(data-chart="waterfall")
 				table
 					tbody
