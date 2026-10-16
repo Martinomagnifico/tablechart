@@ -131,6 +131,19 @@ export interface ChartType {
 	/** Default: one bar per row from the baseline. */
 	segments?: (rows: Row[]) => Segment[];
 	draw: (geo: Geometry) => void;
+	/** The lines of the tooltip of a row. Default: each value with the name of its series, and the total of a stack. */
+	tooltip?: (state: ChartState, index: number, config: Config) => TooltipLine[];
+}
+
+/** One line of a tooltip, under the name of the row. */
+export interface TooltipLine {
+	/** The name of the series; empty for a chart with one series. */
+	name: string;
+	value: string;
+	/** A small key in the colour of the series. */
+	colour?: string;
+	/** The shape of that key, as in the legend: a line with its point, or a box. */
+	sample?: { marker: string | null; open: boolean; line: string | null; box: boolean };
 }
 
 export interface HeadroomInput {

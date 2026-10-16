@@ -17,7 +17,6 @@ import {
 	PLOT_CLASS,
 	HOLE_CLASS,
 	LIBRARY_NAME,
-	POINTER_CLASS,
 	SR_CLASS,
 	MINUS_CLASS,
 	SHOWN_CLASS,
@@ -33,6 +32,7 @@ import type { Squeeze } from "./functions/scale";
 import { readSeries, readTable } from "./functions/read-table";
 import { cutOut, htmlEl, short, svgEl } from "./functions/svg";
 import { applySteps, makeControls, planSteps, stepTo } from "./steps";
+import { attachTooltip, releaseTooltip } from "./tooltip";
 import type { AnnotationType, ChartState, ChartType, Geometry, Motion, Row, Shape } from "./types";
 
 const CHARTS: Record<string, ChartType> = { area, bar, column, donut, line, waterfall };
@@ -300,6 +300,16 @@ export const build = (
 			: null;
 	if (controls) figure.appendChild(controls);
 
+	// The table under the chart, on screen, in print, or in print when numbers are left out.
+	const asked = figure.getAttribute("data-chart-table");
+	const table = asked && TABLES.includes(asked) ? asked : config.table;
+	if (table === "never") figure.removeAttribute("data-table");
+	else {
+		figure.setAttribute("data-table", table);
+		const own = figure.querySelector(":scope > table");
+		if (own) figure.append(own);
+	}
+
 	const annotations = Array.from(figure.querySelectorAll<HTMLElement>("[data-annotation]"))
 		.map((spec) => {
 			const name = spec.getAttribute("data-annotation") as string;
@@ -357,12 +367,16 @@ export const build = (
 		if (go) stepTo(state, state.step + (go === "next" ? 1 : -1));
 	});
 	stepTo(state, 0, true);
-	if (config.hover && figure.getAttribute("data-chart-hover") !== "false") pointAt(state);
+	// `hover` and `data-chart-hover` are the old names.
+	const own = figure.getAttribute("data-chart-tooltip") ?? figure.getAttribute("data-chart-hover");
+	const tooltip = own === "false" ? false : own === "auto" ? "auto" : own !== null ? true : config.hover === false ? false : config.tooltip;
+	if (tooltip) attachTooltip(state, config, tooltip === "auto");
 	relabel(state, config);
 	return state;
 };
 
 const MOTIONS: Record<string, Motion> = { grow: "grow", sweep: "sweep" };
+const TABLES = ["never", "auto", "print", "always"];
 // `up` and `across` are the old names of `grow` and `sweep`, for lines and areas.
 const LINE_MOTIONS: Record<string, Motion> = { ...MOTIONS, up: "grow", across: "sweep" };
 
@@ -423,6 +437,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	// Undo what the last layout did to the size of the text, then read every size at once, before anything is placed.
 	for (const node of [...seriesValues.flat(), ...state.totals]) delete node.dataset.place;
 	plot.style.removeProperty("--_fit");
+	state.categories[0]?.parentElement?.style.removeProperty("--_beside");
 	measureAll([...seriesValues.flat(), ...state.totals, ...names, ...state.categories, ...annotations.map((a) => a.badge)]);
 
 	const labelHeight = (values[0] ? sizeOf(values[0]).height : 0) * unit;
@@ -698,6 +713,21 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	});
 	cutOut(svg, holes, VIEWBOX_WIDTH, height);
 
+	// A number that is not shown, for lack of room or by design, so `data-chart-table="auto"` prints the table.
+	// A cell without a number, such as "n/a", has nothing to leave out; nor has a donut's total, which is in the middle.
+	const skip = (label: HTMLElement) =>
+		label.dataset.missing !== undefined || (type.centre && rows[Number(label.dataset.row) - 1]?.isTotal);
+	const seen = (label: HTMLElement) => label.dataset.place !== "none" && !label.hasAttribute("data-left-out");
+	// On a step chart, one number stands for the rows that share its value.
+	const covered = (label: HTMLElement, all: HTMLElement[]) => {
+		const row = Number(label.dataset.row);
+		return all.some((one) => seen(one) && Number(one.dataset.row) <= row && row <= Number(one.dataset.rowEnd ?? one.dataset.row));
+	};
+	state.figure.toggleAttribute(
+		"data-left-out",
+		[...seriesValues, state.totals].some((all) => all.some((label) => !skip(label) && !seen(label) && !covered(label, all)))
+	);
+
 	return true;
 };
 
@@ -726,6 +756,7 @@ export const relabel = (state: ChartState, config: Config): void => {
 
 /** Removes what `build` added, so the chart can be built again. */
 export const unbuild = (state: ChartState): void => {
+	releaseTooltip(state);
 	state.plot.remove();
 	state.categories[0]?.parentElement?.remove();
 	state.figure.querySelector(`:scope > .${LEGEND_CLASS}`)?.remove();
@@ -735,53 +766,4 @@ export const unbuild = (state: ChartState): void => {
 /** One class, `is-shown`, starts the whole build. */
 export const setShown = (state: ChartState, shown: boolean): void => {
 	state.figure.classList.toggle(SHOWN_CLASS, shown);
-	// A chart that builds again has its numbers arrive in turn again.
-	if (!shown) state.plot.removeAttribute("data-pointed");
-};
-
-/** Pointing at a row shows its numbers that were left out for lack of room. */
-const pointAt = (state: ChartState): void => {
-	const { plot } = state;
-	const labels = () => [...state.seriesValues.flat(), ...state.totals];
-	const covers = (label: HTMLElement, row: number) => {
-		const from = Number(label.dataset.row);
-		const to = Number(label.dataset.rowEnd ?? from);
-		return row >= from && row <= to;
-	};
-	plot.setAttribute("data-hover", "");
-	// A faint band behind the row that is pointed at.
-	const band = document.createElement("div");
-	band.className = POINTER_CLASS;
-	plot.prepend(band);
-	const clear = () => {
-		plot.removeAttribute("data-active");
-		for (const label of labels()) label.removeAttribute("data-active");
-	};
-	const activate = (event: PointerEvent) => {
-		if (!plot.classList.contains(PLACED_CLASS) || !state.rowAt) return;
-		const box = plot.getBoundingClientRect();
-		// The plot can be scaled with a CSS transform.
-		const scale = box.width / plot.offsetWidth || 1;
-		const index = state.rowAt((event.clientX - box.left) / scale, (event.clientY - box.top) / scale);
-		const row = index === null ? null : index + 1;
-		const shown = (label: HTMLElement) => label.dataset.place !== "none";
-		const mine = row === null ? [] : labels().filter((label) => covers(label, row) && shown(label));
-		const hidden = labels().some((label) => label.hasAttribute("data-left-out") && shown(label));
-		if (!hidden || !mine.length) return clear();
-		// From now on, numbers show and hide at once, not in turn.
-		plot.setAttribute("data-pointed", "");
-		plot.setAttribute("data-active", String(row));
-		const [left, top, width, height] = state.rowBox?.((row as number) - 1) ?? [0, 0, 0, 0];
-		Object.assign(band.style, { left: `${left}%`, top: `${top}%`, width: `${width}%`, height: `${height}%` });
-		for (const label of labels()) label.toggleAttribute("data-active", mine.includes(label));
-	};
-	plot.addEventListener("pointermove", activate);
-	plot.addEventListener("pointerdown", activate);
-	plot.addEventListener("pointerleave", (event) => {
-		// A tap ends with the pointer leaving; the numbers stay until the next tap.
-		if (event.pointerType === "mouse") clear();
-	});
-	document.addEventListener("pointerdown", (event) => {
-		if (!plot.contains(event.target as Node)) clear();
-	});
 };

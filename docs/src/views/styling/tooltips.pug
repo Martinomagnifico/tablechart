@@ -1,0 +1,107 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Styling | Tooltips"
+	- pagedescription = "The background, text, border, corners and shadow of the tooltip in Tablechart."
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Tooltips
+				p.lead The background, text, border, corners and shadow of the tooltip.
+
+	+section("Where to set the variables")
+		p The tooltip is not inside the chart in the page: there is one tooltip for the whole page, at the end of the page. So it reads the variables of the chart when it opens. Set them on the chart, on a class or on #[code :root], as other variables. The font, the text size and the colour scheme come from the chart too.
+		p The charts on this page show all their numbers, so they have #[code data-chart-tooltip="true"] to have a tooltip anyway. Point at them to see it. See #[a(href=url('/features/tooltips.html')) Tooltips] for what a tooltip shows.
+
+	+section("The variables")
+		table
+			thead
+				tr
+					th Variable
+					th Sets
+			tbody
+				tr
+					td: code --tablechart-tooltip-surface
+					td The background: white by default, and in dark mode a little lighter than the chart's background
+				tr
+					td: code --tablechart-tooltip-color
+					td The text colour: the chart's text colour by default
+				tr
+					td: code --tablechart-tooltip-border
+					td The border: a thin line in the text colour by default
+				tr
+					td: code --tablechart-tooltip-radius
+					td The corners: 0.4em by default
+				tr
+					td: code --tablechart-tooltip-padding
+					td The space inside the tooltip: 0.45em 0.7em by default
+				tr
+					td: code --tablechart-tooltip-shadow
+					td The shadow under the tooltip, so it stands out from what is behind it
+
+	+section("A dark tooltip")
+		p A dark tooltip stands out on a light page. The dots before the names keep the colours of the lines or columns, so check that they show on the dark background.
+
+		+style.
+			.dark-tooltip {
+				--tablechart-tooltip-surface: #16323f;
+				--tablechart-tooltip-color: #f3efe9;
+				--tablechart-tooltip-border: none;
+				--tablechart-color-1: #7fb03f;
+				--tablechart-color-2: #e0a458;
+			}
+
+		+chart(null, '1')
+			figure.dark-tooltip(data-chart="column" data-chart-tooltip="true")
+				table
+					thead
+						tr
+							th Year
+							th Farm shop
+							th Market
+					tbody
+						each row in [['2023', '64', '38'], ['2024', '71', '45'], ['2025', '69', '57']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+	+section("A flat tooltip")
+		p Without a shadow, a border in the colour of the chart sets the tooltip apart. Square corners and more padding make it a small card.
+
+		+style.
+			.flat-tooltip {
+				--tablechart-tooltip-shadow: none;
+				--tablechart-tooltip-border: 2px solid #2f6f7e;
+				--tablechart-tooltip-radius: 0;
+				--tablechart-tooltip-padding: 0.6em 0.9em;
+			}
+
+		+chart(null, '1')
+			figure.flat-tooltip(data-chart="line" data-chart-legend data-chart-tooltip="true")
+				table
+					thead
+						tr
+							th Year
+							th North
+							th(data-line="dashed") South
+					tbody
+						each row in [['2016', '41', '30'], ['2019', '58', '39'], ['2022', '77', '52'], ['2025', '105', '61']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+	+section("Light and dark")
+		p The tooltip follows the colour scheme of the chart. To set a colour for each scheme, use #[code light-dark()] in a variable, as for the chart itself. See #[a(href=url('/styling/light-dark.html')) Light and dark].
+
+		+codeblock('CSS').
+			:root {
+				--tablechart-tooltip-surface: light-dark(#ffffff, #16323f);
+				--tablechart-tooltip-color: light-dark(#16323f, #f3efe9);
+			}
+
+	+section("Next")
+		p See #[a(href=url('/reference/variables.html')) CSS variables] for all variables.

@@ -144,7 +144,7 @@ block content
 								td= row[1]
 
 	+section("Stacked areas")
-		p Add #[code data-chart-stack] to the figure. Each area starts on top of the one before it, the first value column at the bottom. A value below zero takes its area down from the one before it. Each number is shown in the middle of its area, if there is room for it. If you point at the row, or tap it, the numbers of that row are shown.
+		p Add #[code data-chart-stack] to the figure. Each area starts on top of the one before it, the first value column at the bottom. A value below zero takes its area down from the one before it. Each number is shown in the middle of its area, if there is room for it. If you point at the row, or tap it, a tooltip shows the numbers of that row.
 
 		+chart(null, '1')
 			figure(data-chart="area" data-chart-stack)
@@ -166,7 +166,7 @@ block content
 								td= row[2]
 
 		p Stacked areas do not overlap, so their default opacity is #[code 0.5].
-		p In a stack, each area adds its value to the one before it, also below zero. The top line is the total. A number of a part below zero is shown when you point at its row, so it does not cover the number of the area under it.
+		p In a stack, each area adds its value to the one before it, also below zero. The top line is the total. A number of a part below zero is in the tooltip of its row, so it does not cover the number of the area under it.
 
 		+chart
 			figure(data-chart="area" data-chart-stack)
@@ -188,7 +188,7 @@ block content
 								td= row[2]
 
 	+section("Steps")
-		p Add #[code data-chart-shape="step"] to the figure. Each value is flat across the width of its row, and the line goes straight up or down to the next row. A number is shown only where the value changes, in the middle of the rows that have that value. If a number is wider than those rows, it is left out. If you point at the row, or tap it, the numbers of that row are shown.
+		p Add #[code data-chart-shape="step"] to the figure. Each value is flat across the width of its row, and the line goes straight up or down to the next row. A number is shown only where the value changes, in the middle of the rows that have that value. If a number is wider than those rows, it is left out. If you point at the row, or tap it, a tooltip shows the numbers of that row.
 
 		+chart(null, '1')
 			figure(data-chart="area" data-chart-stack data-chart-shape="step" data-chart-legend)

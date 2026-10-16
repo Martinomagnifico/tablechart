@@ -51,12 +51,9 @@
 		display: none;
 	}
 
-	// Hidden rather than removed, so it can be measured and shown when its row is pointed at.
+	// Hidden rather than removed, so it can still be measured. The tooltip of its row shows it.
 	&[data-left-out] {
 		visibility: hidden;
-	}
-	&[data-active] {
-		visibility: visible;
 	}
 	&[data-place="inside"][data-kind="up"] {
 		color: var(--tablechart-up-value-color, var(--tablechart-up-ink, #{ink("var(--tablechart-up-color, #{$barfill})")}));
@@ -106,6 +103,19 @@
 		mask-size: contain;
 		mask-repeat: no-repeat;
 	}
+	&[data-swatch="box"]::before {
+		width: 0.7em;
+		height: 0.7em;
+		vertical-align: -0.05em;
+		border-radius: 0.15em;
+		background: #{$seriesink};
+		mask: none;
+	}
+}
+
+// The line and point of each sample, for the legend and the tooltip.
+.tablechart-name[data-place="legend"],
+.tablechart-tooltip-key[data-sample] {
 	--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H24'/%3E%3C/svg%3E");
 	&[data-line="dashed"] {
 		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H24' stroke-dasharray='4 2.5' stroke-linecap='butt'/%3E%3C/svg%3E");
@@ -152,15 +162,6 @@
 	&[data-marker="diamond"][data-open][data-line="dotted"] {
 		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H7.9 M16.1 6H24' stroke-dasharray='0 3'/%3E%3C/svg%3E");
 	}
-
-	&[data-swatch="box"]::before {
-		width: 0.7em;
-		height: 0.7em;
-		vertical-align: -0.05em;
-		border-radius: 0.15em;
-		background: #{$seriesink};
-		mask: none;
-	}
 }
 
 // One equal column per bar, matching the plot's bands.
@@ -201,9 +202,14 @@
 		padding: 0;
 		text-align: right;
 		width: max-content;
-		max-width: var(--tablechart-name-max, 40%);
+		max-width: min(var(--tablechart-name-max, 40%), var(--_beside, 100%));
+		// Never narrower than its longest word, and only a word of six letters or more is hyphenated, so "Jan" stays whole.
+		min-width: min-content;
 		text-wrap: balance;
 		hyphens: auto;
+		hyphenate-limit-chars: 6 3 3;
+		-webkit-hyphenate-limit-before: 3;
+		-webkit-hyphenate-limit-after: 3;
 		overflow-wrap: break-word;
 		transform: translate(-100%, -50%);
 	}

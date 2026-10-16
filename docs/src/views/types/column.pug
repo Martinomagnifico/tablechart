@@ -158,7 +158,7 @@ block content
 				--tablechart-bar-color: #7fb03f;
 			}
 
-		p If the numbers are wider than their columns, they all get smaller together, down to 70% of their size. If they still do not fit, none of them are shown. If you point at the row, or tap it, the numbers of that row are shown.
+		p If the numbers are wider than their columns, they all get smaller together, down to 70% of their size. If they still do not fit, none of them are shown. If you point at the row, or tap it, a tooltip shows the numbers of that row.
 
 	+section("Stacked columns")
 		p Add #[code data-chart-stack] to the figure. The values of a row are shown on top of each other, the first value column at the bottom. Values below zero are stacked down from the baseline. The total of the row is above the column.
@@ -182,7 +182,7 @@ block content
 								td= row[1]
 								td= row[2]
 
-		p A number is shown inside its part of the column if it fits. If not, it is left out. If you point at the row, or tap it, the numbers of that row are shown.
+		p A number is shown inside its part of the column if it fits. If not, it is left out. If you point at the row, or tap it, a tooltip shows the numbers of that row.
 		p Below zero, the parts of a stack go down from the baseline. The total is the sum of all parts, above the column, or under it if the whole stack is below zero.
 
 		+chart

@@ -27,10 +27,10 @@ export const CENTRE_CLASS = "tablechart-centre";
 export const LEADER_CLASS = "tablechart-leader";
 export const BREAK_CLASS = "tablechart-break";
 export const PLACED_CLASS = "is-placed";
-export const POINTER_CLASS = "tablechart-pointer";
 export const SR_CLASS = "tablechart-sr";
 export const MINUS_CLASS = "tablechart-minus";
 export const SHOWN_CLASS = "is-shown";
+export const PRINTING_CLASS = "is-printing";
 // A chart in a sequence that has not had its turn: the whole figure waits hidden.
 export const QUEUED_CLASS = "tablechart-queued";
 export const CONTROLS_CLASS = "tablechart-controls";
@@ -62,8 +62,12 @@ export interface Config {
 	shape: "straight" | "step" | "smooth";
 	/** Names of several lines in a legend instead of at the end of each line. A figure overrides it with `data-chart-legend`. */
 	legend: boolean;
-	/** Pointing at a row shows numbers that were left out for lack of room. A figure turns it off with `data-chart-hover="false"`. */
-	hover: boolean;
+	/** A tooltip with the values of a row that is pointed at or tapped: `"auto"`, the default, only on a chart that does not show all its numbers; `true` always; `false` never. A figure overrides it with `data-chart-tooltip`. */
+	tooltip: boolean | "auto";
+	/** The old name of `tooltip`, until the next minor version. */
+	hover?: boolean;
+	/** The table under the chart: `"always"`, only in `"print"`, in print when numbers are left out (`"auto"`), or `"never"`. A figure overrides it with `data-chart-table`. */
+	table: "never" | "auto" | "print" | "always";
 	/** The name of the total that a donut without a total row works out, for screen readers. */
 	totallabel: string;
 	/** Previous and Next buttons under a chart that steps (`data-fragment`). `false` leaves them out, for buttons of your own. */
@@ -94,7 +98,8 @@ export const defaultConfig: Config = {
 	labels: "outside",
 	shape: "straight",
 	legend: false,
-	hover: true,
+	tooltip: "auto",
+	table: "never",
 	totallabel: "Total",
 	controls: true,
 	previouslabel: "Previous",

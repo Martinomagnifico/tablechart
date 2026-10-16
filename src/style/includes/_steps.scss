@@ -7,72 +7,75 @@ $shown: "clamp(0, var(--_step, 0) - var(--step, -1), 1)";
 // A line and its area are revealed together, up to the last row shown (`--reveal`).
 $reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px -10px)";
 
-:where([data-animate][data-steps]) {
-	:where(.tablechart-series),
-	:where(.tablechart-area-fill > *) {
-		clip-path: inset(-10px calc(100% + 10px) -10px -10px);
-		transition: clip-path #{$duration} ease;
+// On screen only, as the build animation: on paper every step is shown.
+@media screen {
+	:where([data-animate][data-steps]) {
+		:where(.tablechart-series),
+		:where(.tablechart-area-fill > *) {
+			clip-path: inset(-10px calc(100% + 10px) -10px -10px);
+			transition: clip-path #{$duration} ease;
+		}
+		:where(.tablechart-area-fill) {
+			opacity: 1;
+			transition: none;
+		}
+		// A piece of a stack on a step of its own grows from the piece under it.
+		:where(.tablechart-piece) {
+			transform-box: fill-box;
+			transform-origin: bottom;
+			transition: transform #{$duration} #{$easing};
+			transition-delay: calc(var(--i, 0) * #{$stagger});
+		}
+		:where(.tablechart-piece[data-grow="right"]) {
+			transform-origin: left;
+		}
+		:where(.tablechart-piece[data-grow="down"]) {
+			transform-origin: top;
+		}
+		:where(.tablechart-piece[data-grow="left"]) {
+			transform-origin: right;
+		}
 	}
-	:where(.tablechart-area-fill) {
-		opacity: 1;
-		transition: none;
-	}
-	// A piece of a stack on a step of its own grows from the piece under it.
-	:where(.tablechart-piece) {
-		transform-box: fill-box;
-		transform-origin: bottom;
-		transition: transform #{$duration} #{$easing};
-		transition-delay: calc(var(--i, 0) * #{$stagger});
-	}
-	:where(.tablechart-piece[data-grow="right"]) {
-		transform-origin: left;
-	}
-	:where(.tablechart-piece[data-grow="down"]) {
-		transform-origin: top;
-	}
-	:where(.tablechart-piece[data-grow="left"]) {
-		transform-origin: right;
-	}
-}
 
-:where([data-animate][data-steps].is-shown) {
-	:where(.tablechart-bar) {
-		transform: scaleY(#{$shown});
-	}
-	:where(.tablechart-bar:is([data-grow="right"], [data-grow="left"])) {
-		transform: scaleX(#{$shown});
-	}
-	:where(.tablechart-piece) {
-		transform: scaleY(#{$shown});
-	}
-	:where(.tablechart-piece:is([data-grow="right"], [data-grow="left"])) {
-		transform: scaleX(#{$shown});
-	}
-	:where(.tablechart-value),
-	:where(.tablechart-name),
-	:where(.tablechart-head),
-	:where(.tablechart-badge),
-	:where(.tablechart-centre),
-	:where(.tablechart-point),
-	:where(.tablechart-hole) {
-		opacity: #{$shown};
-	}
-	:where(.tablechart-leader),
-	:where(.tablechart-break[data-part="edge"]) {
-		stroke-opacity: #{$shown};
-	}
-	:where(.tablechart-line) {
-		stroke-dashoffset: calc(var(--len) * (1 - #{$shown}));
-	}
-	:where(.tablechart-connector) {
-		clip-path: inset(-10px calc((1 - #{$shown}) * (100% + 20px) - 10px) -10px -10px);
-	}
-	:where(.tablechart-series),
-	:where(.tablechart-area-fill > *) {
-		clip-path: #{$reveal};
-	}
-	:where(.tablechart-slice) {
-		stroke-dasharray: calc(var(--arc) * #{$shown}) calc(var(--circ) - var(--arc) * #{$shown});
+	:where([data-animate][data-steps].is-shown) {
+		:where(.tablechart-bar) {
+			transform: scaleY(#{$shown});
+		}
+		:where(.tablechart-bar:is([data-grow="right"], [data-grow="left"])) {
+			transform: scaleX(#{$shown});
+		}
+		:where(.tablechart-piece) {
+			transform: scaleY(#{$shown});
+		}
+		:where(.tablechart-piece:is([data-grow="right"], [data-grow="left"])) {
+			transform: scaleX(#{$shown});
+		}
+		:where(.tablechart-value),
+		:where(.tablechart-name),
+		:where(.tablechart-head),
+		:where(.tablechart-badge),
+		:where(.tablechart-centre),
+		:where(.tablechart-point),
+		:where(.tablechart-hole) {
+			opacity: #{$shown};
+		}
+		:where(.tablechart-leader),
+		:where(.tablechart-break[data-part="edge"]) {
+			stroke-opacity: #{$shown};
+		}
+		:where(.tablechart-line) {
+			stroke-dashoffset: calc(var(--len) * (1 - #{$shown}));
+		}
+		:where(.tablechart-connector) {
+			clip-path: inset(-10px calc((1 - #{$shown}) * (100% + 20px) - 10px) -10px -10px);
+		}
+		:where(.tablechart-series),
+		:where(.tablechart-area-fill > *) {
+			clip-path: #{$reveal};
+		}
+		:where(.tablechart-slice) {
+			stroke-dasharray: calc(var(--arc) * #{$shown}) calc(var(--circ) - var(--arc) * #{$shown});
+		}
 	}
 }
 

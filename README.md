@@ -16,6 +16,8 @@ Tablechart makes simple charts from a table: an HTML table, a Markdown table or 
 * **Real text:** names and numbers are HTML, so they use the font of the page and do not scale with the drawing.
 * **CSS for the looks:** colours, sizes and animation are CSS variables. Light and dark mode follow the page.
 * **Annotations:** badges, brackets, trend arrows and a break in the scale
+* **Tooltips:** when a chart leaves numbers out, point at a row, or tap it, to see all its values
+* **Print and PDF:** every chart prints whole, and the table can be shown under a chart that leaves numbers out
 * **Step by step:** show the rows one at a time, with Previous and Next buttons
 * **Animation:** a chart builds when it scrolls into view
 
@@ -75,6 +77,8 @@ init({
 	threshold: 0.5,     // How much of a chart must be in view before it builds
 	replay: false,      // Build again each time a chart scrolls back into view
 	controls: true,     // Previous and Next buttons on a chart that steps
+	tooltip: "auto",    // Tooltips: "auto" only when a chart leaves numbers out, true or false
+	table: "never",     // The table under the chart: "never", "auto" (in print, if numbers are left out), "print" or "always"
 	locale: undefined,  // Locale for numbers; the language of the page if not set
 });
 ```

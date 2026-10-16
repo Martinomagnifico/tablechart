@@ -1,11 +1,12 @@
 import "../style/tablechart.scss";
 
-import { type Config, defaultConfig, LIBRARY_NAME } from "./config";
+import { type Config, defaultConfig, LIBRARY_NAME, PRINTING_CLASS } from "./config";
 import { build, layout, relabel, setShown, unbuild } from "./core";
 import { debug } from "./functions/debug";
 import { assignKeys } from "./functions/read-table";
 import { adoptTables, loadSources, readMarkdownRows } from "./functions/sources";
 import { stepTo } from "./steps";
+import { releaseTooltip } from "./tooltip";
 import type { ChartState } from "./types";
 
 export interface TablechartChart {
@@ -204,7 +205,13 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		{ threshold: config.threshold }
 	);
 
-	const print = () => setShown(state, true);
+	// Safari prints a chart that is still building as it is at that moment, so on paper every chart jumps to its end.
+	const print = () => {
+		state.figure.classList.add(PRINTING_CLASS);
+		setShown(state, true);
+		void state.figure.offsetWidth;
+	};
+	const printed = () => state.figure.classList.remove(PRINTING_CLASS);
 
 	const refresh = () => {
 		placed = null;
@@ -218,6 +225,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 	resizer.observe(state.figure);
 	scroll.observe(state.figure);
 	window.addEventListener("beforeprint", print);
+	window.addEventListener("afterprint", printed);
 	listen(speaker);
 
 	const chart: TablechartChart = {
@@ -236,7 +244,9 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 			resizer.disconnect();
 			scroll.disconnect();
 			window.removeEventListener("beforeprint", print);
+			window.removeEventListener("afterprint", printed);
 			unlisten(speaker);
+			releaseTooltip(state);
 			if (state.figure.tablechart === chart) delete state.figure.tablechart;
 		},
 	};
@@ -306,7 +316,9 @@ const warnOldNames = (figures: HTMLElement[], config: Config): void => {
 		return now ? [`"${value}" is now "${now}"`] : [];
 	};
 	const used = new Set(motion(config.animate));
+	if (config.hover !== undefined) used.add(`the "hover" option is now "tooltip"`);
 	for (const figure of figures) {
+		if (figure.hasAttribute("data-chart-hover")) used.add("data-chart-hover is now data-chart-tooltip");
 		const style = getComputedStyle(figure);
 		for (const [old, now] of OLD_NAMES) if (style.getPropertyValue(old).trim()) used.add(`${old} is now ${now}`);
 		for (const one of motion(figure.getAttribute("data-chart-animate"))) used.add(one);

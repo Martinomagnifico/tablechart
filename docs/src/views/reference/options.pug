@@ -65,9 +65,13 @@ block content
 					td: code false
 					td If #[code true], the names of the lines are in a legend under the chart. #[code data-chart-legend] on a figure sets it for one chart.
 				tr
-					td: code hover
-					td: code true
-					td If a number is left out for lack of room, pointing at its row shows it. #[code data-chart-hover="false"] on a figure turns it off for one chart.
+					td: code tooltip
+					td: code "auto"
+					td A tooltip with the values of a row that is pointed at or tapped. #[code "auto"]: only on a chart that does not show all its numbers. #[code true]: always. #[code false]: never. #[code data-chart-tooltip] on a figure sets it for one chart. #[code hover] is the old name.
+				tr
+					td: code table
+					td: code "never"
+					td When the table is shown under the chart: #[code "always"], only in #[code "print"], in print when the chart does not show all its numbers (#[code "auto"]), or #[code "never"]. #[code data-chart-table] on a figure sets it for one chart. See #[a(href=url('/features/accessibility.html')) Accessibility].
 				tr
 					td: code totallabel
 					td: code "Total"

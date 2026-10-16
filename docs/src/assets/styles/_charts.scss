@@ -165,7 +165,7 @@
 		&:hover {
 			border-color: light-dark(var(--btn-primary-bg-hover), var(--chart-accent));
 			color: light-dark(var(--btn-primary-bg-hover), #ffffff);
-			background: light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.08));
+			background: light-dark(rgb(255 255 255 / 0.7), rgb(0 0 0 / 0.25));
 		}
 
 		&[aria-pressed="true"] {
@@ -191,7 +191,8 @@
 }
 
 // The buttons set color-scheme on the example only, not on its code block.
-.scheme-example .demo {
+.scheme-example .demo,
+.scheme-example .scheme-toggle {
 	color-scheme: light;
 }
 

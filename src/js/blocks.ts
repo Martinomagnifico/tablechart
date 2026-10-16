@@ -9,6 +9,7 @@ export {
 	defaultConfig,
 	PLACED_CLASS,
 	PLOT_CLASS,
+	PRINTING_CLASS,
 	QUEUED_CLASS,
 	SHOWN_CLASS,
 } from "./config";

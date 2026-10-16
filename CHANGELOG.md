@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.0.5] - 2026-10-16
+
+### Added
+
+- Tooltips: on a chart that leaves some (or all) numbers out, hovering or tapping, shows tooltips now. `tooltip` and `data-chart-tooltip`: `"auto"` by default, `true` always, `false` never.
+- `--tablechart-tooltip-surface`, `-color`, `-border`, `-radius`, `-padding` and `-shadow`.
+- The `table` option and `data-chart-table`: the table under the chart, always, in print, or in print when the chart does not show all its numbers.
+- `PRINTING_CLASS` in the building blocks, to get a chart ready for print. See the API reference.
+
+### Changed
+
+- A number left out for lack of room is shown in the tooltip, not on the chart.
+
+### Fixed
+
+- Every chart is printed whole, also one that had not scrolled into view or was still building, in every browser. A chart is not split over two pages.
+
+### Removed
+
+- The band behind a row that is pointed at, and `--tablechart-pointer-color`: the tooltip shows the row.
+
+### Deprecated
+
+- The `hover` option and `data-chart-hover`, now `tooltip` and `data-chart-tooltip`. Removed in the next minor version.
+
+
 ## [1.0.4] - 2026-10-14
 
 ### Added

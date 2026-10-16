@@ -4,6 +4,17 @@
 		display: block;
 	}
 
+	// Plain blocks, without containment: Safari keeps nothing in one piece inside a flex box or a size container,
+	// and can even leave out what comes after it.
+	.docs-content,
+	.container {
+		display: block;
+		container-type: normal;
+	}
+	.container > * + * {
+		margin-top: 1rem;
+	}
+
 	.docs-sidebar,
 	.github-corner,
 	button.copy,
@@ -29,10 +40,83 @@
 	.code-block,
 	tr {
 		break-inside: avoid;
+		page-break-inside: avoid;
+	}
+
+	// White paper, also when the browser prints backgrounds.
+	html,
+	body,
+	.docs-content,
+	.lane,
+	section {
+		background: #fff !important;
+	}
+
+	// No card or panel backgrounds: where an example moves to the next page, the rest of its card is then white.
+	// Blocks rather than flex boxes: Safari does not keep a chart in one piece inside a flex box.
+	.card,
+	.indented {
+		display: block;
+		background: none !important;
+		padding: 0;
+
+		> * + * {
+			margin-top: 1rem;
+		}
+	}
+
+	// Side by side as inline blocks: Safari splits grid items over pages, but never an inline block.
+	.overview-charts,
+	.grid-2,
+	.grid-3 {
+		display: block;
+
+		> * {
+			display: inline-block !important;
+			width: calc(50% - 1rem);
+			margin: 0 1.25rem 1.5rem 0;
+			vertical-align: top;
+
+			&:nth-child(2n) {
+				margin-right: 0;
+			}
+		}
+	}
+	.grid-3 > * {
+		width: calc(33.3% - 1.25rem);
+		margin-right: 1.25rem;
+
+		&:nth-child(2n) {
+			margin-right: 1.25rem;
+		}
+		&:nth-child(3n) {
+			margin-right: 0;
+		}
+	}
+
+	// The front page: the three boxes in the middle, in one row and as tall as each other, as on a narrow screen.
+	// The other two may not be laid out, if the screen was narrow.
+	.hero-charts {
+		display: flex;
+		gap: 1em;
+
+		[data-chart] {
+			display: flex;
+			flex: 1 1 0;
+		}
+		[data-chart].hero-extra {
+			display: none;
+		}
+	}
+
+	// A button is no use on paper, and its colour is not printed.
+	.btn.solid {
+		display: none;
 	}
 
 	h2,
 	h3 {
 		break-after: avoid;
+		page-break-after: avoid;
 	}
 }

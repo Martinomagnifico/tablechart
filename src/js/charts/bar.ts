@@ -38,6 +38,8 @@ export const bar: ChartType = {
 		// The widest name decides where every bar starts.
 		const names = Math.max(largest(categories.map((name) => sizeOf(name).width * unit)), 0);
 		const left = Math.min(names + 10 * unit, VIEWBOX_WIDTH * 0.42);
+		// In percent, so a name wraps rather than runs out on the left when the chart is printed narrower than on screen.
+		categories[0]?.parentElement?.style.setProperty("--_beside", `${(((left - 8 * unit) / VIEWBOX_WIDTH) * 100).toFixed(2)}%`);
 		const right = VIEWBOX_WIDTH - 4 * unit;
 
 		const extent = geo.stacked

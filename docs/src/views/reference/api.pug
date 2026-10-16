@@ -145,6 +145,18 @@ block content
 					td: code stepTo()
 					td Shows a chart that steps up to a step. A presentation plugin calls it for its own steps, with #[code controls] set to #[code false].
 
+		p #[code build()] also gives the chart its tooltip, as the #[code tooltip] option says. #[code unbuild()] closes it.
+		p #[code init()] and #[code create()] get every chart ready for print. With the building blocks, do that yourself before the page prints: add #[code PRINTING_CLASS] to the figure, so the chart has no transitions, and show it. Remove the class after printing.
+
+		+codeblock('JS').
+			import { setShown, PRINTING_CLASS } from "@martinomagnifico/tablechart/core";
+
+			window.addEventListener("beforeprint", () => {
+				chart.figure.classList.add(PRINTING_CLASS);
+				setShown(chart, true);
+			});
+			window.addEventListener("afterprint", () => chart.figure.classList.remove(PRINTING_CLASS));
+
 	+section("With a script tag")
 		p Without a build tool, load #[code tablechart.js] and #[code tablechart.css]. #[code Tablechart.init()] and #[code Tablechart.create()] work the same as #[code init()] and #[code create()].
 

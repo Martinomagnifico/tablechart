@@ -101,6 +101,11 @@
                     "href": "/features/steps.html"
                 },
                 {
+                    "text": "Features | Tooltips",
+                    "label": "Tooltips",
+                    "href": "/features/tooltips.html"
+                },
+                {
                     "text": "Features | Translation",
                     "label": "Translation",
                     "href": "/features/translation.html"
@@ -148,6 +153,11 @@
                     "text": "Styling | Text",
                     "label": "Text",
                     "href": "/styling/text.html"
+                },
+                {
+                    "text": "Styling | Tooltips",
+                    "label": "Tooltips",
+                    "href": "/styling/tooltips.html"
                 }
             ]
         },

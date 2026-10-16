@@ -1,0 +1,69 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Features | Tooltips"
+	- pagedescription = "Tooltips in Tablechart: the values of a row, when you point at it or tap it."
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Tooltips
+				p.lead The values of a row, when you point at it or tap it.
+
+	+section("When a chart has a tooltip")
+		p If a chart does not show all its numbers, pointing at a row, or tapping it, shows a tooltip with the name of the row and its values. That is a stack with small parts, a narrow chart, or a line chart with three lines or more. With several value columns, each value has the name of its column and a key in its colour. A stack also shows its total.
+		p A chart that shows all its numbers has no tooltip: it would only repeat the number you point at, and cover it. If the chart gets narrower and leaves numbers out, its tooltip comes on.
+		p This chart has three lines, so it shows no numbers. Point at it to try the tooltip.
+
+		+chart(null, '1')
+			figure(data-chart="line" data-chart-legend)
+				figcaption: b Apples per tree
+				table
+					thead
+						tr
+							th Year
+							th North
+							th South
+							th East
+					tbody
+						each row in [['2016', '41', '30', '22'], ['2019', '58', '39', '35'], ['2022', '77', '52', '41'], ['2025', '105', '61', '70']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+								td= row[3]
+
+	+section("How it works")
+		ul
+			li The tooltip uses the names and numbers of the chart, so it has the same number format and the same translations.
+			li It goes above the row, or below it if there is no room above. It stays inside the window.
+			li Press Escape, tap somewhere else, or move the pointer away to close it. You can move the pointer onto the tooltip.
+			li On a chart with steps, a row that has not arrived yet has no tooltip.
+			li Screen readers do not read the tooltip. They read the table, which has the same values.
+
+	+section("Always or never")
+		p Add #[code data-chart-tooltip="true"] to the figure to give a chart a tooltip all the time, also when it shows all its numbers. This chart shows all its numbers, and has a tooltip anyway.
+
+		+chart(null, '1')
+			figure(data-chart="column" data-chart-tooltip="true")
+				figcaption: b Apples picked
+				table
+					tbody
+						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '41']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		p #[code data-chart-tooltip="false"] turns it off. To set it for every chart, use the #[code tooltip] option: #[code "auto"] by default, #[code true] or #[code false].
+
+		+codeblock('JS').
+			init({ tooltip: true });
+
+		p #[code hover] and #[code data-chart-hover] are the old names, and still work until the next minor version.
+
+	+section("Style it")
+		p The background, text, border, corners and shadow of the tooltip are CSS variables. See #[a(href=url('/styling/tooltips.html')) Styling tooltips], with examples.
+
+	+section("Next")
+		p See #[a(href=url('/features/numbers.html')) Numbers] for how numbers are shown, and #[a(href=url('/reference/variables.html')) CSS variables] for all variables.

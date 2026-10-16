@@ -42,6 +42,8 @@ for (const [label, { code, file, iife }] of Object.entries(entries)) {
 				minify: 'terser',
 				cssCodeSplit: false,
 				target: 'es2020',
+				// The same browsers as the real build in vite.config.js, so the stylesheet is measured as it ships.
+				cssTarget: ['chrome123', 'edge123', 'firefox120', 'safari17.5'],
 				lib: iife
 					? { entry, formats: ['iife'], name: 'Tablechart', fileName: () => 'out.js' }
 					: { entry, formats: ['es'], fileName: 'out' },

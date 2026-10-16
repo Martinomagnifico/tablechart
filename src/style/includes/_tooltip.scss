@@ -1,0 +1,98 @@
+// One tooltip for the page, a child of body, so no parent clips it. Its variables are copied from the chart it is for.
+.tablechart-tooltip {
+	position: fixed;
+	z-index: 1000;
+	top: 0;
+	left: 0;
+	box-sizing: border-box;
+	min-width: 7em;
+	max-width: min(18em, calc(100vw - 16px));
+	padding: var(--tablechart-tooltip-padding, 0.45em 0.7em);
+	border: var(--tablechart-tooltip-border, 1px solid color-mix(in oklab, currentColor 28%, transparent));
+	border-radius: var(--tablechart-tooltip-radius, 0.4em);
+	// Lighter than the chart's background, with a clear shadow, so it stands out from what is behind it.
+	// White in light mode; in dark mode a little lighter than the chart's background. It follows the chart's colour scheme.
+	background: var(--tablechart-tooltip-surface, light-dark(#fff, oklch(from var(--tablechart-surface, Canvas) calc(l + 0.06) c h)));
+	color: var(--tablechart-tooltip-color, var(--_color, CanvasText));
+	box-shadow: var(--tablechart-tooltip-shadow, 0 1px 3px rgb(0 0 0 / 0.12), 0 6px 18px rgb(0 0 0 / 0.18));
+	line-height: 1.35;
+
+	&[hidden] {
+		display: none;
+	}
+}
+
+.tablechart-tooltip-title {
+	font-weight: 600;
+}
+
+// A name and its value on one line; only a long name wraps, never the value.
+.tablechart-tooltip-line {
+	display: flex;
+	align-items: baseline;
+	gap: 0.45em;
+}
+
+.tablechart-tooltip-name,
+.tablechart-tooltip-title {
+	min-width: 0;
+}
+
+.tablechart-tooltip-value {
+	flex: none;
+	margin-left: auto;
+	padding-left: 1em;
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+}
+
+.tablechart-tooltip-key {
+	flex: none;
+	align-self: center;
+	width: 0.6em;
+	height: 0.6em;
+	border-radius: 50%;
+
+	// The legend's sample of a line, with its point; the shapes are set with the legend's.
+	&[data-sample="line"] {
+		width: 1.6em;
+		height: 0.8em;
+		border-radius: 0;
+		mask-image: var(--_line), var(--_mark, none);
+		mask-position: center;
+		mask-size: contain;
+		mask-repeat: no-repeat;
+	}
+	&[data-sample="box"] {
+		width: 0.7em;
+		height: 0.7em;
+		border-radius: 0.15em;
+	}
+}
+
+// A square turned a quarter, with the tooltip's own background and border; `place` sets its left.
+.tablechart-tooltip-arrow {
+	position: absolute;
+	width: 0.6em;
+	height: 0.6em;
+	border: inherit;
+	background: inherit;
+	transform: translate(-50%, -50%) rotate(45deg);
+
+	[data-side="top"] > & {
+		top: 100%;
+		border-top-color: transparent;
+		border-left-color: transparent;
+	}
+	[data-side="bottom"] > & {
+		top: 0;
+		border-right-color: transparent;
+		border-bottom-color: transparent;
+	}
+}
+
+@media print {
+	.tablechart-tooltip {
+		display: none;
+	}
+}

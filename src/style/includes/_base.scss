@@ -30,6 +30,26 @@
 		clip-path: inset(50%);
 	}
 
+	// `data-chart-table="always"`: the table under the chart, also on screen.
+	// A shown table gets room between its cells, names to the left and numbers to the right; a site's own table styles win.
+	&[data-table] > :where(table) {
+		margin-top: 0.75em;
+		border-collapse: collapse;
+
+		:where(th, td) {
+			padding: 0.2em 1.25em 0.2em 0;
+			text-align: start;
+		}
+		:where(td, thead th:not(:first-child)) {
+			text-align: end;
+			font-variant-numeric: tabular-nums;
+		}
+	}
+	&[data-table="always"] > :where(table) {
+		position: static;
+		clip-path: none;
+	}
+
 	// If scripts do not run, there is no chart, so the table is shown instead.
 	@media (scripting: none) {
 		:where(table),

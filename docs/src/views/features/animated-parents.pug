@@ -35,6 +35,12 @@ block content
 					transform: none;
 				}
 			}
+			@media print {
+				.slide-in {
+					opacity: 1;
+					transform: none;
+				}
+			}
 
 		p A small script adds #[code is-visible] when the block scrolls into view:
 
@@ -81,6 +87,17 @@ block content
 
 	+section("A parent that is still hidden")
 		p A parent can be invisible, with an opacity of 0, until its own script starts the animation. If the chart comes into view before that, Tablechart waits until the parent starts to animate in, or becomes visible.
+
+	+section("In print")
+		p When the page is printed, Tablechart shows every chart whole. But a parent that has not animated in yet is still invisible, so its chart is not printed. Make the parent visible in print, as the example above does:
+
+		+codeblock('CSS').
+			@media print {
+				.slide-in {
+					opacity: 1;
+					transform: none;
+				}
+			}
 
 	+section("Animations that follow the scroll")
 		p A CSS animation with #[code animation-timeline] follows the scroll position, and has no duration in seconds. Tablechart does not wait for it.

@@ -2,28 +2,149 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Features | Accessibility"
-	- pagedescription = "Accessibility in Tablechart: what screen readers read, and what works without colour, motion or JavaScript."
+	- pagedescription = "Accessibility in Tablechart: every chart is also a real table, for screen readers, print and PDF."
 
 block content
 	.lane
 		.container
 			.page-header
 				h1 Accessibility
-				p.lead What screen readers read, and what works without colour, motion or JavaScript.
+				p.lead Every chart is also a real table: for screen readers, for print and PDF, and when JavaScript does not run.
 
-	+section("Screen readers read the table")
-		p The table stays in the page. It is hidden from sight, but screen readers read it like any other table: the names of the rows and columns, and every number.
-		p The drawing is hidden from screen readers, with #[code aria-hidden="true"]. That includes the numbers and names in the drawing, because the table already has them. So a screen reader does not read everything twice. The names under the chart and the legend are also #[code inert], because Safari with VoiceOver reads them otherwise.
+	+section("What a screen reader gets")
+		p The table stays in the page. It is hidden from sight, but screen readers read it like any other table: the names of the rows and columns, and every number. The drawing is hidden from screen readers, with #[code aria-hidden="true"], so they do not read everything twice.
+		p The button shows the table that a screen reader reads, under the chart.
+
+		.lang-toggle(role="group" aria-label="The table of the example")
+			button.show-table(type="button" aria-pressed="false") Show the table
+		+chart(null, '1')
+			figure#a11y-table(data-chart="column" data-chart-table="print")
+				figcaption
+					b Apples picked
+					br
+					span thousands
+				table
+					tbody
+						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '41']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		script.
+			document.querySelector('.show-table').addEventListener('click', function () {
+				var figure = document.getElementById('a11y-table');
+				var shown = this.getAttribute('aria-pressed') !== 'true';
+				figure.setAttribute('data-table', shown ? 'always' : 'print');
+				this.setAttribute('aria-pressed', String(shown));
+			});
+
 		p Give the chart a title with a #[code figcaption]. Tablechart makes it the name of the figure and of the table, with #[code aria-labelledby]. So a screen reader that jumps to the table also reads the title and the unit. If the figure or the table already has a name, with #[code aria-label], #[code aria-labelledby] or a #[code caption], it keeps that name.
 		p A screen reader does not read a line break. So Tablechart puts a full stop before each #[code br] in the title, hidden from sight, and a screen reader pauses between the title and the subtitle. If the line already ends with a full stop, a question mark, a colon or a comma, nothing is added.
-
-		+codeblock('HTML').
-			<figure data-chart="column">
-				<figcaption><b>Apples picked</b><br><span>thousands</span></figcaption>
-				<table>…</table>
-			</figure>
-
 		p If the chart has no #[code figcaption], add #[code aria-label] to the figure, such as #[code aria-label="Apples picked, in thousands"].
+
+	+section("Numbers that do not fit")
+		p Some charts do not show all their numbers: a stack with small parts, a narrow chart, or a line chart with three lines or more. The numbers are still in the table, so screen readers read them. Pointing at a row, or tapping it, shows them in a tooltip.
+		p To show the table under the chart as well, add #[code data-chart-table="always"] to the figure. This chart has three lines, so it shows no numbers; the table under it has them all.
+
+		+chart(null, '1')
+			figure(data-chart="line" data-chart-table="always")
+				figcaption: b Apples per tree
+				table
+					thead
+						tr
+							th Year
+							th North
+							th South
+							th East
+					tbody
+						each row in [['2016', '41', '30', '22'], ['2019', '58', '39', '35'], ['2022', '77', '52', '41'], ['2025', '105', '61', '70']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+								td= row[3]
+
+	+section("In print and PDF")
+		p On screen, the tooltip shows numbers that are left out. On paper there is no tooltip, so a chart that leaves numbers out also needs its table. #[code data-chart-table], or the #[code table] option for all charts, says when the table is shown under the chart:
+
+		table
+			thead
+				tr
+					th Value
+					th On screen
+					th In print and PDF
+			tbody
+				tr
+					td: code never
+					td Hidden
+					td Hidden. The default.
+				tr
+					td: code auto
+					td Hidden
+					td Shown, if the chart does not show all its numbers
+				tr
+					td: code print
+					td Hidden
+					td Always shown
+				tr
+					td: code always
+					td Shown
+					td Shown
+
+		p If your pages become PDFs, use #[code auto]. Then a table only takes room on the page when the chart needs it.
+
+		+codeblock('JS').
+			init({ table: "auto" });
+
+		p Whether numbers are left out depends on the width of the chart. #[code auto] uses the width the chart has on the page.
+
+	+section("Not only colour")
+		p Lines are told apart by their points as well: filled and open circles, squares and diamonds. A line can also be dashed or dotted. The button shows the chart without colour, as some people see it.
+
+		.lang-toggle(role="group" aria-label="Colour of the example")
+			button.greyscale(type="button" aria-pressed="false") Without colour
+
+		+style.
+			.a11y-colours {
+				--tablechart-color-1: #c2410c;
+				--tablechart-color-2: #15803d;
+				--tablechart-color-3: #1d4ed8;
+				--tablechart-color-4: #a21caf;
+			}
+			.is-grey .demo {
+				filter: grayscale(1);
+			}
+
+		.a11y-grey
+			+chart(null, '5')
+				figure.a11y-colours(data-chart="line" data-chart-legend)
+					table
+						thead
+							tr
+								th Year
+								th North
+								th(data-line="dashed") South
+								th East
+								th(data-marker="diamond open") West
+						tbody
+							each row in [['2016', '41', '30', '22', '12'], ['2019', '58', '39', '35', '20'], ['2022', '77', '52', '41', '33'], ['2025', '105', '61', '70', '45']]
+								tr
+									th= row[0]
+									td= row[1]
+									td= row[2]
+									td= row[3]
+									td= row[4]
+
+		script.
+			document.querySelector('.greyscale').addEventListener('click', function () {
+				var grey = this.getAttribute('aria-pressed') !== 'true';
+				document.querySelector('.a11y-grey').classList.toggle('is-grey', grey);
+				this.setAttribute('aria-pressed', String(grey));
+			});
+
+		ul
+			li A number inside a bar is dark or light, whichever reads on the colour of the bar.
+			li If you set your own colours, check that they contrast enough with the background: 3:1 for bars and lines, and 4.5:1 for a number inside a bar.
 
 	+section("The total of a donut")
 		p If a donut has no total row, the number in the middle is the sum of the slices. Tablechart adds it to the table, in a hidden row at the bottom, so screen readers read it with a name: "Total, 74.5". The #[code totallabel] option sets the name.
@@ -35,11 +156,8 @@ block content
 		p If JavaScript does not run, there is no chart. The table is then shown instead, with its title.
 		p A chart with #[code data-chart-src] has no table until JavaScript has read the JSON file. If JavaScript does not run, or the file cannot be read, there is no table and no chart. Write the table in the HTML instead of as a JSON data source if you want to be sure that the data (as a table then) is always available.
 
-	+section("Colour")
-		ul
-			li Lines are told apart by their points as well: filled and open circles, squares and diamonds. You can also make a line dashed or dotted. See #[a(href=url('/types/line.html')) Line].
-			li A number inside a bar is dark or light, whichever reads on the colour of the bar.
-			li If you set your own colours, check that they contrast enough with the background: 3:1 for bars and lines, and 4.5:1 for a number inside a bar.
+	+section("Keyboard")
+		p The table is the way to the numbers for screen readers, and they move through it with their own keys. The tooltip only works with a pointer or a tap. If people who use a keyboard, without a screen reader, must be able to read every number, show the table with #[code data-chart-table="always"].
 
 	+section("Zoom and text size")
 		p All text is HTML, sized in #[code em]. It follows the text size and the zoom of the browser, and stays sharp. Long names beside the bars of a bar chart wrap onto more lines.
@@ -47,9 +165,9 @@ block content
 	+section("Motion")
 		p If the visitor has asked for reduced motion in their system settings, charts are shown without animation.
 
-	+section("Numbers that do not fit")
-		p If there is no room for a number, it is left out of the drawing. It is still in the table, so screen readers read it. Pointing at the row, or tapping it, shows the number.
-		p Showing a number this way does not work with the keyboard yet.
-
 	+section("Language")
 		p Set the #[code lang] attribute on the #[code html] element, such as #[code lang="en"]. Screen readers use it to read the text in the right language, and Tablechart uses it to format the numbers. See #[a(href=url('/features/numbers.html')) Numbers].
+
+	+section("Standards")
+		p Websites in the European Union must meet the European Accessibility Act, which refers to the standard EN 301 549, and through it to WCAG 2.1 at level AA. For a chart, the most important requirements are a text alternative (WCAG 1.1.1) and information that is available as structure (WCAG 1.3.1). A real data table meets both, and Tablechart keeps that table in the page.
+		p Tablechart helps with these requirements, but whether a website meets them depends on the whole website. Test your own pages, for example with a screen reader.

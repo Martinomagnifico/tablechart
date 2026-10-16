@@ -3,4 +3,35 @@
 	:where(.tablechart, [data-chart]) :where(table, .chart-annotations) {
 		display: none;
 	}
+
+	// A chart is not split over two pages: the drawing stays whole, with its title above it and its names under it.
+	// A long table under it may go on on the next page.
+	:where(.tablechart-plot) {
+		break-inside: avoid;
+		page-break-inside: avoid;
+	}
+	:where(.tablechart, [data-chart]) > :where(figcaption) {
+		break-after: avoid;
+		page-break-after: avoid;
+	}
+	:where(.tablechart-categories, .tablechart-legend) {
+		break-before: avoid;
+		page-break-before: avoid;
+	}
+
+	// `data-chart-table`: the table under the chart in print, or only when the chart leaves numbers out.
+	[data-table="print"] > :where(table),
+	[data-table="always"] > :where(table),
+	[data-table="auto"][data-left-out] > :where(table) {
+		display: table;
+		position: static;
+		clip-path: none;
+	}
+}
+
+// While the page prints, a chart has no transitions, so one that was still building is at its end straight away.
+.is-printing,
+.is-printing * {
+	transition: none !important;
+	animation: none !important;
 }

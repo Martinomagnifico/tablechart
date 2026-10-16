@@ -17,7 +17,7 @@ const BUDGET = { rows: 10_000, seconds: 2 };
 
 const script = `
 import { build, defaultConfig, layout, prepare } from "/tablechart-core.mjs";
-const config = { ...defaultConfig, animate: false, hover: false };
+const config = { ...defaultConfig, animate: false, tooltip: false };
 const results = [];
 for (const rows of ${JSON.stringify(counts)}) {
 	for (const kind of ${JSON.stringify(kinds)}) {

@@ -1,15 +1,5 @@
 @use "tokens" as *;
 
-// While a row is pointed at, only its numbers show; after that, numbers show and hide at once.
-
-.tablechart-plot[data-active] .tablechart-value:not([data-active]) {
-	visibility: hidden;
-}
-
-.tablechart-plot[data-pointed] .tablechart-value {
-	transition-delay: 0s;
-}
-
 // Numbers cannot be selected, so pointing at a row does not start a selection.
 .tablechart-plot[data-hover] {
 	cursor: default;
@@ -17,16 +7,5 @@
 	:where(.tablechart-value) {
 		user-select: none;
 		-webkit-user-select: none;
-	}
-}
-
-.tablechart-pointer {
-	position: absolute;
-	display: none;
-	background: var(--tablechart-pointer-color, color-mix(in oklab, currentColor 8%, transparent));
-	pointer-events: none;
-
-	.tablechart-plot[data-active] > & {
-		display: block;
 	}
 }

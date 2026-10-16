@@ -3,6 +3,9 @@ import { defineConfig, build } from 'vite';
 import { resolve } from 'path';
 import { dts } from 'rolldown-plugin-dts';
 
+// Browsers that know light-dark(), so the build leaves it as it is; the stylesheet already needs oklch(from …).
+const CSS_TARGET = ['chrome123', 'edge123', 'firefox120', 'safari17.5'];
+
 const iifeBuild = () => ({
   name: 'iife-build',
   closeBundle: async () => {
@@ -18,6 +21,8 @@ const iifeBuild = () => ({
         emptyOutDir: false,
         sourcemap: false,
         minify: 'terser',
+        // This build writes tablechart.css as well, so it needs the same browsers.
+        cssTarget: CSS_TARGET,
         terserOptions: {
           // Smaller bundle.
           mangle: { properties: { regex: /^_/ } },
@@ -61,7 +66,8 @@ export default defineConfig({
     },
     sourcemap: false,
     minify: 'oxc',
-    target: 'es2020'
+    target: 'es2020',
+    cssTarget: CSS_TARGET
   },
   server: {
     host: true,

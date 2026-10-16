@@ -1,288 +1,291 @@
 @use "tokens" as *;
 
-:where([data-animate], [data-animate] .tablechart-plot) {
-	@include timing;
-	--_build: min(calc(0.6 * var(--count, 1) * #{$duration}), calc(#{$max} - #{$fade}));
-	--_steptime: min(calc(0.65 * #{$duration}), calc(#{$max} / (var(--count, 1) - 0.08)));
-	--_rise: min(calc(#{$element} * 1.6), calc(#{$max} - #{$fade}));
-	--_ring: calc(#{$duration} + (var(--count, 1) - 1) * #{$stagger});
-}
-
-// `is-shown` starts the build; `--after` is how many stagger steps the data takes, so commentary lands after it.
-// What follows an element starts a fraction of the element time after it, so it never lands with it when the stagger shrinks.
-
-:where([data-animate]) {
-	:where(.tablechart-bar) {
-		transform: scaleY(0);
-		transform-box: fill-box;
-		transform-origin: bottom;
-		transition: transform #{$duration} #{$easing};
-		transition-delay: calc(var(--i) * #{$stagger});
+// On screen only: on paper and in a PDF every chart is at its end, whether it was built or not.
+@media screen {
+	:where([data-animate], [data-animate] .tablechart-plot) {
+		@include timing;
+		--_build: min(calc(0.6 * var(--count, 1) * #{$duration}), calc(#{$max} - #{$fade}));
+		--_steptime: min(calc(0.65 * #{$duration}), calc(#{$max} / (var(--count, 1) - 0.08)));
+		--_rise: min(calc(#{$element} * 1.6), calc(#{$max} - #{$fade}));
+		--_ring: calc(#{$duration} + (var(--count, 1) - 1) * #{$stagger});
 	}
 
-	:where(.tablechart-bar[data-grow="down"]) {
-		transform-origin: top;
+	// `is-shown` starts the build; `--after` is how many stagger steps the data takes, so commentary lands after it.
+	// What follows an element starts a fraction of the element time after it, so it never lands with it when the stagger shrinks.
+
+	:where([data-animate]) {
+		:where(.tablechart-bar) {
+			transform: scaleY(0);
+			transform-box: fill-box;
+			transform-origin: bottom;
+			transition: transform #{$duration} #{$easing};
+			transition-delay: calc(var(--i) * #{$stagger});
+		}
+
+		:where(.tablechart-bar[data-grow="down"]) {
+			transform-origin: top;
+		}
+
+		:where(.tablechart-bar[data-grow="right"]) {
+			transform: scaleX(0);
+			transform-origin: left;
+		}
+
+		:where(.tablechart-bar[data-grow="left"]) {
+			transform: scaleX(0);
+			transform-origin: right;
+		}
+
+		// Revealed from left to right by a clip, at an even speed, so a dashed or dotted line keeps its pattern while it grows.
+		:where(.tablechart-series) {
+			clip-path: inset(-10px calc(100% + 10px) -10px -10px);
+			transition: clip-path calc(var(--d, 1) * #{$stagger}) linear;
+			transition-delay: calc(max(var(--i) - 1, 0) * #{$stagger});
+		}
+
+		:where(.tablechart-area-fill) {
+			opacity: 0;
+			transition: opacity calc(max(var(--rows) - 1, 1) * #{$stagger}) linear;
+			transition-delay: calc(max(var(--i) - 1, 0) * #{$stagger});
+		}
+
+		:where(.tablechart-point, .tablechart-hole) {
+			opacity: 0;
+			transition: opacity #{$fade} ease;
+			transition-delay: calc(var(--i) * #{$stagger} + 0.048 * #{$duration});
+		}
+
+		:where(.tablechart-hole[data-for="badge"]) {
+			transition: opacity 0.3s ease;
+			transition-delay: calc(var(--after) * #{$stagger} + 0.35s);
+		}
+
+		:where(.tablechart-value, .tablechart-name) {
+			opacity: 0;
+			transition: opacity #{$fade} ease;
+			transition-delay: calc(var(--i) * #{$stagger} + 0.096 * #{$duration});
+		}
+
+		// A connector is revealed from left to right by a clip, so its dots stay in place.
+		// It draws as the column it leads into starts, in a third of the element time, whatever the other columns do.
+		:where(.tablechart-connector) {
+			clip-path: inset(-10px calc(100% + 10px) -10px -10px);
+			transition: clip-path calc(#{$duration} / 3) linear;
+			transition-delay: calc(var(--i) * #{$stagger});
+		}
+
+		// A slice is one element, like a bar: a big slice turns faster than a small one.
+		:where(.tablechart-slice) {
+			stroke-dasharray: 0 var(--circ);
+			transition: stroke-dasharray #{$duration} #{$easing};
+			transition-delay: calc(var(--i) * #{$stagger});
+		}
+
+		:where(.tablechart-centre) {
+			opacity: 0;
+			transition: opacity #{$fade} ease;
+			transition-delay: calc(var(--i, 0) * #{$stagger} + 0.5 * #{$duration});
+		}
+
+		// On `stroke-opacity`, so the element's own opacity token still holds. It comes when its slice is mostly drawn.
+		:where(.tablechart-leader) {
+			stroke-opacity: 0;
+			transition: stroke-opacity #{$fade} ease;
+			transition-delay: calc(var(--i, 0) * #{$stagger} + 0.5 * #{$duration});
+		}
+
+		:where([data-chart="donut"] .tablechart-value) {
+			transition-delay: calc(var(--i, 0) * #{$stagger} + 0.5 * #{$duration});
+		}
+
+		:where(.tablechart-break[data-part="edge"]) {
+			stroke-opacity: 0;
+			transition: stroke-opacity 0.2s ease;
+			transition-delay: calc((var(--after) + 0.9) * #{$stagger});
+		}
+
+		:where(.tablechart-line) {
+			stroke-dasharray: var(--len);
+			stroke-dashoffset: var(--len);
+			transition: stroke-dashoffset var(--tablechart-annotation-duration, 0.6s) #{$easing};
+			transition-delay: calc(var(--after) * #{$stagger});
+		}
+
+		:where(.tablechart-head) {
+			opacity: 0;
+			transition: opacity 0.2s ease;
+			transition-delay: calc(var(--after) * #{$stagger} + 0.55s);
+		}
+
+		:where(.tablechart-badge) {
+			opacity: 0;
+			transition: opacity 0.3s ease;
+			transition-delay: calc(var(--after) * #{$stagger} + 0.35s);
+		}
 	}
 
-	:where(.tablechart-bar[data-grow="right"]) {
-		transform: scaleX(0);
-		transform-origin: left;
+	// A waterfall grows column by column: the next starts when the one before it is at 95%. Under the maximum its columns get shorter too.
+	:where([data-chart="waterfall"]:not([data-animate="sweep"])) {
+		--_ratio: 0.6;
+		--_keep: 1;
 	}
 
-	:where(.tablechart-bar[data-grow="left"]) {
-		transform: scaleX(0);
-		transform-origin: right;
+	// `sweep` on a waterfall: one motion at one speed. Each column starts when the one before it ends, and its connector draws meanwhile.
+	// The parts come from the chart. A column takes 0.6 of the element time, and the whole ends a fade-in before the maximum.
+	$build: var(--_build);
+
+	:where([data-animate="sweep"][data-chart="waterfall"]:not([data-steps])) {
+		:where(.tablechart-bar, .tablechart-connector) {
+			transition-duration: calc(var(--span, 1) * #{$build});
+			transition-timing-function: var(--ease, linear);
+			transition-delay: calc(var(--start, 0) * #{$build});
+		}
+
+		:where(.tablechart-value) {
+			transition-delay: calc((var(--start, 0) + 0.5 * var(--span, 0)) * #{$build});
+		}
+
+		:where(.tablechart-badge, .tablechart-hole[data-for="badge"]) {
+			transition-delay: calc(#{$build} + 0.2s);
+		}
+
+		:where(.tablechart-break[data-part="edge"]) {
+			transition-delay: calc((var(--start, 0) + var(--span, 1)) * #{$build});
+		}
 	}
 
-	// Revealed from left to right by a clip, at an even speed, so a dashed or dotted line keeps its pattern while it grows.
-	:where(.tablechart-series) {
-		clip-path: inset(-10px calc(100% + 10px) -10px -10px);
-		transition: clip-path calc(var(--d, 1) * #{$stagger}) linear;
-		transition-delay: calc(max(var(--i) - 1, 0) * #{$stagger});
+	// With steps, each step builds on its own: a column grows, then its connector draws, and only then the next column starts.
+	// A step is 0.65 of the element time; its column takes 0.6, and its connector starts when the column is at 98%.
+	$step-time: var(--_steptime);
+	$step-grow: calc(0.923 * #{$step-time});
+	$step-ready: calc(0.692 * #{$step-time});
+	$step-link: calc(0.308 * #{$step-time});
+
+	:where([data-animate][data-chart="waterfall"][data-steps]) {
+		:where(.tablechart-bar) {
+			transition-duration: #{$step-grow};
+			transition-delay: calc(var(--i) * #{$step-time});
+		}
+
+		:where(.tablechart-connector) {
+			transition: clip-path #{$step-link} linear;
+			transition-delay: calc((var(--i) - 1) * #{$step-time} + #{$step-ready});
+		}
+
+		:where(.tablechart-value) {
+			transition-delay: calc(var(--i) * #{$step-time} + #{$step-grow} * 0.5);
+		}
+
+		:where(.tablechart-badge, .tablechart-hole[data-for="badge"]) {
+			transition-delay: calc(var(--after) * #{$step-time} + 0.2s);
+		}
 	}
 
-	:where(.tablechart-area-fill) {
+	:where([data-animate].is-shown) {
+		:where(.tablechart-bar) {
+			transform: scaleY(1);
+		}
+		:where(.tablechart-bar:is([data-grow="right"], [data-grow="left"])) {
+			transform: scaleX(1);
+		}
+		:where(.tablechart-series) {
+			clip-path: inset(-10px);
+		}
+		:where(.tablechart-point),
+		:where(.tablechart-hole),
+		:where(.tablechart-area-fill) {
+			opacity: 1;
+		}
+		:where(.tablechart-value),
+		:where(.tablechart-name),
+		:where(.tablechart-head),
+		:where(.tablechart-badge),
+		:where(.tablechart-centre) {
+			opacity: 1;
+		}
+		:where(.tablechart-leader),
+		:where(.tablechart-break[data-part="edge"]) {
+			stroke-opacity: 1;
+		}
+		:where(.tablechart-slice) {
+			stroke-dasharray: var(--arc) calc(var(--circ) - var(--arc));
+		}
+		:where(.tablechart-connector) {
+			clip-path: inset(-10px);
+		}
+		:where(.tablechart-line) {
+			stroke-dashoffset: 0;
+		}
+	}
+
+	// `grow` on a line or area: it grows from zero as a whole, its points rise with it, and the numbers follow.
+	$rise: var(--_rise);
+
+	:where([data-animate="grow"]:is([data-chart="line"], [data-chart="area"])) {
+		:where(.tablechart-series, .tablechart-area) {
+			clip-path: none;
+			transform: scaleY(0);
+			transform-box: view-box;
+			transform-origin: 0 var(--_base);
+			transition: transform #{$rise} #{$easing};
+			transition-delay: 0s;
+		}
+		:where(.tablechart-area-fill) {
+			opacity: 1;
+			transition: none;
+		}
+		:where(.tablechart-point, .tablechart-hole:not([data-for])) {
+			opacity: 0;
+			transform: translateY(var(--rise, 0));
+			transition: transform #{$rise} #{$easing}, opacity 0.15s ease;
+			transition-delay: 0s;
+		}
+		:where(.tablechart-value, .tablechart-name) {
+			transition-delay: #{$rise};
+		}
+	}
+
+	:where([data-animate="grow"]:is([data-chart="line"], [data-chart="area"]).is-shown) {
+		:where(.tablechart-series, .tablechart-area) {
+			transform: scaleY(1);
+		}
+		:where(.tablechart-point, .tablechart-hole:not([data-for])) {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	// `sweep` on a donut: one motion round the ring at one speed, as long as the slices would take one after the other.
+	// Each slice has its piece of it (`--start`, `--span`, `--ease`); its leader and number come when it has arrived.
+	$ring: var(--_ring);
+
+	:where([data-animate="sweep"][data-chart="donut"]) {
+		:where(.tablechart-slice) {
+			transition: stroke-dasharray calc(var(--span, 1) * #{$ring}) var(--ease, linear);
+			transition-delay: calc(var(--start, 0) * #{$ring});
+		}
+		:where(.tablechart-leader, .tablechart-value) {
+			transition-delay: calc((var(--start, 0) + var(--span, 0)) * #{$ring});
+		}
+		:where(.tablechart-centre) {
+			transition-delay: calc(0.5 * #{$ring});
+		}
+	}
+
+	// A chart in a sequence waits hidden and fades in as its marks start to build.
+
+	:where([data-animate]) {
+		transition: opacity var(--tablechart-queue-duration, 0.4s) ease;
+	}
+
+	:where([data-animate].tablechart-queued) {
 		opacity: 0;
-		transition: opacity calc(max(var(--rows) - 1, 1) * #{$stagger}) linear;
-		transition-delay: calc(max(var(--i) - 1, 0) * #{$stagger});
 	}
 
-	:where(.tablechart-point, .tablechart-hole) {
-		opacity: 0;
-		transition: opacity #{$fade} ease;
-		transition-delay: calc(var(--i) * #{$stagger} + 0.048 * #{$duration});
-	}
-
-	:where(.tablechart-hole[data-for="badge"]) {
-		transition: opacity 0.3s ease;
-		transition-delay: calc(var(--after) * #{$stagger} + 0.35s);
-	}
-
-	:where(.tablechart-value, .tablechart-name) {
-		opacity: 0;
-		transition: opacity #{$fade} ease;
-		transition-delay: calc(var(--i) * #{$stagger} + 0.096 * #{$duration});
-	}
-
-	// A connector is revealed from left to right by a clip, so its dots stay in place.
-	// It draws as the column it leads into starts, in a third of the element time, whatever the other columns do.
-	:where(.tablechart-connector) {
-		clip-path: inset(-10px calc(100% + 10px) -10px -10px);
-		transition: clip-path calc(#{$duration} / 3) linear;
-		transition-delay: calc(var(--i) * #{$stagger});
-	}
-
-	// A slice is one element, like a bar: a big slice turns faster than a small one.
-	:where(.tablechart-slice) {
-		stroke-dasharray: 0 var(--circ);
-		transition: stroke-dasharray #{$duration} #{$easing};
-		transition-delay: calc(var(--i) * #{$stagger});
-	}
-
-	:where(.tablechart-centre) {
-		opacity: 0;
-		transition: opacity #{$fade} ease;
-		transition-delay: calc(var(--i, 0) * #{$stagger} + 0.5 * #{$duration});
-	}
-
-	// On `stroke-opacity`, so the element's own opacity token still holds. It comes when its slice is mostly drawn.
-	:where(.tablechart-leader) {
-		stroke-opacity: 0;
-		transition: stroke-opacity #{$fade} ease;
-		transition-delay: calc(var(--i, 0) * #{$stagger} + 0.5 * #{$duration});
-	}
-
-	:where([data-chart="donut"] .tablechart-value) {
-		transition-delay: calc(var(--i, 0) * #{$stagger} + 0.5 * #{$duration});
-	}
-
-	:where(.tablechart-break[data-part="edge"]) {
-		stroke-opacity: 0;
-		transition: stroke-opacity 0.2s ease;
-		transition-delay: calc((var(--after) + 0.9) * #{$stagger});
-	}
-
-	:where(.tablechart-line) {
-		stroke-dasharray: var(--len);
-		stroke-dashoffset: var(--len);
-		transition: stroke-dashoffset var(--tablechart-annotation-duration, 0.6s) #{$easing};
-		transition-delay: calc(var(--after) * #{$stagger});
-	}
-
-	:where(.tablechart-head) {
-		opacity: 0;
-		transition: opacity 0.2s ease;
-		transition-delay: calc(var(--after) * #{$stagger} + 0.55s);
-	}
-
-	:where(.tablechart-badge) {
-		opacity: 0;
-		transition: opacity 0.3s ease;
-		transition-delay: calc(var(--after) * #{$stagger} + 0.35s);
-	}
-}
-
-// A waterfall grows column by column: the next starts when the one before it is at 95%. Under the maximum its columns get shorter too.
-:where([data-chart="waterfall"]:not([data-animate="sweep"])) {
-	--_ratio: 0.6;
-	--_keep: 1;
-}
-
-// `sweep` on a waterfall: one motion at one speed. Each column starts when the one before it ends, and its connector draws meanwhile.
-// The parts come from the chart. A column takes 0.6 of the element time, and the whole ends a fade-in before the maximum.
-$build: var(--_build);
-
-:where([data-animate="sweep"][data-chart="waterfall"]:not([data-steps])) {
-	:where(.tablechart-bar, .tablechart-connector) {
-		transition-duration: calc(var(--span, 1) * #{$build});
-		transition-timing-function: var(--ease, linear);
-		transition-delay: calc(var(--start, 0) * #{$build});
-	}
-
-	:where(.tablechart-value) {
-		transition-delay: calc((var(--start, 0) + 0.5 * var(--span, 0)) * #{$build});
-	}
-
-	:where(.tablechart-badge, .tablechart-hole[data-for="badge"]) {
-		transition-delay: calc(#{$build} + 0.2s);
-	}
-
-	:where(.tablechart-break[data-part="edge"]) {
-		transition-delay: calc((var(--start, 0) + var(--span, 1)) * #{$build});
-	}
-}
-
-// With steps, each step builds on its own: a column grows, then its connector draws, and only then the next column starts.
-// A step is 0.65 of the element time; its column takes 0.6, and its connector starts when the column is at 98%.
-$step-time: var(--_steptime);
-$step-grow: calc(0.923 * #{$step-time});
-$step-ready: calc(0.692 * #{$step-time});
-$step-link: calc(0.308 * #{$step-time});
-
-:where([data-animate][data-chart="waterfall"][data-steps]) {
-	:where(.tablechart-bar) {
-		transition-duration: #{$step-grow};
-		transition-delay: calc(var(--i) * #{$step-time});
-	}
-
-	:where(.tablechart-connector) {
-		transition: clip-path #{$step-link} linear;
-		transition-delay: calc((var(--i) - 1) * #{$step-time} + #{$step-ready});
-	}
-
-	:where(.tablechart-value) {
-		transition-delay: calc(var(--i) * #{$step-time} + #{$step-grow} * 0.5);
-	}
-
-	:where(.tablechart-badge, .tablechart-hole[data-for="badge"]) {
-		transition-delay: calc(var(--after) * #{$step-time} + 0.2s);
-	}
-}
-
-:where([data-animate].is-shown) {
-	:where(.tablechart-bar) {
-		transform: scaleY(1);
-	}
-	:where(.tablechart-bar:is([data-grow="right"], [data-grow="left"])) {
-		transform: scaleX(1);
-	}
-	:where(.tablechart-series) {
-		clip-path: inset(-10px);
-	}
-	:where(.tablechart-point),
-	:where(.tablechart-hole),
-	:where(.tablechart-area-fill) {
-		opacity: 1;
-	}
-	:where(.tablechart-value),
-	:where(.tablechart-name),
-	:where(.tablechart-head),
-	:where(.tablechart-badge),
-	:where(.tablechart-centre) {
-		opacity: 1;
-	}
-	:where(.tablechart-leader),
-	:where(.tablechart-break[data-part="edge"]) {
-		stroke-opacity: 1;
-	}
-	:where(.tablechart-slice) {
-		stroke-dasharray: var(--arc) calc(var(--circ) - var(--arc));
-	}
-	:where(.tablechart-connector) {
-		clip-path: inset(-10px);
-	}
-	:where(.tablechart-line) {
-		stroke-dashoffset: 0;
-	}
-}
-
-// `grow` on a line or area: it grows from zero as a whole, its points rise with it, and the numbers follow.
-$rise: var(--_rise);
-
-:where([data-animate="grow"]:is([data-chart="line"], [data-chart="area"])) {
-	:where(.tablechart-series, .tablechart-area) {
-		clip-path: none;
-		transform: scaleY(0);
-		transform-box: view-box;
-		transform-origin: 0 var(--_base);
-		transition: transform #{$rise} #{$easing};
-		transition-delay: 0s;
-	}
-	:where(.tablechart-area-fill) {
-		opacity: 1;
-		transition: none;
-	}
-	:where(.tablechart-point, .tablechart-hole:not([data-for])) {
-		opacity: 0;
-		transform: translateY(var(--rise, 0));
-		transition: transform #{$rise} #{$easing}, opacity 0.15s ease;
-		transition-delay: 0s;
-	}
-	:where(.tablechart-value, .tablechart-name) {
-		transition-delay: #{$rise};
-	}
-}
-
-:where([data-animate="grow"]:is([data-chart="line"], [data-chart="area"]).is-shown) {
-	:where(.tablechart-series, .tablechart-area) {
-		transform: scaleY(1);
-	}
-	:where(.tablechart-point, .tablechart-hole:not([data-for])) {
-		opacity: 1;
-		transform: none;
-	}
-}
-
-// `sweep` on a donut: one motion round the ring at one speed, as long as the slices would take one after the other.
-// Each slice has its piece of it (`--start`, `--span`, `--ease`); its leader and number come when it has arrived.
-$ring: var(--_ring);
-
-:where([data-animate="sweep"][data-chart="donut"]) {
-	:where(.tablechart-slice) {
-		transition: stroke-dasharray calc(var(--span, 1) * #{$ring}) var(--ease, linear);
-		transition-delay: calc(var(--start, 0) * #{$ring});
-	}
-	:where(.tablechart-leader, .tablechart-value) {
-		transition-delay: calc((var(--start, 0) + var(--span, 0)) * #{$ring});
-	}
-	:where(.tablechart-centre) {
-		transition-delay: calc(0.5 * #{$ring});
-	}
-}
-
-// A chart in a sequence waits hidden and fades in as its marks start to build.
-
-:where([data-animate]) {
-	transition: opacity var(--tablechart-queue-duration, 0.4s) ease;
-}
-
-:where([data-animate].tablechart-queued) {
-	opacity: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	:where([data-animate]) :where(*) {
-		transition-duration: 1ms !important;
-		transition-delay: 0ms !important;
+	@media (prefers-reduced-motion: reduce) {
+		:where([data-animate]) :where(*) {
+			transition-duration: 1ms !important;
+			transition-delay: 0ms !important;
+		}
 	}
 }

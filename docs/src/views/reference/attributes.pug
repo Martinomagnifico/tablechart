@@ -55,8 +55,11 @@ block content
 					td: code data-chart-aspect
 					td Sets the height of the chart as a share of its width, such as #[code 0.5]
 				tr
-					td: code data-chart-hover="false"
-					td Turns off showing left-out numbers when a row is pointed at
+					td: code data-chart-tooltip="auto"
+					td The tooltip of the chart: #[code auto] only when the chart does not show all its numbers, #[code false] never, #[code true] always. #[code data-chart-hover] is the old name.
+				tr
+					td: code data-chart-table="auto"
+					td When the table is shown under the chart: #[code always], #[code print], #[code auto] (in print, when the chart does not show all its numbers) or #[code never]
 				tr
 					td: code data-chart-keys
 					td Adds translation keys to the names, starting with its value. See #[a(href=url('/features/translation.html')) Translation].

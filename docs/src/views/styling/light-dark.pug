@@ -103,6 +103,8 @@ block content
 				button.addEventListener('click', function () {
 					var demo = document.querySelector('.scheme-example .demo');
 					demo.style.colorScheme = button.dataset.scheme;
+					// The buttons are over the example, so they take its colour scheme too.
+					button.parentElement.style.colorScheme = button.dataset.scheme;
 					button.parentElement.querySelectorAll('button').forEach(function (other) {
 						other.setAttribute('aria-pressed', String(other === button));
 					});
