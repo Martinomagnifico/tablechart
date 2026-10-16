@@ -15,7 +15,7 @@ block content
 		+installWizard('Tablechart', 'init')
 
 	+section("Markup")
-		p A chart is an element with #[code data-chart] and a table in it. The first cell of a row is the label, the second the value.
+		p A chart is a #[code figure] with #[code data-chart] and a table in it. Its #[code figcaption] is the title. The first cell of a row is the label, the second the value.
 
 		.card
 			.demo
@@ -51,7 +51,7 @@ block content
 		p #[code data-chart] sets the chart type: #[code column], #[code bar], #[code line], #[code waterfall] or #[code donut].
 
 	+section("Start it")
-		p Call #[code init()] once the page has loaded. It makes a chart of every element with #[code data-chart].
+		p Call #[code init()] once the page has loaded. It makes a chart of every figure with #[code data-chart].
 
 		+codeblock('JS').
 			import { init } from '@martinomagnifico/tablechart';

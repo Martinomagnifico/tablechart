@@ -31,6 +31,38 @@ const hide = (): void => {
 	shownRow = null;
 };
 
+// Only a mouse that moves opens a tooltip. A key closes it, and a page that changes
+// under a resting pointer, such as the next slide of a presentation, does not open
+// one: browsers send a pointer event then, but at the same place on the screen.
+let resting = false;
+let moved = true;
+let lastX = Number.NaN;
+let lastY = Number.NaN;
+let watching = false;
+const watch = (): void => {
+	if (watching) return;
+	watching = true;
+	document.addEventListener(
+		"pointermove",
+		(event) => {
+			if (event.pointerType !== "mouse") return;
+			moved = event.screenX !== lastX || event.screenY !== lastY;
+			lastX = event.screenX;
+			lastY = event.screenY;
+			if (moved) resting = false;
+		},
+		{ capture: true, passive: true }
+	);
+	document.addEventListener(
+		"keydown",
+		() => {
+			resting = true;
+			hide();
+		},
+		true
+	);
+};
+
 // A short wait, so the pointer can move from the chart onto the tooltip.
 const hideSoon = (): void => {
 	clearTimeout(timer);
@@ -50,7 +82,6 @@ const make = (): HTMLElement => {
 	document.body.append(node);
 	node.addEventListener("pointerenter", () => clearTimeout(timer));
 	node.addEventListener("pointerleave", (event) => event.pointerType === "mouse" && hideSoon());
-	document.addEventListener("keydown", (event) => event.key === "Escape" && hide());
 	document.addEventListener("pointerdown", (event) => {
 		const target = event.target as Node;
 		if (owner && !owner.plot.contains(target) && !node.contains(target)) hide();
@@ -199,6 +230,7 @@ const show = (state: ChartState, index: number, config: Config): void => {
 export const attachTooltip = (state: ChartState, config: Config, auto = false): void => {
 	const { plot } = state;
 	plot.setAttribute("data-hover", "");
+	watch();
 
 	const rowOf = (event: PointerEvent): number | null => {
 		if (state.rowAt) {
@@ -222,6 +254,9 @@ export const attachTooltip = (state: ChartState, config: Config, auto = false): 
 	};
 	let pointed: number | null = null;
 	const point = (event: PointerEvent) => {
+		// A click or a tap is meant; a mouse that did not move is not.
+		if (event.type === "pointerdown") resting = false;
+		else if (event.pointerType === "mouse" && (!moved || resting)) return;
 		if (!plot.classList.contains(PLACED_CLASS) || !state.figure.classList.contains(SHOWN_CLASS)) return;
 		// `auto`: only while the chart leaves numbers out, which can change with its width.
 		if (auto && !state.figure.hasAttribute("data-left-out")) return owner === state ? hide() : undefined;
@@ -244,7 +279,7 @@ export const attachTooltip = (state: ChartState, config: Config, auto = false): 
 		moving.delete(one);
 		// The pointer waited on this row: show it now that it is there.
 		const index = Number(one.getAttribute("data-row")) - 1;
-		if (pointed === index && !busy(index)) show(state, index, config);
+		if (pointed === index && !busy(index) && !resting) show(state, index, config);
 	};
 	state.svg.addEventListener("transitionend", arrive);
 	state.svg.addEventListener("transitioncancel", arrive);

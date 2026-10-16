@@ -89,7 +89,7 @@ Most options can also be set on one chart with a `data-chart-*` attribute. All o
 
 `init()` returns `{ charts, refresh, destroy }`. `refresh()` lays out every chart again. `destroy()` stops watching scroll, size and language changes.
 
-To make a chart of one element, use `create()`. Each chart is also on its element, as `element.tablechart`.
+To make a chart of one figure, use `create()`. Each chart is also on its figure, as `figure.tablechart`.
 
 ```js
 import { create } from "@martinomagnifico/tablechart";

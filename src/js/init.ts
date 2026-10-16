@@ -254,9 +254,22 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 	return chart;
 };
 
+// Once per page: a chart works in any element, but only a figure with a figcaption gives it a title for screen readers.
+let warnedFigure = false;
+const warnNotFigure = (figures: HTMLElement[]): void => {
+	const other = figures.find((figure) => figure.tagName !== "FIGURE");
+	if (warnedFigure || !other) return;
+	warnedFigure = true;
+	console.warn(
+		`[${LIBRARY_NAME}] A chart is a <${other.tagName.toLowerCase()}>. Use a <figure> with a <figcaption>, so the chart has a title, also for screen readers.`,
+		other
+	);
+};
+
 /** Turns elements into figures with a table and translation keys, all at once, so duplicate keys are found. */
 export const prepare = async (found: HTMLElement[], config: Config): Promise<HTMLElement[]> => {
 	const figures = adoptTables(found.filter((element) => !element.hasAttribute(MADE)));
+	warnNotFigure(figures);
 	await loadSources(figures);
 	readMarkdownRows(figures);
 	assignKeys(figures, config.langattribute);
@@ -270,7 +283,7 @@ const make = (figure: HTMLElement, config: Config): TablechartChart | null => {
 	return watch(state, config);
 };
 
-/** Makes a chart of one element; returns the existing chart if there is one, or null without data. */
+/** Makes a chart of one figure; returns the existing chart if there is one, or null without data. */
 export const create = async (
 	element: HTMLElement,
 	options: Partial<Config> = {}
@@ -328,7 +341,7 @@ const warnOldNames = (figures: HTMLElement[], config: Config): void => {
 	console.warn(`[${LIBRARY_NAME}] ${[...used].join("; ")}. The old names work until the next minor version.`);
 };
 
-/** Makes a chart of every element in `root` that matches the selector, skipping existing charts. */
+/** Makes a chart of every figure in `root` that matches the selector, skipping existing charts. */
 export const init = async (
 	options: Partial<Config> = {},
 	root: ParentNode = document

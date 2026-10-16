@@ -112,6 +112,19 @@
   }
 }
 
+// Text that says where the examples of a .grid-2 are: beside each other, or one above the other.
+.when-stacked {
+  display: none;
+}
+@container (max-width: 600px) {
+  .when-beside {
+    display: none;
+  }
+  .when-stacked {
+    display: inline;
+  }
+}
+
 .btn.bottom, .bottom:not(.column) {
   margin-top: auto;
 }

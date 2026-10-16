@@ -131,7 +131,10 @@ export const build = (
 	const rows = readTable(figure, config.langattribute);
 	if (!rows.length) {
 		console.warn(
-			`[${LIBRARY_NAME}] A chart has no rows in its table, so there is nothing to draw.`
+			figure.querySelector("table")
+				? `[${LIBRARY_NAME}] A chart has no rows in its table, so there is nothing to draw.`
+				: `[${LIBRARY_NAME}] A chart has no table, so there is nothing to draw.`,
+			figure
 		);
 		figure.setAttribute("data-chart-empty", "");
 		return null;

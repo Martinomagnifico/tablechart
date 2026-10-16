@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.6] - 2026-10-16
+
+### Changed
+
+- Any key closes a tooltip, not only Escape.
+- Only a mouse that moves opens a tooltip.
+- A Markdown table with chart attributes is wrapped in a `figure`, not a `div`.
+- The console asks for a `figure` when a chart is another element.
+
+
+
 ## [1.0.5] - 2026-10-16
 
 ### Added

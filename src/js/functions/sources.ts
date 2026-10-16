@@ -119,13 +119,13 @@ const moveChartAttributes = (from: Element, to: Element): void => {
 	}
 };
 
-/** A Markdown table, or a caption with chart attributes, is wrapped in a div with the caption and annotations beside it. */
+/** A Markdown table, or a caption with chart attributes, is wrapped in a figure with the caption and annotations beside it. */
 export const adoptTables = (figures: HTMLElement[]): HTMLElement[] =>
 	figures.map((found) => {
 		const inCaption = found.closest("p");
 		const figure = isCaption(inCaption) ? inCaption : found;
 		if (figure.tagName !== "TABLE" && figure.tagName !== "P") return figure;
-		const wrapper = document.createElement("div");
+		const wrapper = document.createElement("figure");
 		moveChartAttributes(found, wrapper);
 		if (!found.classList.length) found.removeAttribute("class");
 

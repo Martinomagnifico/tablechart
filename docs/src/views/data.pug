@@ -13,6 +13,7 @@ block content
 
 	+section("A table")
 		p A chart is a #[code figure] with #[code data-chart] and a table in it. Each row of the table is a bar or a point. The first cell of a row is its name, the other cells are its values.
+		p A chart is always a #[code figure], with a #[code figcaption] for the title. Then the chart has a name, also for screen readers. If the element is not a figure, the console says so.
 
 		+chart
 			figure(data-chart="column")

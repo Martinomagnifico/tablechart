@@ -12,7 +12,7 @@ block content
 				p.lead init(), create() and what they return.
 
 	+section("init()")
-		p #[code init()] makes a chart of every element that matches #[code selector], and builds each chart when it scrolls into view. It returns a promise.
+		p #[code init()] makes a chart of every figure that matches #[code selector], and builds each chart when it scrolls into view. It returns a promise.
 
 		+codeblock('JS').
 			import { init } from "@martinomagnifico/tablechart";
@@ -33,7 +33,7 @@ block content
 					td: code root
 					td The element to look for charts in. #[code document] by default.
 
-		p If you call #[code init()] again, it skips the elements that are already charts. To make charts of elements that are added to the page later, call it again with the element that holds them as #[code root], or use #[code create()].
+		p If you call #[code init()] again, it skips the figures that are already charts. To make charts of figures that are added to the page later, call it again with the element that holds them as #[code root], or use #[code create()].
 
 	+section("What it returns")
 		table
@@ -53,7 +53,7 @@ block content
 					td Stops watching scroll, size and language. The charts stay as they are.
 
 	+section("create()")
-		p #[code create()] makes a chart of one element, and builds it when it scrolls into view. It returns a promise with the chart, or #[code null] if the element has no data to draw. If the element is already a chart, it returns that chart.
+		p #[code create()] makes a chart of one figure, and builds it when it scrolls into view. It returns a promise with the chart, or #[code null] if the figure has no data to draw. If the figure is already a chart, it returns that chart.
 
 		+codeblock('JS').
 			import { create } from "@martinomagnifico/tablechart";
@@ -78,7 +78,7 @@ block content
 			tbody
 				tr
 					td: code figure
-					td The element that holds the chart
+					td The figure of the chart
 				tr
 					td: code refresh()
 					td Lays the chart out again

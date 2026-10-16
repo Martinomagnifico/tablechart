@@ -12,7 +12,8 @@ block content
 				p.lead How a table becomes a chart, and when the chart builds.
 
 	+section("From table to chart")
-		p On the left is a table. On the right is the chart that Tablechart makes from the same table.
+		p #[span.when-beside On the left]#[span.when-stacked At the top] is a table. #[span.when-beside On the right]#[span.when-stacked Under it] is the chart that Tablechart makes from that same table. 
+
 
 		.grid-2
 			div
@@ -38,7 +39,7 @@ block content
 											td= row[1]
 
 		ol
-			li You call #[code init()]. Tablechart finds every element with #[code data-chart].
+			li You call #[code init()]. Tablechart finds every #[code figure] with #[code data-chart].
 			li It reads the table in it. The first cell of a row is the name, the other cells are the values.
 			li It hides the table from view and adds the chart. Screen readers still read the table, and a translation script still finds the names in it.
 			li When the chart scrolls into view, it builds.
