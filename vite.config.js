@@ -13,7 +13,7 @@ const iifeBuild = () => ({
       configFile: false,
       build: {
         lib: {
-          entry: resolve(__dirname, 'src/js/index.iife.ts'),
+          entry: resolve(import.meta.dirname, 'src/js/index.iife.ts'),
           name: 'Tablechart',
           formats: ['iife'],
           fileName: () => 'tablechart.js'
@@ -50,8 +50,8 @@ export default defineConfig({
     // is dist/tablechart.css.
     lib: {
       entry: {
-        tablechart: resolve(__dirname, 'src/js/index.ts'),
-        'tablechart-core': resolve(__dirname, 'src/js/blocks.ts'),
+        tablechart: resolve(import.meta.dirname, 'src/js/index.ts'),
+        'tablechart-core': resolve(import.meta.dirname, 'src/js/blocks.ts'),
       },
       formats: ['es'],
       fileName: (_format, name) => `${name}.mjs`,
