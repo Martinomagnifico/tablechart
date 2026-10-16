@@ -31,7 +31,7 @@ const hide = (): void => {
 	shownRow = null;
 };
 
-// Only a mouse that moves opens a tooltip. A key closes it, and a page that changes
+// Only a mouse that moves opens a tooltip. A key or a scroll closes it, and a page that changes
 // under a resting pointer, such as the next slide of a presentation, does not open
 // one: browsers send a pointer event then, but at the same place on the screen.
 let resting = false;
@@ -53,14 +53,26 @@ const watch = (): void => {
 		},
 		{ capture: true, passive: true }
 	);
-	document.addEventListener(
-		"keydown",
-		() => {
-			resting = true;
-			hide();
-		},
-		true
-	);
+	// A key, or a scroll: the page changes under the pointer. A scroll also moves the
+	// row away from a tooltip that is fixed to the window.
+	const rest = () => {
+		resting = true;
+		hide();
+	};
+	document.addEventListener("keydown", rest, true);
+	window.addEventListener("scroll", rest, { capture: true, passive: true });
+};
+
+// The scale an element has on screen, for example in the slides of a presentation. Its width from
+// `getComputedStyle()`, as `offsetWidth` is rounded to whole pixels, which moved a tooltip by a pixel or two.
+const scaleOf = (element: HTMLElement, onScreen: number): number =>
+	onScreen / Number.parseFloat(getComputedStyle(element).width) || 1;
+
+// The `tooltipparent` option: an element, a selector, or else the body.
+const parentOf = (config: Config): HTMLElement => {
+	const asked = config.tooltipparent;
+	const found = typeof asked === "string" ? document.querySelector<HTMLElement>(asked) : asked;
+	return found ?? document.body;
 };
 
 // A short wait, so the pointer can move from the chart onto the tooltip.
@@ -86,8 +98,6 @@ const make = (): HTMLElement => {
 		const target = event.target as Node;
 		if (owner && !owner.plot.contains(target) && !node.contains(target)) hide();
 	});
-	// Fixed to the window, so it would drift away from its row.
-	window.addEventListener("scroll", hide, { capture: true, passive: true });
 	window.addEventListener("resize", hide);
 	return node;
 };
@@ -216,14 +226,23 @@ const show = (state: ChartState, index: number, config: Config): void => {
 	tip.style.setProperty("--_color", style.color);
 	tip.style.colorScheme = style.colorScheme;
 	tip.style.fontFamily = style.fontFamily;
-	tip.style.fontSize = style.fontSize;
 
+	const parent = parentOf(config);
+	if (tip.parentElement !== parent) parent.append(tip);
 	owner = state;
 	shownRow = index;
 	tip.hidden = false;
-	// Measured at the left edge, so the width of the window does not wrap it where it was last time.
+	// At the top left of its parent, where it is measured: so the width of the window does not wrap it where
+	// it was last time, and to read where its parent puts it on the screen and at what scale.
 	tip.style.left = "0px";
-	place(tip, arrow, anchorOf(state, index));
+	tip.style.top = "0px";
+	const at = tip.getBoundingClientRect();
+	const frame = { x: at.left, y: at.top, scale: scaleOf(tip, at.width) };
+	// The size the text of the chart has on screen. A chart can be scaled, as the slides of a presentation are,
+	// and so can the parent of the tooltip.
+	const chart = scaleOf(state.plot, state.plot.getBoundingClientRect().width);
+	tip.style.fontSize = `${(Number.parseFloat(style.fontSize) * chart) / frame.scale}px`;
+	place(tip, arrow, anchorOf(state, index), frame);
 };
 
 /** Pointing at a row, or tapping it, shows its values in a tooltip; with `auto`, only on a chart that leaves numbers out. */
@@ -236,7 +255,7 @@ export const attachTooltip = (state: ChartState, config: Config, auto = false): 
 		if (state.rowAt) {
 			const box = plot.getBoundingClientRect();
 			// The plot can be scaled with a CSS transform.
-			const scale = box.width / plot.offsetWidth || 1;
+			const scale = scaleOf(plot, box.width);
 			return state.rowAt((event.clientX - box.left) / scale, (event.clientY - box.top) / scale);
 		}
 		// A donut has no rows side by side: the slice under the pointer says which row it is.

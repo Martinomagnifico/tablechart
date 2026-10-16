@@ -12,7 +12,7 @@ block content
 				p.lead The values of a row, when you point at it or tap it.
 
 	+section("When a chart has a tooltip")
-		p If a chart does not show all its numbers, pointing at a row, or tapping it, shows a tooltip with the name of the row and its values. That is a stack with small parts, a narrow chart, or a line chart with three lines or more. With several value columns, each value has the name of its column and a key in its colour. A stack also shows its total.
+		p If a chart does not show all its numbers (when it gets too crowded), you need a tooltip.  Hovering a row, or tapping it, then shows a tooltip with the name of the row and its values. With several value columns, each value has the name of its column and a key in its colour. A stack also shows its total.
 		p A chart that shows all its numbers has no tooltip: it would only repeat the number you point at, and cover it. If the chart gets narrower and leaves numbers out, its tooltip comes on.
 		p This chart has three lines, so it shows no numbers. Point at it to try the tooltip.
 
@@ -39,7 +39,8 @@ block content
 			li The tooltip uses the names and numbers of the chart, so it has the same number format and the same translations.
 			li It goes above the row, or below it if there is no room above. It stays inside the window.
 			li Pressing any key, tapping somewhere else, or moving the pointer away closes the tooltip. 
-			li Only a mouse that moves opens a tooltip. If the page changes under a mouse that rests, for example when a key shows the next slide of a presentation, no tooltip opens.
+			li Only a mouse that moves opens a tooltip. If the page changes under a mouse that rests, for example when a key shows the next slide of a presentation or the page scrolls, no tooltip opens.
+			li The text has the size of the chart's text on the screen, also when the chart is scaled.
 			li On a chart with steps, a row that has not arrived yet has no tooltip.
 			li Screen readers do not read the tooltip. They read the table, which has the same values.
 

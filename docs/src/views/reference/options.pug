@@ -69,6 +69,10 @@ block content
 					td: code "auto"
 					td A tooltip with the values of a row that is pointed at or tapped. #[code "auto"]: only on a chart that does not show all its numbers. #[code true]: always. #[code false]: never. #[code data-chart-tooltip] on a figure sets it for one chart. #[code hover] is the old name.
 				tr
+					td: code tooltipparent
+					td: code null
+					td Where the tooltip goes in the page: an element or a selector. By default it is the end of #[code body]. In an element that is scaled, such as the slides of a presentation, the tooltip has the same scale.
+				tr
 					td: code table
 					td: code "never"
 					td When the table is shown under the chart: #[code "always"], only in #[code "print"], in print when the chart does not show all its numbers (#[code "auto"]), or #[code "never"]. #[code data-chart-table] on a figure sets it for one chart. See #[a(href=url('/features/accessibility.html')) Accessibility].

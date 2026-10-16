@@ -66,6 +66,8 @@ export interface Config {
 	tooltip: boolean | "auto";
 	/** The old name of `tooltip`, until the next minor version. */
 	hover?: boolean;
+	/** Where the tooltip goes in the page: an element or a selector, `body` by default. In a scaled element, such as the slides of a presentation, the tooltip has their scale. */
+	tooltipparent: HTMLElement | string | null;
 	/** The table under the chart: `"always"`, only in `"print"`, in print when numbers are left out (`"auto"`), or `"never"`. A figure overrides it with `data-chart-table`. */
 	table: "never" | "auto" | "print" | "always";
 	/** The name of the total that a donut without a total row works out, for screen readers. */
@@ -99,6 +101,7 @@ export const defaultConfig: Config = {
 	shape: "straight",
 	legend: false,
 	tooltip: "auto",
+	tooltipparent: null,
 	table: "never",
 	totallabel: "Total",
 	controls: true,

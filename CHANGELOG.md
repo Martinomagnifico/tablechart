@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.0.7] - 2026-10-16
+
+### Added
+
+- A `tooltipparent` option. Can by body or any other selector. 
+
+### Changed
+
+- The text of a tooltip has the size of the chart's text on the screen, also when the chart is scaled.
+- A scroll closes a tooltip, like a key. It opens again when the mouse moves.
+
+### Fixed
+
+- After a scroll, a tooltip could show at the top of the window, for a row that had scrolled away.
+- The arrow of a tooltip points at the middle of its row and stops just short of it, at every size. It was a little to the right, and on a large screen it covered the mark.
+
+
+
 ## [1.0.6] - 2026-10-16
 
 ### Changed

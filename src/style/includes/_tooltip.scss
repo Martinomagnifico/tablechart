@@ -1,6 +1,9 @@
-// One tooltip for the page, a child of body, so no parent clips it. Its variables are copied from the chart it is for.
+// One tooltip for the page, a child of body by default, so no parent clips it. Its variables are copied from the chart it is for.
 .tablechart-tooltip {
 	position: fixed;
+	// In another parent, such as the slides of a presentation, it does not take what that parent sets for its own content.
+	pointer-events: auto;
+	text-align: start;
 	z-index: 1000;
 	top: 0;
 	left: 0;
