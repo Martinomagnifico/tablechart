@@ -1,18 +1,19 @@
 extends /views/templates/layouts/_base
 
 append variables
-	- pagetitle = "Chart types | Extras"
-	- pagedescription = "Extra chart types in Tablechart, such as the scatter chart, and how to load them."
+	- pagetitle = "Chart types | Additional types"
+	- pagedescription = "The additional chart types of Tablechart, such as the scatter chart, and how to load them."
 
 block content
 	.lane
 		.container
 			.page-header
-				h1 Extras
-				p.lead Chart types that not every page needs.
+				h1 Additional types
 
-	+section("What is in the extras")
-		p The main script has the column, bar, line, area, waterfall and donut charts. Other chart types are in a script of their own. A page loads them only if it uses them. The stylesheet is the same for all.
+	+section("The additional types")
+		p The main script has the column, bar, line, area, waterfall and donut charts. The additional types are in a separate script. Maybe you do not need it, then you do not need to load it. The stylesheet is the same for all.
+
+		p Right now, only the 'Scatter' chart is in the additional chart types. More types may be added in the future.
 
 		table
 			thead
@@ -25,11 +26,11 @@ block content
 					td: code scatter
 
 	+section("With a build tool")
-		p If you use a build tool, import the type from #[code @martinomagnifico/tablechart/extras], and add it with #[code addType()] before #[code init()] or #[code create()]. The first argument is the value of #[code data-chart].
+		p If you use a build tool, import the type from #[code @martinomagnifico/tablechart/additional-types], and add it with #[code addType()] before #[code init()] or #[code create()]. The first argument is the value of #[code data-chart].
 
 		+codeblock('JS').
 			import { addType, init } from "@martinomagnifico/tablechart";
-			import { scatter } from "@martinomagnifico/tablechart/extras";
+			import { scatter } from "@martinomagnifico/tablechart/additional-types";
 
 			addType("scatter", scatter);
 			init();
@@ -37,12 +38,12 @@ block content
 		p Only the types you import are in your bundle.
 
 	+section("With a script tag")
-		p If you use a script tag, load #[code tablechart-extras.js] after #[code tablechart.js]. It adds all the extra types. It uses the code in #[code tablechart.js], so that code is not loaded twice.
+		p If you use a script tag, load #[code tablechart-additional-types.js] after #[code tablechart.js]. It adds all the additional types. It uses the code in #[code tablechart.js], so that code is not loaded twice.
 
 		+codeblock('HTML').
 			<link rel="stylesheet" href="tablechart.css">
 			<script src="tablechart.js"></script>
-			<script src="tablechart-extras.js"></script>
+			<script src="tablechart-additional-types.js"></script>
 			<script>
 				Tablechart.init();
 			</script>

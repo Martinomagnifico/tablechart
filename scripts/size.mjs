@@ -23,10 +23,10 @@ const entries = {
 	'Both entries':      { code: `export * from './src/js/index';\nexport * from './src/js/blocks';` },
 	// Built from the file itself: package.json's `sideEffects` would drop a bare import.
 	'Script tag (IIFE)': { file: './src/js/index.iife.ts', iife: true },
-	// The extras on their own, with the helpers they share with the core.
-	'tablechart/extras': { code: `export * from './src/js/extras';` },
+	// The additional types on their own, with the helpers they share with the core.
+	'tablechart/additional-types': { code: `export * from './src/js/additional-types';` },
 	// Takes the helpers from the core's script, as it ships.
-	'Extras script tag': { file: './src/js/extras.iife.ts', iife: true, kit: true },
+	'Additional types script tag': { file: './src/js/additional-types.iife.ts', iife: true, kit: true },
 };
 const kit = (id) => /[/\\]kit(\.ts)?$/.test(id);
 
@@ -86,7 +86,7 @@ writeFileSync(data, JSON.stringify({ size }, null, '\t') + '\n');
 const kb = (n) => (n / 1024).toFixed(1) + ' kB';
 console.log('\ngzipped size (tree-shaken, terser):\n');
 for (const r of rows) {
-	console.log(`  ${r.label.padEnd(18)} ${kb(r.gzip).padStart(8)}   (raw ${kb(r.raw)})`);
+	console.log(`  ${r.label.padEnd(28)} ${kb(r.gzip).padStart(8)}   (raw ${kb(r.raw)})`);
 }
 console.log('\nThe entries share most of their code, so standalone sizes overlap and');
 console.log('do not add up.\n');

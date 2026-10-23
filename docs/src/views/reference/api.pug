@@ -65,16 +65,16 @@ block content
 		p The options are the same as for #[code init()]. #[code selector] is not used.
 
 	+section("addType()")
-		p #[code addType()] adds a chart type, such as one from the extras. The first argument is the value of #[code data-chart], the second the type. Add it before #[code init()] or #[code create()]. See #[a(href=url('/types/extras.html')) Extras].
+		p #[code addType()] adds one of the additional types. The first argument is the value of #[code data-chart], the second the type. Add it before #[code init()] or #[code create()]. See #[a(href=url('/types/additional-types.html')) Extras].
 
 		+codeblock('JS').
 			import { addType, init } from "@martinomagnifico/tablechart";
-			import { scatter } from "@martinomagnifico/tablechart/extras";
+			import { scatter } from "@martinomagnifico/tablechart/additional-types";
 
 			addType("scatter", scatter);
 			init();
 
-		p With a script tag it is #[code Tablechart.addType()]. #[code tablechart-extras.js] calls it by itself.
+		p With a script tag it is #[code Tablechart.addType()]. #[code tablechart-additional-types.js] calls it by itself.
 
 	+section("One chart")
 		p Each chart that #[code init()] or #[code create()] makes is also on its element, as #[code tablechart].

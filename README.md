@@ -11,7 +11,7 @@
 
 Tablechart makes simple charts from a table: an HTML table, a Markdown table or a JSON file. You write the table, Tablechart shows it as a chart.
 
-* **Chart types:** column, bar, line, area, waterfall and donut, and scatter in the extras
+* **Chart types:** column, bar, line, area, waterfall and donut, and scatter as an additional type
 * **The table stays:** it is hidden from sight, but screen readers, search engines and translation scripts still read it. Without JavaScript, the table is all there is.
 * **Real text:** names and numbers are HTML, so they use the font of the page and do not scale with the drawing.
 * **CSS for the looks:** colours, sizes and animation are CSS variables. Light and dark mode follow the page.
@@ -50,6 +50,8 @@ Or with a script tag:
 </script>
 ```
 
+The scatter chart is an additional type, in a script of its own. To use it, see [Additional types](#additional-types).
+
 ## A chart
 
 A chart is a `figure` with `data-chart` and a table in it. The first cell of a row is its name, the other cells are its values. The `figcaption` is the title; text after a `br` is the subtitle.
@@ -69,19 +71,19 @@ A chart is a `figure` with `data-chart` and a table in it. The first cell of a r
 
 Use `bar`, `line`, `area`, `waterfall` or `donut` for the other types. With more than one value column, each column is a line, or a bar in each group. Add `data-chart-stack` to stack them.
 
-### Extras
+### Additional types
 
-The scatter chart is in the extras. Add it before `init()`:
+The scatter chart is an additional type, in a script of its own. To use it, add it before `init()`:
 
 ```js
 import { addType, init } from "@martinomagnifico/tablechart";
-import { scatter } from "@martinomagnifico/tablechart/extras";
+import { scatter } from "@martinomagnifico/tablechart/additional-types";
 
 addType("scatter", scatter);
 init();
 ```
 
-With a script tag, load `tablechart-extras.js` after `tablechart.js`. See [Extras](https://martinomagnifico.github.io/tablechart/types/extras.html).
+With a script tag, load `tablechart-additional-types.js` after `tablechart.js`. See [Additional types](https://martinomagnifico.github.io/tablechart/types/additional-types.html).
 
 ## Options
 

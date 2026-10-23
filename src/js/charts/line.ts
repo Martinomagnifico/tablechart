@@ -3,6 +3,7 @@ import { AREA_CLASS, AREA_FILL_CLASS, HOLE_CLASS, POINT_CLASS, RULE_CLASS, SERIE
 import { stackOf } from "../functions/groups";
 import { markerEl, markerOf } from "../functions/markers";
 import { spread } from "../functions/labels";
+import { avoidCollisions, type Box } from "../functions/collision";
 import { curveTo, fixed, tangentsWithGaps } from "../functions/smooth";
 import { cutOut, placeAt, svgEl } from "../functions/svg";
 import type { Cell, ChartType, Geometry, Row, Segment } from "../types";
@@ -231,9 +232,36 @@ const trend = (area: boolean): ChartType => ({
 			return "below";
 		};
 
+		// With more than two lines, each number goes above its point or below it, where it covers no point and no other number.
+		// Per row the highest value places first; below zero, below comes first. A number with no room at all is left out.
+		const crowded = several && !focused && series.length > 2 && !stacked && !step;
+		const picks = new Map<HTMLElement, Place | null>();
+		if (crowded) {
+			const items = rows
+				.flatMap((_row, i) => series.map((_one, s) => ({ s, i, value: cellAt(s, i)?.value ?? 0 })))
+				.filter(({ s, i }) => placeOf(s, i) !== "none")
+				.sort((a, b) => a.i - b.i || b.value - a.value || a.s - b.s);
+			const places = (value: number): Place[] => (value < 0 ? ["below", "above"] : ["above", "below"]);
+			const candidates = items.map(({ s, i, value }): Box[] => {
+				const w = sizeOf(seriesValues[s][i]).width * unit;
+				const [px, py] = pointAt(s, i);
+				return places(value).map((place): Box => [px - w / 2, place === "above" ? py - 7 * unit - labelHeight : py + 7 * unit, w, labelHeight]);
+			});
+			const points = series.flatMap((_one, s) =>
+				rows.flatMap((_row, i): Box[] => {
+					if (missing(s, i)) return [];
+					const [px, py] = pointAt(s, i);
+					return [[px - 4 * unit, py - 4 * unit, 8 * unit, 8 * unit]];
+				})
+			);
+			const chosen = avoidCollisions(candidates, points, [0, 0, cx(last) + cx(0), height]);
+			items.forEach(({ s, i, value }, k) => picks.set(seriesValues[s][i], chosen[k] === null ? null : places(value)[chosen[k] as number]));
+		}
+
 		// A number with no room is still placed, so it can be shown when its row is pointed at.
 		const leftOut = (s: number, i: number): boolean => {
-			if (!stacked && !step) return several && !focused && series.length > 2;
+			if (crowded) return picks.get(seriesValues[s][i]) === null;
+			if (!stacked && !step) return false;
 			const width = sizeOf(seriesValues[s][i]).width * unit;
 			const rowsWide = step ? runEnd(s, i) - i + 1 : 1;
 			if (width > rowsWide * band - 4 * unit) return true;
@@ -246,7 +274,7 @@ const trend = (area: boolean): ChartType => ({
 			labels.forEach((label, i) => {
 				// A number arrives when the line reaches it: its point, or the middle of its row on a step chart.
 				label.style.setProperty("--i", String(fixed(step ? (reach(i) + reach(i + 1)) / 2 : reach(i))));
-				const place = placeOf(s, i);
+				const place = picks.get(label) ?? placeOf(s, i);
 				label.dataset.place = place === "above" ? "outside" : place;
 				label.toggleAttribute("data-left-out", place !== "none" && leftOut(s, i));
 				if (step && place !== "none") label.dataset.rowEnd = String(runEnd(s, i) + 1);

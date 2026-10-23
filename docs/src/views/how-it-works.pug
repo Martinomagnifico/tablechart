@@ -44,8 +44,8 @@ block content
 			li It hides the table from view and adds the chart. Screen readers still read the table, and a translation script still finds the names in it.
 			li When the chart scrolls into view, it builds.
 
-	+section("When a chart builds")
-		p A chart builds when it scrolls into view. By default, half of the chart must be in view. Set #[code threshold] to change that, from #[code 0] to #[code 1].
+	+section("Animation")
+		p By default, a chart builds with an animation when it scrolls into view: when half of the chart is in view. To change how much must be in view, set #[code threshold], from #[code 0] to #[code 1].
 		p If #[code replay] is #[code true], a chart builds again each time it scrolls back into view. If not, it builds once.
 
 		+codeblock('JS').
@@ -80,6 +80,16 @@ block content
 				figure.classList.remove('no-motion');
 				figure.classList.add('is-shown');
 			});
+
+		p If you want a chart on the page from the start, without animation, add #[code data-chart-animate="false"] to the figure. The chart is then shown as soon as the page is ready, also when it is not in view.
+
+		+codeblock('HTML').
+			<figure data-chart="column" data-chart-animate="false">
+
+		p To do this for every chart, set the #[code animate] option to #[code false]. See #[a(href=url('/styling/animation.html#no-animation')) No animation].
+
+		+codeblock('JS').
+			init({ animate: false });
 
 	+section("Inside an animated container")
 		p If a chart is inside an element that animates in, for example with a CSS animation, the chart builds when that animation is halfway. Then the chart builds in a container that can already be seen. See #[a(href=url('/features/animated-parents.html')) Animated parents].

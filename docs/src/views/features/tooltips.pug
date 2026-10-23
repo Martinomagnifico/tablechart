@@ -14,7 +14,7 @@ block content
 	+section("When a chart has a tooltip")
 		p If a chart does not show all its numbers (when it gets too crowded), you need a tooltip.  Hovering a row, or tapping it, then shows a tooltip with the name of the row and its values. With several value columns, each value has the name of its column and a key in its colour. A stack also shows its total.
 		p A chart that shows all its numbers has no tooltip: it would only repeat the number you point at, and cover it. If the chart gets narrower and leaves numbers out, its tooltip comes on.
-		p This chart has three lines, so it shows no numbers. Point at it to try the tooltip.
+		p This chart has three lines close together, so it leaves numbers out. Point at it to try the tooltip.
 
 		+chart(null, '1')
 			figure(data-chart="line" data-chart-legend)
@@ -27,7 +27,7 @@ block content
 							th South
 							th East
 					tbody
-						each row in [['2016', '41', '30', '22'], ['2019', '58', '39', '35'], ['2022', '77', '52', '41'], ['2025', '105', '61', '70']]
+						each row in [['2018', '41', '38', '35'], ['2019', '45', '44', '42'], ['2020', '48', '47', '49'], ['2021', '52', '50', '51'], ['2022', '55', '56', '53'], ['2023', '58', '57', '59'], ['2024', '61', '60', '62'], ['2025', '64', '66', '63']]
 							tr
 								th= row[0]
 								td= row[1]

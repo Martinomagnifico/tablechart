@@ -299,7 +299,10 @@ block content
 			init({ animate: "grow" });
 
 	+section("No animation")
-		p To show charts without animation, set #[code animate] to #[code false]. If the visitor prefers reduced motion, charts build without animation anyway.
+		p To show a chart without animation, add #[code data-chart-animate="false"] to the figure. The chart is then on the page from the start, also when it is not in view. To do this for every chart, set the #[code animate] option to #[code false]. If the visitor prefers reduced motion, charts build without animation anyway.
+
+		+codeblock('HTML').
+			<figure data-chart="column" data-chart-animate="false">
 
 		+codeblock('JS').
 			init({ animate: false });

@@ -19,7 +19,7 @@ const BUDGET = { rows: 10_000, seconds: 2 };
 
 const script = `
 import { addType, build, defaultConfig, layout, prepare } from "/tablechart-core.mjs";
-import { scatter } from "/tablechart-extras.mjs";
+import { scatter } from "/tablechart-additional-types.mjs";
 addType("scatter", scatter);
 const config = { ...defaultConfig, animate: false, tooltip: false };
 const results = [];

@@ -202,12 +202,13 @@ export const scatter: ChartType = {
 		};
 	},
 
-	// A scatter leaves names out, not numbers, so its tooltip shows names: the one pointed at, and any at the same place.
+	// A scatter leaves names out, not numbers, so its tooltip shows names: the one pointed at, or all at the same place.
 	tooltip(state, index) {
 		const { x, y } = fieldsOf(state.series);
 		const here = placeOf(state.rows[index], x, y);
 		const same = state.rows.flatMap((row, i) => (i === index || (here !== null && placeOf(row, x, y) === here) ? [i] : []));
-		// The one pointed at first.
-		return [index, ...same.filter((i) => i !== index)].map((i) => ({ name: state.categories[i]?.textContent ?? "", value: "" }));
+		// The same order wherever the pointer is on them: the name shown on the chart first, then table order.
+		const shown = same.filter((i) => state.categories[i]?.hasAttribute("data-more"));
+		return [...shown, ...same.filter((i) => !shown.includes(i))].map((i) => ({ name: state.categories[i]?.textContent ?? "", value: "" }));
 	},
 };

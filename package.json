@@ -20,6 +20,10 @@
       "types": "./dist/tablechart-core.d.mts",
       "import": "./dist/tablechart-core.mjs"
     },
+    "./additional-types": {
+      "types": "./dist/tablechart-additional-types.d.mts",
+      "import": "./dist/tablechart-additional-types.mjs"
+    },
     "./style.css": "./dist/tablechart.css"
   },
   "files": [

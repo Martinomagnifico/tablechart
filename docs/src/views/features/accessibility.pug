@@ -43,8 +43,8 @@ block content
 		p If the chart has no #[code figcaption], add #[code aria-label] to the figure, such as #[code aria-label="Apples picked, in thousands"].
 
 	+section("Numbers that do not fit")
-		p Some charts do not show all their numbers: a stack with small parts, a narrow chart, or a line chart with three lines or more. The numbers are still in the table, so screen readers read them. Pointing at a row, or tapping it, shows them in a tooltip.
-		p To show the table under the chart as well, add #[code data-chart-table="always"] to the figure. This chart has three lines, so it shows no numbers; the table under it has them all.
+		p Some charts do not show all their numbers: a stack with small parts, a narrow chart, or a line chart with lines close together. The numbers are still in the table, so screen readers read them. Pointing at a row, or tapping it, shows them in a tooltip.
+		p To show the table under the chart as well, add #[code data-chart-table="always"] to the figure. This chart has three lines close together, so it leaves numbers out. The table under it has them all.
 
 		+chart(null, '1')
 			figure(data-chart="line" data-chart-table="always")
@@ -57,7 +57,7 @@ block content
 							th South
 							th East
 					tbody
-						each row in [['2016', '41', '30', '22'], ['2019', '58', '39', '35'], ['2022', '77', '52', '41'], ['2025', '105', '61', '70']]
+						each row in [['2018', '41', '38', '35'], ['2019', '45', '44', '42'], ['2020', '48', '47', '49'], ['2021', '52', '50', '51'], ['2022', '55', '56', '53'], ['2023', '58', '57', '59'], ['2024', '61', '60', '62'], ['2025', '64', '66', '63']]
 							tr
 								th= row[0]
 								td= row[1]

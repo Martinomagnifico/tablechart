@@ -42,7 +42,7 @@ import { attachTooltip, releaseTooltip } from "./tooltip";
 import type { AnnotationType, ChartState, ChartType, Geometry, Motion, Row, Shape } from "./types";
 
 const CHARTS: Record<string, ChartType> = { area, bar, column, donut, line, waterfall };
-/** Adds a chart type for `data-chart="name"`, such as one from `@martinomagnifico/tablechart/extras`, before `init()`. */
+/** Adds a chart type for `data-chart="name"`, such as one from `@martinomagnifico/tablechart/additional-types`, before `init()`. */
 export const addType = (name: string, type: ChartType): void => {
 	CHARTS[name] = type;
 };
@@ -67,6 +67,10 @@ const turnedOn = (figure: HTMLElement, name: string, option: boolean): boolean =
 	const own = figure.getAttribute(name);
 	return own === null ? option : own !== "false";
 };
+
+/** Whether a chart builds with animation: `data-chart-animate="false"` on the figure, or the `animate` option, turns it off. */
+export const animated = (figure: HTMLElement, config: Config): boolean =>
+	Boolean(config.animate) && figure.getAttribute("data-chart-animate") !== "false";
 
 /** A figure's own `data-chart-shape`, or else the option. */
 const shapeOf = (figure: HTMLElement, config: Config): Shape => {
@@ -331,7 +335,7 @@ export const build = (
 	type.text?.({ figure, plot, rows, series, config });
 
 	// A chart that steps (`data-fragment`) builds a step at a time, from left to right. Without animation it is shown whole.
-	const plan = config.animate && !type.axes ? planSteps(figure) : null;
+	const plan = animated(figure, config) && !type.axes ? planSteps(figure) : null;
 	if (type.axes && figure.querySelector("[data-fragment]")) debug.log(`A ${kind} chart has no steps, so it is shown whole.`, figure);
 	if (plan) figure.setAttribute("data-steps", "");
 	const keys = figure.getAttribute("data-chart-keys");
@@ -381,7 +385,7 @@ export const build = (
 		})
 		.filter((a): a is NonNullable<typeof a> => a !== null);
 
-	if (config.animate) figure.setAttribute("data-animate", motionOf(figure, kind, config, Boolean(plan)));
+	if (animated(figure, config)) figure.setAttribute("data-animate", motionOf(figure, kind, config, Boolean(plan)));
 
 	const state: ChartState = {
 		figure,

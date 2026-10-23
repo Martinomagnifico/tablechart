@@ -1,7 +1,7 @@
 import "../style/tablechart.scss";
 
 import { type Config, defaultConfig, LIBRARY_NAME, PRINTING_CLASS } from "./config";
-import { build, layout, relabel, setShown, unbuild } from "./core";
+import { animated, build, layout, relabel, setShown, unbuild } from "./core";
 import { debug } from "./functions/debug";
 import { assignKeys } from "./functions/read-table";
 import { adoptTables, loadSources, readMarkdownRows } from "./functions/sources";
@@ -150,7 +150,8 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 	let waiting = false;
 
 	const show = async (): Promise<void> => {
-		if (!config.animate) return setShown(state, true);
+		// Without animation a chart is shown as soon as it is laid out, in view or not.
+		if (!animated(state.figure, config)) return setShown(state, true);
 		const shown = state.figure.classList.contains("is-shown");
 		if (inView && placed !== null && !shown && !waiting) {
 			waiting = true;

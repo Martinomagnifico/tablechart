@@ -56,7 +56,7 @@ export interface Config {
 	ringfill: number;
 	/** Locale for numbers. Unset, the document's language is used and followed when it changes. */
 	locale?: string;
-	/** Animate a chart when it builds. `"grow"` grows each element from zero, `"sweep"` reveals the chart in one movement; a figure overrides it with `data-chart-animate`. */
+	/** Animate a chart when it builds. `"grow"` grows each element from zero, `"sweep"` reveals the chart in one movement; a figure overrides it with `data-chart-animate`, also with `"false"`. */
 	animate: boolean | Motion;
 	/** How far an animated parent is in before its chart builds: 0 when it starts moving, 1 when it is in. A figure overrides it with `data-chart-entrance`. */
 	entrance: number;

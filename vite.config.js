@@ -6,7 +6,7 @@ import { dts } from 'rolldown-plugin-dts';
 // Browsers that know light-dark(), so the build leaves it as it is; the stylesheet already needs oklch(from …).
 const CSS_TARGET = ['chrome123', 'edge123', 'firefox120', 'safari17.5'];
 
-// One script for a <script> tag. The extras take the helpers of the core from `Tablechart.kit`, so they hold no copy.
+// One script for a <script> tag. The additional types take the helpers of the core from `Tablechart.kit`, so they hold no copy.
 const iife = (entry, fileName, rollupOptions = {}) =>
   build({
     configFile: false,
@@ -37,7 +37,7 @@ const iifeBuild = () => ({
   closeBundle: async () => {
     await iife('src/js/index.iife.ts', 'tablechart.js');
     const kit = (id) => /[/\\]kit(\.ts)?$/.test(id);
-    await iife('src/js/extras.iife.ts', 'tablechart-extras.js', {
+    await iife('src/js/additional-types.iife.ts', 'tablechart-additional-types.js', {
       external: kit,
       output: { globals: (id) => (kit(id) ? 'Tablechart.kit' : id) }
     });
@@ -57,13 +57,13 @@ export default defineConfig({
   build: {
     // One ES module per entry: dist/tablechart.mjs for init() and create(),
     // dist/tablechart-core.mjs for the building blocks under them, and
-    // dist/tablechart-extras.mjs for chart types not every page needs. The stylesheet
+    // dist/tablechart-additional-types.mjs for chart types not every page needs. The stylesheet
     // is dist/tablechart.css.
     lib: {
       entry: {
         tablechart: resolve(import.meta.dirname, 'src/js/index.ts'),
         'tablechart-core': resolve(import.meta.dirname, 'src/js/blocks.ts'),
-        'tablechart-extras': resolve(import.meta.dirname, 'src/js/extras.ts'),
+        'tablechart-additional-types': resolve(import.meta.dirname, 'src/js/additional-types.ts'),
       },
       formats: ['es'],
       fileName: (_format, name) => `${name}.mjs`,

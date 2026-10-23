@@ -65,6 +65,19 @@ block content
 									th= row[0]
 									td= row[1]
 
+			+type("Waterfall", "/types/waterfall.html")
+				figure(data-chart="waterfall" aria-label="What happened to the crop, in thousands of apples")
+					table
+						tbody
+							each row in [['Picked', '74.5', 'total'], ['Lost', '-29.4'], ['Pressed', '45.1', 'total']]
+								tr(data-kind=row[2])
+									th= row[0]
+									td= row[1]
+
+	+section("Additional types")
+		p These chart types are in a script of their own. To use one, load it before the charts are made. See #[a(href=url('/types/additional-types.html')) About additional types].
+
+		.overview-charts
 			+type("Scatter", "/types/scatter.html")
 				figure(data-chart="scatter" aria-label="Harvest per tree and price per kilo, per variety")
 					table
@@ -79,12 +92,3 @@ block content
 									th= row[0]
 									td= row[1]
 									td= row[2]
-
-			+type("Waterfall", "/types/waterfall.html")
-				figure(data-chart="waterfall" aria-label="What happened to the crop, in thousands of apples")
-					table
-						tbody
-							each row in [['Picked', '74.5', 'total'], ['Lost', '-29.4'], ['Pressed', '45.1', 'total']]
-								tr(data-kind=row[2])
-									th= row[0]
-									td= row[1]

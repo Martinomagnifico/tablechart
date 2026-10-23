@@ -14,7 +14,7 @@ block content
 
 	+section("Scatter chart")
 		p Each row is a marker. The first value column is the position across, the second the position up. The headers of those two columns are the titles of the axes. The name of the row is shown next to its marker.
-		p The scatter chart is an extra. To use it, load it before the charts are made. See #[a(href="#load-it") Load it].
+		p The scatter chart is an additional type. To use it, load it before the charts are made. See #[a(href="#load-it") Load it].
 
 		+chart(null, '1,5')
 			figure(data-chart="scatter")
@@ -143,20 +143,20 @@ block content
 		p #[code --tablechart-grid-color], #[code --tablechart-grid-opacity] and #[code --tablechart-grid-width] set how the gridlines look. #[code --tablechart-axis-color], #[code --tablechart-axis-width] and #[code --tablechart-axis-size] set the axes and the text along them. See #[a(href=url('/styling/axes.html')) Axes and gridlines].
 
 	+section("Load it")
-		p The scatter chart is not in the main script. It is in the extras. See #[a(href=url('/types/extras.html')) Extras].
+		p The scatter chart is not in the main script. It is an additional type, in a script of its own. See #[a(href=url('/types/additional-types.html')) Additional types].
 
 		+codeblock('JS').
 			import { addType, init } from "@martinomagnifico/tablechart";
-			import { scatter } from "@martinomagnifico/tablechart/extras";
+			import { scatter } from "@martinomagnifico/tablechart/additional-types";
 
 			addType("scatter", scatter);
 			init();
 
-		p If you use a script tag, load #[code tablechart-extras.js] after #[code tablechart.js]. It adds the scatter chart.
+		p If you use a script tag, load #[code tablechart-additional-types.js] after #[code tablechart.js]. It adds the scatter chart.
 
 		+codeblock('HTML').
 			<script src="tablechart.js"></script>
-			<script src="tablechart-extras.js"></script>
+			<script src="tablechart-additional-types.js"></script>
 			<script>
 				Tablechart.init();
 			</script>

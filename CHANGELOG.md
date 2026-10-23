@@ -1,14 +1,19 @@
 # Changelog
 
-## [1.1.0] - Unreleased
+## [1.1.0] - 2026-10-23
 
 ### Added
 
-- A scatter and bubble chart, `data-chart="scatter"`, in the new extras: `@martinomagnifico/tablechart/extras` or `tablechart-extras.js`.
-- `addType()`, to add a chart type such as one from the extras.
+- A scatter and bubble chart, `data-chart="scatter"`, in the new additional types: `@martinomagnifico/tablechart/additional-types` or `tablechart-additional-types.js`.
+- `addType()`, to add one of the additional types.
 - Axes with numbers on the scatter chart, with a scale of your own (`data-chart-scale`).
 - A value axis (`data-chart-axis`) and gridlines (`data-chart-grid`) on the other types, off by default. With either, the scale ends on a number of the axis, or where `data-chart-scale` says.
 - A reference line annotation, at a value, the mean or the median.
+- `data-chart-animate="false"`, to show one chart from the start, without animation.
+
+### Changed
+
+- A line chart with three lines or more shows a number above or below each point where there is room. Before, it left all numbers out.
 
 ### Removed
 

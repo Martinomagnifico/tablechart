@@ -14,6 +14,30 @@ block content
 	+section("Install")
 		+installWizard('Tablechart', 'init')
 
+	+section("Additional types")
+		p The column, bar, line, area, waterfall and donut charts are in the main script. If you use an additional type, such as the #[a(href=url('/types/scatter.html')) scatter chart], load it as well, before the charts are made.
+		p If you use a build tool, import the type and add it with #[code addType()]:
+
+		+codeblock('JS').
+			import { addType, init } from '@martinomagnifico/tablechart';
+			import { scatter } from '@martinomagnifico/tablechart/additional-types';
+			import '@martinomagnifico/tablechart/style.css';
+
+			addType('scatter', scatter);
+			init();
+
+		p If you use a script tag, load #[code tablechart-additional-types.js] after #[code tablechart.js]. It adds all the additional types.
+
+		+codeblock('HTML').
+			<link rel="stylesheet" href="tablechart.css">
+			<script src="tablechart.js"></script>
+			<script src="tablechart-additional-types.js"></script>
+			<script>
+				Tablechart.init();
+			</script>
+
+		p See #[a(href=url('/types/additional-types.html')) Additional types].
+
 	+section("Markup")
 		p A chart is a #[code figure] with #[code data-chart] and a table in it. Its #[code figcaption] is the title. The first cell of a row is the label, the second the value.
 
@@ -48,7 +72,7 @@ block content
 								th Autumn
 								td 70
 
-		p #[code data-chart] sets the chart type: #[code column], #[code bar], #[code line], #[code waterfall] or #[code donut].
+		p #[code data-chart] sets the chart type: #[code column], #[code bar], #[code line], #[code area], #[code waterfall] or #[code donut], or an #[a(href=url('/types/additional-types.html')) additional type] such as #[code scatter].
 
 	+section("Start it")
 		p Call #[code init()] once the page has loaded. It makes a chart of every figure with #[code data-chart].

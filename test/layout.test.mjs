@@ -67,7 +67,7 @@ figures.push(
 	figure('data-chart="bar"', table([["a", "12", "9"], ["b", "15", "11"], ["c", "140", "120"]], ["A", "B"]) + notes('<span data-annotation="axis-break" data-from="20"></span>'))
 );
 
-// Scatter charts, from the extras: a few points, a crowded cluster whose names do not all fit, bubbles in groups, and a narrow one.
+// Scatter charts, an additional type: a few points, a crowded cluster whose names do not all fit, bubbles in groups, and a narrow one.
 const points = [["Apples", "12%", "3.4"], ["Quinces", "12%", "3.4"], ["Pears", "30%", "2.1"], ["Plums", "22%", "4.5"], ["Cherries", "41%", "n/a"]];
 const cluster = Array.from({ length: 30 }, (_, i) => [`Variety ${i + 1}`, String(50 + ((i * 7) % 11)), String(2 + ((i * 5) % 9) / 10)]);
 const bubbles = [["Orchard", "64", "3.1", "14", "Own"], ["Market", "41", "2.2", "6", "Own"], ["Shop", "22", "3.8", "2", "Bought"], ["Online", "70", "1.4", "9", "Bought"]];
@@ -103,7 +103,7 @@ figures.push(
 
 const script = `
 import { addType, init } from "/tablechart.mjs";
-import { scatter } from "/tablechart-extras.mjs";
+import { scatter } from "/tablechart-additional-types.mjs";
 addType("scatter", scatter);
 const describe = () => [...document.querySelectorAll("figure")].map((figure, k) => {
 	const svg = figure.querySelector("svg")?.outerHTML ?? "(no drawing)";
