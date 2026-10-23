@@ -74,8 +74,6 @@ export interface Config {
 	names: boolean;
 	/** A tooltip with the values of a row that is pointed at or tapped: `"auto"`, the default, only on a chart that does not show all its numbers; `true` always; `false` never. A figure overrides it with `data-chart-tooltip`. */
 	tooltip: boolean | "auto";
-	/** The old name of `tooltip`, until the next minor version. */
-	hover?: boolean;
 	/** Where the tooltip goes in the page: an element or a selector, `body` by default. In a scaled element, such as the slides of a presentation, the tooltip has their scale. */
 	tooltipparent: HTMLElement | string | null;
 	/** The table under the chart: `"always"`, only in `"print"`, in print when numbers are left out (`"auto"`), or `"never"`. A figure overrides it with `data-chart-table`. */

@@ -75,7 +75,7 @@ block content
 						span +12%
 
 	+section("Reference line")
-		p A reference line marks a value, such as a target or the mean. #[code data-value] puts it on the value axis: across a column, line or area chart, and up a bar chart. It takes a number, #[code mean] or #[code median]. The mean and the median are of the values in the table.
+		p A reference line marks a value, such as a target or the mean. To put it on the value axis, add #[code data-value]. The line then goes across a column, line or area chart, and up a bar chart. #[code data-value] is a number, #[code mean] or #[code median]. The mean and the median are of the values in the table.
 
 		+chart(null, '11')
 			figure(data-chart="column")
@@ -89,7 +89,7 @@ block content
 				.chart-annotations
 					span(data-annotation="reference" data-value="60") Target
 
-		p If the names of the rows are numbers, #[code data-name] puts the line among them, as if the names were a scale. Here each row is a number of apples on a branch, and its value is how many branches have that many. With #[code mean] or #[code median], each name counts as often as its value says: the mean is the mean number of apples on a branch.
+		p If the names of the rows are numbers, add #[code data-name] to put the line among them, as if the names were a scale. Here each row is a number of apples on a branch, and its value is how many branches have that many. If you use #[code mean] or #[code median], each name counts as often as its value: the mean is the mean number of apples on a branch.
 
 		+chart(null, '13')
 			figure(data-chart="column")
@@ -104,7 +104,7 @@ block content
 					span(data-annotation="reference" data-name="mean") Mean 4.3
 					span(data-annotation="reference" data-name="median" data-line="dotted") Median 4
 
-		p The line is dashed, or dotted with #[code data-line="dotted"]. The text of the annotation is its label, on the line. If two labels would cover each other, the second moves beside its line or a line lower. Without text, there is only the line.
+		p The line is dashed. If you add #[code data-line="dotted"], it is dotted. The text of the annotation is the label, on the line. If two labels would cover each other, the second one moves beside its line, or one line lower. If the annotation has no text, there is only the line.
 		p If the label has a number and the line uses #[code mean] or #[code median], Tablechart checks it, to the decimals you wrote, and shows a warning in the console if they differ. Your text is always the one shown.
 
 	+section("Break the scale")

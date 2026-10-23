@@ -413,9 +413,8 @@ export const build = (
 		if (go) stepTo(state, state.step + (go === "next" ? 1 : -1));
 	});
 	stepTo(state, 0, true);
-	// `hover` and `data-chart-hover` are the old names.
-	const own = figure.getAttribute("data-chart-tooltip") ?? figure.getAttribute("data-chart-hover");
-	const tooltip = own === "false" ? false : own === "auto" ? "auto" : own !== null ? true : config.hover === false ? false : config.tooltip;
+	const own = figure.getAttribute("data-chart-tooltip");
+	const tooltip = own === "false" ? false : own === "auto" ? "auto" : own !== null ? true : config.tooltip;
 	if (tooltip) attachTooltip(state, config, tooltip === "auto");
 	relabel(state, config);
 	return state;
@@ -970,8 +969,20 @@ export const layout = (state: ChartState, config: Config): boolean => {
 			if (node.dataset.place === "none" || node.hidden || node.hasAttribute("data-left-out")) return [];
 			const r = node.getBoundingClientRect();
 			const tall = (r.height * scale) / lines;
+			// With the timing of its text, such as `--i` and `--step`, so the gap arrives with it.
+			const timing = Array.from(node.style).filter((name) => name.startsWith("--")).map((name) => `${name}:${node.style.getPropertyValue(name)}`);
 			return r.width
-				? [svgEl("rect", { x: (r.left - box.left) * scale - 3 * unit, y: (r.top - box.top) * scale + (r.height * scale - tall) / 2 - unit, width: r.width * scale + 6 * unit, height: tall + 2 * unit })]
+				? [
+						svgEl("rect", {
+							class: HOLE_CLASS,
+							"data-for": "text",
+							x: (r.left - box.left) * scale - 3 * unit,
+							y: (r.top - box.top) * scale + (r.height * scale - tall) / 2 - unit,
+							width: r.width * scale + 6 * unit,
+							height: tall + 2 * unit,
+							style: timing.join("; "),
+						}),
+					]
 				: [];
 		});
 		cutOut(svg, under, VIEWBOX_WIDTH, height, grid);

@@ -295,18 +295,6 @@ export const create = async (
 	return figure ? make(figure, config) : null;
 };
 
-// Once per page: the old names still work until the next minor version.
-let warned = false;
-const warnOldNames = (figures: HTMLElement[], config: Config): void => {
-	if (warned) return;
-	const used = new Set<string>();
-	if (config.hover !== undefined) used.add(`the "hover" option is now "tooltip"`);
-	if (figures.some((figure) => figure.hasAttribute("data-chart-hover"))) used.add("data-chart-hover is now data-chart-tooltip");
-	if (!used.size) return;
-	warned = true;
-	console.warn(`[${LIBRARY_NAME}] ${[...used].join("; ")}. The old names work until the next minor version.`);
-};
-
 /** Makes a chart of every figure in `root` that matches the selector, skipping existing charts. */
 export const init = async (
 	options: Partial<Config> = {},
@@ -316,7 +304,6 @@ export const init = async (
 	if (config.debug) debug.enabled = true;
 
 	const figures = await prepare(Array.from(root.querySelectorAll<HTMLElement>(config.selector)), config);
-	warnOldNames(figures, config);
 	const charts = figures
 		.map((figure) => make(figure, config))
 		.filter((chart): chart is TablechartChart => chart !== null);

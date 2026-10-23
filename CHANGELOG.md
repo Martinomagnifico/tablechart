@@ -13,6 +13,7 @@
 ### Removed
 
 - The old CSS variable names from 1.0.4, and the animate values `up` and `across`.
+- The `hover` option and `data-chart-hover`. Use `tooltip` and `data-chart-tooltip`.
 
 
 

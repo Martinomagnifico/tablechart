@@ -57,6 +57,25 @@ block content
 					td: code --tablechart-caption-gap
 					td The space under the title: 0.5em by default.
 
+	+section("Text colours")
+		p By default, all text in a chart has the text colour of the chart. To give some of it another colour, set one of these variables.
+
+		table
+			thead
+				tr
+					th Variable
+					th Sets
+			tbody
+				tr
+					td: code --tablechart-name-color
+					td The names of the rows, under the columns or beside the bars
+				tr
+					td: code --tablechart-value-color
+					td The numbers on and after the bars, not inside them
+				tr
+					td: code --tablechart-axis-text-color
+					td The numbers and titles along the axes. See #[a(href=url('/styling/axes.html')) Axes and gridlines].
+
 	+section("Numbers inside the bars")
 		p #[code --tablechart-value-align] sets where a number inside its bar goes: #[code start], where the bar starts, #[code center], or #[code end], where it ends. On a waterfall, a step down ends at the bottom. The number is as far from the start or end as the widest number is from the sides. Columns and bars use #[code end] by default, a waterfall #[code center].
 

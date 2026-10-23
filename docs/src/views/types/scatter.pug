@@ -13,8 +13,8 @@ block content
 				p.lead Two numbers per row, as a marker with its name.
 
 	+section("Scatter chart")
-		p Each row is a marker. The first value column sets where the marker is across, the second where it is up. The headers of those columns are the titles of the axes. The name of the row is shown next to its marker.
-		p The scatter chart is an extra: load it before the charts are made. See #[a(href="#load-it") Load it].
+		p Each row is a marker. The first value column is the position across, the second the position up. The headers of those two columns are the titles of the axes. The name of the row is shown next to its marker.
+		p The scatter chart is an extra. To use it, load it before the charts are made. See #[a(href="#load-it") Load it].
 
 		+chart(null, '1,5')
 			figure(data-chart="scatter")
@@ -32,11 +32,11 @@ block content
 								td= row[1]
 								td= row[2]
 
-		p The axes start a little below the lowest value and end a little above the highest, so they do not have to start at zero. The numbers along the axes get the format of the numbers in the table, with the same text around them, such as #[code %].
-		p A row without a number in one of the two columns has no marker. It stays in the table.
+		p The axes start a little below the lowest value and end a little above the highest value, so they do not always start at zero. The numbers along the axes have the same format as the numbers in the table, with the same text around them, such as #[code %].
+		p If a row has no number in one of the two columns, it has no marker. The row stays in the table.
 
 	+section("Bubbles")
-		p A third value column sets the size of each marker. The area of a marker follows its value. The largest marker is #[code --tablechart-bubble-max] across, #[code 24px] by default. The header of the column is shown in the legend, with a small and a large circle.
+		p If there is a third value column, it sets the size of each marker: the area of a marker matches its value. The largest marker is #[code --tablechart-bubble-max] wide, #[code 24px] by default. The header of the column is shown in the legend, with a small and a large circle.
 
 		+chart(null, '5')
 			figure(data-chart="scatter")
@@ -56,10 +56,10 @@ block content
 								td= row[2]
 								td= row[3]
 
-		p Larger markers come first, so a small marker is on top of a large one.
+		p If two markers overlap, the smaller one is on top.
 
 	+section("Groups")
-		p Add #[code data-group] to the header of a column with names, such as "Eating" and "Cooking". Each group gets its own colour and its own shape: a circle, a triangle, a square and a diamond. The groups are in the legend. The colours are #[code --tablechart-color-1], #[code --tablechart-color-2] and so on. See #[a(href=url('/styling/colours.html')) Colours].
+		p To show groups, add #[code data-group] to the header of a column with names, such as "Eating" and "Cooking". Each group then has its own colour, its own shape (a circle, a triangle, a square or a diamond) and an entry in the legend. The colours are #[code --tablechart-color-1], #[code --tablechart-color-2] and so on. See #[a(href=url('/styling/colours.html')) Colours].
 
 		+chart(null, '5')
 			figure.scatter-colours(data-chart="scatter")
@@ -87,21 +87,21 @@ block content
 				--tablechart-color-2: #d9844f;
 			}
 
-		p The group names are cells of the table, so screen readers read them, and with #[code data-chart-keys] they get translation keys, such as #[code apples-group1]. See #[a(href=url('/features/translation.html')) Translation].
+		p The group names are cells of the table, so screen readers read them. If the figure has #[code data-chart-keys], each group name gets a translation key, such as #[code apples-group1]. See #[a(href=url('/features/translation.html')) Translation].
 
 	+section("Names")
-		p Each name goes to the right of its marker if there is room. If not, it tries the left, above, below, and then the corners. A name does not cover a marker or another name, and stays inside the axes. The larger markers get their place first.
-		p If a name has no room at all, it is left out. Then the chart has a tooltip: pointing at a marker shows its name. See #[a(href=url('/features/tooltips.html')) Tooltips].
-		p Rows with the same two numbers have their markers in the same place. They share one name, with the number of the others: #[strong Boskoop +1] above. The tooltip of that marker shows all their names.
-		p #[code data-chart-names="false"] turns the names off, for every marker. Then the tooltip shows the name of the marker that is pointed at. The #[code names] option does the same for every scatter chart.
+		p If there is room, a name is shown to the right of its marker. If not, it goes to the left, above, below, or to one of the corners. A name does not cover a marker or another name, and stays inside the axes. Larger markers get their place first.
+		p If a name has no room at all, it is left out. The chart then has a tooltip: if you point at a marker, its name is shown. See #[a(href=url('/features/tooltips.html')) Tooltips].
+		p If rows have the same two numbers, their markers are in the same place. They then share one name, with the number of the other rows, such as #[strong Boskoop +1] above. The tooltip of that marker shows all their names.
+		p To turn the names off, add #[code data-chart-names="false"]. The tooltip then shows the name of the marker you point at. To turn them off on every scatter chart, set the #[code names] option to #[code false].
 
 		+codeblock('HTML').
 			<figure data-chart="scatter" data-chart-names="false">
 
-		p Above 400 markers, a chart does not look for room for the names: they are all left out, and the tooltip shows them.
+		p If a chart has more than 400 markers, no names are placed. They are all left out, and the tooltip shows them.
 
 	+section("Axes")
-		p #[code data-chart-scale] sets the axis up: two numbers are where it starts and ends, and three or more are the numbers along it. #[code data-chart-scale-x] does the same for the axis across. #[code data-chart-scale-y] is another name for #[code data-chart-scale].
+		p To set the axis up yourself, add #[code data-chart-scale]. If you give two numbers, they are where the axis starts and ends. If you give three or more, they are the numbers along the axis. #[code data-chart-scale-x] does the same for the axis across. #[code data-chart-scale-y] is another name for #[code data-chart-scale].
 
 		+chart(null, '1')
 			figure(data-chart="scatter" data-chart-scale-x="0 100" data-chart-scale="0 0.5 1 1.5 2")
@@ -119,10 +119,10 @@ block content
 								td= row[1]
 								td= row[2]
 
-		p Without numbers of your own, Tablechart chooses steps of 1, 2 or 5 times 10, 100 and so on. On a narrow chart it shows fewer numbers, so they do not touch.
+		p If you do not give numbers, the axis goes up in steps of 1, 2 or 5 times 10, 100 and so on. If the chart is narrow, it shows fewer numbers, so they do not touch.
 
 	+section("Gridlines")
-		p #[code data-chart-grid] adds a light line at each number along both axes. The #[code grid] option does the same for every chart with axes.
+		p To add a light line at each number along both axes, add #[code data-chart-grid]. To add them to every chart, set the #[code grid] option to #[code true].
 
 		+chart(null, '1')
 			figure(data-chart="scatter" data-chart-grid)
@@ -143,7 +143,7 @@ block content
 		p #[code --tablechart-grid-color], #[code --tablechart-grid-opacity] and #[code --tablechart-grid-width] set how the gridlines look. #[code --tablechart-axis-color], #[code --tablechart-axis-width] and #[code --tablechart-axis-size] set the axes and the text along them. See #[a(href=url('/styling/axes.html')) Axes and gridlines].
 
 	+section("Load it")
-		p The scatter chart is not in the main script, as most pages do not need it. It is in the extras. See #[a(href=url('/types/extras.html')) Extras].
+		p The scatter chart is not in the main script. It is in the extras. See #[a(href=url('/types/extras.html')) Extras].
 
 		+codeblock('JS').
 			import { addType, init } from "@martinomagnifico/tablechart";
@@ -152,7 +152,7 @@ block content
 			addType("scatter", scatter);
 			init();
 
-		p With a script tag, load #[code tablechart-extras.js] after #[code tablechart.js]. It adds the scatter chart by itself.
+		p If you use a script tag, load #[code tablechart-extras.js] after #[code tablechart.js]. It adds the scatter chart.
 
 		+codeblock('HTML').
 			<script src="tablechart.js"></script>
@@ -162,7 +162,7 @@ block content
 			</script>
 
 	+section("What it does not do")
-		p A scatter chart has no steps, no stacks and no break in the scale. If a figure asks for one, the chart is shown whole. For a stack or a break the console shows a warning; for steps it shows a message with the #[code debug] option.
+		p A scatter chart has no steps, no stacks and no break in the scale. If a figure has one of those, the chart is shown whole. For a stack or a break, the console shows a warning. For steps, it shows a message if the #[code debug] option is on.
 
 	+section("Next")
 		p To set the colours of the groups, see #[a(href=url('/styling/colours.html')) Colours]. For all the attributes, see #[a(href=url('/reference/attributes.html')) Attributes].

@@ -76,7 +76,7 @@ block content
 					span(data-annotation="axis-break" data-from="20" data-to="160")
 
 	+section("Axis and gridlines")
-		p The value axis is off by default: the numbers on the columns show the values. #[code data-chart-axis] adds numbers along the axis, on the left. #[code data-chart-grid] adds a light line at each of those numbers. Use one of them, or both. The #[code axis] and #[code grid] options do the same for every chart.
+		p By default there is no value axis: the numbers on the columns show the values. To add numbers along the axis, on the left, add #[code data-chart-axis]. To add a light line at each of those numbers, add #[code data-chart-grid]. You can add one of them, or both. To add them to every chart, set the #[code axis] and #[code grid] options to #[code true].
 
 		+chart(null, '1')
 			figure(data-chart="waterfall" data-chart-axis data-chart-grid)
@@ -91,7 +91,7 @@ block content
 								th= row[0]
 								td= row[1]
 
-		p The scale then ends on a number of the axis. To set the scale yourself, use #[code data-chart-scale], such as #[code data-chart-scale="0 100"]. To change how the axis and gridlines look, see #[a(href=url('/styling/axes.html')) Axes and gridlines].
+		p If a chart has an axis or gridlines, its scale ends on a number of the axis. To set the scale yourself, add #[code data-chart-scale], such as #[code data-chart-scale="0 100"]. To change how the axis and gridlines look, see #[a(href=url('/styling/axes.html')) Axes and gridlines].
 
 	+section("Next")
 		p To set the colours of rising steps, falling steps and totals, see #[a(href=url('/styling/colours.html')) Colours].

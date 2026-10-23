@@ -181,6 +181,7 @@
 	position: absolute;
 	white-space: nowrap;
 	font-size: var(--tablechart-axis-size, #{$namesize});
+	color: var(--tablechart-axis-text-color, inherit);
 }
 .tablechart-tick {
 	&[data-place="below"] {
@@ -258,6 +259,7 @@
 	margin-top: var(--tablechart-name-gap, 0.45em);
 
 	:where(span) {
+		color: var(--tablechart-name-color, inherit);
 		text-align: center;
 		padding: var(--tablechart-name-padding, 0 0.2em);
 		font-size: calc(#{$namesize} * var(--_name-fit, 1));
