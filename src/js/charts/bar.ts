@@ -163,19 +163,22 @@ export const bar: ChartType = {
 					const end = x(cell.value);
 					const back = cell.value < 0;
 					const top = cy(i) + layout.offset(s);
-					svg.appendChild(
-						svgEl("rect", {
-							class: withRow(BAR_CLASS, row),
-							"data-kind": "bar",
-							"data-row": i + 1,
-							"data-grow": back ? "left" : "right",
-							x: Math.min(end, zero),
-							y: top,
-							width: Math.max(Math.abs(end - zero), 1),
-							height: layout.size,
-							...seriesMark(geo, row, s),
-						})
-					);
+					// A value of zero has no bar. A very small one is at least one unit, on its own side of the zero line.
+					const wide = Math.max(Math.abs(end - zero), 1);
+					if (cell.value !== 0)
+						svg.appendChild(
+							svgEl("rect", {
+								class: withRow(BAR_CLASS, row),
+								"data-kind": "bar",
+								"data-row": i + 1,
+								"data-grow": back ? "left" : "right",
+								x: back ? zero - wide : zero,
+								y: top,
+								width: wide,
+								height: layout.size,
+								...seriesMark(geo, row, s),
+							})
+						);
 					label.dataset.place = back ? "before" : "after";
 					label.toggleAttribute("data-left-out", !fit);
 					placeAt(label, back ? end - gap : end + gap, top + layout.size / 2, VIEWBOX_WIDTH, height);
@@ -199,19 +202,22 @@ export const bar: ChartType = {
 			const back = seg.value < 0;
 			const length = Math.abs(end - zero);
 
-			svg.appendChild(
-				svgEl("rect", {
-					class: withRow(BAR_CLASS, seg),
-					"data-kind": seg.kind,
-					"data-row": i + 1,
-					"data-grow": back ? "left" : "right",
-					x: Math.min(end, zero),
-					y: middle - thickness / 2,
-					width: Math.max(length, 1),
-					height: thickness,
-					style: timing("--i", seg.slot),
-				})
-			);
+			// A value of zero has no bar. A very small one is at least one unit, on its own side of the zero line.
+			const wide = Math.max(length, 1);
+			if (seg.value !== 0)
+				svg.appendChild(
+					svgEl("rect", {
+						class: withRow(BAR_CLASS, seg),
+						"data-kind": seg.kind,
+						"data-row": i + 1,
+						"data-grow": back ? "left" : "right",
+						x: back ? zero - wide : zero,
+						y: middle - thickness / 2,
+						width: wide,
+						height: thickness,
+						style: timing("--i", seg.slot),
+					})
+				);
 
 			const label = values[i];
 			const pad = Math.max(Math.min(gap, length - widthOf(label) - 6 * unit), 6 * unit);

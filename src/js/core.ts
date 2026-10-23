@@ -20,6 +20,8 @@ import {
 	PLACED_CLASS,
 	PLOT_CLASS,
 	HOLE_CLASS,
+	VALUES_CLASS,
+	WEBKIT_CLASS,
 	LIBRARY_NAME,
 	SR_CLASS,
 	MINUS_CLASS,
@@ -194,10 +196,14 @@ export const build = (
 	);
 
 	const columnDecimals = series.map((_one, s) => Math.max(0, largest(rows.map((r) => decimalsIn(r.cells[s]?.number ?? "")))));
+	// All numbers in one element, so a chart without steps can fade them in at once.
+	const numbers = document.createElement("div");
+	numbers.className = VALUES_CLASS;
+	plot.appendChild(numbers);
 	const seriesValues = series.map((_one, s) =>
 		rows.map((row, i) => {
 			const cell = row.cells[s] ?? row.cells[0];
-			const node = htmlEl(VALUE_CLASS, plot);
+			const node = htmlEl(VALUE_CLASS, numbers);
 			node.classList.add(...row.classes);
 			node.dataset.value = String(cell.value);
 			if (cell.prefix) node.dataset.prefix = cell.prefix;
@@ -216,7 +222,7 @@ export const build = (
 	const totals =
 		stacked && type.totals
 			? rows.map((row, i) => {
-					const node = htmlEl(VALUE_CLASS, plot);
+					const node = htmlEl(VALUE_CLASS, numbers);
 					node.classList.add(...row.classes);
 					node.dataset.kind = "total";
 					node.dataset.row = String(i + 1);
@@ -386,6 +392,7 @@ export const build = (
 		.filter((a): a is NonNullable<typeof a> => a !== null);
 
 	if (animated(figure, config)) figure.setAttribute("data-animate", motionOf(figure, kind, config, Boolean(plan)));
+	figure.classList.toggle(WEBKIT_CLASS, navigator.vendor === "Apple Computer, Inc.");
 
 	const state: ChartState = {
 		figure,
@@ -412,6 +419,15 @@ export const build = (
 		step: 0,
 		controls,
 	};
+	// Once every mark has moved into place, the masks that waited are put on.
+	let moving = 0;
+	svg.addEventListener("transitionrun", () => moving++);
+	const arrived = () => {
+		moving = Math.max(0, moving - 1);
+		if (!moving && figure.classList.contains(SHOWN_CLASS)) putMasksOn(svg);
+	};
+	svg.addEventListener("transitionend", arrived);
+	svg.addEventListener("transitioncancel", arrived);
 	controls?.addEventListener("click", (event) => {
 		const go = (event.target as Element).closest("button")?.dataset.go;
 		if (go) stepTo(state, state.step + (go === "next" ? 1 : -1));
@@ -992,6 +1008,13 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		cutOut(svg, under, VIEWBOX_WIDTH, height, grid);
 	}
 	cutOut(svg, holes, VIEWBOX_WIDTH, height);
+	// Under a mask, Safari draws everything again on every frame, so while the marks still have to build, the mask of a badge waits.
+	const masked = holes.length ? svg.lastElementChild : null;
+	const building = state.figure.hasAttribute("data-animate") && !state.figure.hasAttribute("data-steps") && !state.figure.classList.contains(SHOWN_CLASS);
+	if (masked && building) {
+		masked.setAttribute("data-mask", masked.getAttribute("mask") ?? "");
+		masked.removeAttribute("mask");
+	}
 
 	// A number that is not shown, for lack of room or by design, so `data-chart-table="auto"` prints the table.
 	// A cell without a number, such as "n/a", has nothing to leave out; nor has a donut's total, which is in the middle.
@@ -1047,4 +1070,12 @@ export const unbuild = (state: ChartState): void => {
 /** One class, `is-shown`, starts the whole build. */
 export const setShown = (state: ChartState, shown: boolean): void => {
 	state.figure.classList.toggle(SHOWN_CLASS, shown);
+};
+
+/** Puts on the masks that waited for the build, at once, such as for print. */
+export const putMasksOn = (svg: SVGSVGElement): void => {
+	for (const group of svg.querySelectorAll<SVGElement>("[data-mask]")) {
+		group.setAttribute("mask", group.dataset.mask ?? "");
+		group.removeAttribute("data-mask");
+	}
 };

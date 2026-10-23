@@ -140,6 +140,13 @@
 		}
 	}
 
+	// Columns and bars: a longer, even movement with much overlap, so a long bar moves only a little on each frame, also on a large screen.
+	:where([data-chart="column"], [data-chart="bar"]) {
+		--_element: 0.8s;
+		--_ratio: 0.06;
+		--_easing: cubic-bezier(0.37, 0, 0.63, 1);
+	}
+
 	// A waterfall grows column by column: the next starts when the one before it is at 95%. Under the maximum its columns get shorter too.
 	:where([data-chart="waterfall"]:not([data-animate="sweep"])) {
 		--_ratio: 0.6;
@@ -291,6 +298,59 @@
 		:where(.tablechart-centre) {
 			transition-delay: calc(0.5 * #{$ring});
 		}
+	}
+
+	// A chart without steps: its numbers, and the names on a scatter chart, fade in as one group when the shapes are nearly done.
+	// A hole switches on rather than fades.
+	$after-shapes: calc((var(--count, 1) - 1) * #{$stagger} + 0.6 * #{$duration});
+	$together: ":where(.tablechart-values, [data-chart='scatter'] .tablechart-categories[data-place='beside'])";
+
+	:where([data-animate]:not([data-steps])) {
+		:where(.tablechart-values .tablechart-value, [data-chart="scatter"] .tablechart-categories span) {
+			opacity: 1;
+			transition: none;
+		}
+		#{$together} {
+			opacity: 0;
+			transition: opacity #{$fade} ease;
+			transition-delay: #{$after-shapes};
+		}
+		// Under its text: on as the text starts to appear, which covers the gap.
+		:where(.tablechart-hole[data-for="text"]) {
+			transition: opacity 0s linear;
+			transition-delay: #{$after-shapes};
+		}
+		:where(.tablechart-hole[data-for="badge"]) {
+			transition-duration: 0s;
+		}
+		// Around a point: on when the point is nearly there, so the line does not look broken.
+		:where(.tablechart-hole:not([data-for])) {
+			transition: opacity 0s linear;
+			transition-delay: calc(var(--i) * #{$stagger} + 0.048 * #{$duration} + 0.7 * #{$fade});
+		}
+	}
+
+	:where([data-animate]:not([data-steps]).is-shown) #{$together} {
+		opacity: 1;
+	}
+
+	// In WebKit, text that fades costs many frames on a large screen, also after the shapes, so there it appears at once.
+	:where([data-animate].is-webkit:not([data-steps])) :where(.tablechart-values, .tablechart-categories, .tablechart-name, .tablechart-reference, .tablechart-badge, .tablechart-centre) {
+		transition-duration: 0s;
+	}
+
+	// The same, after the motion of a line or area that grows, or of a waterfall that sweeps.
+	:where([data-animate="grow"]:is([data-chart="line"], [data-chart="area"]):not([data-steps])) {
+		:where(.tablechart-values, .tablechart-hole[data-for="text"]) {
+			transition-delay: #{$rise};
+		}
+		:where(.tablechart-hole:not([data-for])) {
+			transition: transform #{$rise} #{$easing}, opacity 0s linear #{$rise};
+		}
+	}
+
+	:where([data-animate="sweep"][data-chart="waterfall"]:not([data-steps])) :where(.tablechart-values, .tablechart-hole[data-for="text"]) {
+		transition-delay: calc(0.8 * #{$build});
 	}
 
 	// A chart in a sequence waits hidden and fades in as its marks start to build.

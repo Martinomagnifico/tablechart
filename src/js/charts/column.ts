@@ -78,19 +78,22 @@ export const column: ChartType = {
 					}
 					const end = y(cell.value);
 					const below = cell.value < 0;
-					svg.appendChild(
-						svgEl("rect", {
-							class: withRow(BAR_CLASS, row),
-							"data-kind": "bar",
-							"data-row": i + 1,
-							...(below && { "data-grow": "down" }),
-							x,
-							y: Math.min(end, baseline),
-							width: layout.size,
-							height: Math.max(Math.abs(baseline - end), 1),
-							...seriesMark(geo, row, s),
-						})
-					);
+					// A value of zero has no column. A very small one is at least one unit, on its own side of the baseline.
+					const tall = Math.max(Math.abs(baseline - end), 1);
+					if (cell.value !== 0)
+						svg.appendChild(
+							svgEl("rect", {
+								class: withRow(BAR_CLASS, row),
+								"data-kind": "bar",
+								"data-row": i + 1,
+								...(below && { "data-grow": "down" }),
+								x,
+								y: below ? baseline : baseline - tall,
+								width: layout.size,
+								height: tall,
+								...seriesMark(geo, row, s),
+							})
+						);
 					label.dataset.place = below ? "below" : "outside";
 					label.toggleAttribute("data-left-out", !fit);
 					placeAt(label, x + layout.size / 2, below ? end + 4 * unit : end - 4 * unit, VIEWBOX_WIDTH, height);
@@ -123,19 +126,22 @@ export const column: ChartType = {
 				values[i].dataset.place = "outside";
 				return;
 			}
-			svg.appendChild(
-				svgEl("rect", {
-					class: withRow(BAR_CLASS, seg),
-					"data-kind": seg.kind,
-					"data-row": i + 1,
-					...(below && { "data-grow": "down" }),
-					x: cx(i) - barWidth / 2,
-					y: Math.min(end, baseline),
-					width: barWidth,
-					height: Math.max(Math.abs(baseline - end), 1),
-					style: timing("--i", seg.slot),
-				})
-			);
+			// A value of zero has no column. A very small one is at least one unit, on its own side of the baseline.
+			const tall = Math.max(Math.abs(baseline - end), 1);
+			if (seg.value !== 0)
+				svg.appendChild(
+					svgEl("rect", {
+						class: withRow(BAR_CLASS, seg),
+						"data-kind": seg.kind,
+						"data-row": i + 1,
+						...(below && { "data-grow": "down" }),
+						x: cx(i) - barWidth / 2,
+						y: below ? baseline : baseline - tall,
+						width: barWidth,
+						height: tall,
+						style: timing("--i", seg.slot),
+					})
+				);
 			// Measured from the end of the column towards the baseline, up or down.
 			const toward = below ? -1 : 1;
 			const pad = Math.min(side, (Math.abs(baseline - end) - digits) / 2);

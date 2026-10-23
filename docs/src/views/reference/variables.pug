@@ -194,10 +194,10 @@ block content
 		p See #[a(href=url('/styling/animation.html')) Animation].
 
 		+vars([
-			['--tablechart-animation-ease', 'Fast at the start, settling at the end', 'The easing of bars, donuts, and lines and areas that grow'],
-			['--tablechart-animation-element-duration', '<code>0.5s</code>', 'How long one bar, column, point or donut slice takes'],
-			['--tablechart-animation-max', 'Four times the element time: <code>2s</code>', 'The longest a chart may take to build'],
-			['--tablechart-animation-stagger', '<code>0.24</code>, <code>0.6</code> for a waterfall', 'When the next element starts, as a share of the element time'],
+			['--tablechart-animation-ease', 'Slow at the start and the end for columns and bars; fast at the start, settling at the end for the other types', 'The easing of bars, donuts, and lines and areas that grow'],
+			['--tablechart-animation-element-duration', '<code>0.8s</code> for columns and bars, <code>0.5s</code> for the other types', 'How long one bar, column, point or donut slice takes'],
+			['--tablechart-animation-max', 'Four times the element time', 'The longest a chart may take to build'],
+			['--tablechart-animation-stagger', '<code>0.06</code> for columns and bars, <code>0.6</code> for a waterfall, <code>0.24</code> for the other types', 'When the next element starts, as a share of the element time'],
 			['--tablechart-annotation-duration', '<code>0.6s</code>', 'How long an annotation line takes'],
 			['--tablechart-queue-duration', '<code>0.4s</code>', 'How long a chart in a sequence takes to fade in'],
 		])

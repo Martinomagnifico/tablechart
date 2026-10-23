@@ -1,24 +1,40 @@
 # Changelog
 
+## [1.1.1] - 2026-10-23
+
+### Changed
+
+- Columns and bars now grow in 0.8s with an ease-in-out, and overlap more to avoid stutter.
+- Numbers now fade in as one group to avoid Safari issues.
+- Gaps in lines and gridlines now switch on instead of fading.
+- The mask under an annotation label is now set when the chart has built, not during the build.
+
+### Fixed
+
+- A value of zero no longer shows a sliver of a column or bar under the axis.
+
+
+
 ## [1.1.0] - 2026-10-23
 
 ### Added
 
-- A scatter and bubble chart, `data-chart="scatter"`, in the new additional types: `@martinomagnifico/tablechart/additional-types` or `tablechart-additional-types.js`.
-- `addType()`, to add one of the additional types.
-- Axes with numbers on the scatter chart, with a scale of your own (`data-chart-scale`).
-- A value axis (`data-chart-axis`) and gridlines (`data-chart-grid`) on the other types, off by default. With either, the scale ends on a number of the axis, or where `data-chart-scale` says.
-- A reference line annotation, at a value, the mean or the median.
-- `data-chart-animate="false"`, to show one chart from the start, without animation.
+- Scatter and bubble charts: `data-chart="scatter"`. The first additional type, in `@martinomagnifico/tablechart/additional-types` or `tablechart-additional-types.js`. It is in a script of its own, so a page without a scatter chart does not load it.
+- `addType()`, to add an additional type.
+- A value axis with `data-chart-axis`, and gridlines with `data-chart-grid`. Off by default, because the numbers on the bars already show the values. A scatter chart always has its axes.
+- `data-chart-scale` for a scale of your own, such as 0 to 100%. On a scatter chart also `-x` and `-y`.
+- Reference lines: `data-annotation="reference"`, at a value, the mean or the median. For a target, or the mean and median of a histogram.
+- `data-chart-animate="false"`, for a chart that should just be there, without waiting to scroll into view.
+- `--tablechart-axis-text-color` and `--tablechart-name-color`, so the numbers on an axis can be lighter or darker than the names.
 
 ### Changed
 
-- A line chart with three lines or more shows a number above or below each point where there is room. Before, it left all numbers out.
+- A line chart with three lines or more now shows its numbers where there is room, above or below the point. Before, they were all left out, so you only saw them in the tooltip.
 
 ### Removed
 
-- The old CSS variable names from 1.0.4, and the animate values `up` and `across`.
-- The `hover` option and `data-chart-hover`. Use `tooltip` and `data-chart-tooltip`.
+- The old CSS variable names from 1.0.4, and `up` and `across` for `animate`. Deprecated since 1.0.4.
+- `hover` and `data-chart-hover`. Use `tooltip` and `data-chart-tooltip`. Deprecated since 1.0.5, when tooltips replaced the numbers that appeared on hover.
 
 
 

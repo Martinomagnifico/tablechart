@@ -4,6 +4,11 @@ import { resolve } from 'path';
 import { dts } from 'rolldown-plugin-dts';
 
 // Browsers that know light-dark(), so the build leaves it as it is; the stylesheet already needs oklch(from …).
+const MAIN_ENTRY = resolve(import.meta.dirname, 'src/js/index.ts');
+const CORE_ENTRY = resolve(import.meta.dirname, 'src/js/blocks.ts');
+// The modules the main entries use, worked out once per build from their imports.
+let mainCode = null;
+
 const CSS_TARGET = ['chrome123', 'edge123', 'firefox120', 'safari17.5'];
 
 // One script for a <script> tag. The additional types take the helpers of the core from `Tablechart.kit`, so they hold no copy.
@@ -61,8 +66,8 @@ export default defineConfig({
     // is dist/tablechart.css.
     lib: {
       entry: {
-        tablechart: resolve(import.meta.dirname, 'src/js/index.ts'),
-        'tablechart-core': resolve(import.meta.dirname, 'src/js/blocks.ts'),
+        tablechart: MAIN_ENTRY,
+        'tablechart-core': CORE_ENTRY,
         'tablechart-additional-types': resolve(import.meta.dirname, 'src/js/additional-types.ts'),
       },
       formats: ['es'],
@@ -70,9 +75,24 @@ export default defineConfig({
       cssFileName: 'tablechart',
     },
     rollupOptions: {
-      // Both entries use the same code, so it is in one shared file that they
-      // both import: dist/tablechart-shared.mjs.
+      // All code of the two main entries is in one shared file, also the part the additional types use:
+      // dist/tablechart-shared.mjs. Code that only an additional type needs stays in its own entry.
       output: {
+        manualChunks: (id, { getModuleInfo }) => {
+          if (!mainCode) {
+            mainCode = new Set();
+            const walk = (one) => {
+              if (mainCode.has(one)) return;
+              mainCode.add(one);
+              for (const next of getModuleInfo(one)?.importedIds ?? []) walk(next);
+            };
+            walk(MAIN_ENTRY);
+            walk(CORE_ENTRY);
+          }
+          // The types of all entries share one file too.
+          if (/\.d\.[mc]?ts$/.test(id)) return /[/\\](index|blocks|additional-types)\.d\.[mc]?ts$/.test(id) ? undefined : 'shared.d';
+          if (/\.[mc]?[jt]s$/.test(id) && id !== MAIN_ENTRY && id !== CORE_ENTRY && mainCode.has(id)) return 'shared';
+        },
         chunkFileNames: chunk => chunk.name.endsWith('.d') ? 'tablechart-shared.d.mts' : 'tablechart-shared.mjs',
       },
     },

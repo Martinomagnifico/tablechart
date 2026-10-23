@@ -11,8 +11,8 @@ $easing: var(--_ease);
 
 // On an animated figure and its plot: the plot sets `--count`, the number of elements that start one after the other.
 @mixin timing {
-	// The time of one element.
-	--_el: var(--tablechart-animation-element-duration, 0.5s);
+	// The time of one element. A chart can set its own default with `--_element`.
+	--_el: var(--tablechart-animation-element-duration, var(--_element, 0.5s));
 	// A ceiling on the build of one chart, never a target: four elements by default.
 	--_max: var(--tablechart-animation-max, calc(4 * var(--_el)));
 	// The stagger as a share of the element time. A chart can set its own default with `--_ratio`.
@@ -21,9 +21,9 @@ $easing: var(--_ease);
 	--_dur: min(var(--_el), calc(var(--_max) / (1 + var(--_keep, 0) * (var(--count, 1) - 1) * var(--_r))));
 	// The gap between two starts; under the maximum only this gives.
 	--_stg: min(calc(var(--_r) * var(--_el)), max(0s, calc((var(--_max) - var(--_dur)) / max(var(--count, 1) - 1, 1))));
-	// How long a number or point takes to fade in: never more than a quarter of the maximum.
-	--_fade: min(var(--_dur), calc(var(--_max) / 4));
-	--_ease: var(--tablechart-animation-ease, cubic-bezier(0.26, 0.86, 0.44, 0.985));
+	// How long a number or point takes to fade in: never more than a quarter of the maximum, or 0.6s.
+	--_fade: min(var(--_dur), calc(var(--_max) / 4), 0.6s);
+	--_ease: var(--tablechart-animation-ease, var(--_easing, cubic-bezier(0.26, 0.86, 0.44, 0.985)));
 }
 
 // The background behind the chart; lighter colours are mixed with it.

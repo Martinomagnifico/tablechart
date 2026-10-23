@@ -6,6 +6,7 @@ export const LIBRARY_NAME = "tablechart";
 export const PLOT_CLASS = "tablechart-plot";
 export const CATEGORIES_CLASS = "tablechart-categories";
 export const VALUE_CLASS = "tablechart-value";
+export const VALUES_CLASS = "tablechart-values";
 export const BAR_CLASS = "tablechart-bar";
 export const PIECE_CLASS = "tablechart-piece";
 export const RULE_CLASS = "tablechart-rule";
@@ -32,6 +33,8 @@ export const SR_CLASS = "tablechart-sr";
 export const MINUS_CLASS = "tablechart-minus";
 export const SHOWN_CLASS = "is-shown";
 export const PRINTING_CLASS = "is-printing";
+// Safari, and every browser on iPhone and iPad: there text appears at once rather than fades, which costs many frames on a large screen.
+export const WEBKIT_CLASS = "is-webkit";
 // A chart in a sequence that has not had its turn: the whole figure waits hidden.
 export const QUEUED_CLASS = "tablechart-queued";
 export const CONTROLS_CLASS = "tablechart-controls";

@@ -1,7 +1,7 @@
 import "../style/tablechart.scss";
 
 import { type Config, defaultConfig, LIBRARY_NAME, PRINTING_CLASS } from "./config";
-import { animated, build, layout, relabel, setShown, unbuild } from "./core";
+import { animated, build, layout, putMasksOn, relabel, setShown, unbuild } from "./core";
 import { debug } from "./functions/debug";
 import { assignKeys } from "./functions/read-table";
 import { adoptTables, loadSources, readMarkdownRows } from "./functions/sources";
@@ -210,6 +210,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 	const print = () => {
 		state.figure.classList.add(PRINTING_CLASS);
 		setShown(state, true);
+		putMasksOn(state.svg);
 		void state.figure.offsetWidth;
 	};
 	const printed = () => state.figure.classList.remove(PRINTING_CLASS);
