@@ -28,9 +28,9 @@
 
 // Strokes are in screen pixels, so a rule has the same weight at any size.
 .tablechart-rule {
-	stroke: var(--tablechart-baseline-color, var(--tablechart-rule-color, currentColor));
-	stroke-width: var(--tablechart-baseline-width, var(--tablechart-rule-width, 1px));
-	opacity: var(--tablechart-baseline-opacity, var(--tablechart-rule-opacity, 0.45));
+	stroke: var(--tablechart-baseline-color, currentColor);
+	stroke-width: var(--tablechart-baseline-width, 1px);
+	opacity: var(--tablechart-baseline-opacity, 0.45);
 	vector-effect: non-scaling-stroke;
 }
 
@@ -70,10 +70,10 @@
 }
 
 .tablechart-series[data-line="dashed"] {
-	stroke-dasharray: var(--tablechart-series-dash, var(--tablechart-dash, 6 4));
+	stroke-dasharray: var(--tablechart-series-dash, 6 4);
 }
 .tablechart-series[data-line="dotted"] {
-	stroke-dasharray: var(--tablechart-series-dot, var(--tablechart-dot, 0 4));
+	stroke-dasharray: var(--tablechart-series-dot, 0 4);
 }
 
 .tablechart-point {
@@ -86,6 +86,28 @@
 		stroke-width: var(--tablechart-series-width, 2px);
 		vector-effect: non-scaling-stroke;
 	}
+}
+
+// On a scatter chart, a line in the background colour sets apart markers that overlap.
+:where([data-chart="scatter"]) .tablechart-point {
+	stroke: var(--tablechart-surface, Canvas);
+	stroke-width: 1px;
+	vector-effect: non-scaling-stroke;
+}
+
+.tablechart-axis {
+	fill: none;
+	stroke: var(--tablechart-axis-color, color-mix(in oklab, currentColor 55%, transparent));
+	stroke-width: var(--tablechart-axis-width, 1px);
+	vector-effect: non-scaling-stroke;
+}
+
+.tablechart-grid {
+	fill: none;
+	stroke: var(--tablechart-grid-color, currentColor);
+	stroke-width: var(--tablechart-grid-width, 1px);
+	opacity: var(--tablechart-grid-opacity, 0.09);
+	vector-effect: non-scaling-stroke;
 }
 
 // Every slice is the same ink, stepped lighter by its place in the table.

@@ -23,12 +23,17 @@ const entries = {
 	'Both entries':      { code: `export * from './src/js/index';\nexport * from './src/js/blocks';` },
 	// Built from the file itself: package.json's `sideEffects` would drop a bare import.
 	'Script tag (IIFE)': { file: './src/js/index.iife.ts', iife: true },
+	// The extras on their own, with the helpers they share with the core.
+	'tablechart/extras': { code: `export * from './src/js/extras';` },
+	// Takes the helpers from the core's script, as it ships.
+	'Extras script tag': { file: './src/js/extras.iife.ts', iife: true, kit: true },
 };
+const kit = (id) => /[/\\]kit(\.ts)?$/.test(id);
 
 const rows = [];
 let css = null;
 let i = 0;
-for (const [label, { code, file, iife }] of Object.entries(entries)) {
+for (const [label, { code, file, iife, kit: fromCore }] of Object.entries(entries)) {
 	const entry = file ?? `./.size-entry-${i++}.mjs`;
 	const out = mkdtempSync(join(tmpdir(), 'tablechart-size-'));
 	if (!file) writeFileSync(entry, code);
@@ -47,6 +52,7 @@ for (const [label, { code, file, iife }] of Object.entries(entries)) {
 				lib: iife
 					? { entry, formats: ['iife'], name: 'Tablechart', fileName: () => 'out.js' }
 					: { entry, formats: ['es'], fileName: 'out' },
+				rollupOptions: fromCore ? { external: kit, output: { globals: () => 'Tablechart.kit' } } : {},
 			},
 		});
 		const files = readdirSync(out);

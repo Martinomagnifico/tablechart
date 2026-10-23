@@ -38,6 +38,8 @@ export interface Series {
 	/** `data-marker` on the header, such as `square` or `diamond open`. */
 	marker: string | null;
 	line: "dashed" | "dotted" | null;
+	/** `data-group` on the header: the cells name a group, such as "Predefined". */
+	group: boolean;
 }
 
 export interface Segment extends Row {
@@ -52,6 +54,14 @@ export interface Geometry {
 	segments: Segment[];
 	cx: (index: number) => number;
 	y: (value: number) => number;
+	/** Across: on a chart with two axes, and the value scale of a bar chart, set by its drawing. */
+	x?: (value: number) => number;
+	/** The plot inside the axes, on a chart with axes. */
+	frame?: [number, number, number, number];
+	/** A chart that knows better which row is pointed at sets this, in screen pixels from the plot's corner. */
+	rowAt?: (x: number, y: number) => number | null;
+	/** A CSS length set on the figure, such as `--tablechart-marker-size`, in viewBox units. */
+	length: (name: string, fallback: string) => number | null;
 	barWidth: number;
 	barMax: number;
 	height: number;
@@ -69,6 +79,8 @@ export interface Geometry {
 	squeeze: Squeeze | null;
 	/** The empty space where the scale jumps, in viewBox units. */
 	breakGap: number;
+	/** The range of the value axis, on a chart with an axis or gridlines; a chart that makes its own scale reaches it. */
+	domain: [number, number] | null;
 	/** Where a bar chart is cut across, in viewBox units; set by its drawing. */
 	breakX?: number;
 	labels: "outside" | "inside";
@@ -92,6 +104,8 @@ export interface Geometry {
 	config: Config;
 	/** Numbers an annotation worked out, against the ones the author wrote. */
 	checks: Check[];
+	/** The labels of annotations placed so far, as left, top, width and height, so the next one finds room. */
+	taken: [number, number, number, number][];
 }
 
 export interface Check {
@@ -115,6 +129,12 @@ export interface ChartType {
 	swatch?: "box";
 	categories?: "under" | "beside";
 	series?: boolean;
+	/** The value columns are the fields of one mark, such as x and y, rather than series: no names for them. */
+	columns?: boolean;
+	/** An axis across and an axis up, from the first two value columns, with their headers as titles. */
+	axes?: boolean;
+	/** Text of its own, made with the rest of the text so a translation script finds it, such as a legend. */
+	text?: (input: { figure: HTMLElement; plot: HTMLElement; rows: Row[]; series: Series[]; config: Config }) => void;
 	/** With several series, always a legend, with a sample of this shape. */
 	legend?: "box";
 	headroom?: (geo: HeadroomInput) => number;
@@ -175,6 +195,8 @@ export interface ChartState {
 	names: HTMLElement[];
 	categories: HTMLElement[];
 	centre: HTMLElement | null;
+	/** The axis titles and the place for the numbers along the axes. Without `numbers`, only for gridlines. */
+	axes: { titles: HTMLElement[]; ticks: HTMLElement; numbers: boolean } | null;
 	stacked: boolean;
 	totals: HTMLElement[];
 	totalCell: HTMLElement | null;

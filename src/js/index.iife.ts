@@ -1,4 +1,5 @@
-import { create, defaultConfig, init } from "./index.js";
+import { addType, create, defaultConfig, init } from "./index.js";
+import * as kit from "./kit.js";
 
-// For a <script> tag: `Tablechart.init()` and `Tablechart.create()`.
-(window as unknown as { Tablechart: unknown }).Tablechart = { init, create, defaultConfig };
+// For a <script> tag: `Tablechart.init()` and `Tablechart.create()`. The script with the extras uses `addType` and `kit`.
+(window as unknown as { Tablechart: unknown }).Tablechart = { init, create, defaultConfig, addType, kit };

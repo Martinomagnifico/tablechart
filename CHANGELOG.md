@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.1.0] - Unreleased
+
+### Added
+
+- A scatter and bubble chart, `data-chart="scatter"`, in the new extras: `@martinomagnifico/tablechart/extras` or `tablechart-extras.js`.
+- `addType()`, to add a chart type such as one from the extras.
+- Axes with numbers on the scatter chart, with a scale of your own (`data-chart-scale`).
+- A value axis (`data-chart-axis`) and gridlines (`data-chart-grid`) on the other types, off by default. With either, the scale ends on a number of the axis, or where `data-chart-scale` says.
+- A reference line annotation, at a value, the mean or the median.
+
+### Removed
+
+- The old CSS variable names from 1.0.4, and the animate values `up` and `across`.
+
+
+
 ## [1.0.7] - 2026-10-16
 
 ### Added

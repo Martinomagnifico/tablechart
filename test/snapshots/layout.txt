@@ -690,6 +690,431 @@ plot: --count: 3;
 --n: 1; --palette: var(--tablechart-color-2); --m: 0; --i: 2; | legend
 plot: --count: 3; --_fit: 1;
 
+#44 <figure data-chart="scatter" data-chart-made="" style="--_series-count: 2;" data-left-out="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 620"><path class="tablechart-axis" d="M81.25,14.84V541.88H976.56M257.6,541.88v6.25M483.69,541.88v6.25M709.78,541.88v6.25M935.87,541.88v6.25M81.25,537.88h-6.25M81.25,438.07h-6.25M81.25,338.25h-6.25M81.25,238.43h-6.25M81.25,138.62h-6.25M81.25,38.8h-6.25"></path><circle cx="121.95" cy="258.4" r="7.81" class="tablechart-point" data-row="1" data-marker="circle" style="--i:0; "></circle><circle cx="121.95" cy="258.4" r="7.81" class="tablechart-point" data-row="2" data-marker="circle" style="--i:1; "></circle><circle cx="935.87" cy="517.92" r="7.81" class="tablechart-point" data-row="3" data-marker="circle" style="--i:3; "></circle><circle cx="574.12" cy="38.8" r="7.81" class="tablechart-point" data-row="4" data-marker="circle" style="--i:2; "></circle></svg>
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 4; | none
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 4; | none
+--i: 0; left: 13.6009%; top: 39.2826%; |  | +1
+--i: 1; |  | left out
+--i: 3; left: 85.9304%; top: 81.0988%; | 
+--i: 2; left: 58.8187%; top: 3.86387%; | 
+--i: 4; | 
+left: 52.8906%; top: 95.2117%; | 
+left: 0%; top: 44.8967%; | 
+left: 25.7599%; top: 88.9113%; | below
+left: 48.3688%; top: 88.9113%; | below
+left: 70.9777%; top: 88.9113%; | below
+left: 93.5866%; top: 88.9113%; | below
+left: 7.1875%; top: 86.7552%; | before
+left: 7.1875%; top: 70.6558%; | before
+left: 7.1875%; top: 54.5563%; | before
+left: 7.1875%; top: 38.4569%; | before
+left: 7.1875%; top: 22.3575%; | before
+left: 7.1875%; top: 6.25802%; | before
+plot: --count: 4;
+
+#45 <figure data-chart="scatter" data-chart-grid="" data-chart-scale-x="0 100" data-chart-scale="1 2 3 4" data-chart-made="" style="--_series-count: 2;" data-left-out="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 620"><defs><mask id="tablechart-cut-14" maskUnits="userSpaceOnUse"><rect x="-1000" y="-620" width="3000" height="1860" fill="white"></rect><rect x="409.77" y="352.75" width="101.37" height="26.88" fill="black"></rect><rect x="622.02" y="247.33" width="101.37" height="26.88" fill="black"></rect><rect x="428.15" y="229.78" width="101.37" height="26.88" fill="black"></rect><rect x="612.82" y="300.04" width="101.37" height="26.88" fill="black"></rect><rect x="515.89" y="183.29" width="101.37" height="26.88" fill="black"></rect><rect x="418.95" y="282.49" width="101.37" height="26.88" fill="black"></rect><rect x="603.64" y="352.75" width="114.58" height="26.88" fill="black"></rect><rect x="402.73" y="311.73" width="114.58" height="26.88" fill="black"></rect><rect x="616.55" y="206.34" width="114.58" height="26.88" fill="black"></rect><rect x="509.64" y="381.66" width="114.58" height="26.88" fill="black"></rect></mask></defs><path class="tablechart-grid" d="M60.94,14.84V541.88M244.84,14.84V541.88M428.75,14.84V541.88M612.66,14.84V541.88M796.56,14.84V541.88M980.47,14.84V541.88M60.94,541.88H980.47M60.94,366.2H980.47M60.94,190.52H980.47M60.94,14.84H980.47" mask="url(#tablechart-cut-14)"></path><path class="tablechart-axis" d="M60.94,14.84V541.88H980.47M60.94,541.88v6.25M244.84,541.88v6.25M428.75,541.88v6.25M612.66,541.88v6.25M796.56,541.88v6.25M980.47,541.88v6.25M60.94,541.88h-6.25M60.94,366.2h-6.25M60.94,190.52h-6.25M60.94,14.84h-6.25"></path><circle cx="520.7" cy="366.2" r="7.81" class="tablechart-point" data-row="1" data-marker="circle" style="--i:0; "></circle><circle cx="585.07" cy="278.36" r="7.81" class="tablechart-point" data-row="2" data-marker="circle" style="--i:3.93; "></circle><circle cx="548.29" cy="348.63" r="7.81" class="tablechart-point" data-row="3" data-marker="circle" style="--i:1.66; "></circle><circle cx="612.66" cy="260.79" r="7.81" class="tablechart-point" data-row="4" data-marker="circle" style="--i:5.59; "></circle><circle cx="575.88" cy="331.06" r="7.81" class="tablechart-point" data-row="5" data-marker="circle" style="--i:3.31; "></circle><circle cx="539.09" cy="243.22" r="7.81" class="tablechart-point" data-row="6" data-marker="circle" style="--i:1.03; "></circle><circle cx="603.46" cy="313.49" r="7.81" class="tablechart-point" data-row="7" data-marker="circle" style="--i:4.97; "></circle><circle cx="566.68" cy="225.66" r="7.81" class="tablechart-point" data-row="8" data-marker="circle" style="--i:2.69; "></circle><circle cx="529.9" cy="295.93" r="7.81" class="tablechart-point" data-row="9" data-marker="circle" style="--i:0.62; "></circle><circle cx="594.27" cy="366.2" r="7.81" class="tablechart-point" data-row="10" data-marker="circle" style="--i:4.55; "></circle><circle cx="557.48" cy="278.36" r="7.81" class="tablechart-point" data-row="11" data-marker="circle" style="--i:2.28; "></circle><circle cx="520.7" cy="348.63" r="7.81" class="tablechart-point" data-row="12" data-marker="circle" style="--i:0.21; "></circle><circle cx="585.07" cy="260.79" r="7.81" class="tablechart-point" data-row="13" data-marker="circle" style="--i:4.14; "></circle><circle cx="548.29" cy="331.06" r="7.81" class="tablechart-point" data-row="14" data-marker="circle" style="--i:1.86; "></circle><circle cx="612.66" cy="243.22" r="7.81" class="tablechart-point" data-row="15" data-marker="circle" style="--i:5.79; "></circle><circle cx="575.88" cy="313.49" r="7.81" class="tablechart-point" data-row="16" data-marker="circle" style="--i:3.52; "></circle><circle cx="539.09" cy="225.66" r="7.81" class="tablechart-point" data-row="17" data-marker="circle" style="--i:1.24; "></circle><circle cx="603.46" cy="295.93" r="7.81" class="tablechart-point" data-row="18" data-marker="circle" style="--i:5.17; "></circle><circle cx="566.68" cy="366.2" r="7.81" class="tablechart-point" data-row="19" data-marker="circle" style="--i:2.9; "></circle><circle cx="529.9" cy="278.36" r="7.81" class="tablechart-point" data-row="20" data-marker="circle" style="--i:0.83; "></circle><circle cx="594.27" cy="348.63" r="7.81" class="tablechart-point" data-row="21" data-marker="circle" style="--i:4.76; "></circle><circle cx="557.48" cy="260.79" r="7.81" class="tablechart-point" data-row="22" data-marker="circle" style="--i:2.48; "></circle><circle cx="520.7" cy="331.06" r="7.81" class="tablechart-point" data-row="23" data-marker="circle" style="--i:0.41; "></circle><circle cx="585.07" cy="243.22" r="7.81" class="tablechart-point" data-row="24" data-marker="circle" style="--i:4.34; "></circle><circle cx="548.29" cy="313.49" r="7.81" class="tablechart-point" data-row="25" data-marker="circle" style="--i:2.07; "></circle><circle cx="612.66" cy="225.66" r="7.81" class="tablechart-point" data-row="26" data-marker="circle" style="--i:6; "></circle><circle cx="575.88" cy="295.93" r="7.81" class="tablechart-point" data-row="27" data-marker="circle" style="--i:3.72; "></circle><circle cx="539.09" cy="366.2" r="7.81" class="tablechart-point" data-row="28" data-marker="circle" style="--i:1.45; "></circle><circle cx="603.46" cy="278.36" r="7.81" class="tablechart-point" data-row="29" data-marker="circle" style="--i:5.38; "></circle><circle cx="566.68" cy="348.63" r="7.81" class="tablechart-point" data-row="30" data-marker="circle" style="--i:3.1; "></circle></svg>
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 4; | none
+--i: 5; | none
+--i: 6; | none
+--i: 7; | none
+--i: 8; | none
+--i: 9; | none
+--i: 10; | none
+--i: 11; | none
+--i: 12; | none
+--i: 13; | none
+--i: 14; | none
+--i: 15; | none
+--i: 16; | none
+--i: 17; | none
+--i: 18; | none
+--i: 19; | none
+--i: 20; | none
+--i: 21; | none
+--i: 22; | none
+--i: 23; | none
+--i: 24; | none
+--i: 25; | none
+--i: 26; | none
+--i: 27; | none
+--i: 28; | none
+--i: 29; | none
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 4; | none
+--i: 5; | none
+--i: 6; | none
+--i: 7; | none
+--i: 8; | none
+--i: 9; | none
+--i: 10; | none
+--i: 11; | none
+--i: 12; | none
+--i: 13; | none
+--i: 14; | none
+--i: 15; | none
+--i: 16; | none
+--i: 17; | none
+--i: 18; | none
+--i: 19; | none
+--i: 20; | none
+--i: 21; | none
+--i: 22; | none
+--i: 23; | none
+--i: 24; | none
+--i: 25; | none
+--i: 26; | none
+--i: 27; | none
+--i: 28; | none
+--i: 29; | none
+--i: 0; left: 41.4453%; top: 56.67%; | 
+--i: 3.93; |  | left out
+--i: 1.66; |  | left out
+--i: 5.59; left: 62.6719%; top: 39.669%; | 
+--i: 3.31; |  | left out
+--i: 1.03; left: 43.2844%; top: 36.8355%; | 
+--i: 4.97; left: 61.7523%; top: 48.1695%; | 
+--i: 2.69; left: 52.0586%; top: 29.3397%; | 
+--i: 0.62; left: 42.3648%; top: 45.336%; | 
+--i: 4.55; left: 60.8328%; top: 56.67%; | 
+--i: 2.28; |  | left out
+--i: 0.21; left: 40.7422%; top: 50.0563%; | 
+--i: 4.14; |  | left out
+--i: 1.86; |  | left out
+--i: 5.79; left: 62.125%; top: 33.0553%; | 
+--i: 3.52; |  | left out
+--i: 1.24; |  | left out
+--i: 5.17; |  | left out
+--i: 2.9; left: 51.4336%; top: 61.3323%; | 
+--i: 0.83; |  | left out
+--i: 4.76; |  | left out
+--i: 2.48; |  | left out
+--i: 0.41; |  | left out
+--i: 4.34; |  | left out
+--i: 2.07; |  | left out
+--i: 6; |  | left out
+--i: 3.72; |  | left out
+--i: 1.45; |  | left out
+--i: 5.38; |  | left out
+--i: 3.1; |  | left out
+left: 52.0703%; top: 95.2117%; | 
+left: 0%; top: 44.8967%; | 
+left: 6.09375%; top: 88.9113%; | below
+left: 24.4844%; top: 88.9113%; | below
+left: 42.875%; top: 88.9113%; | below
+left: 61.2656%; top: 88.9113%; | below
+left: 79.6562%; top: 88.9113%; | below
+left: 98.0469%; top: 88.9113%; | below
+left: 5.15625%; top: 87.3992%; | before
+left: 5.15625%; top: 59.0642%; | before
+left: 5.15625%; top: 30.7292%; | before
+left: 5.15625%; top: 2.39415%; | before
+plot: --count: 7;
+
+#46 <figure data-chart="scatter" data-chart-made="" style="--_series-count: 4;" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 620"><path class="tablechart-axis" d="M81.25,14.84V541.88H986.72M88.11,541.88v6.25M259.6,541.88v6.25M431.09,541.88v6.25M602.58,541.88v6.25M774.07,541.88v6.25M945.56,541.88v6.25M81.25,497.96h-6.25M81.25,398.14h-6.25M81.25,298.32h-6.25M81.25,198.51h-6.25M81.25,98.69h-6.25"></path><circle cx="842.67" cy="178.54" r="18.75" class="tablechart-point" data-row="1" data-marker="circle" style="--i:2; --n:0; --palette:var(--tablechart-color-1)"></circle><polygon points="945.5610795454545,498.3755557760631 962.5639056793706,527.6907732483321 928.5582534115384,527.6907732483321" class="tablechart-point" data-row="4" data-marker="triangle" style="--i:3; --n:1; --palette:var(--tablechart-color-2)"></polygon><circle cx="448.24" cy="358.21" r="12.27" class="tablechart-point" data-row="2" data-marker="circle" style="--i:1; --n:0; --palette:var(--tablechart-color-1)"></circle><polygon points="122.40767045454542,29.586831879491022 130.42287956029736,43.406157923890895 114.3924613487935,43.406157923890895" class="tablechart-point" data-row="3" data-marker="triangle" style="--i:0; --n:1; --palette:var(--tablechart-color-2)"></polygon></svg>
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 2; left: 86.7667%; top: 26.4031%; | 
+--i: 1; left: 46.6764%; top: 55.3821%; | 
+--i: 0; left: 13.5745%; top: 3.86387%; | 
+--i: 3; left: 85.5528%; top: 81.0988%; | 
+left: 53.3984%; top: 95.2117%; | 
+left: 0%; top: 44.8967%; | 
+left: 8.81096%; top: 88.9113%; | below
+left: 25.96%; top: 88.9113%; | below
+left: 43.109%; top: 88.9113%; | below
+left: 60.258%; top: 88.9113%; | below
+left: 77.4071%; top: 88.9113%; | below
+left: 94.5561%; top: 88.9113%; | below
+left: 7.1875%; top: 80.3154%; | before
+left: 7.1875%; top: 64.216%; | before
+left: 7.1875%; top: 48.1166%; | before
+left: 7.1875%; top: 32.0171%; | before
+left: 7.1875%; top: 15.9177%; | before
+--n: 0; --palette: var(--tablechart-color-1); | legend
+--n: 1; --palette: var(--tablechart-color-2); | legend
+ | legend
+plot: --count: 4;
+
+#47 <figure data-chart="scatter" style="width: 260px; --_series-count: 4;" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 769.23"><path class="tablechart-axis" d="M200,36.54V576.92H967.31M205.81,576.92v15.38M351.14,576.92v15.38M496.46,576.92v15.38M641.78,576.92v15.38M787.11,576.92v15.38M932.43,576.92v15.38M200,531.89h-15.38M200,429.55h-15.38M200,327.2h-15.38M200,224.85h-15.38M200,122.51h-15.38"></path><circle cx="845.24" cy="204.39" r="46.15" class="tablechart-point" data-row="1" data-marker="circle" style="--i:2; --n:0; --palette:var(--tablechart-color-1)"></circle><polygon points="932.4300699300699,504.2531163159034 974.2831804135556,576.413651632258 890.5769594465842,576.413651632258" class="tablechart-point" data-row="4" data-marker="triangle" style="--i:3; --n:1; --palette:var(--tablechart-color-2)"></polygon><circle cx="510.99" cy="388.61" r="30.21" class="tablechart-point" data-row="2" data-marker="circle" style="--i:1; --n:0; --palette:var(--tablechart-color-1)"></circle><polygon points="234.87762237762237,38.42353022084498 254.60736786870405,72.44033279167543 215.1478768865407,72.44033279167543" class="tablechart-point" data-row="3" data-marker="triangle" style="--i:0; --n:1; --palette:var(--tablechart-color-2)"></polygon></svg>
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 2; left: 57.2159%; top: 21.8201%; | 
+--i: 1; left: 55.6592%; top: 45.7689%; | 
+--i: 0; left: 26.7707%; top: 4.75%; | 
+--i: 3; left: 71.0809%; top: 62.5%; | 
+left: 58.3654%; top: 90.5%; | 
+left: 0%; top: 39.875%; | 
+left: 20.5813%; top: 78%; | below
+left: 35.1136%; top: 78%; | below
+left: 49.646%; top: 78%; | below
+left: 64.1783%; top: 78%; | below
+left: 78.7107%; top: 78%; | below
+left: 93.243%; top: 78%; | below
+left: 17.6923%; top: 69.1458%; | before
+left: 17.6923%; top: 55.8409%; | before
+left: 17.6923%; top: 42.536%; | before
+left: 17.6923%; top: 29.2311%; | before
+left: 17.6923%; top: 15.9261%; | before
+--n: 0; --palette: var(--tablechart-color-1); | legend
+--n: 1; --palette: var(--tablechart-color-2); | legend
+ | legend
+plot: --count: 4;
+
+#48 <figure data-chart="column" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 380"><defs><mask id="tablechart-cut-15" maskUnits="userSpaceOnUse"><rect x="-1000" y="-380" width="3000" height="1140" fill="white"></rect><rect class="tablechart-hole" data-for="badge" data-note="1" x="437.5" y="0" width="125" height="34.38" rx="0" ry="0" style="--after:5" fill="black"></rect><rect class="tablechart-hole" data-for="badge" data-note="2" x="250" y="0" width="143.75" height="34.38" rx="0" ry="0" style="--after:5" fill="black"></rect></mask></defs><g mask="url(#tablechart-cut-15)"><rect class="tablechart-bar" data-kind="bar" data-row="1" x="53.13" y="309.09" width="93.75" height="67.78" style="--i:0"></rect><rect class="tablechart-bar" data-kind="bar" data-row="2" x="253.13" y="105.74" width="93.75" height="271.14" style="--i:1"></rect><rect class="tablechart-bar" data-kind="bar" data-row="3" x="453.13" y="241.31" width="93.75" height="135.57" style="--i:2"></rect><rect class="tablechart-bar" data-kind="bar" data-row="4" x="653.13" y="376.88" width="93.75" height="1" style="--i:3"></rect><rect class="tablechart-bar" data-kind="bar" data-row="5" x="853.13" y="173.52" width="93.75" height="203.35" style="--i:4"></rect><line class="tablechart-rule" x1="0" x2="1000" y1="376.88" y2="376.88"></line><line class="tablechart-reference" data-note="1" x1="500" x2="500" y1="0" y2="376.88" style="--after:5"></line><line class="tablechart-reference" data-note="2" data-line="dotted" x1="400" x2="400" y1="0" y2="376.88" style="--after:5"></line></g></svg>
+--i: 0; left: 10%; top: 79.6948%; | outside
+--i: 1; left: 30%; top: 26.1803%; | outside
+--i: 2; left: 50%; top: 61.8566%; | outside
+--i: 3; left: 70%; top: 97.5329%; | outside
+--i: 4; left: 90%; top: 44.0185%; | outside
+left: 50%; top: 4.52303%; --after: 5; | 
+left: 32.1875%; top: 4.52303%; --after: 5; | 
+--i: 0; | 
+--i: 1; | 
+--i: 2; | 
+--i: 3; | 
+--i: 4; | 
+plot: --count: 5;
+
+#49 <figure data-chart="column" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 380"><defs><mask id="tablechart-cut-16" maskUnits="userSpaceOnUse"><rect x="-1000" y="-380" width="3000" height="1140" fill="white"></rect><rect class="tablechart-hole" data-for="badge" data-note="1" x="917.19" y="162.92" width="82.81" height="34.38" rx="0" ry="0" style="--after:4" fill="black"></rect></mask></defs><g mask="url(#tablechart-cut-16)"><rect class="tablechart-bar" data-kind="bar" data-row="1" x="78.13" y="158.46" width="93.75" height="218.42" style="--i:0"></rect><rect class="tablechart-bar" data-kind="bar" data-row="2" x="328.13" y="105.74" width="93.75" height="271.14" style="--i:1"></rect><rect class="tablechart-bar" data-kind="bar" data-row="3" x="578.13" y="113.27" width="93.75" height="263.61" style="--i:2"></rect><rect class="tablechart-bar" data-kind="bar" data-row="4" x="828.13" y="342.98" width="93.75" height="33.89" style="--i:3"></rect><line class="tablechart-rule" x1="0" x2="1000" y1="376.88" y2="376.88"></line><line class="tablechart-reference" data-note="1" x1="0" x2="1000" y1="180.11" y2="180.11" style="--after:4"></line></g></svg>
+--i: 0; left: 12.5%; top: 40.0544%; | outside
+--i: 1; left: 37.5%; top: 26.1803%; | outside
+--i: 2; left: 62.5%; top: 28.1624%; | outside
+--i: 3; left: 87.5%; top: 88.6138%; | outside
+left: 95.8594%; top: 47.3975%; --after: 4; | 
+--i: 0; | 
+--i: 1; | 
+--i: 2; | 
+--i: 3; | 
+plot: --count: 4;
+
+#50 <figure data-chart="bar" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 500"><defs><mask id="tablechart-cut-17" maskUnits="userSpaceOnUse"><rect x="-1000" y="-500" width="3000" height="1500" fill="white"></rect><rect class="tablechart-hole" data-for="badge" data-note="1" x="677.56" y="0" width="89.06" height="34.38" rx="0" ry="0" style="--after:4" fill="black"></rect></mask></defs><g mask="url(#tablechart-cut-17)"><rect class="tablechart-bar" data-kind="bar" data-row="1" data-grow="right" x="104.69" y="26.25" width="716.19" height="72.5" style="--i:0"></rect><rect class="tablechart-bar" data-kind="bar" data-row="2" data-grow="right" x="104.69" y="151.25" width="889.06" height="72.5" style="--i:1"></rect><rect class="tablechart-bar" data-kind="bar" data-row="3" data-grow="right" x="104.69" y="276.25" width="864.37" height="72.5" style="--i:2"></rect><rect class="tablechart-bar" data-kind="bar" data-row="4" data-grow="right" x="104.69" y="401.25" width="111.13" height="72.5" style="--i:3"></rect><line class="tablechart-rule" x1="104.69" x2="104.69" y1="0" y2="500"></line><line class="tablechart-reference" data-note="1" x1="722.09" x2="722.09" y1="0" y2="500" style="--after:4"></line></g></svg>
+--i: 0; left: 77.8377%; top: 12.5%; | inside
+--i: 1; left: 95.125%; top: 37.5%; | inside
+--i: 2; left: 92.6554%; top: 62.5%; | inside
+--i: 3; left: 18.1914%; top: 87.5%; | inside
+--i: 0; left: 9.21875%; top: 12.5%; | 
+--i: 1; left: 9.21875%; top: 37.5%; | 
+--i: 2; left: 9.21875%; top: 62.5%; | 
+--i: 3; left: 9.21875%; top: 87.5%; | 
+left: 72.2092%; top: 3.4375%; --after: 4; | 
+plot: --count: 4;
+
+#51 <figure data-chart="column" data-chart-axis="" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 380"><rect class="tablechart-bar" data-kind="bar" data-row="1" x="76.06" y="137.9" width="97.88" height="238.84" style="--i:0"></rect><rect class="tablechart-bar" data-kind="bar" data-row="2" x="326.06" y="80.25" width="97.88" height="296.49" style="--i:1"></rect><rect class="tablechart-bar" data-kind="bar" data-row="3" x="576.06" y="88.49" width="97.88" height="288.25" style="--i:2"></rect><rect class="tablechart-bar" data-kind="bar" data-row="4" x="826.06" y="339.68" width="97.88" height="37.06" style="--i:3"></rect><line class="tablechart-rule" x1="0" x2="1000" y1="376.74" y2="376.74"></line><path class="tablechart-axis" d="M0,47.31V376.74M0,376.74h-6.53M0,294.38h-6.53M0,212.02h-6.53M0,129.67h-6.53M0,47.31h-6.53"></path></svg>
+--i: 0; left: 12.5%; top: 34.5726%; | outside
+--i: 1; left: 37.5%; top: 19.4016%; | outside
+--i: 2; left: 62.5%; top: 21.5689%; | outside
+--i: 3; left: 87.5%; top: 87.6714%; | outside
+left: -0.978793%; top: 99.1414%; | before
+left: -0.978793%; top: 77.4684%; | before
+left: -0.978793%; top: 55.7955%; | before
+left: -0.978793%; top: 34.1225%; | before
+left: -0.978793%; top: 12.4496%; | before
+--i: 0; | 
+--i: 1; | 
+--i: 2; | 
+--i: 3; | 
+plot: --count: 4; margin-left: 27px;
+
+#52 <figure data-chart="line" data-chart-axis="" data-chart-grid="" style="--_series-count: 2;" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 380" style="--_base: 324.54px;"><path class="tablechart-grid" d="M0,324.54H962.48M0,282.95H962.48M0,241.37H962.48M0,199.79H962.48M0,158.21H962.48M0,116.62H962.48M0,75.04H962.48" mask="url(#tablechart-cut-24)"></path><defs><mask id="tablechart-cut-23" maskUnits="userSpaceOnUse"><rect x="-1000" y="-380" width="3000" height="1140" fill="white"></rect><circle cx="120.31" cy="282.95" r="6.53" class="tablechart-hole" data-row="1" data-series="2" style="--rise:41.58px; --i:0" fill="black"></circle><circle cx="360.93" cy="249.69" r="6.53" class="tablechart-hole" data-row="2" data-series="2" style="--rise:74.85px; --i:1" fill="black"></circle><circle cx="601.55" cy="141.57" r="6.53" class="tablechart-hole" data-row="3" data-series="2" style="--rise:182.96px; --i:2" fill="black"></circle><circle cx="842.17" cy="208.1" r="6.53" class="tablechart-hole" data-row="4" data-series="2" style="--rise:116.43px; --i:3" fill="black"></circle></mask><mask id="tablechart-cut-24" maskUnits="userSpaceOnUse"><rect x="-1000" y="-380" width="3000" height="1140" fill="white"></rect><rect x="97.48" y="175.4" width="45.65" height="35.5" fill="black"></rect><rect x="338.1" y="25.7" width="45.65" height="35.5" fill="black"></rect><rect x="578.72" y="188.65" width="45.65" height="35.5" fill="black"></rect><rect x="819.34" y="58.99" width="45.65" height="35.5" fill="black"></rect><rect x="106.44" y="296.75" width="27.73" height="35.5" fill="black"></rect><rect x="347.06" y="263.49" width="27.73" height="35.5" fill="black"></rect><rect x="578.72" y="92.25" width="45.65" height="35.5" fill="black"></rect><rect x="819.34" y="221.91" width="45.65" height="35.5" fill="black"></rect></mask></defs><g mask="url(#tablechart-cut-23)"><path class="tablechart-series" data-series="1" d="M120.31,224.74 L360.93,75.04 L601.55,174.84 L842.17,108.31" data-from="1" data-to="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:3"></path><path class="tablechart-series" data-series="2" d="M120.31,282.95 L360.93,249.69 L601.55,141.57 L842.17,208.1" data-from="1" data-to="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:3"></path></g><circle cx="120.31" cy="224.74" r="6.53" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:99.8px; --i:0"></circle><circle cx="360.93" cy="75.04" r="6.53" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:249.49px; --i:1"></circle><circle cx="601.55" cy="174.84" r="6.53" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:149.7px; --i:2"></circle><circle cx="842.17" cy="108.31" r="6.53" class="tablechart-point" data-series="1" data-marker="circle" data-row="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:216.23px; --i:3"></circle><circle cx="120.31" cy="282.95" r="6.53" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:41.58px; --i:0"></circle><circle cx="360.93" cy="249.69" r="6.53" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:74.85px; --i:1"></circle><circle cx="601.55" cy="141.57" r="6.53" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:182.96px; --i:2"></circle><circle cx="842.17" cy="208.1" r="6.53" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:116.43px; --i:3"></circle><line class="tablechart-rule" x1="0" x2="962.48" y1="376.74" y2="376.74"></line><path class="tablechart-axis" d="M0,75.04V324.54M0,324.54h-6.53M0,282.95h-6.53M0,241.37h-6.53M0,199.79h-6.53M0,158.21h-6.53M0,116.62h-6.53M0,75.04h-6.53"></path></svg>
+--i: 0; left: 12.031%; top: 56.1363%; | outside
+--i: 1; left: 36.093%; top: 16.7425%; | outside
+--i: 2; left: 60.155%; top: 49.0152%; | below
+--i: 3; left: 84.217%; top: 25.4967%; | outside
+--i: 0; left: 12.031%; top: 77.4663%; | below
+--i: 1; left: 36.093%; top: 68.7121%; | below
+--i: 2; left: 60.155%; top: 34.2509%; | outside
+--i: 3; left: 84.217%; top: 57.7694%; | below
+--n: 0; --palette: var(--tablechart-color-1); --m: 0; --i: 3; left: 85.8483%; top: 28.5018%; | 
+--n: 1; --palette: var(--tablechart-color-2); --m: 0; --i: 3; left: 85.8483%; top: 54.7643%; | 
+left: -0.978793%; top: 85.404%; | before
+left: -0.978793%; top: 74.4612%; | before
+left: -0.978793%; top: 63.5185%; | before
+left: -0.978793%; top: 52.5758%; | before
+left: -0.978793%; top: 41.633%; | before
+left: -0.978793%; top: 30.6903%; | before
+left: -0.978793%; top: 19.7476%; | before
+--i: 0; | 
+--i: 1; | 
+--i: 2; | 
+--i: 3; | 
+plot: --count: 4; margin-left: 27px;
+
+#53 <figure data-chart="area" data-chart-grid="" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 380" style="--_base: 376.88px;"><defs><mask id="tablechart-cut-20" maskUnits="userSpaceOnUse"><rect x="-1000" y="-380" width="3000" height="1140" fill="white"></rect><rect x="49.55" y="238.11" width="43.73" height="34" fill="black"></rect><rect x="192.42" y="100.86" width="43.73" height="34" fill="black"></rect><rect x="335.27" y="192.36" width="43.73" height="34" fill="black"></rect><rect x="620.98" y="138.99" width="43.73" height="34" fill="black"></rect><rect x="763.83" y="138.99" width="43.73" height="34" fill="black"></rect><rect x="906.7" y="24.61" width="43.73" height="34" fill="black"></rect></mask></defs><path class="tablechart-grid" d="M0,376.88H1000M0,300.63H1000M0,224.38H1000M0,148.13H1000M0,71.88H1000" mask="url(#tablechart-cut-20)"></path><g class="tablechart-area" style=""><g class="tablechart-area-fill" style="--rows:7; --i:1; --d:2"><path d="M71.43,376.88 L71.43,285.38 L214.29,148.13 L357.14,239.63 L357.14,376.88 L214.29,376.88 L71.43,376.88 Z" data-from="1" data-to="3" style="--i:1; --d:2"></path><path d="M642.86,376.88 L642.86,186.25 L785.71,186.25 L928.57,71.88 L928.57,376.88 L785.71,376.88 L642.86,376.88 Z" data-from="5" data-to="7" style="--i:5; --d:2"></path></g></g><path class="tablechart-series" d="M71.43,285.38 L214.29,148.13 L357.14,239.63" data-from="1" data-to="3" style="--i:1; --d:2"></path><path class="tablechart-series" d="M642.86,186.25 L785.71,186.25 L928.57,71.88" data-from="5" data-to="7" style="--i:5; --d:2"></path><circle cx="71.43" cy="285.38" r="6.25" class="tablechart-point" data-marker="circle" data-row="1" style="--rise:91.5px; --i:0"></circle><circle cx="214.29" cy="148.13" r="6.25" class="tablechart-point" data-marker="circle" data-row="2" style="--rise:228.75px; --i:1"></circle><circle cx="357.14" cy="239.63" r="6.25" class="tablechart-point" data-marker="circle" data-row="3" style="--rise:137.25px; --i:2"></circle><circle cx="642.86" cy="186.25" r="6.25" class="tablechart-point" data-marker="circle" data-row="5" style="--rise:190.63px; --i:4"></circle><circle cx="785.71" cy="186.25" r="6.25" class="tablechart-point" data-marker="circle" data-row="6" style="--rise:190.63px; --i:5"></circle><circle cx="928.57" cy="71.88" r="6.25" class="tablechart-point" data-marker="circle" data-row="7" style="--rise:305px; --i:6"></circle><line class="tablechart-rule" x1="0" x2="1000" y1="376.88" y2="376.88"></line></svg>
+--i: 0; left: 7.14286%; top: 72.2204%; | outside
+--i: 1; left: 21.4286%; top: 36.102%; | outside
+--i: 2; left: 35.7143%; top: 60.1809%; | outside
+--i: 3; | none
+--i: 4; left: 64.2857%; top: 46.1349%; | outside
+--i: 5; left: 78.5714%; top: 46.1349%; | outside
+--i: 6; left: 92.8571%; top: 16.0362%; | outside
+ | none
+ | none
+ | none
+ | none
+ | none
+--i: 0; | 
+--i: 1; | 
+--i: 2; | 
+--i: 3; | 
+--i: 4; | 
+--i: 5; | 
+--i: 6; | 
+plot: --count: 7;
+
+#54 <figure data-chart="bar" data-chart-axis="" data-chart-grid="" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 500"><defs><mask id="tablechart-cut-21" maskUnits="userSpaceOnUse"><rect x="-1000" y="-500" width="3000" height="1500" fill="white"></rect><rect x="755.47" y="66.32" width="69.48" height="34" fill="black"></rect><rect x="701.95" y="233" width="69.48" height="34" fill="black"></rect><rect x="458.96" y="399.65" width="52.32" height="34" fill="black"></rect><rect x="-1.76" y="69.89" width="383.01" height="26.88" fill="black"></rect><rect x="162.35" y="236.56" width="218.9" height="26.88" fill="black"></rect><rect x="267.6" y="403.21" width="113.65" height="26.88" fill="black"></rect></mask></defs><path class="tablechart-grid" d="M389.06,0V500M463.39,0V500M537.72,0V500M612.05,0V500M686.38,0V500M760.71,0V500M835.04,0V500M909.38,0V500" mask="url(#tablechart-cut-21)"></path><rect class="tablechart-bar" data-kind="bar" data-row="1" data-grow="right" x="389.06" y="36.46" width="466.79" height="93.75" style="--i:0"></rect><rect class="tablechart-bar" data-kind="bar" data-row="2" data-grow="right" x="389.06" y="203.13" width="413.28" height="93.75" style="--i:1"></rect><rect class="tablechart-bar" data-kind="bar" data-row="3" data-grow="right" x="389.06" y="369.79" width="38.65" height="93.75" style="--i:2"></rect><line class="tablechart-rule" x1="389.06" x2="389.06" y1="0" y2="500"></line><path class="tablechart-axis" d="M389.06,500H909.38M389.06,500v6.25M463.39,500v6.25M537.72,500v6.25M612.05,500v6.25M686.38,500v6.25M760.71,500v6.25M835.04,500v6.25M909.38,500v6.25"></path></svg>
+--i: 0; left: 79.0232%; top: 16.6667%; | inside
+--i: 1; left: 73.6714%; top: 50%; | inside
+--i: 2; left: 46.3652%; top: 83.3333%; | after
+--i: 0; left: 37.6562%; top: 16.6667%; | 
+--i: 1; left: 37.6562%; top: 50%; | 
+--i: 2; left: 37.6562%; top: 83.3333%; | 
+left: 38.9062%; top: 101.875%; | below
+left: 46.3393%; top: 101.875%; | below
+left: 53.7723%; top: 101.875%; | below
+left: 61.2054%; top: 101.875%; | below
+left: 68.6384%; top: 101.875%; | below
+left: 76.0714%; top: 101.875%; | below
+left: 83.5045%; top: 101.875%; | below
+left: 90.9375%; top: 101.875%; | below
+plot: margin-bottom: 25px; --count: 3;
+
+#55 <figure data-chart="waterfall" data-chart-axis="" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 380"><line class="tablechart-connector" x1="149.59" x2="250.41" y1="174.64" y2="174.64" data-row="2" style="--i:1; --start:0.2000; --span:0.0667; --ease:linear;"></line><line class="tablechart-connector" x1="349.59" x2="450.41" y1="98.16" y2="98.16" data-row="3" style="--i:2; --start:0.4000; --span:0.0667; --ease:linear;"></line><line class="tablechart-connector" x1="549.59" x2="650.41" y1="141.82" y2="141.82" data-row="4" style="--i:3; --start:0.6000; --span:0.0667; --ease:linear;"></line><line class="tablechart-connector" x1="749.59" x2="850.41" y1="177.9" y2="177.9" data-row="5" style="--i:4; --start:0.8000; --span:0.0667; --ease:linear;"></line><rect class="tablechart-bar" data-kind="total" data-row="1" data-grow="up" x="50.41" y="174.64" width="99.17" height="202.05" style="--i:0; --start:0.0000; --span:0.2000; --ease:linear;"></rect><rect class="tablechart-bar" data-kind="up" data-row="2" data-grow="up" x="250.41" y="98.16" width="99.17" height="76.48" style="--i:1; --start:0.2000; --span:0.2000; --ease:linear;"></rect><rect class="tablechart-bar" data-kind="down" data-row="3" data-grow="down" x="450.41" y="98.16" width="99.17" height="43.67" style="--i:2; --start:0.4000; --span:0.2000; --ease:linear;"></rect><rect class="tablechart-bar" data-kind="down" data-row="4" data-grow="down" x="650.41" y="141.82" width="99.17" height="36.07" style="--i:3; --start:0.6000; --span:0.2000; --ease:linear;"></rect><rect class="tablechart-bar" data-kind="total" data-row="5" data-grow="down" x="850.41" y="177.9" width="99.17" height="198.8" style="--i:4; --start:0.8000; --span:0.2000; --ease:cubic-bezier(0.3, 0.3, 0.6, 1);"></rect><line class="tablechart-rule" x1="0" x2="1000" y1="376.69" y2="376.69"></line><path class="tablechart-axis" d="M0,51.24V376.69M0,376.69h-6.61M0,322.45h-6.61M0,268.21h-6.61M0,213.97h-6.61M0,159.72h-6.61M0,105.48h-6.61M0,51.24h-6.61"></path></svg>
+--i: 0; --start: 0.0000; --span: 0.2000; left: 10%; top: 72.5441%; | inside
+--i: 1; --start: 0.2000; --span: 0.2000; left: 30%; top: 35.8948%; | inside
+--i: 2; --start: 0.4000; --span: 0.2000; left: 50%; top: 49.5014%; | outside
+--i: 3; --start: 0.6000; --span: 0.2000; left: 70%; top: 58.9939%; | outside
+--i: 4; --start: 0.8000; --span: 0.2000; left: 90%; top: 72.9724%; | inside
+left: -0.991736%; top: 99.1301%; | before
+left: -0.991736%; top: 84.8557%; | before
+left: -0.991736%; top: 70.5814%; | before
+left: -0.991736%; top: 56.3071%; | before
+left: -0.991736%; top: 42.0328%; | before
+left: -0.991736%; top: 27.7584%; | before
+left: -0.991736%; top: 13.4841%; | before
+--i: 0; | 
+--i: 1; | 
+--i: 2; | 
+--i: 3; | 
+--i: 4; | 
+plot: --count: 5; margin-left: 35px;
+
+#56 <figure data-chart="column" data-chart-axis="" data-chart-stack="" data-chart-made="" style="--_series-count: 3;" data-left-out="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 380"><g class="tablechart-bar" data-kind="bar" data-row="1" data-stack="" style="--i:0"><rect x="117.73" y="310.85" width="97.88" height="65.89" class="tablechart-piece" data-row="1" data-series="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:0"></rect><rect x="117.73" y="212.02" width="97.88" height="98.83" class="tablechart-piece" data-row="1" data-series="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:0"></rect><rect x="117.73" y="179.08" width="97.88" height="32.94" class="tablechart-piece" data-row="1" data-series="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --i:0"></rect></g><g class="tablechart-bar" data-kind="bar" data-row="2" data-stack="" style="--i:1"><rect x="451.06" y="244.97" width="97.88" height="131.77" class="tablechart-piece" data-row="2" data-series="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1"></rect><rect x="451.06" y="195.55" width="97.88" height="49.41" class="tablechart-piece" data-row="2" data-series="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1"></rect><rect x="451.06" y="113.19" width="97.88" height="82.36" class="tablechart-piece" data-row="2" data-series="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --i:1"></rect></g><g class="tablechart-bar" data-kind="bar" data-row="3" data-stack="" style="--i:2"><rect x="784.39" y="277.91" width="97.88" height="98.83" class="tablechart-piece" data-row="3" data-series="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:2"></rect><rect x="784.39" y="162.61" width="97.88" height="115.3" class="tablechart-piece" data-row="3" data-series="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:2"></rect><rect x="784.39" y="96.72" width="97.88" height="65.89" class="tablechart-piece" data-row="3" data-series="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --i:2"></rect></g><line class="tablechart-rule" x1="0" x2="1000" y1="376.74" y2="376.74"></line><path class="tablechart-axis" d="M0,47.31V376.74M0,376.74h-6.53M0,294.38h-6.53M0,212.02h-6.53M0,129.67h-6.53M0,47.31h-6.53"></path></svg>
+--i: 0; --n: 0; --m: 0; --palette: var(--tablechart-color-1); left: 16.6667%; top: 90.4722%; | inside
+--i: 1; --n: 0; --m: 0; --palette: var(--tablechart-color-1); left: 50%; top: 81.803%; | inside
+--i: 2; --n: 0; --m: 0; --palette: var(--tablechart-color-1); left: 83.3333%; top: 86.1376%; | inside
+--i: 0; --n: 1; --m: 0; --palette: var(--tablechart-color-2); left: 16.6667%; top: 68.7993%; | inside
+--i: 1; --n: 1; --m: 0; --palette: var(--tablechart-color-2); left: 50%; top: 57.9628%; | inside | left out
+--i: 2; --n: 1; --m: 0; --palette: var(--tablechart-color-2); left: 83.3333%; top: 57.9628%; | inside
+--i: 0; --n: 2; --m: 0; --palette: var(--tablechart-color-3); left: 16.6667%; top: 51.4609%; | inside | left out
+--i: 1; --n: 2; --m: 0; --palette: var(--tablechart-color-3); left: 50%; top: 40.6244%; | inside
+--i: 2; --n: 2; --m: 0; --palette: var(--tablechart-color-3); left: 83.3333%; top: 34.1225%; | inside
+--i: 0; left: 16.6667%; top: 45.4091%; | outside
+--i: 1; left: 50%; top: 28.0707%; | outside
+--i: 2; left: 83.3333%; top: 23.7362%; | outside
+left: -0.978793%; top: 99.1414%; | before
+left: -0.978793%; top: 77.4684%; | before
+left: -0.978793%; top: 55.7955%; | before
+left: -0.978793%; top: 34.1225%; | before
+left: -0.978793%; top: 12.4496%; | before
+--i: 0; | 
+--i: 1; | 
+--i: 2; | 
+--n: 0; --palette: var(--tablechart-color-1); --m: 0; --i: 2; | legend
+--n: 1; --palette: var(--tablechart-color-2); --m: 0; --i: 2; | legend
+--n: 2; --palette: var(--tablechart-color-3); --m: 0; --i: 2; | legend
+plot: --count: 3; margin-left: 27px;
+
+#57 <figure data-chart="column" data-chart-axis="" data-chart-scale="0 25 50 75 100" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 380"><rect class="tablechart-bar" data-kind="bar" data-row="1" x="75.41" y="186.01" width="99.17" height="190.68" style="--i:0"></rect><rect class="tablechart-bar" data-kind="bar" data-row="2" x="325.41" y="139.99" width="99.17" height="236.71" style="--i:1"></rect><rect class="tablechart-bar" data-kind="bar" data-row="3" x="575.41" y="146.56" width="99.17" height="230.13" style="--i:2"></rect><rect class="tablechart-bar" data-kind="bar" data-row="4" x="825.41" y="347.11" width="99.17" height="29.59" style="--i:3"></rect><line class="tablechart-rule" x1="0" x2="1000" y1="376.69" y2="376.69"></line><path class="tablechart-axis" d="M0,47.93V376.69M0,376.69h-6.61M0,294.5h-6.61M0,212.31h-6.61M0,130.12h-6.61M0,47.93h-6.61"></path></svg>
+--i: 0; left: 12.5%; top: 47.211%; | outside
+--i: 1; left: 37.5%; top: 35.0987%; | outside
+--i: 2; left: 62.5%; top: 36.8291%; | outside
+--i: 3; left: 87.5%; top: 89.6037%; | outside
+left: -0.991736%; top: 99.1301%; | before
+left: -0.991736%; top: 77.5011%; | before
+left: -0.991736%; top: 55.8721%; | before
+left: -0.991736%; top: 34.2431%; | before
+left: -0.991736%; top: 12.6142%; | before
+--i: 0; | 
+--i: 1; | 
+--i: 2; | 
+--i: 3; | 
+plot: --count: 4; margin-left: 35px;
+
+#58 <figure data-chart="bar" data-chart-grid="" data-chart-scale="0 100" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 500"><defs><mask id="tablechart-cut-22" maskUnits="userSpaceOnUse"><rect x="-1000" y="-500" width="3000" height="1500" fill="white"></rect><rect x="555.97" y="45.5" width="43.73" height="34" fill="black"></rect><rect x="680.43" y="170.5" width="43.73" height="34" fill="black"></rect><rect x="662.66" y="295.5" width="43.73" height="34" fill="black"></rect><rect x="137.5" y="420.5" width="26.56" height="34" fill="black"></rect><rect x="18.85" y="49.06" width="78.03" height="26.88" fill="black"></rect><rect x="-2.25" y="174.06" width="99.12" height="26.88" fill="black"></rect><rect x="5.64" y="299.06" width="91.24" height="26.88" fill="black"></rect><rect x="18.87" y="424.06" width="78" height="26.88" fill="black"></rect></mask></defs><path class="tablechart-grid" d="M104.69,0V500M282.5,0V500M460.31,0V500M638.13,0V500M815.94,0V500M993.75,0V500" mask="url(#tablechart-cut-22)"></path><rect class="tablechart-bar" data-kind="bar" data-row="1" data-grow="right" x="104.69" y="26.25" width="515.66" height="72.5" style="--i:0"></rect><rect class="tablechart-bar" data-kind="bar" data-row="2" data-grow="right" x="104.69" y="151.25" width="640.13" height="72.5" style="--i:1"></rect><rect class="tablechart-bar" data-kind="bar" data-row="3" data-grow="right" x="104.69" y="276.25" width="622.34" height="72.5" style="--i:2"></rect><rect class="tablechart-bar" data-kind="bar" data-row="4" data-grow="right" x="104.69" y="401.25" width="80.02" height="72.5" style="--i:3"></rect><line class="tablechart-rule" x1="104.69" x2="104.69" y1="0" y2="500"></line></svg>
+--i: 0; left: 57.7844%; top: 12.5%; | inside
+--i: 1; left: 70.2313%; top: 37.5%; | inside
+--i: 2; left: 68.4531%; top: 62.5%; | inside
+--i: 3; left: 15.0797%; top: 87.5%; | inside
+--i: 0; left: 9.21875%; top: 12.5%; | 
+--i: 1; left: 9.21875%; top: 37.5%; | 
+--i: 2; left: 9.21875%; top: 62.5%; | 
+--i: 3; left: 9.21875%; top: 87.5%; | 
+ | none
+ | none
+ | none
+ | none
+ | none
+ | none
+plot: --count: 4;
+
 ===== after a resize to 420px =====
 
 #0 <figure data-chart="column" data-chart-made="" class="is-shown">
@@ -879,7 +1304,7 @@ plot: --count: 3;
 plot: --count: 7;
 
 #13 <figure data-chart="line" data-chart-shape="straight" style="--_series-count: 2;" data-chart-made="" class="is-shown">
-<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 395.24px;"><defs><mask id="tablechart-cut-14" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="118.15" cy="348.55" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:46.69px; --i:0" fill="black"></circle><circle cx="354.46" cy="311.2" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:84.03px; --i:1" fill="black"></circle><circle cx="590.77" cy="189.82" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:205.42px; --i:2" fill="black"></circle><circle cx="827.08" cy="264.52" r="9.52" class="tablechart-hole" data-row="4" data-series="2" style="--rise:130.72px; --i:3" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-14)"><path class="tablechart-series" data-series="1" d="M118.15,283.19 L354.46,115.13 L590.77,227.17 L827.08,152.47" data-from="1" data-to="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:3"></path><path class="tablechart-series" data-series="2" d="M118.15,348.55 L354.46,311.2 L590.77,189.82 L827.08,264.52" data-from="1" data-to="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:3"></path></g><circle cx="118.15" cy="283.19" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:112.04px; --i:0"></circle><circle cx="354.46" cy="115.13" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:280.11px; --i:1"></circle><circle cx="590.77" cy="227.17" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:168.07px; --i:2"></circle><circle cx="827.08" cy="152.47" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:242.76px; --i:3"></circle><circle cx="118.15" cy="348.55" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:46.69px; --i:0"></circle><circle cx="354.46" cy="311.2" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:84.03px; --i:1"></circle><circle cx="590.77" cy="189.82" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:205.42px; --i:2"></circle><circle cx="827.08" cy="264.52" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:130.72px; --i:3"></circle><line class="tablechart-rule" x1="0" x2="945.24" y1="471.43" y2="471.43"></line></svg>
+<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 395.24px;"><defs><mask id="tablechart-cut-25" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="118.15" cy="348.55" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:46.69px; --i:0" fill="black"></circle><circle cx="354.46" cy="311.2" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:84.03px; --i:1" fill="black"></circle><circle cx="590.77" cy="189.82" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:205.42px; --i:2" fill="black"></circle><circle cx="827.08" cy="264.52" r="9.52" class="tablechart-hole" data-row="4" data-series="2" style="--rise:130.72px; --i:3" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-25)"><path class="tablechart-series" data-series="1" d="M118.15,283.19 L354.46,115.13 L590.77,227.17 L827.08,152.47" data-from="1" data-to="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:3"></path><path class="tablechart-series" data-series="2" d="M118.15,348.55 L354.46,311.2 L590.77,189.82 L827.08,264.52" data-from="1" data-to="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:3"></path></g><circle cx="118.15" cy="283.19" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:112.04px; --i:0"></circle><circle cx="354.46" cy="115.13" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:280.11px; --i:1"></circle><circle cx="590.77" cy="227.17" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:168.07px; --i:2"></circle><circle cx="827.08" cy="152.47" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:242.76px; --i:3"></circle><circle cx="118.15" cy="348.55" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:46.69px; --i:0"></circle><circle cx="354.46" cy="311.2" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:84.03px; --i:1"></circle><circle cx="590.77" cy="189.82" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:205.42px; --i:2"></circle><circle cx="827.08" cy="264.52" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:130.72px; --i:3"></circle><line class="tablechart-rule" x1="0" x2="945.24" y1="471.43" y2="471.43"></line></svg>
 --i: 0; left: 11.8155%; top: 55.9706%; | outside
 --i: 1; left: 35.4464%; top: 20.6765%; | outside
 --i: 2; left: 59.0774%; top: 51.2059%; | below
@@ -897,7 +1322,7 @@ plot: --count: 7;
 plot: --count: 4;
 
 #14 <figure data-chart="line" data-chart-shape="straight" data-chart-stack="" style="--_series-count: 3;" data-chart-made="" data-left-out="" class="is-shown">
-<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-15" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="157.94" cy="262.72" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:208.71px; --i:0" fill="black"></circle><circle cx="473.81" cy="241.85" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:229.58px; --i:1" fill="black"></circle><circle cx="789.68" cy="200.1" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:271.32px; --i:2" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-15)"><path class="tablechart-series" data-series="1" d="M157.94,387.94 L473.81,304.46 L789.68,346.2" data-from="1" data-to="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:2"></path><path class="tablechart-series" data-series="2" d="M157.94,262.72 L473.81,241.85 L789.68,200.1" data-from="1" data-to="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:2"></path><path class="tablechart-series" data-series="3" d="M157.94,220.98 L473.81,137.49 L789.68,116.62" data-from="1" data-to="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --i:1; --d:2"></path></g><circle cx="157.94" cy="387.94" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:83.48px; --i:0"></circle><circle cx="473.81" cy="304.46" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:166.97px; --i:1"></circle><circle cx="789.68" cy="346.2" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:125.23px; --i:2"></circle><circle cx="157.94" cy="262.72" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:208.71px; --i:0"></circle><circle cx="473.81" cy="241.85" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:229.58px; --i:1"></circle><circle cx="789.68" cy="200.1" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:271.32px; --i:2"></circle><rect x="149.56" y="212.59" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="1" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:250.45px; --i:0"></rect><rect x="465.43" y="129.11" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="2" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:333.94px; --i:1"></rect><rect x="781.3" y="108.24" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:354.81px; --i:2"></rect><line class="tablechart-rule" x1="0" x2="947.62" y1="471.43" y2="471.43"></line></svg>
+<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-26" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="157.94" cy="262.72" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:208.71px; --i:0" fill="black"></circle><circle cx="473.81" cy="241.85" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:229.58px; --i:1" fill="black"></circle><circle cx="789.68" cy="200.1" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:271.32px; --i:2" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-26)"><path class="tablechart-series" data-series="1" d="M157.94,387.94 L473.81,304.46 L789.68,346.2" data-from="1" data-to="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:2"></path><path class="tablechart-series" data-series="2" d="M157.94,262.72 L473.81,241.85 L789.68,200.1" data-from="1" data-to="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:2"></path><path class="tablechart-series" data-series="3" d="M157.94,220.98 L473.81,137.49 L789.68,116.62" data-from="1" data-to="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --i:1; --d:2"></path></g><circle cx="157.94" cy="387.94" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:83.48px; --i:0"></circle><circle cx="473.81" cy="304.46" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:166.97px; --i:1"></circle><circle cx="789.68" cy="346.2" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:125.23px; --i:2"></circle><circle cx="157.94" cy="262.72" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:208.71px; --i:0"></circle><circle cx="473.81" cy="241.85" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:229.58px; --i:1"></circle><circle cx="789.68" cy="200.1" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:271.32px; --i:2"></circle><rect x="149.56" y="212.59" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="1" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:250.45px; --i:0"></rect><rect x="465.43" y="129.11" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="2" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:333.94px; --i:1"></rect><rect x="781.3" y="108.24" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:354.81px; --i:2"></rect><line class="tablechart-rule" x1="0" x2="947.62" y1="471.43" y2="471.43"></line></svg>
 --i: 0; left: 18.0556%; top: 90.2341%; | middle
 --i: 1; left: 47.381%; top: 81.4683%; | middle
 --i: 2; left: 76.7063%; top: 85.8512%; | middle
@@ -989,7 +1414,7 @@ plot: --count: 3;
 plot: --count: 7;
 
 #19 <figure data-chart="line" data-chart-shape="smooth" style="--_series-count: 2;" data-chart-made="" class="is-shown">
-<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 395.24px;"><defs><mask id="tablechart-cut-16" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="118.15" cy="348.55" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:46.69px; --i:0" fill="black"></circle><circle cx="354.46" cy="311.2" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:84.03px; --i:1" fill="black"></circle><circle cx="590.77" cy="189.82" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:205.42px; --i:2" fill="black"></circle><circle cx="827.08" cy="264.52" r="9.52" class="tablechart-hole" data-row="4" data-series="2" style="--rise:130.72px; --i:3" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-16)"><path class="tablechart-series" data-series="1" d="M118.15,283.19 C196.92,199.16 275.69,115.13 354.46,115.13 C433.23,115.13 512,227.17 590.77,227.17 C669.54,227.17 748.31,189.82 827.08,152.47" data-from="1" data-to="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:3"></path><path class="tablechart-series" data-series="2" d="M118.15,348.55 C196.92,342.33 275.69,336.1 354.46,311.2 C433.23,286.31 512,189.82 590.77,189.82 C669.54,189.82 748.31,227.17 827.08,264.52" data-from="1" data-to="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:3"></path></g><circle cx="118.15" cy="283.19" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:112.04px; --i:0"></circle><circle cx="354.46" cy="115.13" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:280.11px; --i:1"></circle><circle cx="590.77" cy="227.17" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:168.07px; --i:2"></circle><circle cx="827.08" cy="152.47" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:242.76px; --i:3"></circle><circle cx="118.15" cy="348.55" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:46.69px; --i:0"></circle><circle cx="354.46" cy="311.2" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:84.03px; --i:1"></circle><circle cx="590.77" cy="189.82" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:205.42px; --i:2"></circle><circle cx="827.08" cy="264.52" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:130.72px; --i:3"></circle><line class="tablechart-rule" x1="0" x2="945.24" y1="471.43" y2="471.43"></line></svg>
+<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 395.24px;"><defs><mask id="tablechart-cut-27" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="118.15" cy="348.55" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:46.69px; --i:0" fill="black"></circle><circle cx="354.46" cy="311.2" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:84.03px; --i:1" fill="black"></circle><circle cx="590.77" cy="189.82" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:205.42px; --i:2" fill="black"></circle><circle cx="827.08" cy="264.52" r="9.52" class="tablechart-hole" data-row="4" data-series="2" style="--rise:130.72px; --i:3" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-27)"><path class="tablechart-series" data-series="1" d="M118.15,283.19 C196.92,199.16 275.69,115.13 354.46,115.13 C433.23,115.13 512,227.17 590.77,227.17 C669.54,227.17 748.31,189.82 827.08,152.47" data-from="1" data-to="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:3"></path><path class="tablechart-series" data-series="2" d="M118.15,348.55 C196.92,342.33 275.69,336.1 354.46,311.2 C433.23,286.31 512,189.82 590.77,189.82 C669.54,189.82 748.31,227.17 827.08,264.52" data-from="1" data-to="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:3"></path></g><circle cx="118.15" cy="283.19" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:112.04px; --i:0"></circle><circle cx="354.46" cy="115.13" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:280.11px; --i:1"></circle><circle cx="590.77" cy="227.17" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:168.07px; --i:2"></circle><circle cx="827.08" cy="152.47" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:242.76px; --i:3"></circle><circle cx="118.15" cy="348.55" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:46.69px; --i:0"></circle><circle cx="354.46" cy="311.2" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:84.03px; --i:1"></circle><circle cx="590.77" cy="189.82" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:205.42px; --i:2"></circle><circle cx="827.08" cy="264.52" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:130.72px; --i:3"></circle><line class="tablechart-rule" x1="0" x2="945.24" y1="471.43" y2="471.43"></line></svg>
 --i: 0; left: 11.8155%; top: 55.9706%; | outside
 --i: 1; left: 35.4464%; top: 20.6765%; | outside
 --i: 2; left: 59.0774%; top: 51.2059%; | below
@@ -1007,7 +1432,7 @@ plot: --count: 7;
 plot: --count: 4;
 
 #20 <figure data-chart="line" data-chart-shape="smooth" data-chart-stack="" style="--_series-count: 3;" data-chart-made="" data-left-out="" class="is-shown">
-<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-17" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="157.94" cy="262.72" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:208.71px; --i:0" fill="black"></circle><circle cx="473.81" cy="241.85" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:229.58px; --i:1" fill="black"></circle><circle cx="789.68" cy="200.1" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:271.32px; --i:2" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-17)"><path class="tablechart-series" data-series="1" d="M157.94,387.94 C263.23,346.2 368.52,304.46 473.81,304.46 C579.1,304.46 684.39,325.33 789.68,346.2" data-from="1" data-to="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:2"></path><path class="tablechart-series" data-series="2" d="M157.94,262.72 C263.23,257.5 368.52,252.28 473.81,241.85 C579.1,231.41 684.39,215.76 789.68,200.1" data-from="1" data-to="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:2"></path><path class="tablechart-series" data-series="3" d="M157.94,220.98 C263.23,186.19 368.52,151.41 473.81,137.49 C579.1,123.58 684.39,120.1 789.68,116.62" data-from="1" data-to="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --i:1; --d:2"></path></g><circle cx="157.94" cy="387.94" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:83.48px; --i:0"></circle><circle cx="473.81" cy="304.46" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:166.97px; --i:1"></circle><circle cx="789.68" cy="346.2" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:125.23px; --i:2"></circle><circle cx="157.94" cy="262.72" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:208.71px; --i:0"></circle><circle cx="473.81" cy="241.85" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:229.58px; --i:1"></circle><circle cx="789.68" cy="200.1" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:271.32px; --i:2"></circle><rect x="149.56" y="212.59" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="1" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:250.45px; --i:0"></rect><rect x="465.43" y="129.11" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="2" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:333.94px; --i:1"></rect><rect x="781.3" y="108.24" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:354.81px; --i:2"></rect><line class="tablechart-rule" x1="0" x2="947.62" y1="471.43" y2="471.43"></line></svg>
+<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-28" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="157.94" cy="262.72" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:208.71px; --i:0" fill="black"></circle><circle cx="473.81" cy="241.85" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:229.58px; --i:1" fill="black"></circle><circle cx="789.68" cy="200.1" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:271.32px; --i:2" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-28)"><path class="tablechart-series" data-series="1" d="M157.94,387.94 C263.23,346.2 368.52,304.46 473.81,304.46 C579.1,304.46 684.39,325.33 789.68,346.2" data-from="1" data-to="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:2"></path><path class="tablechart-series" data-series="2" d="M157.94,262.72 C263.23,257.5 368.52,252.28 473.81,241.85 C579.1,231.41 684.39,215.76 789.68,200.1" data-from="1" data-to="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:2"></path><path class="tablechart-series" data-series="3" d="M157.94,220.98 C263.23,186.19 368.52,151.41 473.81,137.49 C579.1,123.58 684.39,120.1 789.68,116.62" data-from="1" data-to="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --i:1; --d:2"></path></g><circle cx="157.94" cy="387.94" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:83.48px; --i:0"></circle><circle cx="473.81" cy="304.46" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:166.97px; --i:1"></circle><circle cx="789.68" cy="346.2" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:125.23px; --i:2"></circle><circle cx="157.94" cy="262.72" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:208.71px; --i:0"></circle><circle cx="473.81" cy="241.85" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:229.58px; --i:1"></circle><circle cx="789.68" cy="200.1" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:271.32px; --i:2"></circle><rect x="149.56" y="212.59" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="1" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:250.45px; --i:0"></rect><rect x="465.43" y="129.11" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="2" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:333.94px; --i:1"></rect><rect x="781.3" y="108.24" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:354.81px; --i:2"></rect><line class="tablechart-rule" x1="0" x2="947.62" y1="471.43" y2="471.43"></line></svg>
 --i: 0; left: 18.0556%; top: 90.2341%; | middle
 --i: 1; left: 47.381%; top: 81.4683%; | middle
 --i: 2; left: 76.7063%; top: 85.8512%; | middle
@@ -1044,7 +1469,7 @@ plot: --count: 3;
 plot: --count: 7;
 
 #22 <figure data-chart="area" data-chart-shape="straight" data-chart-made="" style="--_series-count: 2;" class="is-shown">
-<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-18" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="118.15" cy="412.29" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:59.13px; --i:0" fill="black"></circle><circle cx="354.46" cy="364.99" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:106.44px; --i:1" fill="black"></circle><circle cx="590.77" cy="211.24" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:260.19px; --i:2" fill="black"></circle><circle cx="827.08" cy="305.85" r="9.52" class="tablechart-hole" data-row="4" data-series="2" style="--rise:165.58px; --i:3" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-18)"><g class="tablechart-area" data-series="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); "><g class="tablechart-area-fill" style="--rows:4; --i:1; --d:3"><path d="M118.15,471.43 L118.15,329.51 L354.46,116.62 L590.77,258.54 L827.08,163.93 L827.08,471.43 L590.77,471.43 L354.46,471.43 L118.15,471.43 Z" data-from="1" data-to="4" style="--i:1; --d:3"></path></g></g><g class="tablechart-area" data-series="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); "><g class="tablechart-area-fill" style="--rows:4; --i:1; --d:3"><path d="M118.15,471.43 L118.15,412.29 L354.46,364.99 L590.77,211.24 L827.08,305.85 L827.08,471.43 L590.77,471.43 L354.46,471.43 L118.15,471.43 Z" data-from="1" data-to="4" style="--i:1; --d:3"></path></g></g><path class="tablechart-series" data-series="1" d="M118.15,329.51 L354.46,116.62 L590.77,258.54 L827.08,163.93" data-from="1" data-to="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:3"></path><path class="tablechart-series" data-series="2" d="M118.15,412.29 L354.46,364.99 L590.77,211.24 L827.08,305.85" data-from="1" data-to="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:3"></path></g><circle cx="118.15" cy="329.51" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:141.92px; --i:0"></circle><circle cx="354.46" cy="116.62" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:354.81px; --i:1"></circle><circle cx="590.77" cy="258.54" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:212.89px; --i:2"></circle><circle cx="827.08" cy="163.93" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:307.5px; --i:3"></circle><circle cx="118.15" cy="412.29" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:59.13px; --i:0"></circle><circle cx="354.46" cy="364.99" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:106.44px; --i:1"></circle><circle cx="590.77" cy="211.24" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:260.19px; --i:2"></circle><circle cx="827.08" cy="305.85" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:165.58px; --i:3"></circle><line class="tablechart-rule" x1="0" x2="945.24" y1="471.43" y2="471.43"></line></svg>
+<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-29" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="118.15" cy="412.29" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:59.13px; --i:0" fill="black"></circle><circle cx="354.46" cy="364.99" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:106.44px; --i:1" fill="black"></circle><circle cx="590.77" cy="211.24" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:260.19px; --i:2" fill="black"></circle><circle cx="827.08" cy="305.85" r="9.52" class="tablechart-hole" data-row="4" data-series="2" style="--rise:165.58px; --i:3" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-29)"><g class="tablechart-area" data-series="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); "><g class="tablechart-area-fill" style="--rows:4; --i:1; --d:3"><path d="M118.15,471.43 L118.15,329.51 L354.46,116.62 L590.77,258.54 L827.08,163.93 L827.08,471.43 L590.77,471.43 L354.46,471.43 L118.15,471.43 Z" data-from="1" data-to="4" style="--i:1; --d:3"></path></g></g><g class="tablechart-area" data-series="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); "><g class="tablechart-area-fill" style="--rows:4; --i:1; --d:3"><path d="M118.15,471.43 L118.15,412.29 L354.46,364.99 L590.77,211.24 L827.08,305.85 L827.08,471.43 L590.77,471.43 L354.46,471.43 L118.15,471.43 Z" data-from="1" data-to="4" style="--i:1; --d:3"></path></g></g><path class="tablechart-series" data-series="1" d="M118.15,329.51 L354.46,116.62 L590.77,258.54 L827.08,163.93" data-from="1" data-to="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:3"></path><path class="tablechart-series" data-series="2" d="M118.15,412.29 L354.46,364.99 L590.77,211.24 L827.08,305.85" data-from="1" data-to="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:3"></path></g><circle cx="118.15" cy="329.51" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:141.92px; --i:0"></circle><circle cx="354.46" cy="116.62" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:354.81px; --i:1"></circle><circle cx="590.77" cy="258.54" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:212.89px; --i:2"></circle><circle cx="827.08" cy="163.93" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:307.5px; --i:3"></circle><circle cx="118.15" cy="412.29" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:59.13px; --i:0"></circle><circle cx="354.46" cy="364.99" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:106.44px; --i:1"></circle><circle cx="590.77" cy="211.24" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:260.19px; --i:2"></circle><circle cx="827.08" cy="305.85" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:165.58px; --i:3"></circle><line class="tablechart-rule" x1="0" x2="945.24" y1="471.43" y2="471.43"></line></svg>
 --i: 0; left: 11.8155%; top: 65.6961%; | outside
 --i: 1; left: 35.4464%; top: 20.9902%; | outside
 --i: 2; left: 59.0774%; top: 57.7941%; | below
@@ -1062,7 +1487,7 @@ plot: --count: 7;
 plot: --count: 4;
 
 #23 <figure data-chart="area" data-chart-shape="straight" data-chart-stack="" data-chart-made="" style="--_series-count: 3;" data-left-out="" class="is-shown">
-<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-19" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="157.94" cy="262.72" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:208.71px; --i:0" fill="black"></circle><circle cx="473.81" cy="241.85" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:229.58px; --i:1" fill="black"></circle><circle cx="789.68" cy="200.1" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:271.32px; --i:2" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-19)"><g class="tablechart-area" data-series="1" data-stacked="" style="--n:0; --m:0; --palette:var(--tablechart-color-1); "><g class="tablechart-area-fill" style="--rows:3; --i:1; --d:2"><path d="M157.94,471.43 L157.94,387.94 L473.81,304.46 L789.68,346.2 L789.68,471.43 L473.81,471.43 L157.94,471.43 Z" data-from="1" data-to="3" style="--i:1; --d:2"></path></g></g><g class="tablechart-area" data-series="2" data-stacked="" style="--n:1; --m:0; --palette:var(--tablechart-color-2); "><g class="tablechart-area-fill" style="--rows:3; --i:1; --d:2"><path d="M157.94,387.94 L157.94,262.72 L473.81,241.85 L789.68,200.1 L789.68,346.2 L473.81,304.46 L157.94,387.94 Z" data-from="1" data-to="3" style="--i:1; --d:2"></path></g></g><g class="tablechart-area" data-series="3" data-stacked="" style="--n:2; --m:0; --palette:var(--tablechart-color-3); "><g class="tablechart-area-fill" style="--rows:3; --i:1; --d:2"><path d="M157.94,262.72 L157.94,220.98 L473.81,137.49 L789.68,116.62 L789.68,200.1 L473.81,241.85 L157.94,262.72 Z" data-from="1" data-to="3" style="--i:1; --d:2"></path></g></g><path class="tablechart-series" data-series="1" d="M157.94,387.94 L473.81,304.46 L789.68,346.2" data-from="1" data-to="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:2"></path><path class="tablechart-series" data-series="2" d="M157.94,262.72 L473.81,241.85 L789.68,200.1" data-from="1" data-to="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:2"></path><path class="tablechart-series" data-series="3" d="M157.94,220.98 L473.81,137.49 L789.68,116.62" data-from="1" data-to="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --i:1; --d:2"></path></g><circle cx="157.94" cy="387.94" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:83.48px; --i:0"></circle><circle cx="473.81" cy="304.46" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:166.97px; --i:1"></circle><circle cx="789.68" cy="346.2" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:125.23px; --i:2"></circle><circle cx="157.94" cy="262.72" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:208.71px; --i:0"></circle><circle cx="473.81" cy="241.85" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:229.58px; --i:1"></circle><circle cx="789.68" cy="200.1" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:271.32px; --i:2"></circle><rect x="149.56" y="212.59" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="1" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:250.45px; --i:0"></rect><rect x="465.43" y="129.11" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="2" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:333.94px; --i:1"></rect><rect x="781.3" y="108.24" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:354.81px; --i:2"></rect><line class="tablechart-rule" x1="0" x2="947.62" y1="471.43" y2="471.43"></line></svg>
+<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-30" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="157.94" cy="262.72" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:208.71px; --i:0" fill="black"></circle><circle cx="473.81" cy="241.85" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:229.58px; --i:1" fill="black"></circle><circle cx="789.68" cy="200.1" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:271.32px; --i:2" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-30)"><g class="tablechart-area" data-series="1" data-stacked="" style="--n:0; --m:0; --palette:var(--tablechart-color-1); "><g class="tablechart-area-fill" style="--rows:3; --i:1; --d:2"><path d="M157.94,471.43 L157.94,387.94 L473.81,304.46 L789.68,346.2 L789.68,471.43 L473.81,471.43 L157.94,471.43 Z" data-from="1" data-to="3" style="--i:1; --d:2"></path></g></g><g class="tablechart-area" data-series="2" data-stacked="" style="--n:1; --m:0; --palette:var(--tablechart-color-2); "><g class="tablechart-area-fill" style="--rows:3; --i:1; --d:2"><path d="M157.94,387.94 L157.94,262.72 L473.81,241.85 L789.68,200.1 L789.68,346.2 L473.81,304.46 L157.94,387.94 Z" data-from="1" data-to="3" style="--i:1; --d:2"></path></g></g><g class="tablechart-area" data-series="3" data-stacked="" style="--n:2; --m:0; --palette:var(--tablechart-color-3); "><g class="tablechart-area-fill" style="--rows:3; --i:1; --d:2"><path d="M157.94,262.72 L157.94,220.98 L473.81,137.49 L789.68,116.62 L789.68,200.1 L473.81,241.85 L157.94,262.72 Z" data-from="1" data-to="3" style="--i:1; --d:2"></path></g></g><path class="tablechart-series" data-series="1" d="M157.94,387.94 L473.81,304.46 L789.68,346.2" data-from="1" data-to="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:2"></path><path class="tablechart-series" data-series="2" d="M157.94,262.72 L473.81,241.85 L789.68,200.1" data-from="1" data-to="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:2"></path><path class="tablechart-series" data-series="3" d="M157.94,220.98 L473.81,137.49 L789.68,116.62" data-from="1" data-to="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --i:1; --d:2"></path></g><circle cx="157.94" cy="387.94" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:83.48px; --i:0"></circle><circle cx="473.81" cy="304.46" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:166.97px; --i:1"></circle><circle cx="789.68" cy="346.2" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:125.23px; --i:2"></circle><circle cx="157.94" cy="262.72" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:208.71px; --i:0"></circle><circle cx="473.81" cy="241.85" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:229.58px; --i:1"></circle><circle cx="789.68" cy="200.1" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:271.32px; --i:2"></circle><rect x="149.56" y="212.59" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="1" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:250.45px; --i:0"></rect><rect x="465.43" y="129.11" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="2" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:333.94px; --i:1"></rect><rect x="781.3" y="108.24" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:354.81px; --i:2"></rect><line class="tablechart-rule" x1="0" x2="947.62" y1="471.43" y2="471.43"></line></svg>
 --i: 0; left: 18.0556%; top: 90.2341%; | middle
 --i: 1; left: 47.381%; top: 81.4683%; | middle
 --i: 2; left: 76.7063%; top: 85.8512%; | middle
@@ -1154,7 +1579,7 @@ plot: --count: 3;
 plot: --count: 7;
 
 #28 <figure data-chart="area" data-chart-shape="smooth" data-chart-made="" style="--_series-count: 2;" class="is-shown">
-<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-20" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="118.15" cy="412.29" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:59.13px; --i:0" fill="black"></circle><circle cx="354.46" cy="364.99" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:106.44px; --i:1" fill="black"></circle><circle cx="590.77" cy="211.24" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:260.19px; --i:2" fill="black"></circle><circle cx="827.08" cy="305.85" r="9.52" class="tablechart-hole" data-row="4" data-series="2" style="--rise:165.58px; --i:3" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-20)"><g class="tablechart-area" data-series="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); "><g class="tablechart-area-fill" style="--rows:4; --i:1; --d:3"><path d="M118.15,471.43 L118.15,329.51 C196.92,223.06 275.69,116.62 354.46,116.62 C433.23,116.62 512,258.54 590.77,258.54 C669.54,258.54 748.31,211.24 827.08,163.93 L827.08,471.43 C748.31,471.43 669.54,471.43 590.77,471.43 C512,471.43 433.23,471.43 354.46,471.43 C275.69,471.43 196.92,471.43 118.15,471.43 Z" data-from="1" data-to="4" style="--i:1; --d:3"></path></g></g><g class="tablechart-area" data-series="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); "><g class="tablechart-area-fill" style="--rows:4; --i:1; --d:3"><path d="M118.15,471.43 L118.15,412.29 C196.92,404.41 275.69,396.52 354.46,364.99 C433.23,333.45 512,211.24 590.77,211.24 C669.54,211.24 748.31,258.54 827.08,305.85 L827.08,471.43 C748.31,471.43 669.54,471.43 590.77,471.43 C512,471.43 433.23,471.43 354.46,471.43 C275.69,471.43 196.92,471.43 118.15,471.43 Z" data-from="1" data-to="4" style="--i:1; --d:3"></path></g></g><path class="tablechart-series" data-series="1" d="M118.15,329.51 C196.92,223.06 275.69,116.62 354.46,116.62 C433.23,116.62 512,258.54 590.77,258.54 C669.54,258.54 748.31,211.24 827.08,163.93" data-from="1" data-to="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:3"></path><path class="tablechart-series" data-series="2" d="M118.15,412.29 C196.92,404.41 275.69,396.52 354.46,364.99 C433.23,333.45 512,211.24 590.77,211.24 C669.54,211.24 748.31,258.54 827.08,305.85" data-from="1" data-to="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:3"></path></g><circle cx="118.15" cy="329.51" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:141.92px; --i:0"></circle><circle cx="354.46" cy="116.62" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:354.81px; --i:1"></circle><circle cx="590.77" cy="258.54" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:212.89px; --i:2"></circle><circle cx="827.08" cy="163.93" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:307.5px; --i:3"></circle><circle cx="118.15" cy="412.29" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:59.13px; --i:0"></circle><circle cx="354.46" cy="364.99" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:106.44px; --i:1"></circle><circle cx="590.77" cy="211.24" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:260.19px; --i:2"></circle><circle cx="827.08" cy="305.85" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:165.58px; --i:3"></circle><line class="tablechart-rule" x1="0" x2="945.24" y1="471.43" y2="471.43"></line></svg>
+<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-31" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="118.15" cy="412.29" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:59.13px; --i:0" fill="black"></circle><circle cx="354.46" cy="364.99" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:106.44px; --i:1" fill="black"></circle><circle cx="590.77" cy="211.24" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:260.19px; --i:2" fill="black"></circle><circle cx="827.08" cy="305.85" r="9.52" class="tablechart-hole" data-row="4" data-series="2" style="--rise:165.58px; --i:3" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-31)"><g class="tablechart-area" data-series="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); "><g class="tablechart-area-fill" style="--rows:4; --i:1; --d:3"><path d="M118.15,471.43 L118.15,329.51 C196.92,223.06 275.69,116.62 354.46,116.62 C433.23,116.62 512,258.54 590.77,258.54 C669.54,258.54 748.31,211.24 827.08,163.93 L827.08,471.43 C748.31,471.43 669.54,471.43 590.77,471.43 C512,471.43 433.23,471.43 354.46,471.43 C275.69,471.43 196.92,471.43 118.15,471.43 Z" data-from="1" data-to="4" style="--i:1; --d:3"></path></g></g><g class="tablechart-area" data-series="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); "><g class="tablechart-area-fill" style="--rows:4; --i:1; --d:3"><path d="M118.15,471.43 L118.15,412.29 C196.92,404.41 275.69,396.52 354.46,364.99 C433.23,333.45 512,211.24 590.77,211.24 C669.54,211.24 748.31,258.54 827.08,305.85 L827.08,471.43 C748.31,471.43 669.54,471.43 590.77,471.43 C512,471.43 433.23,471.43 354.46,471.43 C275.69,471.43 196.92,471.43 118.15,471.43 Z" data-from="1" data-to="4" style="--i:1; --d:3"></path></g></g><path class="tablechart-series" data-series="1" d="M118.15,329.51 C196.92,223.06 275.69,116.62 354.46,116.62 C433.23,116.62 512,258.54 590.77,258.54 C669.54,258.54 748.31,211.24 827.08,163.93" data-from="1" data-to="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:3"></path><path class="tablechart-series" data-series="2" d="M118.15,412.29 C196.92,404.41 275.69,396.52 354.46,364.99 C433.23,333.45 512,211.24 590.77,211.24 C669.54,211.24 748.31,258.54 827.08,305.85" data-from="1" data-to="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:3"></path></g><circle cx="118.15" cy="329.51" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:141.92px; --i:0"></circle><circle cx="354.46" cy="116.62" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:354.81px; --i:1"></circle><circle cx="590.77" cy="258.54" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:212.89px; --i:2"></circle><circle cx="827.08" cy="163.93" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:307.5px; --i:3"></circle><circle cx="118.15" cy="412.29" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:59.13px; --i:0"></circle><circle cx="354.46" cy="364.99" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:106.44px; --i:1"></circle><circle cx="590.77" cy="211.24" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:260.19px; --i:2"></circle><circle cx="827.08" cy="305.85" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:165.58px; --i:3"></circle><line class="tablechart-rule" x1="0" x2="945.24" y1="471.43" y2="471.43"></line></svg>
 --i: 0; left: 11.8155%; top: 65.6961%; | outside
 --i: 1; left: 35.4464%; top: 20.9902%; | outside
 --i: 2; left: 59.0774%; top: 57.7941%; | below
@@ -1172,7 +1597,7 @@ plot: --count: 7;
 plot: --count: 4;
 
 #29 <figure data-chart="area" data-chart-shape="smooth" data-chart-stack="" data-chart-made="" style="--_series-count: 3;" data-left-out="" class="is-shown">
-<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-21" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="157.94" cy="262.72" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:208.71px; --i:0" fill="black"></circle><circle cx="473.81" cy="241.85" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:229.58px; --i:1" fill="black"></circle><circle cx="789.68" cy="200.1" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:271.32px; --i:2" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-21)"><g class="tablechart-area" data-series="1" data-stacked="" style="--n:0; --m:0; --palette:var(--tablechart-color-1); "><g class="tablechart-area-fill" style="--rows:3; --i:1; --d:2"><path d="M157.94,471.43 L157.94,387.94 C263.23,346.2 368.52,304.46 473.81,304.46 C579.1,304.46 684.39,325.33 789.68,346.2 L789.68,471.43 C684.39,471.43 579.1,471.43 473.81,471.43 C368.52,471.43 263.23,471.43 157.94,471.43 Z" data-from="1" data-to="3" style="--i:1; --d:2"></path></g></g><g class="tablechart-area" data-series="2" data-stacked="" style="--n:1; --m:0; --palette:var(--tablechart-color-2); "><g class="tablechart-area-fill" style="--rows:3; --i:1; --d:2"><path d="M157.94,387.94 L157.94,262.72 C263.23,257.5 368.52,252.28 473.81,241.85 C579.1,231.41 684.39,215.76 789.68,200.1 L789.68,346.2 C684.39,325.33 579.1,304.46 473.81,304.46 C368.52,304.46 263.23,346.2 157.94,387.94 Z" data-from="1" data-to="3" style="--i:1; --d:2"></path></g></g><g class="tablechart-area" data-series="3" data-stacked="" style="--n:2; --m:0; --palette:var(--tablechart-color-3); "><g class="tablechart-area-fill" style="--rows:3; --i:1; --d:2"><path d="M157.94,262.72 L157.94,220.98 C263.23,186.19 368.52,151.41 473.81,137.49 C579.1,123.58 684.39,120.1 789.68,116.62 L789.68,200.1 C684.39,215.76 579.1,231.41 473.81,241.85 C368.52,252.28 263.23,257.5 157.94,262.72 Z" data-from="1" data-to="3" style="--i:1; --d:2"></path></g></g><path class="tablechart-series" data-series="1" d="M157.94,387.94 C263.23,346.2 368.52,304.46 473.81,304.46 C579.1,304.46 684.39,325.33 789.68,346.2" data-from="1" data-to="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:2"></path><path class="tablechart-series" data-series="2" d="M157.94,262.72 C263.23,257.5 368.52,252.28 473.81,241.85 C579.1,231.41 684.39,215.76 789.68,200.1" data-from="1" data-to="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:2"></path><path class="tablechart-series" data-series="3" d="M157.94,220.98 C263.23,186.19 368.52,151.41 473.81,137.49 C579.1,123.58 684.39,120.1 789.68,116.62" data-from="1" data-to="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --i:1; --d:2"></path></g><circle cx="157.94" cy="387.94" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:83.48px; --i:0"></circle><circle cx="473.81" cy="304.46" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:166.97px; --i:1"></circle><circle cx="789.68" cy="346.2" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:125.23px; --i:2"></circle><circle cx="157.94" cy="262.72" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:208.71px; --i:0"></circle><circle cx="473.81" cy="241.85" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:229.58px; --i:1"></circle><circle cx="789.68" cy="200.1" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:271.32px; --i:2"></circle><rect x="149.56" y="212.59" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="1" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:250.45px; --i:0"></rect><rect x="465.43" y="129.11" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="2" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:333.94px; --i:1"></rect><rect x="781.3" y="108.24" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:354.81px; --i:2"></rect><line class="tablechart-rule" x1="0" x2="947.62" y1="471.43" y2="471.43"></line></svg>
+<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-32" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="157.94" cy="262.72" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:208.71px; --i:0" fill="black"></circle><circle cx="473.81" cy="241.85" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:229.58px; --i:1" fill="black"></circle><circle cx="789.68" cy="200.1" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:271.32px; --i:2" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-32)"><g class="tablechart-area" data-series="1" data-stacked="" style="--n:0; --m:0; --palette:var(--tablechart-color-1); "><g class="tablechart-area-fill" style="--rows:3; --i:1; --d:2"><path d="M157.94,471.43 L157.94,387.94 C263.23,346.2 368.52,304.46 473.81,304.46 C579.1,304.46 684.39,325.33 789.68,346.2 L789.68,471.43 C684.39,471.43 579.1,471.43 473.81,471.43 C368.52,471.43 263.23,471.43 157.94,471.43 Z" data-from="1" data-to="3" style="--i:1; --d:2"></path></g></g><g class="tablechart-area" data-series="2" data-stacked="" style="--n:1; --m:0; --palette:var(--tablechart-color-2); "><g class="tablechart-area-fill" style="--rows:3; --i:1; --d:2"><path d="M157.94,387.94 L157.94,262.72 C263.23,257.5 368.52,252.28 473.81,241.85 C579.1,231.41 684.39,215.76 789.68,200.1 L789.68,346.2 C684.39,325.33 579.1,304.46 473.81,304.46 C368.52,304.46 263.23,346.2 157.94,387.94 Z" data-from="1" data-to="3" style="--i:1; --d:2"></path></g></g><g class="tablechart-area" data-series="3" data-stacked="" style="--n:2; --m:0; --palette:var(--tablechart-color-3); "><g class="tablechart-area-fill" style="--rows:3; --i:1; --d:2"><path d="M157.94,262.72 L157.94,220.98 C263.23,186.19 368.52,151.41 473.81,137.49 C579.1,123.58 684.39,120.1 789.68,116.62 L789.68,200.1 C684.39,215.76 579.1,231.41 473.81,241.85 C368.52,252.28 263.23,257.5 157.94,262.72 Z" data-from="1" data-to="3" style="--i:1; --d:2"></path></g></g><path class="tablechart-series" data-series="1" d="M157.94,387.94 C263.23,346.2 368.52,304.46 473.81,304.46 C579.1,304.46 684.39,325.33 789.68,346.2" data-from="1" data-to="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:2"></path><path class="tablechart-series" data-series="2" d="M157.94,262.72 C263.23,257.5 368.52,252.28 473.81,241.85 C579.1,231.41 684.39,215.76 789.68,200.1" data-from="1" data-to="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:2"></path><path class="tablechart-series" data-series="3" d="M157.94,220.98 C263.23,186.19 368.52,151.41 473.81,137.49 C579.1,123.58 684.39,120.1 789.68,116.62" data-from="1" data-to="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --i:1; --d:2"></path></g><circle cx="157.94" cy="387.94" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:83.48px; --i:0"></circle><circle cx="473.81" cy="304.46" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:166.97px; --i:1"></circle><circle cx="789.68" cy="346.2" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:125.23px; --i:2"></circle><circle cx="157.94" cy="262.72" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:208.71px; --i:0"></circle><circle cx="473.81" cy="241.85" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:229.58px; --i:1"></circle><circle cx="789.68" cy="200.1" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:271.32px; --i:2"></circle><rect x="149.56" y="212.59" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="1" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:250.45px; --i:0"></rect><rect x="465.43" y="129.11" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="2" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:333.94px; --i:1"></rect><rect x="781.3" y="108.24" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:354.81px; --i:2"></rect><line class="tablechart-rule" x1="0" x2="947.62" y1="471.43" y2="471.43"></line></svg>
 --i: 0; left: 18.0556%; top: 90.2341%; | middle
 --i: 1; left: 47.381%; top: 81.4683%; | middle
 --i: 2; left: 76.7063%; top: 85.8512%; | middle
@@ -1191,7 +1616,7 @@ plot: --count: 4;
 plot: --count: 3;
 
 #30 <figure data-chart="line" style="--_series-count: 3;" data-chart-made="" data-left-out="" class="is-shown">
-<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-22" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="157.94" cy="205.32" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:266.11px; --i:0" fill="black"></circle><circle cx="473.81" cy="338.38" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:133.05px; --i:1" fill="black"></circle><circle cx="789.68" cy="160.97" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:310.46px; --i:2" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-22)"><path class="tablechart-series" data-series="1" d="M157.94,294.02 L473.81,116.62 L789.68,205.32" data-from="1" data-to="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:2"></path><path class="tablechart-series" data-series="2" d="M157.94,205.32 L473.81,338.38 L789.68,160.97" data-from="1" data-to="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:2"></path><path class="tablechart-series" data-series="3" d="M157.94,382.73 L473.81,249.67 L789.68,294.02" data-from="1" data-to="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --i:1; --d:2"></path></g><circle cx="157.94" cy="294.02" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:177.4px; --i:0"></circle><circle cx="473.81" cy="116.62" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:354.81px; --i:1"></circle><circle cx="789.68" cy="205.32" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:266.11px; --i:2"></circle><circle cx="157.94" cy="205.32" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:266.11px; --i:0"></circle><circle cx="473.81" cy="338.38" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:133.05px; --i:1"></circle><circle cx="789.68" cy="160.97" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:310.46px; --i:2"></circle><rect x="149.56" y="374.35" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="1" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:88.7px; --i:0"></rect><rect x="465.43" y="241.29" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="2" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:221.76px; --i:1"></rect><rect x="781.3" y="285.64" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:177.4px; --i:2"></rect><line class="tablechart-rule" x1="0" x2="947.62" y1="471.43" y2="471.43"></line></svg>
+<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-33" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="157.94" cy="205.32" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:266.11px; --i:0" fill="black"></circle><circle cx="473.81" cy="338.38" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:133.05px; --i:1" fill="black"></circle><circle cx="789.68" cy="160.97" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:310.46px; --i:2" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-33)"><path class="tablechart-series" data-series="1" d="M157.94,294.02 L473.81,116.62 L789.68,205.32" data-from="1" data-to="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:2"></path><path class="tablechart-series" data-series="2" d="M157.94,205.32 L473.81,338.38 L789.68,160.97" data-from="1" data-to="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:2"></path><path class="tablechart-series" data-series="3" d="M157.94,382.73 L473.81,249.67 L789.68,294.02" data-from="1" data-to="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --i:1; --d:2"></path></g><circle cx="157.94" cy="294.02" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:177.4px; --i:0"></circle><circle cx="473.81" cy="116.62" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:354.81px; --i:1"></circle><circle cx="789.68" cy="205.32" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:266.11px; --i:2"></circle><circle cx="157.94" cy="205.32" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:266.11px; --i:0"></circle><circle cx="473.81" cy="338.38" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:133.05px; --i:1"></circle><circle cx="789.68" cy="160.97" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:310.46px; --i:2"></circle><rect x="149.56" y="374.35" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="1" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:88.7px; --i:0"></rect><rect x="465.43" y="241.29" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="2" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:221.76px; --i:1"></rect><rect x="781.3" y="285.64" width="16.76" height="16.76" class="tablechart-point" data-series="3" data-marker="square" data-row="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --rise:177.4px; --i:2"></rect><line class="tablechart-rule" x1="0" x2="947.62" y1="471.43" y2="471.43"></line></svg>
 --i: 0; left: 15.7937%; top: 58.2451%; | outside | left out
 --i: 1; left: 47.381%; top: 20.9902%; | outside | left out
 --i: 2; left: 78.9683%; top: 39.6176%; | outside | left out
@@ -1210,7 +1635,7 @@ plot: --count: 3;
 plot: --count: 3;
 
 #31 <figure data-chart="line" data-chart-legend="" style="--_series-count: 2;" data-chart-made="" class="is-shown">
-<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 395.24px;"><defs><mask id="tablechart-cut-23" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="125" cy="348.55" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:46.69px; --i:0" fill="black"></circle><circle cx="375" cy="311.2" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:84.03px; --i:1" fill="black"></circle><circle cx="625" cy="189.82" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:205.42px; --i:2" fill="black"></circle><circle cx="875" cy="264.52" r="9.52" class="tablechart-hole" data-row="4" data-series="2" style="--rise:130.72px; --i:3" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-23)"><path class="tablechart-series" data-series="1" d="M125,283.19 L375,115.13 L625,227.17 L875,152.47" data-from="1" data-to="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:3"></path><path class="tablechart-series" data-series="2" d="M125,348.55 L375,311.2 L625,189.82 L875,264.52" data-from="1" data-to="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:3"></path></g><circle cx="125" cy="283.19" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:112.04px; --i:0"></circle><circle cx="375" cy="115.13" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:280.11px; --i:1"></circle><circle cx="625" cy="227.17" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:168.07px; --i:2"></circle><circle cx="875" cy="152.47" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:242.76px; --i:3"></circle><circle cx="125" cy="348.55" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:46.69px; --i:0"></circle><circle cx="375" cy="311.2" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:84.03px; --i:1"></circle><circle cx="625" cy="189.82" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:205.42px; --i:2"></circle><circle cx="875" cy="264.52" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:130.72px; --i:3"></circle><line class="tablechart-rule" x1="0" x2="1000" y1="471.43" y2="471.43"></line></svg>
+<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 395.24px;"><defs><mask id="tablechart-cut-34" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="125" cy="348.55" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:46.69px; --i:0" fill="black"></circle><circle cx="375" cy="311.2" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:84.03px; --i:1" fill="black"></circle><circle cx="625" cy="189.82" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:205.42px; --i:2" fill="black"></circle><circle cx="875" cy="264.52" r="9.52" class="tablechart-hole" data-row="4" data-series="2" style="--rise:130.72px; --i:3" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-34)"><path class="tablechart-series" data-series="1" d="M125,283.19 L375,115.13 L625,227.17 L875,152.47" data-from="1" data-to="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:3"></path><path class="tablechart-series" data-series="2" d="M125,348.55 L375,311.2 L625,189.82 L875,264.52" data-from="1" data-to="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:3"></path></g><circle cx="125" cy="283.19" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:112.04px; --i:0"></circle><circle cx="375" cy="115.13" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:280.11px; --i:1"></circle><circle cx="625" cy="227.17" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:168.07px; --i:2"></circle><circle cx="875" cy="152.47" r="9.52" class="tablechart-point" data-series="1" data-marker="circle" data-row="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:242.76px; --i:3"></circle><circle cx="125" cy="348.55" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:46.69px; --i:0"></circle><circle cx="375" cy="311.2" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:84.03px; --i:1"></circle><circle cx="625" cy="189.82" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:205.42px; --i:2"></circle><circle cx="875" cy="264.52" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:130.72px; --i:3"></circle><line class="tablechart-rule" x1="0" x2="1000" y1="471.43" y2="471.43"></line></svg>
 --i: 0; left: 12.5%; top: 55.9706%; | outside
 --i: 1; left: 37.5%; top: 20.6765%; | outside
 --i: 2; left: 62.5%; top: 51.2059%; | below
@@ -1228,7 +1653,7 @@ plot: --count: 3;
 plot: --count: 4;
 
 #32 <figure data-chart="line" data-chart-animate="grow" style="--_series-count: 2;" data-chart-made="" data-left-out="" class="is-shown">
-<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-24" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="118.15" cy="412.29" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:59.13px; --i:0" fill="black"></circle><circle cx="354.46" cy="364.99" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:106.44px; --i:1" fill="black"></circle><circle cx="590.77" cy="211.24" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:260.19px; --i:2" fill="black"></circle><circle cx="827.08" cy="305.85" r="9.52" class="tablechart-hole" data-row="4" data-series="2" style="--rise:165.58px; --i:3" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-24)"><path class="tablechart-series" data-series="1" data-muted="" d="M118.15,329.51 L354.46,116.62 L590.77,258.54 L827.08,163.93" data-from="1" data-to="4" style="--n:0; --m:1; --palette:var(--tablechart-color-1); --i:1; --d:3"></path><path class="tablechart-series" data-series="2" d="M118.15,412.29 L354.46,364.99 L590.77,211.24 L827.08,305.85" data-from="1" data-to="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:3"></path></g><circle cx="118.15" cy="329.51" r="9.52" class="tablechart-point" data-series="1" data-muted="" data-marker="circle" data-row="1" style="--n:0; --m:1; --palette:var(--tablechart-color-1); --rise:141.92px; --i:0"></circle><circle cx="354.46" cy="116.62" r="9.52" class="tablechart-point" data-series="1" data-muted="" data-marker="circle" data-row="2" style="--n:0; --m:1; --palette:var(--tablechart-color-1); --rise:354.81px; --i:1"></circle><circle cx="590.77" cy="258.54" r="9.52" class="tablechart-point" data-series="1" data-muted="" data-marker="circle" data-row="3" style="--n:0; --m:1; --palette:var(--tablechart-color-1); --rise:212.89px; --i:2"></circle><circle cx="827.08" cy="163.93" r="9.52" class="tablechart-point" data-series="1" data-muted="" data-marker="circle" data-row="4" style="--n:0; --m:1; --palette:var(--tablechart-color-1); --rise:307.5px; --i:3"></circle><circle cx="118.15" cy="412.29" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:59.13px; --i:0"></circle><circle cx="354.46" cy="364.99" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:106.44px; --i:1"></circle><circle cx="590.77" cy="211.24" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:260.19px; --i:2"></circle><circle cx="827.08" cy="305.85" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:165.58px; --i:3"></circle><line class="tablechart-rule" x1="0" x2="945.24" y1="471.43" y2="471.43"></line></svg>
+<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-35" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><circle cx="118.15" cy="412.29" r="9.52" class="tablechart-hole" data-row="1" data-series="2" style="--rise:59.13px; --i:0" fill="black"></circle><circle cx="354.46" cy="364.99" r="9.52" class="tablechart-hole" data-row="2" data-series="2" style="--rise:106.44px; --i:1" fill="black"></circle><circle cx="590.77" cy="211.24" r="9.52" class="tablechart-hole" data-row="3" data-series="2" style="--rise:260.19px; --i:2" fill="black"></circle><circle cx="827.08" cy="305.85" r="9.52" class="tablechart-hole" data-row="4" data-series="2" style="--rise:165.58px; --i:3" fill="black"></circle></mask></defs><g mask="url(#tablechart-cut-35)"><path class="tablechart-series" data-series="1" data-muted="" d="M118.15,329.51 L354.46,116.62 L590.77,258.54 L827.08,163.93" data-from="1" data-to="4" style="--n:0; --m:1; --palette:var(--tablechart-color-1); --i:1; --d:3"></path><path class="tablechart-series" data-series="2" d="M118.15,412.29 L354.46,364.99 L590.77,211.24 L827.08,305.85" data-from="1" data-to="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:3"></path></g><circle cx="118.15" cy="329.51" r="9.52" class="tablechart-point" data-series="1" data-muted="" data-marker="circle" data-row="1" style="--n:0; --m:1; --palette:var(--tablechart-color-1); --rise:141.92px; --i:0"></circle><circle cx="354.46" cy="116.62" r="9.52" class="tablechart-point" data-series="1" data-muted="" data-marker="circle" data-row="2" style="--n:0; --m:1; --palette:var(--tablechart-color-1); --rise:354.81px; --i:1"></circle><circle cx="590.77" cy="258.54" r="9.52" class="tablechart-point" data-series="1" data-muted="" data-marker="circle" data-row="3" style="--n:0; --m:1; --palette:var(--tablechart-color-1); --rise:212.89px; --i:2"></circle><circle cx="827.08" cy="163.93" r="9.52" class="tablechart-point" data-series="1" data-muted="" data-marker="circle" data-row="4" style="--n:0; --m:1; --palette:var(--tablechart-color-1); --rise:307.5px; --i:3"></circle><circle cx="118.15" cy="412.29" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:59.13px; --i:0"></circle><circle cx="354.46" cy="364.99" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:106.44px; --i:1"></circle><circle cx="590.77" cy="211.24" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:260.19px; --i:2"></circle><circle cx="827.08" cy="305.85" r="9.52" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:165.58px; --i:3"></circle><line class="tablechart-rule" x1="0" x2="945.24" y1="471.43" y2="471.43"></line></svg>
 --i: 0; | none
 --i: 1; | none
 --i: 2; | none
@@ -1273,7 +1698,7 @@ left: 50%; top: 50%; |
 plot: --count: 4;
 
 #35 <figure data-chart="column" data-chart-made="" class="is-shown">
-<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19"><defs><mask id="tablechart-cut-25" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><rect class="tablechart-hole" data-for="badge" data-note="1" x="276.19" y="28.97" width="197.62" height="80.95" rx="98.81" ry="40.48" style="--after:4" fill="black"></rect></mask></defs><g mask="url(#tablechart-cut-25)"><rect class="tablechart-bar" data-kind="bar" data-row="1" x="53.57" y="255.94" width="142.86" height="215.49" style="--i:0"></rect><rect class="tablechart-bar" data-kind="bar" data-row="2" x="303.57" y="203.92" width="142.86" height="267.51" style="--i:1"></rect><rect class="tablechart-bar" data-kind="bar" data-row="3" x="553.57" y="211.35" width="142.86" height="260.08" style="--i:2"></rect><rect class="tablechart-bar" data-kind="bar" data-row="4" x="803.57" y="437.99" width="142.86" height="33.44" style="--i:3"></rect><line class="tablechart-rule" x1="0" x2="1000" y1="471.43" y2="471.43"></line><path class="tablechart-line" data-note="1" d="M 125 186.88920012449424 L 125 69.44755680049795 L 625 69.44755680049795 L 625 125.63803299097414" style="--len:283.9; --after:4"></path><polygon class="tablechart-head" data-note="1" points="625,142.3046996576408 617.5,125.63803299097414 632.5,125.63803299097414" style="--after:4"></polygon></g></svg>
+<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19"><defs><mask id="tablechart-cut-36" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><rect class="tablechart-hole" data-for="badge" data-note="1" x="276.19" y="28.97" width="197.62" height="80.95" rx="98.81" ry="40.48" style="--after:4" fill="black"></rect></mask></defs><g mask="url(#tablechart-cut-36)"><rect class="tablechart-bar" data-kind="bar" data-row="1" x="53.57" y="255.94" width="142.86" height="215.49" style="--i:0"></rect><rect class="tablechart-bar" data-kind="bar" data-row="2" x="303.57" y="203.92" width="142.86" height="267.51" style="--i:1"></rect><rect class="tablechart-bar" data-kind="bar" data-row="3" x="553.57" y="211.35" width="142.86" height="260.08" style="--i:2"></rect><rect class="tablechart-bar" data-kind="bar" data-row="4" x="803.57" y="437.99" width="142.86" height="33.44" style="--i:3"></rect><line class="tablechart-rule" x1="0" x2="1000" y1="471.43" y2="471.43"></line><path class="tablechart-line" data-note="1" d="M 125 186.88920012449424 L 125 69.44755680049795 L 625 69.44755680049795 L 625 125.63803299097414" style="--len:283.9; --after:4"></path><polygon class="tablechart-head" data-note="1" points="625,142.3046996576408 617.5,125.63803299097414 632.5,125.63803299097414" style="--after:4"></polygon></g></svg>
 --i: 0; left: 12.5%; top: 51.7467%; | outside
 --i: 1; left: 37.5%; top: 40.8235%; | outside
 --i: 2; left: 62.5%; top: 42.384%; | outside
@@ -1286,7 +1711,7 @@ left: 37.5%; top: 14.584%; --after: 4; |
 plot: --count: 4;
 
 #36 <figure data-chart="line" data-chart-made="" class="is-shown">
-<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-26" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><rect class="tablechart-hole" data-for="badge" data-note="1" x="411.9" y="-56.63" width="176.19" height="80.95" rx="88.1" ry="40.48" style="--after:4" fill="black"></rect></mask></defs><g mask="url(#tablechart-cut-26)"><path class="tablechart-series" d="M125,185.61 L375,116.62 L625,126.48 L875,427.08" data-from="1" data-to="4" style="--i:1; --d:3"></path><circle cx="125" cy="185.61" r="9.52" class="tablechart-point" data-marker="circle" data-row="1" style="--rise:285.82px; --i:0"></circle><circle cx="375" cy="116.62" r="9.52" class="tablechart-point" data-marker="circle" data-row="2" style="--rise:354.81px; --i:1"></circle><circle cx="625" cy="126.48" r="9.52" class="tablechart-point" data-marker="circle" data-row="3" style="--rise:344.95px; --i:2"></circle><circle cx="875" cy="427.08" r="9.52" class="tablechart-point" data-marker="circle" data-row="4" style="--rise:44.35px; --i:3"></circle><line class="tablechart-rule" x1="0" x2="1000" y1="471.43" y2="471.43"></line><line class="tablechart-line" data-note="1" x1="102.34" y1="-144.18" x2="875" y2="104.58" style="--len:341.9; --after:4"></line><polygon class="tablechart-head" data-note="1" points="897.6638620589791,111.88057391047121 871.9353586671156,114.1026308969461 878.0646413328844,95.06498676740358" style="--after:4"></polygon></g></svg>
+<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-37" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><rect class="tablechart-hole" data-for="badge" data-note="1" x="411.9" y="-56.63" width="176.19" height="80.95" rx="88.1" ry="40.48" style="--after:4" fill="black"></rect></mask></defs><g mask="url(#tablechart-cut-37)"><path class="tablechart-series" d="M125,185.61 L375,116.62 L625,126.48 L875,427.08" data-from="1" data-to="4" style="--i:1; --d:3"></path><circle cx="125" cy="185.61" r="9.52" class="tablechart-point" data-marker="circle" data-row="1" style="--rise:285.82px; --i:0"></circle><circle cx="375" cy="116.62" r="9.52" class="tablechart-point" data-marker="circle" data-row="2" style="--rise:354.81px; --i:1"></circle><circle cx="625" cy="126.48" r="9.52" class="tablechart-point" data-marker="circle" data-row="3" style="--rise:344.95px; --i:2"></circle><circle cx="875" cy="427.08" r="9.52" class="tablechart-point" data-marker="circle" data-row="4" style="--rise:44.35px; --i:3"></circle><line class="tablechart-rule" x1="0" x2="1000" y1="471.43" y2="471.43"></line><line class="tablechart-line" data-note="1" x1="102.34" y1="-144.18" x2="875" y2="104.58" style="--len:341.9; --after:4"></line><polygon class="tablechart-head" data-note="1" points="897.6638620589791,111.88057391047121 871.9353586671156,114.1026308969461 878.0646413328844,95.06498676740358" style="--after:4"></polygon></g></svg>
 --i: 0; left: 12.5%; top: 35.4782%; | outside
 --i: 1; left: 37.5%; top: 20.9902%; | outside
 --i: 2; left: 62.5%; top: 23.0599%; | outside
@@ -1383,3 +1808,419 @@ plot: --count: 3;
 --n: 0; --palette: var(--tablechart-color-1); --m: 0; --i: 2; | legend
 --n: 1; --palette: var(--tablechart-color-2); --m: 0; --i: 2; | legend
 plot: --count: 3; --_fit: 1;
+
+#44 <figure data-chart="scatter" data-chart-made="" style="--_series-count: 2;" data-left-out="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 620"><path class="tablechart-axis" d="M123.81,22.62V500.95H964.29M289.36,500.95v9.52M501.6,500.95v9.52M713.84,500.95v9.52M926.08,500.95v9.52M123.81,497.33h-9.52M123.81,406.74h-9.52M123.81,316.14h-9.52M123.81,225.55h-9.52M123.81,134.95h-9.52M123.81,44.36h-9.52"></path><circle cx="162.01" cy="243.67" r="11.9" class="tablechart-point" data-row="1" data-marker="circle" style="--i:0; "></circle><circle cx="162.01" cy="243.67" r="11.9" class="tablechart-point" data-row="2" data-marker="circle" style="--i:1; "></circle><circle cx="926.08" cy="479.21" r="11.9" class="tablechart-point" data-row="3" data-marker="circle" style="--i:3; "></circle><circle cx="586.5" cy="44.36" r="11.9" class="tablechart-point" data-row="4" data-marker="circle" style="--i:2; "></circle></svg>
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 4; | none
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 4; | none
+--i: 0; left: 18.3442%; top: 35.6529%; |  | +1
+--i: 1; |  | left out
+--i: 3; left: 80.9416%; top: 71.1982%; | 
+--i: 2; left: 60.7924%; top: 3.64823%; | 
+--i: 4; | 
+left: 54.4048%; top: 92.7035%; | 
+left: 0%; top: 42.2235%; | 
+left: 28.9358%; top: 83.1029%; | below
+left: 50.1599%; top: 83.1029%; | below
+left: 71.3841%; top: 83.1029%; | below
+left: 92.6082%; top: 83.1029%; | below
+left: 10.9524%; top: 80.2143%; | before
+left: 10.9524%; top: 65.6025%; | before
+left: 10.9524%; top: 50.9906%; | before
+left: 10.9524%; top: 36.3788%; | before
+left: 10.9524%; top: 21.7669%; | before
+left: 10.9524%; top: 7.15508%; | before
+plot: --count: 4;
+
+#45 <figure data-chart="scatter" data-chart-grid="" data-chart-scale-x="0 100" data-chart-scale="1 2 3 4" data-chart-made="" style="--_series-count: 2;" data-left-out="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 620"><defs><mask id="tablechart-cut-38" maskUnits="userSpaceOnUse"><rect x="-1000" y="-620" width="3000" height="1860" fill="white"></rect><rect x="362.5" y="321" width="154.46" height="40.95" fill="black"></rect><rect x="633.56" y="225.32" width="154.46" height="40.95" fill="black"></rect><rect x="380.02" y="209.4" width="154.46" height="40.95" fill="black"></rect><rect x="624.78" y="273.16" width="154.46" height="40.95" fill="black"></rect><rect x="498.03" y="149.39" width="154.46" height="40.95" fill="black"></rect><rect x="371.24" y="257.24" width="154.46" height="40.95" fill="black"></rect><rect x="616" y="321" width="174.59" height="40.95" fill="black"></rect><rect x="488.5" y="365.05" width="174.59" height="40.95" fill="black"></rect></mask></defs><path class="tablechart-grid" d="M92.86,22.62V500.95M268.33,22.62V500.95M443.81,22.62V500.95M619.29,22.62V500.95M794.76,22.62V500.95M970.24,22.62V500.95M92.86,500.95H970.24M92.86,341.51H970.24M92.86,182.06H970.24M92.86,22.62H970.24" mask="url(#tablechart-cut-38)"></path><path class="tablechart-axis" d="M92.86,22.62V500.95H970.24M92.86,500.95v9.52M268.33,500.95v9.52M443.81,500.95v9.52M619.29,500.95v9.52M794.76,500.95v9.52M970.24,500.95v9.52M92.86,500.95h-9.52M92.86,341.51h-9.52M92.86,182.06h-9.52M92.86,22.62h-9.52"></path><circle cx="531.55" cy="341.51" r="11.9" class="tablechart-point" data-row="1" data-marker="circle" style="--i:0; "></circle><circle cx="592.96" cy="261.79" r="11.9" class="tablechart-point" data-row="2" data-marker="circle" style="--i:3.93; "></circle><circle cx="557.87" cy="325.56" r="11.9" class="tablechart-point" data-row="3" data-marker="circle" style="--i:1.66; "></circle><circle cx="619.29" cy="245.84" r="11.9" class="tablechart-point" data-row="4" data-marker="circle" style="--i:5.59; "></circle><circle cx="584.19" cy="309.62" r="11.9" class="tablechart-point" data-row="5" data-marker="circle" style="--i:3.31; "></circle><circle cx="549.1" cy="229.9" r="11.9" class="tablechart-point" data-row="6" data-marker="circle" style="--i:1.03; "></circle><circle cx="610.51" cy="293.67" r="11.9" class="tablechart-point" data-row="7" data-marker="circle" style="--i:4.97; "></circle><circle cx="575.42" cy="213.95" r="11.9" class="tablechart-point" data-row="8" data-marker="circle" style="--i:2.69; "></circle><circle cx="540.32" cy="277.73" r="11.9" class="tablechart-point" data-row="9" data-marker="circle" style="--i:0.62; "></circle><circle cx="601.74" cy="341.51" r="11.9" class="tablechart-point" data-row="10" data-marker="circle" style="--i:4.55; "></circle><circle cx="566.64" cy="261.79" r="11.9" class="tablechart-point" data-row="11" data-marker="circle" style="--i:2.28; "></circle><circle cx="531.55" cy="325.56" r="11.9" class="tablechart-point" data-row="12" data-marker="circle" style="--i:0.21; "></circle><circle cx="592.96" cy="245.84" r="11.9" class="tablechart-point" data-row="13" data-marker="circle" style="--i:4.14; "></circle><circle cx="557.87" cy="309.62" r="11.9" class="tablechart-point" data-row="14" data-marker="circle" style="--i:1.86; "></circle><circle cx="619.29" cy="229.9" r="11.9" class="tablechart-point" data-row="15" data-marker="circle" style="--i:5.79; "></circle><circle cx="584.19" cy="293.67" r="11.9" class="tablechart-point" data-row="16" data-marker="circle" style="--i:3.52; "></circle><circle cx="549.1" cy="213.95" r="11.9" class="tablechart-point" data-row="17" data-marker="circle" style="--i:1.24; "></circle><circle cx="610.51" cy="277.73" r="11.9" class="tablechart-point" data-row="18" data-marker="circle" style="--i:5.17; "></circle><circle cx="575.42" cy="341.51" r="11.9" class="tablechart-point" data-row="19" data-marker="circle" style="--i:2.9; "></circle><circle cx="540.32" cy="261.79" r="11.9" class="tablechart-point" data-row="20" data-marker="circle" style="--i:0.83; "></circle><circle cx="601.74" cy="325.56" r="11.9" class="tablechart-point" data-row="21" data-marker="circle" style="--i:4.76; "></circle><circle cx="566.64" cy="245.84" r="11.9" class="tablechart-point" data-row="22" data-marker="circle" style="--i:2.48; "></circle><circle cx="531.55" cy="309.62" r="11.9" class="tablechart-point" data-row="23" data-marker="circle" style="--i:0.41; "></circle><circle cx="592.96" cy="229.9" r="11.9" class="tablechart-point" data-row="24" data-marker="circle" style="--i:4.34; "></circle><circle cx="557.87" cy="293.67" r="11.9" class="tablechart-point" data-row="25" data-marker="circle" style="--i:2.07; "></circle><circle cx="619.29" cy="213.95" r="11.9" class="tablechart-point" data-row="26" data-marker="circle" style="--i:6; "></circle><circle cx="584.19" cy="277.73" r="11.9" class="tablechart-point" data-row="27" data-marker="circle" style="--i:3.72; "></circle><circle cx="549.1" cy="341.51" r="11.9" class="tablechart-point" data-row="28" data-marker="circle" style="--i:1.45; "></circle><circle cx="610.51" cy="261.79" r="11.9" class="tablechart-point" data-row="29" data-marker="circle" style="--i:5.38; "></circle><circle cx="575.42" cy="325.56" r="11.9" class="tablechart-point" data-row="30" data-marker="circle" style="--i:3.1; "></circle></svg>
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 4; | none
+--i: 5; | none
+--i: 6; | none
+--i: 7; | none
+--i: 8; | none
+--i: 9; | none
+--i: 10; | none
+--i: 11; | none
+--i: 12; | none
+--i: 13; | none
+--i: 14; | none
+--i: 15; | none
+--i: 16; | none
+--i: 17; | none
+--i: 18; | none
+--i: 19; | none
+--i: 20; | none
+--i: 21; | none
+--i: 22; | none
+--i: 23; | none
+--i: 24; | none
+--i: 25; | none
+--i: 26; | none
+--i: 27; | none
+--i: 28; | none
+--i: 29; | none
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 4; | none
+--i: 5; | none
+--i: 6; | none
+--i: 7; | none
+--i: 8; | none
+--i: 9; | none
+--i: 10; | none
+--i: 11; | none
+--i: 12; | none
+--i: 13; | none
+--i: 14; | none
+--i: 15; | none
+--i: 16; | none
+--i: 17; | none
+--i: 18; | none
+--i: 19; | none
+--i: 20; | none
+--i: 21; | none
+--i: 22; | none
+--i: 23; | none
+--i: 24; | none
+--i: 25; | none
+--i: 26; | none
+--i: 27; | none
+--i: 28; | none
+--i: 29; | none
+--i: 0; left: 36.9643%; top: 51.4337%; | 
+--i: 3.93; |  | left out
+--i: 1.66; |  | left out
+--i: 5.59; left: 64.0714%; top: 36.0036%; | 
+--i: 3.31; |  | left out
+--i: 1.03; left: 38.719%; top: 33.4319%; | 
+--i: 4.97; left: 63.194%; top: 43.7186%; | 
+--i: 2.69; left: 50.5179%; top: 23.7558%; | 
+--i: 0.62; left: 37.8417%; top: 41.147%; | 
+--i: 4.55; left: 62.3167%; top: 51.4337%; | 
+--i: 2.28; |  | left out
+--i: 0.21; left: 40.7422%; top: 50.0563%; |  | left out
+--i: 4.14; |  | left out
+--i: 1.86; |  | left out
+--i: 5.79; left: 62.125%; top: 33.0553%; |  | left out
+--i: 3.52; |  | left out
+--i: 1.24; |  | left out
+--i: 5.17; |  | left out
+--i: 2.9; left: 49.5655%; top: 58.5381%; | 
+--i: 0.83; |  | left out
+--i: 4.76; |  | left out
+--i: 2.48; |  | left out
+--i: 0.41; |  | left out
+--i: 4.34; |  | left out
+--i: 2.07; |  | left out
+--i: 6; |  | left out
+--i: 3.72; |  | left out
+--i: 1.45; |  | left out
+--i: 5.38; |  | left out
+--i: 3.1; |  | left out
+left: 53.1548%; top: 92.7035%; | 
+left: 0%; top: 42.2235%; | 
+left: 9.28571%; top: 83.1029%; | below
+left: 26.8333%; top: 83.1029%; | below
+left: 44.381%; top: 83.1029%; | below
+left: 61.9286%; top: 83.1029%; | below
+left: 79.4762%; top: 83.1029%; | below
+left: 97.0238%; top: 83.1029%; | below
+left: 7.85714%; top: 80.7988%; | before
+left: 7.85714%; top: 55.0819%; | before
+left: 7.85714%; top: 29.3651%; | before
+left: 7.85714%; top: 3.64823%; | before
+plot: --count: 7;
+
+#46 <figure data-chart="scatter" data-chart-made="" style="--_series-count: 4;" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 620"><path class="tablechart-axis" d="M123.81,22.62V500.95H979.76M130.29,500.95v9.52M292.41,500.95v9.52M454.52,500.95v9.52M616.63,500.95v9.52M778.74,500.95v9.52M940.85,500.95v9.52M123.81,461.09h-9.52M123.81,370.5h-9.52M123.81,279.9h-9.52M123.81,189.31h-9.52M123.81,98.72h-9.52"></path><circle cx="843.59" cy="171.19" r="28.57" class="tablechart-point" data-row="1" data-marker="circle" style="--i:2; --n:0; --palette:var(--tablechart-color-1)"></circle><polygon points="940.8549783549784,449.4294183254294 966.7640467495171,494.10022590222036 914.9459099604396,494.10022590222036" class="tablechart-point" data-row="4" data-marker="triangle" style="--i:3; --n:1; --palette:var(--tablechart-color-2)"></polygon><circle cx="470.73" cy="334.26" r="18.7" class="tablechart-point" data-row="2" data-marker="circle" style="--i:1; --n:0; --palette:var(--tablechart-color-1)"></circle><polygon points="162.7164502164502,30.322791435414885 174.9301021871198,51.380812074500405 150.5027982457806,51.380812074500405" class="tablechart-point" data-row="3" data-marker="triangle" style="--i:0; --n:1; --palette:var(--tablechart-color-2)"></polygon></svg>
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 2; left: 67.454%; top: 23.9634%; | 
+--i: 1; left: 49.8958%; top: 50.2647%; | 
+--i: 0; left: 18.3039%; top: 3.64823%; | 
+--i: 3; left: 80.3661%; top: 71.1982%; | 
+left: 55.1786%; top: 92.7035%; | 
+left: 0%; top: 42.2235%; | 
+left: 13.0294%; top: 83.1029%; | below
+left: 29.2406%; top: 83.1029%; | below
+left: 45.4518%; top: 83.1029%; | below
+left: 61.6631%; top: 83.1029%; | below
+left: 77.8743%; top: 83.1029%; | below
+left: 94.0855%; top: 83.1029%; | below
+left: 10.9524%; top: 74.3696%; | before
+left: 10.9524%; top: 59.7577%; | before
+left: 10.9524%; top: 45.1459%; | before
+left: 10.9524%; top: 30.534%; | before
+left: 10.9524%; top: 15.9222%; | before
+--n: 0; --palette: var(--tablechart-color-1); | legend
+--n: 1; --palette: var(--tablechart-color-2); | legend
+ | legend
+plot: --count: 4;
+
+#47 <figure data-chart="scatter" style="width: 260px; --_series-count: 4;" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 769.23"><path class="tablechart-axis" d="M200,36.54V576.92H967.31M205.81,576.92v15.38M351.14,576.92v15.38M496.46,576.92v15.38M641.78,576.92v15.38M787.11,576.92v15.38M932.43,576.92v15.38M200,531.89h-15.38M200,429.55h-15.38M200,327.2h-15.38M200,224.85h-15.38M200,122.51h-15.38"></path><circle cx="845.24" cy="204.39" r="46.15" class="tablechart-point" data-row="1" data-marker="circle" style="--i:2; --n:0; --palette:var(--tablechart-color-1)"></circle><polygon points="932.4300699300699,504.2531163159034 974.2831804135556,576.413651632258 890.5769594465842,576.413651632258" class="tablechart-point" data-row="4" data-marker="triangle" style="--i:3; --n:1; --palette:var(--tablechart-color-2)"></polygon><circle cx="510.99" cy="388.61" r="30.21" class="tablechart-point" data-row="2" data-marker="circle" style="--i:1; --n:0; --palette:var(--tablechart-color-1)"></circle><polygon points="234.87762237762237,38.42353022084498 254.60736786870405,72.44033279167543 215.1478768865407,72.44033279167543" class="tablechart-point" data-row="3" data-marker="triangle" style="--i:0; --n:1; --palette:var(--tablechart-color-2)"></polygon></svg>
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 0; | none
+--i: 1; | none
+--i: 2; | none
+--i: 3; | none
+--i: 2; left: 57.2159%; top: 21.8201%; | 
+--i: 1; left: 55.6592%; top: 45.7689%; | 
+--i: 0; left: 26.7707%; top: 4.75%; | 
+--i: 3; left: 71.0809%; top: 62.5%; | 
+left: 58.3654%; top: 90.5%; | 
+left: 0%; top: 39.875%; | 
+left: 20.5813%; top: 78%; | below
+left: 35.1136%; top: 78%; | below
+left: 49.646%; top: 78%; | below
+left: 64.1783%; top: 78%; | below
+left: 78.7107%; top: 78%; | below
+left: 93.243%; top: 78%; | below
+left: 17.6923%; top: 69.1458%; | before
+left: 17.6923%; top: 55.8409%; | before
+left: 17.6923%; top: 42.536%; | before
+left: 17.6923%; top: 29.2311%; | before
+left: 17.6923%; top: 15.9261%; | before
+--n: 0; --palette: var(--tablechart-color-1); | legend
+--n: 1; --palette: var(--tablechart-color-2); | legend
+ | legend
+plot: --count: 4;
+
+#48 <figure data-chart="column" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19"><defs><mask id="tablechart-cut-39" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><rect class="tablechart-hole" data-for="badge" data-note="1" x="404.76" y="0" width="190.48" height="52.38" rx="0" ry="0" style="--after:5" fill="black"></rect><rect class="tablechart-hole" data-for="badge" data-note="2" x="171.43" y="0" width="219.05" height="52.38" rx="0" ry="0" style="--after:5" fill="black"></rect></mask></defs><g mask="url(#tablechart-cut-39)"><rect class="tablechart-bar" data-kind="bar" data-row="1" x="42" y="393.35" width="116" height="78.08" style="--i:0"></rect><rect class="tablechart-bar" data-kind="bar" data-row="2" x="242" y="159.1" width="116" height="312.32" style="--i:1"></rect><rect class="tablechart-bar" data-kind="bar" data-row="3" x="442" y="315.27" width="116" height="156.16" style="--i:2"></rect><rect class="tablechart-bar" data-kind="bar" data-row="4" x="642" y="471.43" width="116" height="1" style="--i:3"></rect><rect class="tablechart-bar" data-kind="bar" data-row="5" x="842" y="237.18" width="116" height="234.24" style="--i:4"></rect><line class="tablechart-rule" x1="0" x2="1000" y1="471.43" y2="471.43"></line><line class="tablechart-reference" data-note="1" x1="500" x2="500" y1="0" y2="471.43" style="--after:5"></line><line class="tablechart-reference" data-note="2" data-line="dotted" x1="400" x2="400" y1="0" y2="471.43" style="--after:5"></line></g></svg>
+--i: 0; left: 10%; top: 80.6029%; | outside
+--i: 1; left: 30%; top: 31.4118%; | outside
+--i: 2; left: 50%; top: 64.2059%; | outside
+--i: 3; left: 70%; top: 97%; | outside
+--i: 4; left: 90%; top: 47.8088%; | outside
+left: 50%; top: 5.5%; --after: 5; | 
+left: 28.0952%; top: 5.5%; --after: 5; | 
+--i: 0; | 
+--i: 1; | 
+--i: 2; | 
+--i: 3; | 
+--i: 4; | 
+plot: --count: 5;
+
+#49 <figure data-chart="column" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19"><defs><mask id="tablechart-cut-40" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><rect class="tablechart-hole" data-for="badge" data-note="1" x="873.81" y="218.59" width="126.19" height="52.38" rx="0" ry="0" style="--after:4" fill="black"></rect></mask></defs><g mask="url(#tablechart-cut-40)"><rect class="tablechart-bar" data-kind="bar" data-row="1" x="53.57" y="219.83" width="142.86" height="251.6" style="--i:0"></rect><rect class="tablechart-bar" data-kind="bar" data-row="2" x="303.57" y="159.1" width="142.86" height="312.32" style="--i:1"></rect><rect class="tablechart-bar" data-kind="bar" data-row="3" x="553.57" y="167.78" width="142.86" height="303.65" style="--i:2"></rect><rect class="tablechart-bar" data-kind="bar" data-row="4" x="803.57" y="432.39" width="142.86" height="39.04" style="--i:3"></rect><line class="tablechart-rule" x1="0" x2="1000" y1="471.43" y2="471.43"></line><line class="tablechart-reference" data-note="1" x1="0" x2="1000" y1="244.78" y2="244.78" style="--after:4"></line></g></svg>
+--i: 0; left: 12.5%; top: 44.165%; | outside
+--i: 1; left: 37.5%; top: 31.4118%; | outside
+--i: 2; left: 62.5%; top: 33.2337%; | outside
+--i: 3; left: 87.5%; top: 88.8015%; | outside
+left: 93.6905%; top: 51.403%; --after: 4; | 
+--i: 0; | 
+--i: 1; | 
+--i: 2; | 
+--i: 3; | 
+plot: --count: 4;
+
+#50 <figure data-chart="bar" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 500"><defs><mask id="tablechart-cut-41" maskUnits="userSpaceOnUse"><rect x="-1000" y="-500" width="3000" height="1500" fill="white"></rect><rect class="tablechart-hole" data-for="badge" data-note="1" x="668.72" y="0" width="135.71" height="52.38" rx="0" ry="0" style="--after:4" fill="black"></rect></mask></defs><g mask="url(#tablechart-cut-41)"><rect class="tablechart-bar" data-kind="bar" data-row="1" data-grow="right" x="159.52" y="26.25" width="669.38" height="72.5" style="--i:0"></rect><rect class="tablechart-bar" data-kind="bar" data-row="2" data-grow="right" x="159.52" y="151.25" width="830.95" height="72.5" style="--i:1"></rect><rect class="tablechart-bar" data-kind="bar" data-row="3" data-grow="right" x="159.52" y="276.25" width="807.87" height="72.5" style="--i:2"></rect><rect class="tablechart-bar" data-kind="bar" data-row="4" data-grow="right" x="159.52" y="401.25" width="103.87" height="72.5" style="--i:3"></rect><line class="tablechart-rule" x1="159.52" x2="159.52" y1="0" y2="500"></line><line class="tablechart-reference" data-note="1" x1="736.57" x2="736.57" y1="0" y2="500" style="--after:4"></line></g></svg>
+--i: 0; left: 78.3128%; top: 12.5%; | inside
+--i: 1; left: 94.4702%; top: 37.5%; | inside
+--i: 2; left: 92.162%; top: 62.5%; | inside
+--i: 3; left: 23.0714%; top: 87.5%; | inside
+--i: 0; left: 14.0476%; top: 12.5%; | 
+--i: 1; left: 14.0476%; top: 37.5%; | 
+--i: 2; left: 14.0476%; top: 62.5%; | 
+--i: 3; left: 14.0476%; top: 87.5%; | 
+left: 73.6574%; top: 5.2381%; --after: 4; | 
+plot: --count: 4;
+
+#51 <figure data-chart="column" data-chart-axis="" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 508.91"><rect class="tablechart-bar" data-kind="bar" data-row="1" x="52.5" y="192.05" width="145" height="311.77" style="--i:0"></rect><rect class="tablechart-bar" data-kind="bar" data-row="2" x="302.5" y="116.79" width="145" height="387.02" style="--i:1"></rect><rect class="tablechart-bar" data-kind="bar" data-row="3" x="552.5" y="127.54" width="145" height="376.27" style="--i:2"></rect><rect class="tablechart-bar" data-kind="bar" data-row="4" x="802.5" y="455.44" width="145" height="48.38" style="--i:3"></rect><line class="tablechart-rule" x1="0" x2="1000" y1="503.82" y2="503.82"></line><path class="tablechart-axis" d="M0,73.79V503.82M0,503.82h-10.18M0,396.31h-10.18M0,288.8h-10.18M0,181.3h-10.18M0,73.79h-10.18"></path></svg>
+--i: 0; left: 12.5%; top: 35.7375%; | outside
+--i: 1; left: 37.5%; top: 20.95%; | outside
+--i: 2; left: 62.5%; top: 23.0625%; | outside
+--i: 3; left: 87.5%; top: 87.4938%; | outside
+left: -1.52672%; top: 99%; | before
+left: -1.52672%; top: 77.875%; | before
+left: -1.52672%; top: 56.75%; | before
+left: -1.52672%; top: 35.625%; | before
+left: -1.52672%; top: 14.5%; | before
+--i: 0; | 
+--i: 1; | 
+--i: 2; | 
+--i: 3; | 
+plot: --count: 4; margin-left: 27px;
+
+#52 <figure data-chart="line" data-chart-axis="" data-chart-grid="" style="--_series-count: 2;" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 508.91" style="--_base: 422.39px;"><path class="tablechart-grid" d="M0,422.39H941.48M0,320.61H941.48M0,218.83H941.48M0,117.05H941.48" mask="url(#tablechart-cut-43)"></path><defs><mask id="tablechart-cut-42" maskUnits="userSpaceOnUse"><rect x="-1000" y="-508.91" width="3000" height="1526.72" fill="white"></rect><circle cx="117.68" cy="371.5" r="10.18" class="tablechart-hole" data-row="1" data-series="2" style="--rise:50.89px; --i:0" fill="black"></circle><circle cx="353.05" cy="330.79" r="10.18" class="tablechart-hole" data-row="2" data-series="2" style="--rise:91.6px; --i:1" fill="black"></circle><circle cx="588.42" cy="198.47" r="10.18" class="tablechart-hole" data-row="3" data-series="2" style="--rise:223.92px; --i:2" fill="black"></circle><circle cx="823.79" cy="279.9" r="10.18" class="tablechart-hole" data-row="4" data-series="2" style="--rise:142.49px; --i:3" fill="black"></circle></mask><mask id="tablechart-cut-43" maskUnits="userSpaceOnUse"><rect x="-1000" y="-508.91" width="3000" height="1526.72" fill="white"></rect><rect x="82.08" y="223.33" width="71.21" height="55.38" fill="black"></rect><rect x="317.45" y="40.12" width="71.21" height="55.38" fill="black"></rect><rect x="552.82" y="260.74" width="71.21" height="55.38" fill="black"></rect><rect x="788.19" y="80.83" width="71.21" height="55.38" fill="black"></rect><rect x="96.06" y="393.05" width="43.26" height="55.38" fill="black"></rect><rect x="331.42" y="352.34" width="43.26" height="55.38" fill="black"></rect><rect x="552.82" y="121.55" width="71.21" height="55.38" fill="black"></rect><rect x="788.19" y="301.45" width="71.21" height="55.38" fill="black"></rect></mask></defs><g mask="url(#tablechart-cut-42)"><path class="tablechart-series" data-series="1" d="M117.68,300.25 L353.05,117.05 L588.42,239.19 L823.79,157.76" data-from="1" data-to="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1; --d:3"></path><path class="tablechart-series" data-series="2" d="M117.68,371.5 L353.05,330.79 L588.42,198.47 L823.79,279.9" data-from="1" data-to="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1; --d:3"></path></g><circle cx="117.68" cy="300.25" r="10.18" class="tablechart-point" data-series="1" data-marker="circle" data-row="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:122.14px; --i:0"></circle><circle cx="353.05" cy="117.05" r="10.18" class="tablechart-point" data-series="1" data-marker="circle" data-row="2" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:305.34px; --i:1"></circle><circle cx="588.42" cy="239.19" r="10.18" class="tablechart-point" data-series="1" data-marker="circle" data-row="3" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:183.21px; --i:2"></circle><circle cx="823.79" cy="157.76" r="10.18" class="tablechart-point" data-series="1" data-marker="circle" data-row="4" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --rise:264.63px; --i:3"></circle><circle cx="117.68" cy="371.5" r="10.18" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="1" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:50.89px; --i:0"></circle><circle cx="353.05" cy="330.79" r="10.18" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:91.6px; --i:1"></circle><circle cx="588.42" cy="198.47" r="10.18" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="3" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:223.92px; --i:2"></circle><circle cx="823.79" cy="279.9" r="10.18" class="tablechart-point" data-series="2" data-marker="circle" data-open="" data-row="4" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --rise:142.49px; --i:3"></circle><line class="tablechart-rule" x1="0" x2="941.48" y1="503.82" y2="503.82"></line><path class="tablechart-axis" d="M0,117.05V422.39M0,422.39h-10.18M0,320.61h-10.18M0,218.83h-10.18M0,117.05h-10.18"></path></svg>
+--i: 0; left: 11.7684%; top: 55.5%; | outside
+--i: 1; left: 35.3053%; top: 19.5%; | outside
+--i: 2; left: 58.8422%; top: 50.5%; | below
+--i: 3; left: 82.3791%; top: 27.5%; | outside
+--i: 0; left: 11.7684%; top: 76.5%; | below
+--i: 1; left: 35.3053%; top: 68.5%; | below
+--i: 2; left: 58.8422%; top: 35.5%; | outside
+--i: 3; left: 82.3791%; top: 58.5%; | below
+--n: 0; --palette: var(--tablechart-color-1); --m: 0; --i: 3; left: 84.9237%; top: 31%; | 
+--n: 1; --palette: var(--tablechart-color-2); --m: 0; --i: 3; left: 84.9237%; top: 55%; | 
+left: -1.52672%; top: 83%; | before
+left: -1.52672%; top: 63%; | before
+left: -1.52672%; top: 43%; | before
+left: -1.52672%; top: 23%; | before
+--i: 0; | 
+--i: 1; | 
+--i: 2; | 
+--i: 3; | 
+plot: --count: 4; margin-left: 27px;
+
+#53 <figure data-chart="area" data-chart-grid="" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 476.19" style="--_base: 471.43px;"><defs><mask id="tablechart-cut-44" maskUnits="userSpaceOnUse"><rect x="-1000" y="-476.19" width="3000" height="1428.57" fill="white"></rect><rect x="38.11" y="290.81" width="66.63" height="51.82" fill="black"></rect><rect x="180.97" y="127.98" width="66.63" height="51.82" fill="black"></rect><rect x="323.83" y="236.54" width="66.63" height="51.82" fill="black"></rect><rect x="609.54" y="173.22" width="66.63" height="51.82" fill="black"></rect><rect x="752.4" y="173.22" width="66.63" height="51.82" fill="black"></rect><rect x="895.26" y="37.5" width="66.63" height="51.82" fill="black"></rect></mask></defs><path class="tablechart-grid" d="M0,471.43H1000M0,380.95H1000M0,290.48H1000M0,200H1000M0,109.52H1000" mask="url(#tablechart-cut-44)"></path><g class="tablechart-area" style=""><g class="tablechart-area-fill" style="--rows:7; --i:1; --d:2"><path d="M71.43,471.43 L71.43,362.86 L214.29,200 L357.14,308.57 L357.14,471.43 L214.29,471.43 L71.43,471.43 Z" data-from="1" data-to="3" style="--i:1; --d:2"></path><path d="M642.86,471.43 L642.86,245.24 L785.71,245.24 L928.57,109.52 L928.57,471.43 L785.71,471.43 L642.86,471.43 Z" data-from="5" data-to="7" style="--i:5; --d:2"></path></g></g><path class="tablechart-series" d="M71.43,362.86 L214.29,200 L357.14,308.57" data-from="1" data-to="3" style="--i:1; --d:2"></path><path class="tablechart-series" d="M642.86,245.24 L785.71,245.24 L928.57,109.52" data-from="5" data-to="7" style="--i:5; --d:2"></path><circle cx="71.43" cy="362.86" r="9.52" class="tablechart-point" data-marker="circle" data-row="1" style="--rise:108.57px; --i:0"></circle><circle cx="214.29" cy="200" r="9.52" class="tablechart-point" data-marker="circle" data-row="2" style="--rise:271.43px; --i:1"></circle><circle cx="357.14" cy="308.57" r="9.52" class="tablechart-point" data-marker="circle" data-row="3" style="--rise:162.86px; --i:2"></circle><circle cx="642.86" cy="245.24" r="9.52" class="tablechart-point" data-marker="circle" data-row="5" style="--rise:226.19px; --i:4"></circle><circle cx="785.71" cy="245.24" r="9.52" class="tablechart-point" data-marker="circle" data-row="6" style="--rise:226.19px; --i:5"></circle><circle cx="928.57" cy="109.52" r="9.52" class="tablechart-point" data-marker="circle" data-row="7" style="--rise:361.9px; --i:6"></circle><line class="tablechart-rule" x1="0" x2="1000" y1="471.43" y2="471.43"></line></svg>
+--i: 0; left: 7.14286%; top: 72.7%; | outside
+--i: 1; left: 21.4286%; top: 38.5%; | outside
+--i: 2; left: 35.7143%; top: 61.3%; | outside
+--i: 3; | none
+--i: 4; left: 64.2857%; top: 48%; | outside
+--i: 5; left: 78.5714%; top: 48%; | outside
+--i: 6; left: 92.8571%; top: 19.5%; | outside
+ | none
+ | none
+ | none
+ | none
+ | none
+--i: 0; | 
+--i: 1; | 
+--i: 2; | 
+--i: 3; | 
+--i: 4; | 
+--i: 5; | 
+--i: 6; | 
+plot: --count: 7;
+
+#54 <figure data-chart="bar" data-chart-axis="" data-chart-grid="" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 500"><defs><mask id="tablechart-cut-45" maskUnits="userSpaceOnUse"><rect x="-1000" y="-500" width="3000" height="1500" fill="white"></rect><rect x="655.17" y="57.39" width="105.88" height="51.82" fill="black"></rect><rect x="613.32" y="224.09" width="105.88" height="51.82" fill="black"></rect><rect x="474.74" y="390.76" width="79.72" height="51.82" fill="black"></rect><rect x="-6.21" y="44.72" width="414.29" height="77.14" fill="black"></rect><rect x="74.52" y="229.52" width="333.56" height="40.95" fill="black"></rect><rect x="234.9" y="396.19" width="173.18" height="40.95" fill="black"></rect></mask></defs><path class="tablechart-grid" d="M420,0V500M536.25,0V500M652.5,0V500M768.75,0V500M885,0V500" mask="url(#tablechart-cut-45)"></path><rect class="tablechart-bar" data-kind="bar" data-row="1" data-grow="right" x="420" y="35" width="365.03" height="96.67" style="--i:0"></rect><rect class="tablechart-bar" data-kind="bar" data-row="2" data-grow="right" x="420" y="201.67" width="323.17" height="96.67" style="--i:1"></rect><rect class="tablechart-bar" data-kind="bar" data-row="3" data-grow="right" x="420" y="368.33" width="30.23" height="96.67" style="--i:2"></rect><line class="tablechart-rule" x1="420" x2="420" y1="0" y2="500"></line><path class="tablechart-axis" d="M420,500H885M420,500v9.52M536.25,500v9.52M652.5,500v9.52M768.75,500v9.52M885,500v9.52"></path></svg>
+--i: 0; left: 70.812%; top: 16.6667%; | inside
+--i: 1; left: 66.627%; top: 50%; | inside
+--i: 2; left: 48.1892%; top: 83.3333%; | after
+--i: 0; left: 40.0952%; top: 16.6667%; | 
+--i: 1; left: 40.0952%; top: 50%; | 
+--i: 2; left: 40.0952%; top: 83.3333%; | 
+left: 42%; top: 102.857%; | below
+left: 53.625%; top: 102.857%; | below
+left: 65.25%; top: 102.857%; | below
+left: 76.875%; top: 102.857%; | below
+left: 88.5%; top: 102.857%; | below
+plot: --count: 3; margin-bottom: 25px;
+
+#55 <figure data-chart="waterfall" data-chart-axis="" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 519.48"><line class="tablechart-connector" x1="158" x2="242" y1="244.99" y2="244.99" data-row="2" style="--i:1; --start:0.2000; --span:0.0667; --ease:linear;"></line><line class="tablechart-connector" x1="358" x2="442" y1="143.05" y2="143.05" data-row="3" style="--i:2; --start:0.4000; --span:0.0667; --ease:linear;"></line><line class="tablechart-connector" x1="558" x2="642" y1="201.25" y2="201.25" data-row="4" style="--i:3; --start:0.6000; --span:0.0667; --ease:linear;"></line><line class="tablechart-connector" x1="758" x2="842" y1="249.33" y2="249.33" data-row="5" style="--i:4; --start:0.8000; --span:0.0667; --ease:linear;"></line><rect class="tablechart-bar" data-kind="total" data-row="1" data-grow="up" x="42" y="244.99" width="116" height="269.3" style="--i:0; --start:0.0000; --span:0.2000; --ease:linear;"></rect><rect class="tablechart-bar" data-kind="up" data-row="2" data-grow="up" x="242" y="143.05" width="116" height="101.94" style="--i:1; --start:0.2000; --span:0.2000; --ease:linear;"></rect><rect class="tablechart-bar" data-kind="down" data-row="3" data-grow="down" x="442" y="143.05" width="116" height="58.2" style="--i:2; --start:0.4000; --span:0.2000; --ease:linear;"></rect><rect class="tablechart-bar" data-kind="down" data-row="4" data-grow="down" x="642" y="201.25" width="116" height="48.08" style="--i:3; --start:0.6000; --span:0.2000; --ease:linear;"></rect><rect class="tablechart-bar" data-kind="total" data-row="5" data-grow="down" x="842" y="249.33" width="116" height="264.96" style="--i:4; --start:0.8000; --span:0.2000; --ease:cubic-bezier(0.3, 0.3, 0.6, 1);"></rect><line class="tablechart-rule" x1="0" x2="1000" y1="514.29" y2="514.29"></line><path class="tablechart-axis" d="M0,80.52V514.29M0,514.29h-10.39M0,441.99h-10.39M0,369.7h-10.39M0,297.4h-10.39M0,225.11h-10.39M0,152.81h-10.39M0,80.52h-10.39"></path></svg>
+--i: 0; --start: 0.0000; --span: 0.2000; left: 10%; top: 45.6604%; | outside
+--i: 1; --start: 0.2000; --span: 0.2000; left: 30%; top: 26.0379%; | outside
+--i: 2; --start: 0.4000; --span: 0.2000; left: 50%; top: 52.7408%; | outside
+--i: 3; --start: 0.6000; --span: 0.2000; left: 70%; top: 61.9954%; | outside
+--i: 4; --start: 0.8000; --span: 0.2000; left: 90%; top: 46.4954%; | outside
+left: -1.55844%; top: 99%; | before
+left: -1.55844%; top: 85.0833%; | before
+left: -1.55844%; top: 71.1667%; | before
+left: -1.55844%; top: 57.25%; | before
+left: -1.55844%; top: 43.3333%; | before
+left: -1.55844%; top: 29.4167%; | before
+left: -1.55844%; top: 15.5%; | before
+--i: 0; | 
+--i: 1; | 
+--i: 2; | 
+--i: 3; | 
+--i: 4; | 
+plot: --count: 5; margin-left: 35px;
+
+#56 <figure data-chart="column" data-chart-axis="" data-chart-stack="" data-chart-made="" style="--_series-count: 3;" data-left-out="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 508.91"><g class="tablechart-bar" data-kind="bar" data-row="1" data-stack="" style="--i:0"><rect x="90.33" y="417.81" width="152.67" height="86.01" class="tablechart-piece" data-row="1" data-series="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:0"></rect><rect x="90.33" y="288.8" width="152.67" height="129.01" class="tablechart-piece" data-row="1" data-series="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:0"></rect><rect x="90.33" y="245.8" width="152.67" height="43" class="tablechart-piece" data-row="1" data-series="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --i:0"></rect></g><g class="tablechart-bar" data-kind="bar" data-row="2" data-stack="" style="--i:1"><rect x="423.66" y="331.81" width="152.67" height="172.01" class="tablechart-piece" data-row="2" data-series="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:1"></rect><rect x="423.66" y="267.3" width="152.67" height="64.5" class="tablechart-piece" data-row="2" data-series="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:1"></rect><rect x="423.66" y="159.8" width="152.67" height="107.51" class="tablechart-piece" data-row="2" data-series="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --i:1"></rect></g><g class="tablechart-bar" data-kind="bar" data-row="3" data-stack="" style="--i:2"><rect x="757" y="374.81" width="152.67" height="129.01" class="tablechart-piece" data-row="3" data-series="1" style="--n:0; --m:0; --palette:var(--tablechart-color-1); --i:2"></rect><rect x="757" y="224.3" width="152.67" height="150.51" class="tablechart-piece" data-row="3" data-series="2" style="--n:1; --m:0; --palette:var(--tablechart-color-2); --i:2"></rect><rect x="757" y="138.3" width="152.67" height="86.01" class="tablechart-piece" data-row="3" data-series="3" style="--n:2; --m:0; --palette:var(--tablechart-color-3); --i:2"></rect></g><line class="tablechart-rule" x1="0" x2="1000" y1="503.82" y2="503.82"></line><path class="tablechart-axis" d="M0,73.79V503.82M0,503.82h-10.18M0,396.31h-10.18M0,288.8h-10.18M0,181.3h-10.18M0,73.79h-10.18"></path></svg>
+--i: 0; --n: 0; --m: 0; --palette: var(--tablechart-color-1); left: 16.6667%; top: 90.55%; | inside | left out
+--i: 1; --n: 0; --m: 0; --palette: var(--tablechart-color-1); left: 50%; top: 82.1%; | inside
+--i: 2; --n: 0; --m: 0; --palette: var(--tablechart-color-1); left: 83.3333%; top: 86.325%; | inside
+--i: 0; --n: 1; --m: 0; --palette: var(--tablechart-color-2); left: 16.6667%; top: 69.425%; | inside
+--i: 1; --n: 1; --m: 0; --palette: var(--tablechart-color-2); left: 50%; top: 58.8625%; | inside | left out
+--i: 2; --n: 1; --m: 0; --palette: var(--tablechart-color-2); left: 83.3333%; top: 58.8625%; | inside
+--i: 0; --n: 2; --m: 0; --palette: var(--tablechart-color-3); left: 16.6667%; top: 52.525%; | inside | left out
+--i: 1; --n: 2; --m: 0; --palette: var(--tablechart-color-3); left: 50%; top: 41.9625%; | inside
+--i: 2; --n: 2; --m: 0; --palette: var(--tablechart-color-3); left: 83.3333%; top: 35.625%; | inside | left out
+--i: 0; left: 16.6667%; top: 46.3%; | outside
+--i: 1; left: 50%; top: 29.4%; | outside
+--i: 2; left: 83.3333%; top: 25.175%; | outside
+left: -1.52672%; top: 99%; | before
+left: -1.52672%; top: 77.875%; | before
+left: -1.52672%; top: 56.75%; | before
+left: -1.52672%; top: 35.625%; | before
+left: -1.52672%; top: 14.5%; | before
+--i: 0; | 
+--i: 1; | 
+--i: 2; | 
+--n: 0; --palette: var(--tablechart-color-1); --m: 0; --i: 2; | legend
+--n: 1; --palette: var(--tablechart-color-2); --m: 0; --i: 2; | legend
+--n: 2; --palette: var(--tablechart-color-3); --m: 0; --i: 2; | legend
+plot: --count: 3; margin-left: 27px;
+
+#57 <figure data-chart="column" data-chart-axis="" data-chart-scale="0 25 50 75 100" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 519.48"><rect class="tablechart-bar" data-kind="bar" data-row="1" x="52.5" y="259.69" width="145" height="254.6" style="--i:0"></rect><rect class="tablechart-bar" data-kind="bar" data-row="2" x="302.5" y="198.23" width="145" height="316.05" style="--i:1"></rect><rect class="tablechart-bar" data-kind="bar" data-row="3" x="552.5" y="207.01" width="145" height="307.27" style="--i:2"></rect><rect class="tablechart-bar" data-kind="bar" data-row="4" x="802.5" y="474.78" width="145" height="39.51" style="--i:3"></rect><line class="tablechart-rule" x1="0" x2="1000" y1="514.29" y2="514.29"></line><path class="tablechart-axis" d="M0,75.32V514.29M0,514.29h-10.39M0,404.55h-10.39M0,294.81h-10.39M0,185.06h-10.39M0,75.32h-10.39"></path></svg>
+--i: 0; left: 12.5%; top: 47.99%; | outside
+--i: 1; left: 37.5%; top: 36.16%; | outside
+--i: 2; left: 62.5%; top: 37.85%; | outside
+--i: 3; left: 87.5%; top: 89.395%; | outside
+left: -1.55844%; top: 99%; | before
+left: -1.55844%; top: 77.875%; | before
+left: -1.55844%; top: 56.75%; | before
+left: -1.55844%; top: 35.625%; | before
+left: -1.55844%; top: 14.5%; | before
+--i: 0; | 
+--i: 1; | 
+--i: 2; | 
+--i: 3; | 
+plot: --count: 4; margin-left: 35px;
+
+#58 <figure data-chart="bar" data-chart-grid="" data-chart-scale="0 100" data-chart-made="" class="is-shown">
+<svg role="presentation" focusable="false" viewBox="0 0 1000 500"><defs><mask id="tablechart-cut-46" maskUnits="userSpaceOnUse"><rect x="-1000" y="-500" width="3000" height="1500" fill="white"></rect><rect x="562.37" y="36.59" width="66.63" height="51.82" fill="black"></rect><rect x="678.7" y="161.59" width="66.63" height="51.82" fill="black"></rect><rect x="662.07" y="286.59" width="66.63" height="51.82" fill="black"></rect><rect x="181.36" y="411.59" width="40.48" height="51.82" fill="black"></rect><rect x="28.72" y="42.02" width="118.9" height="40.95" fill="black"></rect><rect x="-3.42" y="167.02" width="151.04" height="40.95" fill="black"></rect><rect x="8.59" y="292.02" width="139.03" height="40.95" fill="black"></rect><rect x="28.76" y="417.02" width="118.86" height="40.95" fill="black"></rect></mask></defs><path class="tablechart-grid" d="M159.52,0V500M575,0V500M990.48,0V500" mask="url(#tablechart-cut-46)"></path><rect class="tablechart-bar" data-kind="bar" data-row="1" data-grow="right" x="159.52" y="26.25" width="481.95" height="72.5" style="--i:0"></rect><rect class="tablechart-bar" data-kind="bar" data-row="2" data-grow="right" x="159.52" y="151.25" width="598.29" height="72.5" style="--i:1"></rect><rect class="tablechart-bar" data-kind="bar" data-row="3" data-grow="right" x="159.52" y="276.25" width="581.67" height="72.5" style="--i:2"></rect><rect class="tablechart-bar" data-kind="bar" data-row="4" data-grow="right" x="159.52" y="401.25" width="74.79" height="72.5" style="--i:3"></rect><line class="tablechart-rule" x1="159.52" x2="159.52" y1="0" y2="500"></line></svg>
+--i: 0; left: 59.5702%; top: 12.5%; | inside
+--i: 1; left: 71.2036%; top: 37.5%; | inside
+--i: 2; left: 69.5417%; top: 62.5%; | inside
+--i: 3; left: 20.1631%; top: 87.5%; | inside
+--i: 0; left: 14.0476%; top: 12.5%; | 
+--i: 1; left: 14.0476%; top: 37.5%; | 
+--i: 2; left: 14.0476%; top: 62.5%; | 
+--i: 3; left: 14.0476%; top: 87.5%; | 
+ | none
+ | none
+ | none
+plot: --count: 4;

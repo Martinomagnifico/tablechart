@@ -54,8 +54,10 @@ export const bar: ChartType = {
 		const depth = geo.stacked
 			? Math.max(largest(geo.rows.map((row) => -stackReach(row, geo.series.length).bottom)), 0)
 			: Math.max(largest(geo.rows.flatMap((row) => row.cells.slice(0, geo.series.length).map((cell) => -cell.value))), 0);
-		// A break squeezes part of the scale, as on a column chart, and leaves its cut empty.
-		const ceiling = Math.max(extent, geo.squeeze?.hi ?? 0) + depth;
+		// With an axis or gridlines, the scale reaches the ends of the axis. A break squeezes part of it, as on a column chart, and leaves its cut empty.
+		const reach = Math.max(extent, geo.domain?.[1] ?? 0);
+		const below = Math.max(depth, -(geo.domain?.[0] ?? 0));
+		const ceiling = Math.max(reach, geo.squeeze?.hi ?? 0) + below;
 		const lengthOf = (value: number, span: number) => along(Math.abs(value), ceiling, span, geo.squeeze, geo.breakGap);
 		const band = height / segs.length;
 		const cy = (i: number) => (i + 0.5) * band;
@@ -103,9 +105,11 @@ export const bar: ChartType = {
 			}
 		}
 		const span = right - left - room - before;
-		const zero = left + before + lengthOf(depth, span);
+		const zero = left + before + lengthOf(below, span);
 		const x = (value: number) => (value < 0 ? zero - lengthOf(value, span) : zero + lengthOf(value, span));
 		if (geo.squeeze) geo.breakX = x(geo.squeeze.gap);
+		// The value scale, for an annotation at a value.
+		geo.x = x;
 
 		if (geo.stacked) {
 			geo.rows.forEach((row, i) => {

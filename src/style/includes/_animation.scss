@@ -60,7 +60,16 @@
 			transition-delay: calc(var(--after) * #{$stagger} + 0.35s);
 		}
 
-		:where(.tablechart-value, .tablechart-name) {
+		// A marker grows from its middle, and its name arrives with it.
+		:where([data-chart="scatter"] .tablechart-point) {
+			transform: scale(0);
+			transform-box: fill-box;
+			transform-origin: center;
+			transition: transform #{$duration} #{$easing}, opacity #{$fade} ease;
+			transition-delay: calc(var(--i) * #{$stagger});
+		}
+
+		:where(.tablechart-value, .tablechart-name, [data-chart="scatter"] .tablechart-categories span) {
 			opacity: 0;
 			transition: opacity #{$fade} ease;
 			transition-delay: calc(var(--i) * #{$stagger} + 0.096 * #{$duration});
@@ -109,6 +118,12 @@
 			stroke-dashoffset: var(--len);
 			transition: stroke-dashoffset var(--tablechart-annotation-duration, 0.6s) #{$easing};
 			transition-delay: calc(var(--after) * #{$stagger});
+		}
+
+		:where(.tablechart-reference) {
+			opacity: 0;
+			transition: opacity 0.3s ease;
+			transition-delay: calc(var(--after) * #{$stagger} + 0.35s);
 		}
 
 		:where(.tablechart-head) {
@@ -196,8 +211,13 @@
 		:where(.tablechart-area-fill) {
 			opacity: 1;
 		}
+		:where([data-chart="scatter"] .tablechart-point) {
+			transform: none;
+		}
+		:where(.tablechart-reference),
 		:where(.tablechart-value),
 		:where(.tablechart-name),
+		:where([data-chart="scatter"] .tablechart-categories span),
 		:where(.tablechart-head),
 		:where(.tablechart-badge),
 		:where(.tablechart-centre) {

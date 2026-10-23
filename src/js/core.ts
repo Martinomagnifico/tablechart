@@ -1,5 +1,6 @@
 import { axisBreak } from "./annotations/axis-break";
 import { bracket } from "./annotations/bracket";
+import { reference } from "./annotations/reference";
 import { trend } from "./annotations/trend";
 import { bar } from "./charts/bar";
 import { column } from "./charts/column";
@@ -7,7 +8,10 @@ import { donut } from "./charts/donut";
 import { area, line } from "./charts/line";
 import { waterfall } from "./charts/waterfall";
 import {
+	AXIS_CLASS,
 	BREAK_GAP,
+	GRID_CLASS,
+	TICK_CLASS,
 	CATEGORIES_CLASS,
 	CENTRE_CLASS,
 	type Config,
@@ -30,13 +34,19 @@ import { fitTogether } from "./functions/labels";
 import { measureAll, sizeOf } from "./functions/measure";
 import type { Squeeze } from "./functions/scale";
 import { readSeries, readTable } from "./functions/read-table";
-import { cutOut, htmlEl, short, svgEl } from "./functions/svg";
+import { cutOut, htmlEl, placeAt, short, svgEl } from "./functions/svg";
+import { niceStep, readScale, type Scale, scaleOf, thin, ticksOf } from "./functions/axis";
+import { debug } from "./functions/debug";
 import { applySteps, makeControls, planSteps, stepTo } from "./steps";
 import { attachTooltip, releaseTooltip } from "./tooltip";
 import type { AnnotationType, ChartState, ChartType, Geometry, Motion, Row, Shape } from "./types";
 
 const CHARTS: Record<string, ChartType> = { area, bar, column, donut, line, waterfall };
-const ANNOTATIONS: Record<string, AnnotationType> = { "axis-break": axisBreak, trend, bracket };
+/** Adds a chart type for `data-chart="name"`, such as one from `@martinomagnifico/tablechart/extras`, before `init()`. */
+export const addType = (name: string, type: ChartType): void => {
+	CHARTS[name] = type;
+};
+const ANNOTATIONS: Record<string, AnnotationType> = { "axis-break": axisBreak, trend, bracket, reference };
 export const ANNOTATION_NAMES = Object.keys(ANNOTATIONS);
 
 /** Three passes: keys, then every text element, then geometry. Geometry makes no text, so a translation script that sweeps once finds it all. */
@@ -51,6 +61,12 @@ const textBefore = (node: Node): string => {
 };
 
 const SHAPES: readonly Shape[] = ["straight", "step", "smooth"];
+
+/** A figure's own `data-chart-…`, on unless it says `false`, or else the option. */
+const turnedOn = (figure: HTMLElement, name: string, option: boolean): boolean => {
+	const own = figure.getAttribute(name);
+	return own === null ? option : own !== "false";
+};
 
 /** A figure's own `data-chart-shape`, or else the option. */
 const shapeOf = (figure: HTMLElement, config: Config): Shape => {
@@ -143,7 +159,7 @@ export const build = (
 	nameTable(figure);
 
 	let series = readSeries(figure, rows, config.langattribute);
-	if (series.length > 1 && !type.series) {
+	if (series.length > 1 && !type.series && !type.columns) {
 		console.warn(
 			`[${LIBRARY_NAME}] A ${kind} chart uses only the first of its ${series.length} value columns.`
 		);
@@ -173,6 +189,7 @@ export const build = (
 		largest(marked.flatMap((r) => r.cells.slice(0, series.length).map((c) => decimalsIn(c.number))))
 	);
 
+	const columnDecimals = series.map((_one, s) => Math.max(0, largest(rows.map((r) => decimalsIn(r.cells[s]?.number ?? "")))));
 	const seriesValues = series.map((_one, s) =>
 		rows.map((row, i) => {
 			const cell = row.cells[s] ?? row.cells[0];
@@ -183,6 +200,8 @@ export const build = (
 			if (cell.suffix) node.dataset.suffix = cell.suffix;
 			if (cell.missing) node.dataset.missing = cell.raw;
 			if (several) node.dataset.series = String(s + 1);
+			// The fields of a mark, such as x and y, each keep the decimal places of their own column.
+			if (type.columns) node.dataset.decimals = String(columnDecimals[s]);
 			node.dataset.row = String(i + 1);
 			node.style.setProperty("--i", String(row.slot));
 			return node;
@@ -211,6 +230,7 @@ export const build = (
 	const legendAsked = figure.getAttribute("data-chart-legend");
 	const legend =
 		several &&
+		!type.columns &&
 		(legendAsked === null ? config.legend || type.legend !== undefined : legendAsked !== "false")
 			? document.createElement("div")
 			: null;
@@ -219,7 +239,7 @@ export const build = (
 		legend.setAttribute("aria-hidden", "true");
 		legend.inert = true;
 	}
-	const names = several
+	const names = several && !type.columns
 		? series.map((one, s) => {
 				const node = htmlEl(NAME_CLASS, legend ?? plot);
 				if (legend) node.dataset.place = "legend";
@@ -289,8 +309,30 @@ export const build = (
 	(beside ? plot : figure).appendChild(categories);
 	if (legend) figure.appendChild(legend);
 
+	// The headers of the first two value columns are the titles of the axes; layout makes the numbers along them.
+	const fields = series.filter((one) => !one.group);
+	// Off by default on the other types: `data-chart-axis` adds the numbers along the value axis, `data-chart-grid` the gridlines.
+	const valueAxis = !type.axes && !type.centre && turnedOn(figure, "data-chart-axis", config.axis);
+	const axes = type.axes
+		? {
+				titles: fields.slice(0, 2).map((one, s) => {
+					const title = htmlEl(`${AXIS_CLASS}-title`, plot);
+					title.dataset.axis = s ? "y" : "x";
+					title.textContent = one.name;
+					if (one.key && config.langattribute) title.setAttribute(config.langattribute, one.key);
+					return title;
+				}),
+				ticks: htmlEl(`${TICK_CLASS}s`, plot),
+				numbers: true,
+			}
+		: valueAxis || (!type.centre && turnedOn(figure, "data-chart-grid", config.grid))
+			? { titles: [], ticks: htmlEl(`${TICK_CLASS}s`, plot), numbers: valueAxis }
+			: null;
+	type.text?.({ figure, plot, rows, series, config });
+
 	// A chart that steps (`data-fragment`) builds a step at a time, from left to right. Without animation it is shown whole.
-	const plan = config.animate ? planSteps(figure) : null;
+	const plan = config.animate && !type.axes ? planSteps(figure) : null;
+	if (type.axes && figure.querySelector("[data-fragment]")) debug.log(`A ${kind} chart has no steps, so it is shown whole.`, figure);
 	if (plan) figure.setAttribute("data-steps", "");
 	const keys = figure.getAttribute("data-chart-keys");
 	const controls =
@@ -354,6 +396,7 @@ export const build = (
 		names: legend ? [] : names,
 		categories: Array.from(categories.children) as HTMLElement[],
 		centre,
+		axes,
 		stacked,
 		totals,
 		totalCell,
@@ -380,18 +423,15 @@ export const build = (
 
 const MOTIONS: Record<string, Motion> = { grow: "grow", sweep: "sweep" };
 const TABLES = ["never", "auto", "print", "always"];
-// `up` and `across` are the old names of `grow` and `sweep`, for lines and areas.
-const LINE_MOTIONS: Record<string, Motion> = { ...MOTIONS, up: "grow", across: "sweep" };
 
 /**
  * How a chart builds: the figure's `data-chart-animate`, or else the option, or else the default of its kind.
  * A line or area sweeps by default; a donut and a waterfall grow, and can sweep; columns and bars only grow.
- * A line or area with steps sweeps. The old names `up` and `across` were only for lines and areas.
+ * A line or area with steps sweeps.
  */
 const motionOf = (figure: HTMLElement, kind: string, config: Config, steps: boolean): Motion => {
 	const lines = kind === "line" || kind === "area";
-	const names = lines ? LINE_MOTIONS : MOTIONS;
-	const asked: Motion | undefined = names[figure.getAttribute("data-chart-animate") ?? ""] ?? names[String(config.animate)];
+	const asked: Motion | undefined = MOTIONS[figure.getAttribute("data-chart-animate") ?? ""] ?? MOTIONS[String(config.animate)];
 	if (lines) return steps ? "sweep" : (asked ?? "sweep");
 	return kind === "donut" || kind === "waterfall" ? (asked ?? "grow") : "grow";
 };
@@ -399,7 +439,7 @@ const motionOf = (figure: HTMLElement, kind: string, config: Config, steps: bool
 // A CSS length in viewBox units, or null if it is not a length, such as `none`.
 const insideAlign = (figure: HTMLElement): Geometry["insideAlign"] => {
 	const style = getComputedStyle(figure);
-	const asked = (style.getPropertyValue("--tablechart-value-align") || style.getPropertyValue("--tablechart-inside-align")).trim();
+	const asked = style.getPropertyValue("--tablechart-value-align").trim();
 	return asked === "start" || asked === "center" || asked === "end" ? asked : null;
 };
 
@@ -426,22 +466,118 @@ const barMax = (figure: HTMLElement, unit: number): number =>
 /** Pass 3. Needs layout; makes no text, only places it. */
 export const layout = (state: ChartState, config: Config): boolean => {
 	const { plot, svg, rows, type, values, series, seriesValues, names, annotations } = state;
+	// A figure's own `data-chart-aspect` beats the kind's and the page's.
+	const ownAspect = Number.parseFloat(state.figure.dataset.chartAspect ?? "");
+	const aspect = ownAspect > 0 ? ownAspect : (type.aspect ?? config.aspect);
+
+	// The value axis of a column, bar or line chart. Its numbers are measured first, as they take room beside the plot, or under a bar chart.
+	const sideways = type.categories === "beside";
+	const along = state.axes && !type.axes ? state.axes : null;
+	const namesUnder = sideways ? null : state.categories[0]?.parentElement;
+	let valueScale: Scale | null = null;
+	if (along) {
+		plot.style.margin = "";
+		if (namesUnder) namesUnder.style.marginLeft = "";
+		const guess = plot.clientWidth;
+		if (!guess) return false;
+		// As the scale does: a step of a waterfall is a size, so only where the steps start and end counts.
+		const segs = type.segments?.(rows) ?? [];
+		const all = state.stacked
+			? rows.flatMap((row) => Object.values(stackReach(row, series.length, type.running)))
+			: segs.some((s) => s.kind === "up" || s.kind === "down")
+				? segs.flatMap((s) => [s.from, s.to])
+				: rows.flatMap((row) => row.cells.slice(0, series.length).filter((cell) => !cell.missing).map((cell) => cell.value));
+		const min = Math.min(0, -largest(all.map((value) => -value)));
+		const max = Math.max(0, largest(all));
+		const font = Number.parseFloat(getComputedStyle(plot).fontSize) || 16;
+		// The scale ends on a number of the axis, or where `data-chart-scale` says; three numbers or more are the numbers themselves.
+		const { chartScaleY, chartScale } = state.figure.dataset;
+		const own = readScale(chartScaleY ?? chartScale);
+		if (own && own.length > 2) valueScale = { min: own[0], max: own[own.length - 1], step: 0, ticks: own };
+		else {
+			const [from, to] = own ?? [min, max];
+			const step = niceStep(to - from, Math.max((sideways ? guess / 9 : (guess * aspect) / 3) / font, 2));
+			const round = (value: number, up: boolean) => (own ? value : Number(((up ? Math.ceil : Math.floor)(value / step - 1e-9 * (up ? 1 : -1)) * step).toPrecision(12)));
+			const lo = round(from, false);
+			const hi = round(to, true);
+			valueScale = { min: lo, max: hi, step, ticks: ticksOf(lo, hi, step) };
+		}
+		along.ticks.textContent = "";
+		const first = rows.find((row) => !row.missing);
+		const places = largest(valueScale.ticks.map((value) => decimalsIn(String(value))));
+		for (const value of valueScale.ticks) {
+			const tick = htmlEl(TICK_CLASS, along.ticks);
+			tick.dataset.value = String(value);
+			tick.dataset.place = "none";
+			if (first?.prefix) tick.dataset.prefix = first.prefix;
+			if (first?.suffix) tick.dataset.suffix = first.suffix;
+			writeNumber(tick, places, config.locale);
+		}
+		if (along.numbers) {
+			const ticks = Array.from(along.ticks.children) as HTMLElement[];
+			for (const tick of ticks) delete tick.dataset.place;
+			measureAll(ticks);
+			if (sideways) plot.style.marginBottom = `${(ticks[0] ? sizeOf(ticks[0]).height : 0) + 6}px`;
+			else {
+				plot.style.marginLeft = `${largest([0, ...ticks.map((tick) => sizeOf(tick).width)]) + 10}px`;
+				if (namesUnder) namesUnder.style.marginLeft = plot.style.marginLeft;
+			}
+		}
+	}
 
 	const widthPx = plot.clientWidth;
 	if (!widthPx) return false;
 
 	// viewBox units per screen pixel.
 	const unit = VIEWBOX_WIDTH / widthPx;
-	// A figure's own `data-chart-aspect` beats the kind's and the page's.
-	const ownAspect = Number.parseFloat(state.figure.dataset.chartAspect ?? "");
-	const shaped = VIEWBOX_WIDTH * (ownAspect > 0 ? ownAspect : (type.aspect ?? config.aspect));
+	const shaped = VIEWBOX_WIDTH * aspect;
 
 	plot.classList.add(PLACED_CLASS);
 	// Undo what the last layout did to the size of the text, then read every size at once, before anything is placed.
 	for (const node of [...seriesValues.flat(), ...state.totals]) delete node.dataset.place;
 	plot.style.removeProperty("--_fit");
 	state.categories[0]?.parentElement?.style.removeProperty("--_beside");
-	measureAll([...seriesValues.flat(), ...state.totals, ...names, ...state.categories, ...annotations.map((a) => a.badge)]);
+
+	// The numbers along the axes, for a first guess at the room. Once they are measured, some may be left out.
+	const axes = type.axes ? state.axes : null;
+	let scales: Scale[] = [];
+	if (axes) {
+		const font = Number.parseFloat(getComputedStyle(plot).fontSize) || 16;
+		const fields = series.flatMap((one, s) => (one.group ? [] : [s])).slice(0, 2);
+		const drawn = rows.filter((row) => fields.every((s) => row.cells[s] && !row.cells[s].missing));
+		const { chartScaleX, chartScaleY, chartScale } = state.figure.dataset;
+		const asked = [readScale(chartScaleX), readScale(chartScaleY ?? chartScale)];
+		scales = fields.map((s, k) =>
+			scaleOf(
+				drawn.length ? drawn.map((row) => row.cells[s].value) : [0, 1],
+				Math.max(k ? shaped / unit / (font * 4) : widthPx / (font * 9), 4),
+				asked[k]
+			)
+		);
+		axes.ticks.textContent = "";
+		scales.forEach((scale, k) => {
+			const first = drawn[0]?.cells[fields[k]];
+			const places = largest(scale.ticks.map((value) => decimalsIn(String(value))));
+			for (const value of scale.ticks) {
+				const tick = htmlEl(TICK_CLASS, axes.ticks);
+				tick.dataset.axis = k ? "y" : "x";
+				tick.dataset.value = String(value);
+				if (first?.prefix) tick.dataset.prefix = first.prefix;
+				if (first?.suffix) tick.dataset.suffix = first.suffix;
+				writeNumber(tick, places, config.locale);
+			}
+		});
+	}
+	const ticks = axes ? (Array.from(axes.ticks.children) as HTMLElement[]) : [];
+	measureAll([
+		...seriesValues.flat(),
+		...state.totals,
+		...names,
+		...state.categories,
+		...annotations.map((a) => a.badge),
+		...(axes?.titles ?? []),
+		...ticks,
+	]);
 
 	const labelHeight = (values[0] ? sizeOf(values[0]).height : 0) * unit;
 	const badgeHeight = annotations[0]?.badge ? sizeOf(annotations[0].badge).height * unit : 0;
@@ -503,8 +639,9 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	const top = headroom;
 
 	const plotHeight = height - top - floor;
-	const ceiling = extent * 1.02;
-	const bottom = depth * 1.02;
+	// With an axis or gridlines, the scale of the axis; a value beyond it is still shown whole.
+	const ceiling = valueScale ? Math.max(valueScale.max, extent) : extent * 1.02;
+	const bottom = valueScale ? Math.min(valueScale.min, depth) : depth * 1.02;
 
 	// The break squeezes `data-from` to `data-to` into `data-size` of the plot; `data-at` is the old spelling of `data-from`.
 	const breakSpec = annotations.find(
@@ -580,6 +717,44 @@ export const layout = (state: ChartState, config: Config): boolean => {
 			return base - lo * density - squeezed - breakGap - (value - hi) * density;
 		};
 	}
+	// The plot inside the axes: room for the titles and the numbers on the left and at the foot.
+	let x: Geometry["x"];
+	let frame: Geometry["frame"];
+	let shownTicks: number[][] = [];
+	if (axes) {
+		const gap = 6 * unit;
+		const [titleX, titleY] = axes.titles;
+		const width = (node?: HTMLElement) => (node ? sizeOf(node).width * unit : 0);
+		const tall = (node?: HTMLElement) => (node ? sizeOf(node).height * unit : 0);
+		const across = ticks.filter((tick) => tick.dataset.axis === "x");
+		const up = ticks.filter((tick) => tick.dataset.axis === "y");
+		const tickHeight = tall(ticks[0]);
+		const left = width(titleY) + largest([0, ...up.map(width)]) + 2 * gap;
+		const top = tickHeight / 2;
+		frame = [left, top, VIEWBOX_WIDTH - left - largest([0, ...across.map(width)]) / 2, height - top - tall(titleX) - tickHeight - 2 * gap];
+		const [fx, fy, fw, fh] = frame;
+		const [sx, sy] = scales;
+		const scaleX = (value: number) => fx + ((value - sx.min) / (sx.max - sx.min || 1)) * fw;
+		const scaleY = (value: number) => fy + fh - ((value - sy.min) / (sy.max - sy.min || 1)) * fh;
+		x = scaleX;
+		y = scaleY;
+		// Fewer numbers where two would touch.
+		const widthAt = (value: number) => width(across.find((tick) => Number(tick.dataset.value) === value));
+		shownTicks = [
+			thin(sx, (list) => list.every((v, k) => !k || scaleX(v) - scaleX(list[k - 1]) > (widthAt(v) + widthAt(list[k - 1])) / 2 + gap)).ticks,
+			thin(sy, (list) => list.every((v, k) => !k || scaleY(list[k - 1]) - scaleY(v) > tickHeight + gap / 2)).ticks,
+		];
+		for (const tick of ticks) {
+			const value = Number(tick.dataset.value);
+			const k = tick.dataset.axis === "x" ? 0 : 1;
+			const shown = shownTicks[k].includes(value);
+			tick.dataset.place = shown ? (k ? "before" : "below") : "none";
+			if (shown) placeAt(tick, k ? fx - gap : scaleX(value), k ? scaleY(value) : fy + fh + gap, VIEWBOX_WIDTH, height);
+		}
+		if (titleX) placeAt(titleX, fx + fw / 2, height - tall(titleX), VIEWBOX_WIDTH, height);
+		if (titleY) placeAt(titleY, 0, fy + fh / 2, VIEWBOX_WIDTH, height);
+	}
+
 	// The bands give up the room the widest series name needs.
 	const gutter = names.length
 		? largest(names.map((name) => sizeOf(name).width)) * unit + 12 * unit
@@ -605,12 +780,39 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	svg.setAttribute("viewBox", `0 0 ${VIEWBOX_WIDTH} ${short(height)}`);
 	svg.textContent = ""; // geometry only; no text lives in here
 
+	// The axes, with a short mark at each number, and gridlines if asked.
+	if (frame && x) {
+		const [fx, fy, fw, fh] = frame;
+		const [across, up] = shownTicks;
+		const scaleX = x;
+		if (turnedOn(state.figure, "data-chart-grid", config.grid))
+			svg.appendChild(
+				svgEl("path", {
+					class: GRID_CLASS,
+					d: [...across.map((v) => `M${short(scaleX(v))},${short(fy)}V${short(fy + fh)}`), ...up.map((v) => `M${short(fx)},${short(y(v))}H${short(fx + fw)}`)].join(""),
+				})
+			);
+		svg.appendChild(
+			svgEl("path", {
+				class: AXIS_CLASS,
+				d: [
+					`M${short(fx)},${short(fy)}V${short(fy + fh)}H${short(fx + fw)}`,
+					...across.map((v) => `M${short(scaleX(v))},${short(fy + fh)}v${short(4 * unit)}`),
+					...up.map((v) => `M${short(fx)},${short(y(v))}h${short(-4 * unit)}`),
+				].join(""),
+			})
+		);
+	}
+
 	state.checks = [];
 	const geo: Geometry = {
 		rows,
 		segments,
 		cx,
 		y,
+		x,
+		frame,
+		length: (name, fallback) => cssLength(state.figure, unit, name, fallback),
 		barWidth: Math.min(band * config.barfill, barMax(state.figure, unit)),
 		barMax: barMax(state.figure, unit),
 		height,
@@ -628,6 +830,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		breakAt,
 		squeeze: compress,
 		breakGap,
+		domain: valueScale ? [valueScale.min, valueScale.max] : null,
 		stacked: state.stacked,
 		shape: shapeOf(state.figure, config),
 		totals: state.totals,
@@ -641,11 +844,51 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		centre: state.centre,
 		config,
 		checks: state.checks,
+		taken: [],
 	};
 
 	// How many elements start one after the other, so the stagger can shrink under `--tablechart-animation-max`.
 	plot.style.setProperty("--count", String(Math.max(1, ...rows.map((row) => row.slot + 1))));
 	type.draw(geo);
+	if (geo.rowAt) state.rowAt = geo.rowAt;
+
+	// The numbers along the value axis, fewer where two would touch, and none in the cut of a broken scale.
+	if (along && valueScale) {
+		const gap = 6 * unit;
+		const at = sideways && geo.x ? geo.x : y;
+		const ticks = Array.from(along.ticks.children) as HTMLElement[];
+		const size = (value: number) => sizeOf(ticks.find((tick) => Number(tick.dataset.value) === value) ?? ticks[0]);
+		const shown = thin(valueScale, (list) =>
+			list.every((v, k) =>
+				!k || (sideways ? at(v) - at(list[k - 1]) > ((size(v).width + size(list[k - 1]).width) / 2) * unit + gap : at(list[k - 1]) - at(v) > size(v).height * unit + gap / 2)
+			)
+		).ticks.filter((v) => !compress || v <= compress.lo || v >= compress.hi);
+		for (const tick of ticks) {
+			const value = Number(tick.dataset.value);
+			const on = along.numbers && shown.includes(value);
+			tick.dataset.place = on ? (sideways ? "below" : "before") : "none";
+			if (on) placeAt(tick, sideways ? at(value) : -gap, sideways ? height + gap : at(value), VIEWBOX_WIDTH, height);
+		}
+		const end = VIEWBOX_WIDTH - gutter;
+		// Under the marks.
+		if (turnedOn(state.figure, "data-chart-grid", config.grid))
+			svg.prepend(
+				svgEl("path", {
+					class: GRID_CLASS,
+					d: shown.map((v) => (sideways ? `M${short(at(v))},0V${short(height)}` : `M0,${short(at(v))}H${short(end)}`)).join(""),
+				})
+			);
+		if (along.numbers)
+			svg.appendChild(
+				svgEl("path", {
+					class: AXIS_CLASS,
+					d: [
+						sideways ? `M${short(at(valueScale.min))},${short(height)}H${short(at(valueScale.max))}` : `M0,${short(at(valueScale.max))}V${short(at(valueScale.min))}`,
+						...shown.map((v) => (sideways ? `M${short(at(v))},${short(height)}v${short(4 * unit)}` : `M0,${short(at(v))}h${short(-4 * unit)}`)),
+					].join(""),
+				})
+			);
+	}
 
 	for (const [n, annotation] of annotations.entries()) {
 		annotation.badge?.setAttribute("data-note", String(n + 1));
@@ -714,6 +957,25 @@ export const layout = (state: ChartState, config: Config): boolean => {
 			}),
 		];
 	});
+	// The gridlines stop a little before each number and name on the chart, and go on after it, so the text reads on any background.
+	const grid = svg.querySelector<SVGElement>(`.${GRID_CLASS}`);
+	if (grid) {
+		const box = plot.getBoundingClientRect();
+		const scale = VIEWBOX_WIDTH / box.width;
+		// The height of the letters, not of the line: the line height over the size of the text.
+		const style = getComputedStyle(plot);
+		const lines = Number.parseFloat(style.lineHeight) / Number.parseFloat(style.fontSize) || 1.2;
+		const texts = [...seriesValues.flat(), ...state.totals, ...(type.categories === "beside" ? state.categories : [])];
+		const under = texts.flatMap((node) => {
+			if (node.dataset.place === "none" || node.hidden || node.hasAttribute("data-left-out")) return [];
+			const r = node.getBoundingClientRect();
+			const tall = (r.height * scale) / lines;
+			return r.width
+				? [svgEl("rect", { x: (r.left - box.left) * scale - 3 * unit, y: (r.top - box.top) * scale + (r.height * scale - tall) / 2 - unit, width: r.width * scale + 6 * unit, height: tall + 2 * unit })]
+				: [];
+		});
+		cutOut(svg, under, VIEWBOX_WIDTH, height, grid);
+	}
 	cutOut(svg, holes, VIEWBOX_WIDTH, height);
 
 	// A number that is not shown, for lack of room or by design, so `data-chart-table="auto"` prints the table.
@@ -726,9 +988,10 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		const row = Number(label.dataset.row);
 		return all.some((one) => seen(one) && Number(one.dataset.row) <= row && row <= Number(one.dataset.rowEnd ?? one.dataset.row));
 	};
+	// A chart whose values are the fields of a mark, such as a scatter, shows names rather than numbers.
 	state.figure.toggleAttribute(
 		"data-left-out",
-		[...seriesValues, state.totals].some((all) => all.some((label) => !skip(label) && !seen(label) && !covered(label, all)))
+		(type.columns ? [state.categories] : [...seriesValues, state.totals]).some((all) => all.some((label) => !skip(label) && !seen(label) && !covered(label, all)))
 	);
 
 	return true;
@@ -738,22 +1001,22 @@ export const layout = (state: ChartState, config: Config): boolean => {
 export const relabel = (state: ChartState, config: Config): void => {
 	const values = [...state.seriesValues.flat(), ...state.totals, ...(state.totalCell ? [state.totalCell] : [])];
 	for (const node of state.centre ? [...values, state.centre] : values) {
-		const { missing, prefix = "", suffix = "" } = node.dataset;
-		if (missing !== undefined) {
-			node.textContent = missing;
-			continue;
-		}
-		const value = Number.parseFloat(node.dataset.value || "0");
-		const places = node.dataset.decimals ? Number(node.dataset.decimals) : state.decimals;
-		const [sign, rest] = splitSign(value, places, config.locale);
-		node.textContent = prefix + (prefix ? sign : "") + rest + suffix;
-		// A leading minus is set apart, so it can hang outside a centred number.
-		if (sign && !prefix) {
-			const minus = document.createElement("span");
-			minus.className = MINUS_CLASS;
-			minus.textContent = sign;
-			node.prepend(minus);
-		}
+		if (node.dataset.missing !== undefined) node.textContent = node.dataset.missing;
+		else writeNumber(node, node.dataset.decimals ? Number(node.dataset.decimals) : state.decimals, config.locale);
+	}
+};
+
+/** The number in `data-value`, in the locale, with the text around it. */
+const writeNumber = (node: HTMLElement, places: number, locale?: string): void => {
+	const { prefix = "", suffix = "" } = node.dataset;
+	const [sign, rest] = splitSign(Number.parseFloat(node.dataset.value || "0"), places, locale);
+	node.textContent = prefix + (prefix ? sign : "") + rest + suffix;
+	// A leading minus is set apart, so it can hang outside a centred number.
+	if (sign && !prefix) {
+		const minus = document.createElement("span");
+		minus.className = MINUS_CLASS;
+		minus.textContent = sign;
+		node.prepend(minus);
 	}
 };
 

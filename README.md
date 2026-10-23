@@ -11,11 +11,11 @@
 
 Tablechart makes simple charts from a table: an HTML table, a Markdown table or a JSON file. You write the table, Tablechart shows it as a chart.
 
-* **Chart types:** column, bar, line, area, waterfall and donut
+* **Chart types:** column, bar, line, area, waterfall and donut, and scatter in the extras
 * **The table stays:** it is hidden from sight, but screen readers, search engines and translation scripts still read it. Without JavaScript, the table is all there is.
 * **Real text:** names and numbers are HTML, so they use the font of the page and do not scale with the drawing.
 * **CSS for the looks:** colours, sizes and animation are CSS variables. Light and dark mode follow the page.
-* **Annotations:** badges, brackets, trend arrows and a break in the scale
+* **Annotations:** badges, brackets, trend arrows, reference lines and a break in the scale
 * **Tooltips:** when a chart leaves numbers out, point at a row, or tap it, to see all its values
 * **Print and PDF:** every chart prints whole, and the table can be shown under a chart that leaves numbers out
 * **Step by step:** show the rows one at a time, with Previous and Next buttons
@@ -69,6 +69,20 @@ A chart is a `figure` with `data-chart` and a table in it. The first cell of a r
 
 Use `bar`, `line`, `area`, `waterfall` or `donut` for the other types. With more than one value column, each column is a line, or a bar in each group. Add `data-chart-stack` to stack them.
 
+### Extras
+
+The scatter chart is in the extras. Add it before `init()`:
+
+```js
+import { addType, init } from "@martinomagnifico/tablechart";
+import { scatter } from "@martinomagnifico/tablechart/extras";
+
+addType("scatter", scatter);
+init();
+```
+
+With a script tag, load `tablechart-extras.js` after `tablechart.js`. See [Extras](https://martinomagnifico.github.io/tablechart/types/extras.html).
+
 ## Options
 
 ```js
@@ -79,6 +93,8 @@ init({
 	controls: true,     // Previous and Next buttons on a chart that steps
 	tooltip: "auto",    // Tooltips: "auto" only when a chart leaves numbers out, true or false
 	table: "never",     // The table under the chart: "never", "auto" (in print, if numbers are left out), "print" or "always"
+	axis: false,        // Numbers along the value axis
+	grid: false,        // Gridlines at the numbers of the axis
 	locale: undefined,  // Locale for numbers; the language of the page if not set
 });
 ```

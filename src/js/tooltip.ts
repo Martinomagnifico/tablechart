@@ -212,8 +212,10 @@ const show = (state: ChartState, index: number, config: Config): void => {
 	const name = state.categories[index]?.textContent ?? state.rows[index].label;
 	// With one value and no series name, the name of the row and its value share a line.
 	const single = lines.length === 1 && !lines[0].name;
+	// Names without values, such as on a scatter chart, are a list of their own, without a title.
+	const names = lines.every((one) => one.name && !one.value);
 	content.replaceChildren(
-		line(name, single ? lines[0].value : "", undefined, true),
+		...(names ? [] : [line(name, single ? lines[0].value : "", undefined, true)]),
 		...(single ? [] : lines.map(({ name, value, colour, sample }) => line(name, value, colour, false, sample)))
 	);
 
@@ -281,7 +283,8 @@ export const attachTooltip = (state: ChartState, config: Config, auto = false): 
 		if (auto && !state.figure.hasAttribute("data-left-out")) return owner === state ? hide() : undefined;
 		const index = rowOf(event);
 		pointed = index;
-		if (index === null || busy(index)) return owner === state ? hideSoon() : undefined;
+		// Off every row but still on the plot, such as between the markers of a scatter chart: closed at once.
+		if (index === null || busy(index)) return owner === state ? hide() : undefined;
 		show(state, index, config);
 	};
 	const mark = (event: Event) => {

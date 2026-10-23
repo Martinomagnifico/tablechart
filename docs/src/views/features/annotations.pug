@@ -2,14 +2,14 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Features | Annotations"
-	- pagedescription = "Annotations in Tablechart: brackets and trend arrows, placed by the data."
+	- pagedescription = "Annotations in Tablechart: brackets, trend arrows and reference lines, placed by the data."
 
 block content
 	.lane
 		.container
 			.page-header
 				h1 Annotations
-				p.lead A bracket or a trend arrow, placed by the data.
+				p.lead A bracket, a trend arrow or a reference line, placed by the data.
 
 	+section("How to add an annotation")
 		p Put a #[code div] with the class #[code chart-annotations] inside the chart. Each annotation in it is a #[code span] with #[code data-annotation]. An annotation is placed by the data, so if you change a number, the annotation moves with it.
@@ -73,6 +73,39 @@ block content
 					span(data-annotation="trend" data-years="4" data-at="0.46")
 						span.tablechart-caption A year
 						span +12%
+
+	+section("Reference line")
+		p A reference line marks a value, such as a target or the mean. #[code data-value] puts it on the value axis: across a column, line or area chart, and up a bar chart. It takes a number, #[code mean] or #[code median]. The mean and the median are of the values in the table.
+
+		+chart(null, '11')
+			figure(data-chart="column")
+				figcaption: b Apples picked
+				table
+					tbody
+						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '41']]
+							tr
+								th= row[0]
+								td= row[1]
+				.chart-annotations
+					span(data-annotation="reference" data-value="60") Target
+
+		p If the names of the rows are numbers, #[code data-name] puts the line among them, as if the names were a scale. Here each row is a number of apples on a branch, and its value is how many branches have that many. With #[code mean] or #[code median], each name counts as often as its value says: the mean is the mean number of apples on a branch.
+
+		+chart(null, '13')
+			figure(data-chart="column")
+				figcaption: b Branches by number of apples
+				table
+					tbody
+						each row in [['2', '3'], ['3', '8'], ['4', '12'], ['5', '9'], ['6', '5'], ['7', '2']]
+							tr
+								th= row[0]
+								td= row[1]
+				.chart-annotations
+					span(data-annotation="reference" data-name="mean") Mean 4.3
+					span(data-annotation="reference" data-name="median" data-line="dotted") Median 4
+
+		p The line is dashed, or dotted with #[code data-line="dotted"]. The text of the annotation is its label, on the line. If two labels would cover each other, the second moves beside its line or a line lower. Without text, there is only the line.
+		p If the label has a number and the line uses #[code mean] or #[code median], Tablechart checks it, to the decimals you wrote, and shows a warning in the console if they differ. Your text is always the one shown.
 
 	+section("Break the scale")
 		p A break in the scale is not an annotation, but it is added the same way. See #[a(href=url('/features/scale-break.html')) Scale break].

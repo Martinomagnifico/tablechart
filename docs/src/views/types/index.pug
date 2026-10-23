@@ -2,7 +2,7 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Chart types | All types"
-	- pagedescription = "All Tablechart chart types on one page: area, bar, column, donut, line and waterfall."
+	- pagedescription = "All Tablechart chart types on one page: area, bar, column, donut, line, scatter and waterfall."
 
 mixin type(name, href)
 	.card
@@ -64,6 +64,21 @@ block content
 								tr
 									th= row[0]
 									td= row[1]
+
+			+type("Scatter", "/types/scatter.html")
+				figure(data-chart="scatter" aria-label="Harvest per tree and price per kilo, per variety")
+					table
+						thead
+							tr
+								th Variety
+								th Harvest (kg)
+								th Price (€)
+						tbody
+							each row in [['Elstar', '62', '1.20'], ['Jonagold', '75', '1.05'], ['Braeburn', '48', '1.45'], ['Cox', '35', '1.85'], ['Boskoop', '70', '0.95']]
+								tr
+									th= row[0]
+									td= row[1]
+									td= row[2]
 
 			+type("Waterfall", "/types/waterfall.html")
 				figure(data-chart="waterfall" aria-label="What happened to the crop, in thousands of apples")

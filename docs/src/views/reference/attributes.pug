@@ -20,7 +20,7 @@ block content
 			tbody
 				tr
 					td: code data-chart
-					td Makes the figure a chart: #[code column], #[code bar], #[code line], #[code area], #[code waterfall] or #[code donut]
+					td Makes the figure a chart: #[code column], #[code bar], #[code line], #[code area], #[code waterfall] or #[code donut], or #[code scatter] from the #[a(href=url('/types/extras.html')) extras]
 				tr
 					td: code data-chart-src
 					td Reads the data from a JSON file. See #[a(href=url('/data.html')) Data].
@@ -61,6 +61,21 @@ block content
 					td: code data-chart-table="auto"
 					td When the table is shown under the chart: #[code always], #[code print], #[code auto] (in print, when the chart does not show all its numbers) or #[code never]
 				tr
+					td: code data-chart-axis
+					td Adds numbers along the value axis of a column, bar, line, area or waterfall chart. #[code data-chart-axis="false"] turns them off when the #[code axis] option is #[code true].
+				tr
+					td: code data-chart-grid
+					td Adds a light line at each number of the value axis, or of both axes on a scatter chart. #[code data-chart-grid="false"] turns it off when the #[code grid] option is #[code true].
+				tr
+					td: code data-chart-scale="0 100"
+					td Where the value axis starts and ends, or with three numbers or more, the numbers along it. On a scatter chart it is the axis up, and #[code data-chart-scale-y] is another name for it. See #[a(href=url('/styling/axes.html#the-scale')) The scale].
+				tr
+					td: code data-chart-scale-x="0 100"
+					td The same, for the axis across
+				tr
+					td: code data-chart-names="false"
+					td Turns off the names next to the markers of a scatter chart
+				tr
 					td: code data-chart-keys
 					td Adds translation keys to the names, starting with its value. See #[a(href=url('/features/translation.html')) Translation].
 
@@ -94,6 +109,9 @@ block content
 				tr
 					td: code data-line
 					td Makes the line #[code dashed] or #[code dotted]
+				tr
+					td: code data-group
+					td On a scatter chart: the cells of this column name the groups. Each group has its own colour and shape. See #[a(href=url('/types/scatter.html#groups')) Scatter].
 
 	+section("On an annotation")
 		p Each annotation is a #[code span] with #[code data-annotation], in a #[code div] with the class #[code chart-annotations]. See #[a(href=url('/features/annotations.html')) Annotations].
@@ -129,6 +147,18 @@ block content
 					td: code axis-break
 					td: code data-mark
 					td How the break is shown: two slanted lines by default, or #[code zigzag]. See #[a(href=url('/features/scale-break.html')) Scale break].
+				tr
+					td: code reference
+					td: code data-value
+					td A line at a value on the value axis: a number, #[code mean] or #[code median] of the values
+				tr
+					td: code reference
+					td: code data-name
+					td A line among names that are numbers: a number, #[code mean] or #[code median], with each name counted as often as its value
+				tr
+					td: code reference
+					td: code data-line
+					td #[code dotted] makes the line dotted. It is dashed by default.
 				tr
 					td All
 					td: code data-series

@@ -51,6 +51,7 @@ export const readSeries = (figure: HTMLElement, rows: Row[], langattribute: stri
 			focus: head?.getAttribute("data-kind") === "focus",
 			marker: head?.getAttribute("data-marker") ?? null,
 			line: lineOf(head?.getAttribute("data-line")),
+			group: !!head?.hasAttribute("data-group"),
 		};
 	});
 };
@@ -85,6 +86,16 @@ export const assignKeys = (figures: HTMLElement[], langattribute: string | false
 				if (!head.getAttribute(langattribute))
 					head.setAttribute(langattribute, `${prefix}-col${i + 1}`);
 			});
+		// The cells of a group column name the groups: one key per group.
+		heads.forEach((head, i) => {
+			if (!head.hasAttribute("data-group")) return;
+			const groups: string[] = [];
+			figure.querySelectorAll(`tbody tr > td:nth-of-type(${i + 1})`).forEach((td) => {
+				const name = (td.textContent || "").trim();
+				if (!groups.includes(name)) groups.push(name);
+				if (!td.getAttribute(langattribute)) td.setAttribute(langattribute, `${prefix}-group${groups.indexOf(name) + 1}`);
+			});
+		});
 		debug?.log?.(
 			`Keys for "${prefix}" written onto ${figure.querySelectorAll("tbody th").length} rows`
 		);

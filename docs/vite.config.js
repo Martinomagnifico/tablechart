@@ -79,6 +79,7 @@ export default defineConfig(({ mode }) => {
             viteStaticCopy({
                 targets: [
                 { src: '../dist/tablechart.js', dest: 'lib' },
+                { src: '../dist/tablechart-extras.js', dest: 'lib' },
                 { src: '../dist/tablechart.css', dest: 'lib' },
                 { src: 'node_modules/panelset/dist/panelset.js', dest: 'lib' },
                 { src: 'node_modules/panelset/dist/panelset.css', dest: 'lib' },
@@ -122,13 +123,23 @@ export default defineConfig(({ mode }) => {
 	        }
 	    },
 		resolve: {
-			alias: {
-				// PanelSet comes from npm, for the sidebar and tabs. Tablechart is this
-				// project's own library: its source while developing, its build otherwise.
-				'@martinomagnifico/tablechart': isDev
-					? resolve(import.meta.dirname, '../src/js/index.ts')
-					: resolve(import.meta.dirname, '../dist/tablechart.mjs')
-			}
+			// PanelSet comes from npm, for the sidebar and tabs. Tablechart is this
+			// project's own library: its source while developing, its build otherwise.
+			// Exact names, so the extras do not resolve inside the main entry.
+			alias: [
+				{
+					find: /^@martinomagnifico\/tablechart\/extras$/,
+					replacement: isDev
+						? resolve(import.meta.dirname, '../src/js/extras.ts')
+						: resolve(import.meta.dirname, '../dist/tablechart-extras.mjs')
+				},
+				{
+					find: /^@martinomagnifico\/tablechart$/,
+					replacement: isDev
+						? resolve(import.meta.dirname, '../src/js/index.ts')
+						: resolve(import.meta.dirname, '../dist/tablechart.mjs')
+				}
+			]
 		}
 	};
 });

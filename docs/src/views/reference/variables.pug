@@ -146,6 +146,24 @@ block content
 			['--tablechart-break-width', '<code>1px</code>', 'The width of those lines'],
 		])
 
+	+section("Axes and gridlines")
+		p On a #[a(href=url('/types/scatter.html')) scatter chart], and on the other types with #[code data-chart-axis] or #[code data-chart-grid]. See #[a(href=url('/styling/axes.html')) Axes and gridlines].
+
+		+vars([
+			['--tablechart-axis-color', 'The text colour, at 55%', 'The lines of the axes'],
+			['--tablechart-axis-size', 'The name size', 'The numbers and titles along the axes'],
+			['--tablechart-axis-width', '<code>1px</code>', 'The width of the lines of the axes'],
+			['--tablechart-grid-color', 'The text colour', 'The gridlines, with <code>data-chart-grid</code>'],
+			['--tablechart-grid-opacity', '<code>0.09</code>', 'The opacity of the gridlines'],
+			['--tablechart-grid-width', '<code>1px</code>', 'The width of the gridlines'],
+		])
+
+	+section("Scatter")
+		+vars([
+			['--tablechart-bubble-max', '<code>24px</code>', 'How wide the largest bubble is'],
+			['--tablechart-marker-size', '<code>10px</code>', 'How wide a marker is, on a chart without a column for the size'],
+		])
+
 	+section("Tooltip")
 		p See #[a(href=url('/styling/tooltips.html')) Styling tooltips]. The tooltip reads these from the chart when it opens.
 
@@ -182,19 +200,3 @@ block content
 			['--tablechart-queue-duration', '<code>0.4s</code>', 'How long a chart in a sequence takes to fade in'],
 		])
 
-	+section("Old names")
-		p These names still work until the next minor version. If a page uses one, the console lists it with its new name. If you set #[code --tablechart-name-size] before, it now also sets the names under the bars.
-
-		table
-			thead
-				tr
-					th Old
-					th New
-			tbody
-				each row in [['duration', 'animation-element-duration'], ['easing', 'animation-ease'], ['category-size', 'name-size'], ['category-padding', 'name-padding'], ['categories-gap', 'name-gap'], ['inside-align', 'value-align'], ['bar-ink', 'bar-value-color'], ['piece-ink', 'piece-value-color'], ['up-ink', 'up-value-color'], ['down-ink', 'down-value-color'], ['total-ink', 'total-value-color'], ['series-ink', 'series-own-color'], ['dash', 'series-dash'], ['dot', 'series-dot'], ['muted-share', 'series-muted-share'], ['rule-color', 'baseline-color'], ['rule-width', 'baseline-width'], ['rule-opacity', 'baseline-opacity'], ['key-size', 'legend-key-size'], ['controls-justify', 'control-justify'], ['controls-gap', 'control-gap']]
-					tr
-						td: code= '--tablechart-' + row[0]
-						td: code= '--tablechart-' + row[1]
-				tr
-					td: code --tablechart-stagger
-					td #[code --tablechart-animation-stagger], now a share of the element time instead of seconds

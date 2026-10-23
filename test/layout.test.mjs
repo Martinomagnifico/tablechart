@@ -67,12 +67,48 @@ figures.push(
 	figure('data-chart="bar"', table([["a", "12", "9"], ["b", "15", "11"], ["c", "140", "120"]], ["A", "B"]) + notes('<span data-annotation="axis-break" data-from="20"></span>'))
 );
 
+// Scatter charts, from the extras: a few points, a crowded cluster whose names do not all fit, bubbles in groups, and a narrow one.
+const points = [["Apples", "12%", "3.4"], ["Quinces", "12%", "3.4"], ["Pears", "30%", "2.1"], ["Plums", "22%", "4.5"], ["Cherries", "41%", "n/a"]];
+const cluster = Array.from({ length: 30 }, (_, i) => [`Variety ${i + 1}`, String(50 + ((i * 7) % 11)), String(2 + ((i * 5) % 9) / 10)]);
+const bubbles = [["Orchard", "64", "3.1", "14", "Own"], ["Market", "41", "2.2", "6", "Own"], ["Shop", "22", "3.8", "2", "Bought"], ["Online", "70", "1.4", "9", "Bought"]];
+const grouped = `<table><thead><tr><th></th><th>Reach</th><th>Score</th><th>Mentions</th><th data-group>Kind</th></tr></thead><tbody>${bubbles
+	.map(([label, ...values]) => `<tr><th>${label}</th>${values.map((v) => `<td>${v}</td>`).join("")}</tr>`)
+	.join("")}</tbody></table>`;
+figures.push(
+	figure('data-chart="scatter"', table(points, ["Reach", "Score"])),
+	figure('data-chart="scatter" data-chart-grid data-chart-scale-x="0 100" data-chart-scale="1 2 3 4"', table(cluster, ["X", "Y"])),
+	figure('data-chart="scatter"', grouped),
+	figure('data-chart="scatter" style="width: 260px"', grouped)
+);
+
+// Reference lines: among names that are numbers, weighted by the values, and at a value on a column and a bar chart.
+const counts = [["2", "1"], ["3", "4"], ["4", "2"], ["5", "0"], ["6", "3"]];
+figures.push(
+	figure('data-chart="column"', table(counts) + notes('<span data-annotation="reference" data-name="mean">Mean 4.0</span><span data-annotation="reference" data-name="median" data-line="dotted">Median 3.5</span>')),
+	figure('data-chart="column"', table(seasons) + notes('<span data-annotation="reference" data-value="mean">Mean</span>')),
+	figure('data-chart="bar"', table(seasons) + notes('<span data-annotation="reference" data-value="50">Target</span>'))
+);
+
+// A value axis and gridlines on the other types: off by default, added by the figure.
+figures.push(
+	figure('data-chart="column" data-chart-axis', table(seasons)),
+	figure('data-chart="line" data-chart-axis data-chart-grid', table(two, ["N", "S"])),
+	figure('data-chart="area" data-chart-grid', table(gaps)),
+	figure('data-chart="bar" data-chart-axis data-chart-grid', table(long)),
+	figure('data-chart="waterfall" data-chart-axis', table(water)),
+	figure('data-chart="column" data-chart-axis data-chart-stack', table(three, ["X", "Y", "Z"])),
+	figure('data-chart="column" data-chart-axis data-chart-scale="0 25 50 75 100"', table(seasons)),
+	figure('data-chart="bar" data-chart-grid data-chart-scale="0 100"', table(seasons))
+);
+
 const script = `
-import { init } from "/tablechart.mjs";
+import { addType, init } from "/tablechart.mjs";
+import { scatter } from "/tablechart-extras.mjs";
+addType("scatter", scatter);
 const describe = () => [...document.querySelectorAll("figure")].map((figure, k) => {
 	const svg = figure.querySelector("svg")?.outerHTML ?? "(no drawing)";
-	const text = [...figure.querySelectorAll(".tablechart-value, .tablechart-name, .tablechart-badge, .tablechart-centre, .tablechart-categories span")]
-		.map((node) => (node.getAttribute("style") ?? "") + " | " + (node.dataset.place ?? "") + (node.hasAttribute("data-left-out") ? " | left out" : ""));
+	const text = [...figure.querySelectorAll(".tablechart-value, .tablechart-name, .tablechart-badge, .tablechart-centre, .tablechart-categories span, .tablechart-tick, .tablechart-axis-title")]
+		.map((node) => (node.getAttribute("style") ?? "") + " | " + (node.dataset.place ?? "") + (node.hasAttribute("data-left-out") ? " | left out" : "") + (node.dataset.more ? " | +" + node.dataset.more : ""));
 	const plot = figure.querySelector(".tablechart-plot")?.getAttribute("style") ?? "";
 	return ["#" + k + " " + figure.outerHTML.slice(0, figure.outerHTML.indexOf(">") + 1), svg, ...text, "plot: " + plot].join("\\n");
 }).join("\\n\\n");

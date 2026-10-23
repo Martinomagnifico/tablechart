@@ -1,4 +1,5 @@
 // How fast a chart with 1,000, 10,000 and 100,000 rows is ready. Fails on an error, or if 10,000 rows take more than 2 seconds.
+// A scatter places names only up to 400 markers, so it is also measured with 400, where finding room for the names costs most.
 //
 //   npm test                                 build, then test
 //   node test/speed.test.mjs                 test the current build
@@ -12,31 +13,38 @@ const argument = (name) => {
 };
 const counts = (argument("--rows") ?? "1000,10000,100000").split(",").map(Number);
 const detail = process.argv.includes("--detail");
-const kinds = ["line", "area", "column", "bar"];
+const kinds = ["line", "area", "column", "bar", "scatter"];
+const NAMED = 400;
 const BUDGET = { rows: 10_000, seconds: 2 };
 
 const script = `
-import { build, defaultConfig, layout, prepare } from "/tablechart-core.mjs";
+import { addType, build, defaultConfig, layout, prepare } from "/tablechart-core.mjs";
+import { scatter } from "/tablechart-extras.mjs";
+addType("scatter", scatter);
 const config = { ...defaultConfig, animate: false, tooltip: false };
 const results = [];
-for (const rows of ${JSON.stringify(counts)}) {
-	for (const kind of ${JSON.stringify(kinds)}) {
-		const figure = document.createElement("figure");
-		figure.dataset.chart = kind;
-		let body = "";
-		for (let i = 0; i < rows; i++) body += "<tr><th>" + i + "</th><td>" + (50 + 40 * Math.sin(i / 7) + (i % 13)).toFixed(1) + "</td></tr>";
-		figure.innerHTML = "<table><tbody>" + body + "</tbody></table>";
-		document.body.append(figure);
-
-		const time = async (work) => { const start = performance.now(); await work(); return performance.now() - start; };
-		const table = await time(() => prepare([figure], config));
-		let state;
-		const building = await time(() => { state = build(figure, config); });
-		const placing = await time(() => layout(state, config));
-		results.push({ rows, kind, table, building, placing });
-		figure.remove();
-		await new Promise((ok) => setTimeout(ok, 50));
+const runs = ${JSON.stringify(counts)}.flatMap((rows) => ${JSON.stringify(kinds)}.map((kind) => [rows, kind]));
+for (const [rows, kind] of [...runs, [${NAMED}, "scatter"]]) {
+	const figure = document.createElement("figure");
+	figure.dataset.chart = kind;
+	let body = "";
+	for (let i = 0; i < rows; i++) {
+		body += "<tr><th>" + i + "</th><td>" + (50 + 40 * Math.sin(i / 7) + (i % 13)).toFixed(1) + "</td>";
+		// A scatter needs a second number, for the axis up.
+		if (kind === "scatter") body += "<td>" + (i % 97).toFixed(1) + "</td>";
+		body += "</tr>";
 	}
+	figure.innerHTML = "<table><tbody>" + body + "</tbody></table>";
+	document.body.append(figure);
+
+	const time = async (work) => { const start = performance.now(); await work(); return performance.now() - start; };
+	const table = await time(() => prepare([figure], config));
+	let state;
+	const building = await time(() => { state = build(figure, config); });
+	const placing = await time(() => layout(state, config));
+	results.push({ rows, kind, table, building, placing });
+	figure.remove();
+	await new Promise((ok) => setTimeout(ok, 50));
 }
 window.done = results;
 `;
@@ -73,6 +81,8 @@ for (const kind of kinds) {
 	const times = counts.map((n) => results.find((r) => r.kind === kind && r.rows === n));
 	console.log(`  ${name(kind).padEnd(8)}${times.map((r) => seconds(total(r)).padStart(cell)).join("")}`);
 }
+const named = results.find((r) => r.kind === "scatter" && r.rows === NAMED && !counts.includes(NAMED));
+if (named) console.log(`\n  A scatter with ${rows(NAMED)}, each with its name: ${seconds(total(named))}`);
 
 if (detail) {
 	console.log("\nEach step:\n");

@@ -11,6 +11,7 @@ export const PIECE_CLASS = "tablechart-piece";
 export const RULE_CLASS = "tablechart-rule";
 export const CONNECTOR_CLASS = "tablechart-connector";
 export const LINE_CLASS = "tablechart-line";
+export const REFERENCE_CLASS = "tablechart-reference";
 export const HEAD_CLASS = "tablechart-head";
 export const BADGE_CLASS = "tablechart-badge";
 export const BADGE_CAPTION_CLASS = "tablechart-caption";
@@ -34,6 +35,9 @@ export const PRINTING_CLASS = "is-printing";
 // A chart in a sequence that has not had its turn: the whole figure waits hidden.
 export const QUEUED_CLASS = "tablechart-queued";
 export const CONTROLS_CLASS = "tablechart-controls";
+export const AXIS_CLASS = "tablechart-axis";
+export const TICK_CLASS = "tablechart-tick";
+export const GRID_CLASS = "tablechart-grid";
 
 // The plot is drawn in these units and scaled by the viewBox.
 export const VIEWBOX_WIDTH = 1000;
@@ -52,8 +56,8 @@ export interface Config {
 	ringfill: number;
 	/** Locale for numbers. Unset, the document's language is used and followed when it changes. */
 	locale?: string;
-	/** Animate a chart when it builds. `"grow"` grows each element from zero, `"sweep"` reveals the chart in one movement; a figure overrides it with `data-chart-animate`. `"up"` and `"across"` are their old names. */
-	animate: boolean | Motion | "across" | "up";
+	/** Animate a chart when it builds. `"grow"` grows each element from zero, `"sweep"` reveals the chart in one movement; a figure overrides it with `data-chart-animate`. */
+	animate: boolean | Motion;
 	/** How far an animated parent is in before its chart builds: 0 when it starts moving, 1 when it is in. A figure overrides it with `data-chart-entrance`. */
 	entrance: number;
 	/** Where a column's number goes: on the bar, or inside it. A figure overrides it with `data-chart-labels`. */
@@ -62,6 +66,12 @@ export interface Config {
 	shape: "straight" | "step" | "smooth";
 	/** Names of several lines in a legend instead of at the end of each line. A figure overrides it with `data-chart-legend`. */
 	legend: boolean;
+	/** Numbers along the value axis of a column, bar, line, area or waterfall chart. A figure overrides it with `data-chart-axis`. */
+	axis: boolean;
+	/** Gridlines across the plot at each number of the axis. A figure overrides it with `data-chart-grid`. */
+	grid: boolean;
+	/** The name of each marker beside it, on a scatter chart. A figure overrides it with `data-chart-names`. */
+	names: boolean;
 	/** A tooltip with the values of a row that is pointed at or tapped: `"auto"`, the default, only on a chart that does not show all its numbers; `true` always; `false` never. A figure overrides it with `data-chart-tooltip`. */
 	tooltip: boolean | "auto";
 	/** The old name of `tooltip`, until the next minor version. */
@@ -100,6 +110,9 @@ export const defaultConfig: Config = {
 	labels: "outside",
 	shape: "straight",
 	legend: false,
+	axis: false,
+	grid: false,
+	names: true,
 	tooltip: "auto",
 	tooltipparent: null,
 	table: "never",

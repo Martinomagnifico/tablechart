@@ -40,8 +40,8 @@ export const placeAt = (
 
 let cuts = 0;
 
-/** Cuts holes in what is drawn so far, with a mask, so the background shows through. */
-export const cutOut = (svg: SVGSVGElement, holes: SVGElement[], width: number, height: number): void => {
+/** Cuts holes in what is drawn so far, or only in `only`, with a mask, so the background shows through. */
+export const cutOut = (svg: SVGSVGElement, holes: SVGElement[], width: number, height: number, only?: SVGElement): void => {
 	if (!holes.length) return;
 	const id = `tablechart-cut-${++cuts}`;
 	const mask = svgEl("mask", { id, maskUnits: "userSpaceOnUse" });
@@ -59,6 +59,7 @@ export const cutOut = (svg: SVGSVGElement, holes: SVGElement[], width: number, h
 		svg.prepend(defs);
 	}
 	defs.appendChild(mask);
+	if (only) return only.setAttribute("mask", `url(#${id})`);
 	const group = svgEl("g", { mask: `url(#${id})` });
 	for (const child of Array.from(svg.childNodes)) if (child !== defs) group.appendChild(child);
 	svg.appendChild(group);

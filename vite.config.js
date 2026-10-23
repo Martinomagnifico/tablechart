@@ -6,30 +6,40 @@ import { dts } from 'rolldown-plugin-dts';
 // Browsers that know light-dark(), so the build leaves it as it is; the stylesheet already needs oklch(from …).
 const CSS_TARGET = ['chrome123', 'edge123', 'firefox120', 'safari17.5'];
 
+// One script for a <script> tag. The extras take the helpers of the core from `Tablechart.kit`, so they hold no copy.
+const iife = (entry, fileName, rollupOptions = {}) =>
+  build({
+    configFile: false,
+    build: {
+      lib: {
+        entry: resolve(import.meta.dirname, entry),
+        name: 'Tablechart',
+        formats: ['iife'],
+        fileName: () => fileName
+      },
+      emptyOutDir: false,
+      sourcemap: false,
+      minify: 'terser',
+      // This build writes tablechart.css as well, so it needs the same browsers.
+      cssTarget: CSS_TARGET,
+      terserOptions: {
+        // Smaller bundle.
+        mangle: { properties: { regex: /^_/ } },
+        compress: { passes: 3 }
+      },
+      target: 'es2020',
+      rollupOptions
+    }
+  });
+
 const iifeBuild = () => ({
   name: 'iife-build',
   closeBundle: async () => {
-    await build({
-      configFile: false,
-      build: {
-        lib: {
-          entry: resolve(import.meta.dirname, 'src/js/index.iife.ts'),
-          name: 'Tablechart',
-          formats: ['iife'],
-          fileName: () => 'tablechart.js'
-        },
-        emptyOutDir: false,
-        sourcemap: false,
-        minify: 'terser',
-        // This build writes tablechart.css as well, so it needs the same browsers.
-        cssTarget: CSS_TARGET,
-        terserOptions: {
-          // Smaller bundle.
-          mangle: { properties: { regex: /^_/ } },
-          compress: { passes: 3 }
-        },
-        target: 'es2020'
-      }
+    await iife('src/js/index.iife.ts', 'tablechart.js');
+    const kit = (id) => /[/\\]kit(\.ts)?$/.test(id);
+    await iife('src/js/extras.iife.ts', 'tablechart-extras.js', {
+      external: kit,
+      output: { globals: (id) => (kit(id) ? 'Tablechart.kit' : id) }
     });
   }
 });
@@ -45,13 +55,15 @@ export default defineConfig({
     iifeBuild()
   ],
   build: {
-    // One ES module per entry: dist/tablechart.mjs for init() and create(), and
-    // dist/tablechart-core.mjs for the building blocks under them. The stylesheet
+    // One ES module per entry: dist/tablechart.mjs for init() and create(),
+    // dist/tablechart-core.mjs for the building blocks under them, and
+    // dist/tablechart-extras.mjs for chart types not every page needs. The stylesheet
     // is dist/tablechart.css.
     lib: {
       entry: {
         tablechart: resolve(import.meta.dirname, 'src/js/index.ts'),
         'tablechart-core': resolve(import.meta.dirname, 'src/js/blocks.ts'),
+        'tablechart-extras': resolve(import.meta.dirname, 'src/js/extras.ts'),
       },
       formats: ['es'],
       fileName: (_format, name) => `${name}.mjs`,

@@ -19,7 +19,7 @@
 	}
 	&[data-place="inside"] {
 		transform: translate(-50%, -50%);
-		color: var(--tablechart-bar-value-color, var(--tablechart-bar-ink, #{ink($barfill)}));
+		color: var(--tablechart-bar-value-color, #{ink($barfill)});
 	}
 
 	&[data-place="around"] {
@@ -56,16 +56,16 @@
 		visibility: hidden;
 	}
 	&[data-place="inside"][data-kind="up"] {
-		color: var(--tablechart-up-value-color, var(--tablechart-up-ink, #{ink("var(--tablechart-up-color, #{$barfill})")}));
+		color: var(--tablechart-up-value-color, #{ink("var(--tablechart-up-color, #{$barfill})")});
 	}
 	&[data-place="inside"][data-kind="down"] {
-		color: var(--tablechart-down-value-color, var(--tablechart-down-ink, #{ink("var(--tablechart-down-color, #{$barfill})")}));
+		color: var(--tablechart-down-value-color, #{ink("var(--tablechart-down-color, #{$barfill})")});
 	}
 	&[data-place="inside"][data-series] {
-		color: var(--tablechart-piece-value-color, var(--tablechart-piece-ink, #{ink($seriesink)}));
+		color: var(--tablechart-piece-value-color, #{ink($seriesink)});
 	}
 	&[data-place="inside"][data-kind="total"] {
-		color: var(--tablechart-total-value-color, var(--tablechart-total-ink, #{ink("var(--tablechart-total-color, #{$barfill})")}));
+		color: var(--tablechart-total-value-color, #{ink("var(--tablechart-total-color, #{$barfill})")});
 	}
 }
 
@@ -164,6 +164,43 @@
 	}
 }
 
+// A marker without a line, on a scatter chart; a small and a large circle for the size of a bubble.
+.tablechart-name[data-place="legend"][data-line="none"] {
+	--_line: none;
+	&[data-marker="triangle"] {
+		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12'%3E%3Cpolygon points='12,1.6 16.4,9.6 7.6,9.6' fill='white'/%3E%3C/svg%3E");
+	}
+	&[data-marker="size"] {
+		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.4'%3E%3Ccircle cx='6' cy='8' r='2.6'/%3E%3Ccircle cx='15.5' cy='6' r='4.8'/%3E%3C/svg%3E");
+	}
+}
+
+// The numbers along an axis, and its title. The title of the axis up reads from the bottom.
+.tablechart-tick,
+.tablechart-axis-title {
+	position: absolute;
+	white-space: nowrap;
+	font-size: var(--tablechart-axis-size, #{$namesize});
+}
+.tablechart-tick {
+	&[data-place="below"] {
+		transform: translate(-50%, 0);
+	}
+	&[data-place="before"] {
+		transform: translate(-100%, -50%);
+	}
+	&[data-place="none"] {
+		display: none;
+	}
+}
+.tablechart-axis-title {
+	transform: translate(-50%, 0);
+	&[data-axis="y"] {
+		writing-mode: vertical-rl;
+		transform: translate(0, -50%) rotate(180deg);
+	}
+}
+
 // One equal column per bar, matching the plot's bands.
 .tablechart-categories :where(span[data-kind="total"]) {
 	display: none;
@@ -172,8 +209,8 @@
 .tablechart-categories :where(span[data-kind="slice"])::before {
 	content: "";
 	display: inline-block;
-	width: var(--tablechart-legend-key-size, var(--tablechart-key-size, 0.6em));
-	height: var(--tablechart-legend-key-size, var(--tablechart-key-size, 0.6em));
+	width: var(--tablechart-legend-key-size, 0.6em);
+	height: var(--tablechart-legend-key-size, 0.6em);
 	margin-right: 0.4em;
 	border-radius: 50%;
 	background: #{$sliceink};
@@ -218,14 +255,34 @@
 .tablechart-categories {
 	display: grid;
 	grid-template-columns: repeat(var(--_columns, 1), minmax(0, 1fr));
-	margin-top: var(--tablechart-name-gap, var(--tablechart-categories-gap, 0.45em));
+	margin-top: var(--tablechart-name-gap, 0.45em);
 
 	:where(span) {
 		text-align: center;
-		padding: var(--tablechart-name-padding, var(--tablechart-category-padding, 0 0.2em));
+		padding: var(--tablechart-name-padding, 0 0.2em);
 		font-size: calc(#{$namesize} * var(--_name-fit, 1));
 		// `manual`, not `none`: an author's soft hyphen still breaks.
 		hyphens: manual;
 		overflow-wrap: normal;
+	}
+}
+
+// On a scatter chart, each name is placed by its corner, beside its marker.
+:where([data-chart="scatter"]) .tablechart-categories[data-place="beside"] :where(span) {
+	transform: none;
+	text-align: left;
+	max-width: 12em;
+	&[data-side="left"] {
+		text-align: right;
+	}
+	&:is([data-side="above"], [data-side="below"]) {
+		text-align: center;
+	}
+	&[data-left-out] {
+		visibility: hidden;
+	}
+	// The other rows at the same place.
+	&[data-more]::after {
+		content: " +" attr(data-more);
 	}
 }

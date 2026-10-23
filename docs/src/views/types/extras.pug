@@ -1,0 +1,54 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Chart types | Extras"
+	- pagedescription = "Extra chart types in Tablechart, such as the scatter chart, and how to load them."
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Extras
+				p.lead Chart types that not every page needs.
+
+	+section("What is in the extras")
+		p The main script has the column, bar, line, area, waterfall and donut charts. Other chart types are in a script of their own, so a page that does not use them does not load them. The stylesheet is the same for all.
+
+		table
+			thead
+				tr
+					th Type
+					th Name
+			tbody
+				tr
+					td: a(href=url('/types/scatter.html')) Scatter
+					td: code scatter
+
+	+section("With a build tool")
+		p Import the type from #[code @martinomagnifico/tablechart/extras], and add it with #[code addType()] before #[code init()] or #[code create()]. The first argument is the value of #[code data-chart].
+
+		+codeblock('JS').
+			import { addType, init } from "@martinomagnifico/tablechart";
+			import { scatter } from "@martinomagnifico/tablechart/extras";
+
+			addType("scatter", scatter);
+			init();
+
+		p Only the types you import are in your bundle.
+
+	+section("With a script tag")
+		p Load #[code tablechart-extras.js] after #[code tablechart.js]. It adds all the extra types by itself. It uses the code that is already in #[code tablechart.js], so that code is not loaded twice.
+
+		+codeblock('HTML').
+			<link rel="stylesheet" href="tablechart.css">
+			<script src="tablechart.js"></script>
+			<script src="tablechart-extras.js"></script>
+			<script>
+				Tablechart.init();
+			</script>
+
+	+section("If a type is not added")
+		p A chart with a type that is not added is not made. The console lists the types that are there.
+
+	+section("Next")
+		p See #[a(href=url('/reference/api.html#addtype')) addType()] in the API.

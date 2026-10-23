@@ -1,0 +1,144 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Styling | Axes and gridlines"
+	- pagedescription = "Styling the axes, the numbers and titles along them, and the gridlines in Tablechart."
+	- const varieties = [['Elstar', '62', '1.20'], ['Jonagold', '75', '1.05'], ['Braeburn', '48', '1.45'], ['Gala', '55', '1.30'], ['Cox', '35', '1.85'], ['Discovery', '30', '1.75']]
+
+mixin varieties
+	table
+		thead
+			tr
+				th Variety
+				th Harvest per tree (kg)
+				th Price per kg (€)
+		tbody
+			each row in varieties
+				tr
+					th= row[0]
+					td= row[1]
+					td= row[2]
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Axes and gridlines
+				p.lead The axes, the numbers and titles along them, and the gridlines.
+
+	+section("Where they are")
+		p A #[a(href=url('/types/scatter.html')) scatter chart] always has an axis on the left and one at the bottom, with a short mark at each number. On the other types the value axis is off by default: #[code data-chart-axis] adds its numbers, on the left, or under a bar chart. On every type but the donut, #[code data-chart-grid] adds the gridlines. The #[code axis] and #[code grid] options do the same for every chart.
+		p This is how they look without styling of your own.
+
+		+chart(null, '1')
+			figure(data-chart="scatter" data-chart-grid)
+				+varieties
+
+		+chart(null, '1')
+			figure(data-chart="line" data-chart-axis data-chart-grid)
+				figcaption: b Rainfall at the orchard
+				table
+					tbody
+						each row in [['Jan', '84'], ['Feb', '71'], ['Mar', '76'], ['Apr', '58'], ['May', '61'], ['Jun', '47'], ['Jul', '39'], ['Aug', '52']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		p A gridline stops a little before each number and name on the chart, and goes on after it. The gridline is cut out there, so the text reads on any background.
+		p Set the variables on the chart, on a class or on #[code :root], as other variables.
+
+	+section("The scale")
+		p With an axis or gridlines, the scale ends on a number of the axis: a chart with 84 as its highest value and steps of 10 goes up to 90. #[code data-chart-scale] sets the scale yourself. Two numbers are where it starts and ends, and Tablechart chooses the numbers between them. Three numbers or more are the numbers along the axis.
+
+		+chart(null, '1')
+			figure(data-chart="column" data-chart-axis data-chart-grid data-chart-scale="0 25 50 75 100")
+				figcaption: b Apples picked, out of 100
+				table
+					tbody
+						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '41']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		p A value beyond the scale you set is still shown whole: the scale goes on until it. On a column, bar, line or area chart the scale always includes zero. On a scatter chart it does not, and #[code data-chart-scale-x] sets the axis across.
+
+	+section("The variables")
+		table
+			thead
+				tr
+					th Variable
+					th Sets
+			tbody
+				tr
+					td: code --tablechart-axis-color
+					td The lines of the axes: the text colour at 55% by default
+				tr
+					td: code --tablechart-axis-width
+					td The width of the lines of the axes: #[code 1px] by default
+				tr
+					td: code --tablechart-axis-size
+					td The size of the numbers and titles along the axes: the size of the names by default
+				tr
+					td: code --tablechart-grid-color
+					td The colour of the gridlines: the text colour by default
+				tr
+					td: code --tablechart-grid-opacity
+					td The opacity of the gridlines: #[code 0.09] by default
+				tr
+					td: code --tablechart-grid-width
+					td The width of the gridlines: #[code 1px] by default
+
+	+section("Softer axes, stronger gridlines")
+		p With lighter axes, the gridlines can be stronger, so the reader can follow a marker to its number.
+
+		+style.
+			.soft-axes {
+				--tablechart-axis-color: color-mix(in oklab, currentColor 25%, transparent);
+				--tablechart-grid-opacity: 0.25;
+			}
+
+		+chart(null, '1')
+			figure.soft-axes(data-chart="scatter" data-chart-grid)
+				+varieties
+
+	+section("Dashed gridlines")
+		p The gridlines are one #[code path] with the class #[code tablechart-grid], so CSS can set more than the variables, such as dashes. A dash is in pixels, at any size of the chart.
+
+		+style.
+			.dashed-grid .tablechart-grid {
+				stroke-dasharray: 1 3;
+				opacity: 0.4;
+			}
+
+		+chart(null, '1')
+			figure.dashed-grid(data-chart="scatter" data-chart-grid)
+				+varieties
+
+	+section("The numbers and titles")
+		p #[code --tablechart-axis-size] sets the size of the numbers along the axes and of the titles. The numbers have the class #[code tablechart-tick], the titles #[code tablechart-axis-title], so they can also be styled on their own.
+
+		+style.
+			.small-axes {
+				--tablechart-axis-size: 0.8em;
+			}
+			.small-axes .tablechart-axis-title {
+				font-weight: 600;
+			}
+
+		+chart(null, '1')
+			figure.small-axes(data-chart="scatter")
+				+varieties
+
+		p A chart with smaller numbers has room for more of them, so it may show more steps.
+
+	+section("Light and dark")
+		p The axes and gridlines use the text colour by default, so they follow the colour scheme. To set a colour for each scheme, use #[code light-dark()]. See #[a(href=url('/styling/light-dark.html')) Light and dark].
+
+		+codeblock('CSS').
+			:root {
+				--tablechart-grid-color: light-dark(#16323f, #f3efe9);
+				--tablechart-axis-color: light-dark(#8aa0aa, #5b6f78);
+			}
+
+	+section("Next")
+		p See #[a(href=url('/reference/variables.html')) CSS variables] for all variables.

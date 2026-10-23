@@ -22,6 +22,11 @@
                     "text": "Chart types | All types",
                     "label": "All types",
                     "href": "/types/index.html"
+                },
+                {
+                    "text": "Chart types | Extras",
+                    "label": "Extras",
+                    "href": "/types/extras.html"
                 }
             ],
             "examplesLabel": "Types",
@@ -50,6 +55,11 @@
                     "text": "Chart types | Line",
                     "label": "Line",
                     "href": "/types/line.html"
+                },
+                {
+                    "text": "Chart types | Scatter",
+                    "label": "Scatter",
+                    "href": "/types/scatter.html"
                 },
                 {
                     "text": "Chart types | Waterfall",
@@ -128,6 +138,11 @@
                     "text": "Styling | Animation",
                     "label": "Animation",
                     "href": "/styling/animation.html"
+                },
+                {
+                    "text": "Styling | Axes and gridlines",
+                    "label": "Axes and gridlines",
+                    "href": "/styling/axes.html"
                 },
                 {
                     "text": "Styling | Background",

@@ -1,7 +1,7 @@
 import type { Series } from "../types";
 import { svgEl } from "./svg";
 
-export type Shape = "circle" | "square" | "diamond";
+export type Shape = "circle" | "square" | "diamond" | "triangle";
 const SHAPES: Shape[] = ["circle", "square", "diamond"];
 
 export interface Marker {
@@ -35,6 +35,13 @@ export const markerEl = (
 		const half = size * 1.2;
 		return svgEl("polygon", {
 			points: `${x},${y - half} ${x + half},${y} ${x},${y + half} ${x - half},${y}`,
+			...attrs,
+		});
+	}
+	if (shape === "triangle") {
+		const half = size * 1.3;
+		return svgEl("polygon", {
+			points: `${x},${y - half} ${x + half * 0.87},${y + half / 2} ${x - half * 0.87},${y + half / 2}`,
 			...attrs,
 		});
 	}
