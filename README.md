@@ -12,9 +12,9 @@
 Tablechart makes simple charts from a table: an HTML table, a Markdown table or a JSON file. You write the table, Tablechart shows it as a chart.
 
 * **Chart types:** column, bar, line, area, waterfall and donut, and scatter as an additional type
-* **The table stays:** it is hidden from sight, but screen readers, search engines and translation scripts still read it. Without JavaScript, the table is all there is.
-* **Real text:** names and numbers are HTML, so they use the font of the page and do not scale with the drawing.
-* **CSS for the looks:** colours, sizes and animation are CSS variables. Light and dark mode follow the page.
+* **The table:** the table is hidden from sight, but screen readers, search engines and translation scripts still read it.
+* **Real text:** names and numbers are HTML, so they use the font of the page. No more Times New Roman labels. Text does not scale, but just uses the font size of the page or a size you define.
+* **CSS styling:** colours, sizes and animation are CSS variables. Light and dark mode follow the page.
 * **Annotations:** badges, brackets, trend arrows, reference lines and a break in the scale
 * **Tooltips:** when a chart leaves numbers out, point at a row, or tap it, to see all its values
 * **Print and PDF:** every chart prints whole, and the table can be shown under a chart that leaves numbers out
