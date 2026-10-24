@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.1.2] - 2026-10-24
+
+### Changed
+
+- Numbers and the names now change colour instead of opacity. This improves performance a lot.
+- The gaps in the gridlines under text now come with their text, in a chart without steps without a mask. Before, they came only after the whole chart had built.
+
+### Added
+- `data-axis="y"` on a reference line, for a line across a scatter chart. Before, a reference line on a scatter could only go up.
+
+### Fixed
+- A vertical reference line on a scatter chart now ends at the axis. 
+- A reference lines no longer cover texts.
+- A reference line no longer covers small markers.
+- Annotations on a scatter or line chart timing fix.
+
+
+
 ## [1.1.1] - 2026-10-23
 
 ### Changed

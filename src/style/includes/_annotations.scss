@@ -12,6 +12,7 @@
 
 // A reference line, such as at the mean, dashed or dotted.
 .tablechart-reference {
+	fill: none;
 	stroke: var(--tablechart-annotation-color, currentColor);
 	stroke-width: var(--tablechart-annotation-width, 1.25px);
 	stroke-dasharray: 6 4;

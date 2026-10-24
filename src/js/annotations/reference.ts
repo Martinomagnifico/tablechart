@@ -1,4 +1,4 @@
-import { LIBRARY_NAME, REFERENCE_CLASS, VIEWBOX_WIDTH } from "../config";
+import { LIBRARY_NAME, POINT_CLASS, REFERENCE_CLASS, VIEWBOX_WIDTH } from "../config";
 import { avoidCollisions, type Box } from "../functions/collision";
 import { numberIn } from "../functions/format";
 import { sizeOf } from "../functions/measure";
@@ -63,26 +63,32 @@ export const reference: AnnotationType = {
 			at = k < 0 ? null : here + share * (next - here);
 			across = false;
 		} else {
-			value = valueOf(asked, shown.map((row) => row.value), shown.map(() => 1));
-			across = !x;
-			at = value === null ? null : x ? x(value) : y(value);
+			// `data-axis="y"` on a scatter chart: a line across, at a value of the axis up. The mean and the median are of that column.
+			const up = Boolean(geo.frame) && spec.getAttribute("data-axis") === "y";
+			const column = geo.frame ? (geo.series.flatMap((one, s) => (one.group ? [] : [s]))[up ? 1 : 0] ?? 0) : 0;
+			value = valueOf(asked, shown.map((row) => row.cells[column]?.value ?? row.value), shown.map(() => 1));
+			across = up || !x;
+			at = value === null ? null : x && !up ? x(value) : y(value);
 		}
 		if (at === null || value === null) {
 			console.warn(`[${LIBRARY_NAME}] A reference line needs a number, "mean" or "median", not "${asked}".`);
 			return;
 		}
 
-		// From the left edge to the last band, or from the top to the baseline.
-		const end = rows.length > 0 ? cx(rows.length - 1) + cx(0) : VIEWBOX_WIDTH;
-		const foot = x ? height : y(0);
-		svg.appendChild(
+		// Inside the axes on a chart that has them; else from the left edge to the last band, or from the top to the baseline.
+		const [left, top, right, foot] = geo.frame
+			? [geo.frame[0], geo.frame[1], geo.frame[0] + geo.frame[2], geo.frame[1] + geo.frame[3]]
+			: [0, 0, rows.length > 0 ? cx(rows.length - 1) + cx(0) : VIEWBOX_WIDTH, x ? height : y(0)];
+		// Under the points and markers, so a small marker on the line stays visible; over bars and lines.
+		svg.insertBefore(
 			svgEl("line", {
 				class: REFERENCE_CLASS,
 				"data-note": geo.note,
 				...(spec.getAttribute("data-line") === "dotted" && { "data-line": "dotted" }),
-				...(across ? { x1: 0, x2: end, y1: at, y2: at } : { x1: at, x2: at, y1: 0, y2: foot }),
+				...(across ? { x1: left, x2: right, y1: at, y2: at } : { x1: at, x2: at, y1: top, y2: foot }),
 				style: timing("--after", after),
-			})
+			}),
+			svg.querySelector(`:scope > .${POINT_CLASS}`)
 		);
 
 		// On the line near its end, where the line is cut out under it; else beside the line, or a line lower, clear of other labels.
@@ -91,8 +97,8 @@ export const reference: AnnotationType = {
 			const h = sizeOf(badge).height * unit;
 			const gap = 4 * unit;
 			const candidates: Box[] = across
-				? [[end - w, at - h / 2, w, h], [end - w, at - h - gap, w, h], [end - w, at + gap, w, h]]
-				: [0, h, 2 * h].flatMap((top): Box[] => [[at - w / 2, top, w, h], [at + gap, top, w, h], [at - gap - w, top, w, h]]);
+				? [[right - w, at - h / 2, w, h], [right - w, at - h - gap, w, h], [right - w, at + gap, w, h]]
+				: [top, top + h, top + 2 * h].flatMap((y0): Box[] => [[at - w / 2, y0, w, h], [at + gap, y0, w, h], [at - gap - w, y0, w, h]]);
 			const [pick] = avoidCollisions([candidates], geo.taken, [0, 0, VIEWBOX_WIDTH, height]);
 			const box = candidates[pick ?? 0];
 			geo.taken.push(box);

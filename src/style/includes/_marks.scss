@@ -110,6 +110,11 @@
 	vector-effect: non-scaling-stroke;
 }
 
+// The piece of gridline over a gap under text: only there while the chart builds, until its text arrives.
+:where(.tablechart-grid[data-gap]) {
+	stroke-opacity: 0;
+}
+
 // Every slice is the same ink, stepped lighter by its place in the table.
 .tablechart-slice {
 	fill: none;

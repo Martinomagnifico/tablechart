@@ -104,7 +104,27 @@ block content
 					span(data-annotation="reference" data-name="mean") Mean 4.3
 					span(data-annotation="reference" data-name="median" data-line="dotted") Median 4
 
-		p The line is dashed. If you add #[code data-line="dotted"], it is dotted. The text of the annotation is the label, on the line. If two labels would cover each other, the second one moves beside its line, or one line lower. If the annotation has no text, there is only the line.
+		p On a scatter chart, #[code data-value] is a value on the axis across, so the line goes up. To put the line across, at a value on the axis up, add #[code data-axis="y"]. The mean and the median are then of the column of that axis.
+
+		+chart(null, '13')
+			figure(data-chart="scatter")
+				figcaption: b Harvest and price per variety
+				table
+					thead
+						tr
+							th Variety
+							th Harvest per tree (kg)
+							th Price per kg (€)
+					tbody
+						each row in [['Elstar', '62', '1.20'], ['Jonagold', '75', '1.05'], ['Braeburn', '48', '1.45'], ['Gala', '55', '1.30'], ['Cox', '35', '1.85'], ['Discovery', '30', '1.75']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+				.chart-annotations
+					span(data-annotation="reference" data-value="1.5" data-axis="y") €1.50
+
+		p The line is dashed. If you add #[code data-line="dotted"], it is dotted. The text of the annotation is the label, on the line. If two labels would cover each other, the second one moves beside its line, or one line lower. If the annotation has no text, there is only the line. Where the line crosses a number or a name on the chart, it stops a little before it and goes on after it.
 		p If the label has a number and the line uses #[code mean] or #[code median], Tablechart checks it, to the decimals you wrote, and shows a warning in the console if they differ. Your text is always the one shown.
 
 	+section("Break the scale")

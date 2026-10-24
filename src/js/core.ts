@@ -21,7 +21,7 @@ import {
 	PLOT_CLASS,
 	HOLE_CLASS,
 	VALUES_CLASS,
-	WEBKIT_CLASS,
+	REFERENCE_CLASS,
 	LIBRARY_NAME,
 	SR_CLASS,
 	MINUS_CLASS,
@@ -38,6 +38,7 @@ import type { Squeeze } from "./functions/scale";
 import { readSeries, readTable } from "./functions/read-table";
 import { cutOut, htmlEl, placeAt, short, svgEl } from "./functions/svg";
 import { niceStep, readScale, type Scale, scaleOf, thin, ticksOf } from "./functions/axis";
+import type { Box } from "./functions/collision";
 import { debug } from "./functions/debug";
 import { applySteps, makeControls, planSteps, stepTo } from "./steps";
 import { attachTooltip, releaseTooltip } from "./tooltip";
@@ -63,6 +64,52 @@ const textBefore = (node: Node): string => {
 };
 
 const SHAPES: readonly Shape[] = ["straight", "step", "smooth"];
+
+/** The path of a straight line in pieces, without the parts that cross `boxes`, so its gaps need no mask. */
+const piecesOf = (x1: number, y1: number, x2: number, y2: number, boxes: Box[]): string => {
+	const across = y1 === y2;
+	const [from, to, at] = across ? [Math.min(x1, x2), Math.max(x1, x2), y1] : [Math.min(y1, y2), Math.max(y1, y2), x1];
+	const cuts = boxes
+		.filter(([x, y, w, h]) => (across ? y <= at && at <= y + h : x <= at && at <= x + w))
+		.map(([x, y, w, h]) => (across ? [x, x + w] : [y, y + h]))
+		.sort((a, b) => a[0] - b[0]);
+	const pieces: [number, number][] = [];
+	let start = from;
+	for (const [a, b] of cuts) {
+		if (a > start) pieces.push([start, Math.min(a, to)]);
+		start = Math.max(start, b);
+	}
+	if (start < to) pieces.push([start, to]);
+	return pieces.map(([a, b]) => (across ? `M${short(a)},${short(at)}H${short(b)}` : `M${short(at)},${short(a)}V${short(b)}`)).join("");
+};
+
+/** A straight `line` as a path in pieces around `boxes`. */
+const lineAround = (line: SVGElement, boxes: Box[]): void => {
+	const [x1, y1, x2, y2] = ["x1", "y1", "x2", "y2"].map((name) => Number(line.getAttribute(name)));
+	const path = svgEl("path", { d: piecesOf(x1, y1, x2, y2, boxes) });
+	for (const { name, value } of Array.from(line.attributes)) if (!/^[xy][12]$/.test(name)) path.setAttribute(name, value);
+	line.replaceWith(path);
+};
+
+/** The straight lines of a path (`M x,y H x` or `V y`), as their ends. */
+const linesIn = (path: SVGElement): [number, number, number, number][] =>
+	Array.from((path.getAttribute("d") ?? "").matchAll(/M(-?[\d.]+),(-?[\d.]+)([HV])(-?[\d.]+)/g), ([, x, y, axis, end]) =>
+		axis === "H" ? [+x, +y, +end, +y] : [+x, +y, +x, +end]
+	);
+
+/** The parts of the straight lines in `path` that lie in `box`, as a path; empty if none do. */
+const piecesIn = (lines: [number, number, number, number][], [x, y, w, h]: Box): string =>
+	lines
+		.map(([x1, y1, x2, y2]) =>
+			y1 === y2
+				? y <= y1 && y1 <= y + h && Math.max(x1, x) < Math.min(x2, x + w)
+					? `M${short(Math.max(x1, x))},${short(y1)}H${short(Math.min(x2, x + w))}`
+					: ""
+				: x <= x1 && x1 <= x + w && Math.max(y1, y) < Math.min(y2, y + h)
+					? `M${short(x1)},${short(Math.max(y1, y))}V${short(Math.min(y2, y + h))}`
+					: ""
+		)
+		.join("");
 
 /** A figure's own `data-chart-…`, on unless it says `false`, or else the option. */
 const turnedOn = (figure: HTMLElement, name: string, option: boolean): boolean => {
@@ -392,7 +439,6 @@ export const build = (
 		.filter((a): a is NonNullable<typeof a> => a !== null);
 
 	if (animated(figure, config)) figure.setAttribute("data-animate", motionOf(figure, kind, config, Boolean(plan)));
-	figure.classList.toggle(WEBKIT_CLASS, navigator.vendor === "Apple Computer, Inc.");
 
 	const state: ChartState = {
 		figure,
@@ -420,14 +466,9 @@ export const build = (
 		controls,
 	};
 	// Once every mark has moved into place, the masks that waited are put on.
-	let moving = 0;
-	svg.addEventListener("transitionrun", () => moving++);
-	const arrived = () => {
-		moving = Math.max(0, moving - 1);
-		if (!moving && figure.classList.contains(SHOWN_CLASS)) putMasksOn(svg);
-	};
-	svg.addEventListener("transitionend", arrived);
-	svg.addEventListener("transitioncancel", arrived);
+	const settle = () => settleMasks(figure, svg);
+	svg.addEventListener("transitionend", settle);
+	svg.addEventListener("transitioncancel", settle);
 	controls?.addEventListener("click", (event) => {
 		const go = (event.target as Element).closest("button")?.dataset.go;
 		if (go) stepTo(state, state.step + (go === "next" ? 1 : -1));
@@ -929,7 +970,8 @@ export const layout = (state: ChartState, config: Config): boolean => {
 				}),
 				values: seriesValues[s],
 			}),
-			after: annotation.after,
+			// Without steps, commentary comes when the marks are done: no later than their stagger steps.
+			after: state.plan ? annotation.after : Math.min(annotation.after, Number(plot.style.getPropertyValue("--count")) || annotation.after),
 			note: n + 1,
 		});
 	}
@@ -977,8 +1019,10 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		];
 	});
 	// The gridlines stop a little before each number and name on the chart, and go on after it, so the text reads on any background.
+	// Reference lines too, so a line across a chart stops at the names and numbers it would cross.
 	const grid = svg.querySelector<SVGElement>(`.${GRID_CLASS}`);
-	if (grid) {
+	const references = Array.from(svg.querySelectorAll<SVGElement>(`.${REFERENCE_CLASS}`));
+	if (grid || references.length) {
 		const box = plot.getBoundingClientRect();
 		const scale = VIEWBOX_WIDTH / box.width;
 		// The height of the letters, not of the line: the line height over the size of the text.
@@ -1005,16 +1049,26 @@ export const layout = (state: ChartState, config: Config): boolean => {
 					]
 				: [];
 		});
-		cutOut(svg, under, VIEWBOX_WIDTH, height, grid);
+		// A line is left out where it crosses text, rather than masked: under a mask, Safari draws everything again on each frame.
+		// A reference line also around its own label. With steps, the grid keeps a mask, so each gap can arrive at its step.
+		const boxOf = (rect: SVGElement): Box => ["x", "y", "width", "height"].map((name) => Number(rect.getAttribute(name))) as Box;
+		for (const line of references) lineAround(line, [...under, ...holes].map(boxOf));
+		if (grid && state.plan) cutOut(svg, under, VIEWBOX_WIDTH, height, [grid]);
+		else if (grid) {
+			const lines = linesIn(grid);
+			grid.setAttribute("d", lines.map(([x1, y1, x2, y2]) => piecesOf(x1, y1, x2, y2, under.map(boxOf))).join(""));
+			// Over each gap, the piece of gridline it leaves out, with the timing of its text: it fades as the text arrives.
+			for (const rect of under) {
+				const d = piecesIn(lines, boxOf(rect));
+				if (d) grid.after(svgEl("path", { class: GRID_CLASS, "data-gap": "", d, style: rect.getAttribute("style") ?? "" }));
+			}
+		}
 	}
-	cutOut(svg, holes, VIEWBOX_WIDTH, height);
-	// Under a mask, Safari draws everything again on every frame, so while the marks still have to build, the mask of a badge waits.
-	const masked = holes.length ? svg.lastElementChild : null;
-	const building = state.figure.hasAttribute("data-animate") && !state.figure.hasAttribute("data-steps") && !state.figure.classList.contains(SHOWN_CLASS);
-	if (masked && building) {
-		masked.setAttribute("data-mask", masked.getAttribute("mask") ?? "");
-		masked.removeAttribute("mask");
-	}
+	// A reference line stays out of that group: under its mask, a fade would make Safari draw the whole group again on each frame.
+	cutOut(svg, holes, VIEWBOX_WIDTH, height, undefined, `.${REFERENCE_CLASS}`);
+	// Under a mask, Safari draws everything again on every frame, so every mask waits while the marks still have to build.
+	if (state.figure.hasAttribute("data-animate") && !state.figure.hasAttribute("data-steps") && !state.figure.classList.contains(SHOWN_CLASS))
+		takeMasksOff(svg);
 
 	// A number that is not shown, for lack of room or by design, so `data-chart-table="auto"` prints the table.
 	// A cell without a number, such as "n/a", has nothing to leave out; nor has a donut's total, which is in the middle.
@@ -1069,7 +1123,24 @@ export const unbuild = (state: ChartState): void => {
 
 /** One class, `is-shown`, starts the whole build. */
 export const setShown = (state: ChartState, shown: boolean): void => {
+	// The marks move back without masks too, and wait for them again on the next build.
+	if (!shown && !state.figure.hasAttribute("data-steps")) takeMasksOff(state.svg);
 	state.figure.classList.toggle(SHOWN_CLASS, shown);
+	// A build without transitions, such as one shown before its first frame, gets its masks too.
+	if (shown) requestAnimationFrame(() => requestAnimationFrame(() => settleMasks(state.figure, state.svg)));
+};
+
+/** Puts the masks on once a shown chart has nothing left to move. */
+const settleMasks = (figure: HTMLElement, svg: SVGSVGElement): void => {
+	if (figure.classList.contains(SHOWN_CLASS) && !svg.getAnimations({ subtree: true }).length) putMasksOn(svg);
+};
+
+/** Takes the masks of holes off until the build is done, such as when a chart is hidden. `putMasksOn` puts them back. A donut keeps the mask of its gaps. */
+export const takeMasksOff = (svg: SVGSVGElement): void => {
+	for (const group of svg.querySelectorAll<SVGElement>('[mask^="url(#tablechart-cut-"]')) {
+		group.dataset.mask = group.getAttribute("mask") ?? "";
+		group.removeAttribute("mask");
+	}
 };
 
 /** Puts on the masks that waited for the build, at once, such as for print. */

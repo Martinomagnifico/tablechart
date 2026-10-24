@@ -76,6 +76,13 @@
 			transition-delay: calc(var(--i) * #{$stagger} + 0.096 * #{$duration});
 		}
 
+		// Without steps, the piece of gridline over that gap fades as its text arrives.
+		:where(.tablechart-grid[data-gap]) {
+			stroke-opacity: 1;
+			transition: stroke-opacity #{$fade} ease;
+			transition-delay: calc(var(--i, 0) * #{$stagger} + 0.096 * #{$duration});
+		}
+
 		// A connector is revealed from left to right by a clip, so its dots stay in place.
 		// It draws as the column it leads into starts, in a third of the element time, whatever the other columns do.
 		:where(.tablechart-connector) {
@@ -164,7 +171,7 @@
 			transition-delay: calc(var(--start, 0) * #{$build});
 		}
 
-		:where(.tablechart-value, .tablechart-hole[data-for="text"]) {
+		:where(.tablechart-value, .tablechart-grid[data-gap]) {
 			transition-delay: calc((var(--start, 0) + 0.5 * var(--span, 0)) * #{$build});
 		}
 
@@ -222,6 +229,9 @@
 		:where([data-chart="scatter"] .tablechart-point) {
 			transform: none;
 		}
+		:where(.tablechart-grid[data-gap]) {
+			stroke-opacity: 0;
+		}
 		:where(.tablechart-reference),
 		:where(.tablechart-value),
 		:where(.tablechart-name),
@@ -268,7 +278,7 @@
 			transition: transform #{$rise} #{$easing}, opacity 0.15s ease;
 			transition-delay: 0s;
 		}
-		:where(.tablechart-value, .tablechart-name, .tablechart-hole[data-for="text"]) {
+		:where(.tablechart-value, .tablechart-name, .tablechart-grid[data-gap]) {
 			transition-delay: #{$rise};
 		}
 	}
@@ -300,26 +310,34 @@
 		}
 	}
 
-	// A chart without steps: its numbers, and the names on a scatter chart, fade in as one group when the shapes are nearly done.
-	// A hole switches on rather than fades.
-	$after-shapes: calc((var(--count, 1) - 1) * #{$stagger} + 0.6 * #{$duration});
-	$together: ":where(.tablechart-values, [data-chart='scatter'] .tablechart-categories[data-place='beside'])";
+	// A chart without steps: each number, and each name on a scatter chart, goes from transparent to its colour as its mark arrives.
+	// A change of colour only paints the text again; a fade of opacity costs Safari many frames on a large screen.
+	// The moment comes from the rules above, so a waterfall that sweeps or a line that grows keeps its own.
+	$label: ":where(.tablechart-values .tablechart-value, [data-chart='scatter'] .tablechart-categories[data-place='beside'] span)";
 
 	:where([data-animate]:not([data-steps])) {
-		:where(.tablechart-values .tablechart-value, [data-chart="scatter"] .tablechart-categories span) {
+		#{$label} {
 			opacity: 1;
-			transition: none;
+			transition-property: color;
 		}
-		#{$together} {
-			opacity: 0;
-			transition: opacity #{$fade} ease;
-			transition-delay: #{$after-shapes};
+		// The other text and annotations too: only paint changes, no fade of opacity.
+		:where(.tablechart-name, .tablechart-badge, .tablechart-centre) {
+			opacity: 1;
+			transition-property: color, border-color, background-color;
 		}
-		// Under its text: on as the text starts to appear, which covers the gap.
-		:where(.tablechart-hole[data-for="text"]) {
-			transition: opacity 0s linear;
-			transition-delay: #{$after-shapes};
+		:where(.tablechart-name)::before {
+			transition: background-color #{$fade} ease;
+			transition-delay: calc(var(--i) * #{$stagger} + 0.096 * #{$duration});
 		}
+		:where(.tablechart-reference) {
+			opacity: 1;
+			transition-property: stroke-opacity;
+		}
+		:where(.tablechart-head) {
+			opacity: 1;
+			transition-property: fill-opacity;
+		}
+		// A hole under a label switches on rather than fades.
 		:where(.tablechart-hole[data-for="badge"]) {
 			transition-duration: 0s;
 		}
@@ -330,27 +348,30 @@
 		}
 	}
 
-	:where([data-animate]:not([data-steps]).is-shown) #{$together} {
-		opacity: 1;
+	// Weighs more than the colours of the labels, so they start transparent.
+	[data-animate]:not([data-steps]):not(.is-shown) .tablechart-values .tablechart-value,
+	[data-chart="scatter"][data-animate]:not([data-steps]):not(.is-shown) .tablechart-categories[data-place="beside"] span {
+		color: transparent;
 	}
 
-	// In WebKit, text that fades costs many frames on a large screen, also after the shapes, so there it appears at once.
-	:where([data-animate].is-webkit:not([data-steps])) :where(.tablechart-values, .tablechart-categories, .tablechart-name, .tablechart-reference, .tablechart-badge, .tablechart-centre) {
-		transition-duration: 0s;
+	[data-animate]:not([data-steps]):not(.is-shown) :is(.tablechart-name, .tablechart-badge, .tablechart-badge .tablechart-caption, .tablechart-centre) {
+		color: transparent;
+		border-color: transparent;
+		background-color: transparent;
+	}
+	[data-animate]:not([data-steps]):not(.is-shown) .tablechart-name::before {
+		background-color: transparent;
+	}
+	[data-animate]:not([data-steps]):not(.is-shown) .tablechart-reference {
+		stroke-opacity: 0;
 	}
 
-	// The same, after the motion of a line or area that grows, or of a waterfall that sweeps.
-	:where([data-animate="grow"]:is([data-chart="line"], [data-chart="area"]):not([data-steps])) {
-		:where(.tablechart-values, .tablechart-hole[data-for="text"]) {
-			transition-delay: #{$rise};
-		}
-		:where(.tablechart-hole:not([data-for])) {
-			transition: transform #{$rise} #{$easing}, opacity 0s linear #{$rise};
-		}
+	[data-animate]:not([data-steps]):not(.is-shown) .tablechart-head {
+		fill-opacity: 0;
 	}
 
-	:where([data-animate="sweep"][data-chart="waterfall"]:not([data-steps])) :where(.tablechart-values, .tablechart-hole[data-for="text"]) {
-		transition-delay: calc(0.8 * #{$build});
+	:where([data-animate="grow"]:is([data-chart="line"], [data-chart="area"]):not([data-steps])) :where(.tablechart-hole:not([data-for])) {
+		transition: transform #{$rise} #{$easing}, opacity 0s linear #{$rise};
 	}
 
 	// A chart in a sequence waits hidden and fades in as its marks start to build.
