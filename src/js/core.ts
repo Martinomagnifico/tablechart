@@ -221,6 +221,19 @@ export const build = (
 		);
 		series = series.slice(0, 1);
 	}
+	// A line over the columns: `data-chart="line"` on a header, in a chart that takes it, and not on every header.
+	if (series.some((one) => one.chart)) {
+		const problem = !type.lines
+			? `A ${kind} chart cannot draw a series as a line.`
+			: series.every((one) => one.chart)
+				? `Every series has data-chart="line", so the chart is a line chart: set data-chart="line" on the figure.`
+				: null;
+		if (problem) {
+			console.warn(`[${LIBRARY_NAME}] ${problem}`);
+			series = series.map((one) => ({ ...one, chart: null }));
+		}
+	}
+	const lined = series.some((one) => one.chart);
 	const several = series.length > 1;
 	// How many lines or bars share the colour steps, so the last is not too light.
 	if (several) figure.style.setProperty("--_series-count", String(series.length));
@@ -228,7 +241,8 @@ export const build = (
 	const stackAsked = figure.hasAttribute("data-chart-stack");
 	if (stackAsked && !type.stackable)
 		console.warn(`[${LIBRARY_NAME}] A ${kind} chart cannot be stacked.`);
-	const stacked = stackAsked && !!type.stackable && several;
+	if (stackAsked && lined) console.warn(`[${LIBRARY_NAME}] A chart with a line cannot be stacked.`);
+	const stacked = stackAsked && !!type.stackable && several && !lined;
 
 	// Hidden from screen readers: they read the table, which has the same numbers and names.
 	const plot = document.createElement("div");
@@ -300,16 +314,18 @@ export const build = (
 		legend.setAttribute("aria-hidden", "true");
 		legend.inert = true;
 	}
+	const lineSeries = series.filter((one) => one.chart);
 	const names = several && !type.columns
 		? series.map((one, s) => {
 				const node = htmlEl(NAME_CLASS, legend ?? plot);
 				if (legend) node.dataset.place = "legend";
-				const swatch = type.legend ?? type.swatch;
+				const swatch = one.chart ? undefined : (type.legend ?? type.swatch);
 				if (swatch) node.dataset.swatch = swatch;
 				node.textContent = one.name;
 				// A step line has no points, so its legend sample has none.
 				if (!swatch && shapeOf(figure, config) !== "step") {
-					const marker = markerOf(series, s);
+					// Over columns, a line takes its marker as the first of the lines, as it does on the chart.
+					const marker = one.chart ? markerOf(lineSeries, lineSeries.indexOf(one)) : markerOf(series, s);
 					node.dataset.marker = marker.shape;
 					node.toggleAttribute("data-open", marker.open);
 				}
@@ -527,6 +543,35 @@ const barMax = (figure: HTMLElement, unit: number): number =>
 	cssLength(figure, unit, "--tablechart-bar-max", "60px") ?? Number.POSITIVE_INFINITY;
 
 
+/** A hole for each text that is shown, the height of its letters, with the timing of its text so it arrives with it. */
+const textHoles = (plot: HTMLElement, unit: number) => {
+	const box = plot.getBoundingClientRect();
+	const scale = VIEWBOX_WIDTH / box.width;
+	// The height of the letters, not of the line: the line height over the size of the text.
+	const style = getComputedStyle(plot);
+	const lines = Number.parseFloat(style.lineHeight) / Number.parseFloat(style.fontSize) || 1.2;
+	return (node: HTMLElement): SVGElement[] => {
+		if (node.dataset.place === "none" || node.hidden || node.hasAttribute("data-left-out")) return [];
+		const r = node.getBoundingClientRect();
+		const tall = (r.height * scale) / lines;
+		// Such as `--i` and `--step`.
+		const timing = Array.from(node.style).filter((name) => name.startsWith("--")).map((name) => `${name}:${node.style.getPropertyValue(name)}`);
+		return r.width
+			? [
+					svgEl("rect", {
+						class: HOLE_CLASS,
+						"data-for": "text",
+						x: (r.left - box.left) * scale - 3 * unit,
+						y: (r.top - box.top) * scale + (r.height * scale - tall) / 2 - unit,
+						width: r.width * scale + 6 * unit,
+						height: tall + 2 * unit,
+						style: timing.join("; "),
+					}),
+				]
+			: [];
+	};
+};
+
 /** Pass 3. Needs layout; makes no text, only places it. */
 export const layout = (state: ChartState, config: Config): boolean => {
 	const { plot, svg, rows, type, values, series, seriesValues, names, annotations } = state;
@@ -701,7 +746,9 @@ export const layout = (state: ChartState, config: Config): boolean => {
 			: rows.flatMap((row) => row.cells.slice(0, series.length).map((cell) => cell.value));
 	const depth = Math.min(-largest(places.map((value) => -value)), 0);
 
-	const headroom = type.headroom?.(room) ?? labelHeight;
+	const lineSeries = series.flatMap((one, s) => (one.chart ? [s] : []));
+	// A line over the columns has its numbers above its points, which needs more room.
+	const headroom = Math.max(type.headroom?.(room) ?? labelHeight, lineSeries.length ? (line.headroom?.(room) ?? 0) : 0);
 	const floor = 2 * unit + (type.footroom?.(room) ?? 0) + (depth < 0 ? labelHeight + 4 * unit : 0);
 	const top = headroom;
 
@@ -888,9 +935,10 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		badgeHeight,
 		after: rows.length,
 		note: 0,
+		// With a line over the columns, the numbers of the columns go inside them where they fit, as the line takes the room above.
 		labels:
 			state.figure.dataset.chartLabels === "inside" ||
-			(state.figure.dataset.chartLabels !== "outside" && config.labels === "inside")
+			(state.figure.dataset.chartLabels !== "outside" && (config.labels === "inside" || lineSeries.length > 0))
 				? "inside"
 				: "outside",
 		insideAlign: insideAlign(state.figure),
@@ -905,6 +953,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		plot,
 		values,
 		series,
+		own: series.map((_one, s) => s),
 		seriesValues,
 		names,
 		categories: state.categories,
@@ -916,7 +965,24 @@ export const layout = (state: ChartState, config: Config): boolean => {
 
 	// How many elements start one after the other, so the stagger can shrink under `--tablechart-animation-max`.
 	plot.style.setProperty("--count", String(Math.max(1, ...rows.map((row) => row.slot + 1))));
-	type.draw(geo);
+	// A row as if one series were the only one, for an annotation on it, or the columns of a chart with a line.
+	const only = (s: number) => {
+		const pick = <T extends Row>(row: T): T => ({ ...row, ...(row.cells[s] ?? row.cells[0]) });
+		return {
+			rows: rows.map(pick),
+			segments: segments.map((seg) => {
+				const picked = pick(seg);
+				return seg.kind === "bar" ? { ...picked, to: picked.value } : picked;
+			}),
+			values: seriesValues[s],
+		};
+	};
+	if (lineSeries.length) {
+		// The columns first, then the line over them, in the same bands.
+		const bars = series.flatMap((one, s) => (one.chart ? [] : [s]));
+		type.draw({ ...geo, own: bars, ...(bars.length === 1 && only(bars[0])) });
+		line.draw({ ...geo, own: lineSeries });
+	} else type.draw(geo);
 	if (geo.rowAt) state.rowAt = geo.rowAt;
 
 	// The numbers along the value axis, fewer where two would touch, and none in the cut of a broken scale.
@@ -961,7 +1027,6 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		annotation.badge?.setAttribute("data-note", String(n + 1));
 		// An annotation on another series reads that series as if it were the only one.
 		const s = annotation.series;
-		const pick = <T extends Row>(row: T): T => ({ ...row, ...(row.cells[s] ?? row.cells[0]) });
 		annotation.type.draw(annotation.spec, annotation.badge, {
 			...geo,
 			// On a stacked chart, an annotation reads the totals.
@@ -969,14 +1034,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 				rows: stackedRows,
 				...(state.totals.length && { values: state.totals }),
 			}),
-			...(s > 0 && !state.stacked && {
-				rows: rows.map(pick),
-				segments: segments.map((seg) => {
-					const picked = pick(seg);
-					return seg.kind === "bar" ? { ...picked, to: picked.value } : picked;
-				}),
-				values: seriesValues[s],
-			}),
+			...(s > 0 && !state.stacked && only(s)),
 			// Without steps, commentary comes when the marks are done: no later than their stagger steps.
 			after: state.plan ? annotation.after : Math.min(annotation.after, Number(plot.style.getPropertyValue("--count")) || annotation.after),
 			note: n + 1,
@@ -1029,33 +1087,12 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	// Reference lines too, so a line across a chart stops at the names and numbers it would cross.
 	const grid = svg.querySelector<SVGElement>(`.${GRID_CLASS}`);
 	const references = Array.from(svg.querySelectorAll<SVGElement>(`.${REFERENCE_CLASS}`));
+	const holeUnder = textHoles(plot, unit);
+	// The numbers of a line over columns are holes in the columns under them, as a badge is.
+	const numberHoles = lineSeries.flatMap((s) => seriesValues[s].flatMap(holeUnder));
 	if (grid || references.length) {
-		const box = plot.getBoundingClientRect();
-		const scale = VIEWBOX_WIDTH / box.width;
-		// The height of the letters, not of the line: the line height over the size of the text.
-		const style = getComputedStyle(plot);
-		const lines = Number.parseFloat(style.lineHeight) / Number.parseFloat(style.fontSize) || 1.2;
 		const texts = [...seriesValues.flat(), ...state.totals, ...(type.categories === "beside" ? state.categories : [])];
-		const under = texts.flatMap((node) => {
-			if (node.dataset.place === "none" || node.hidden || node.hasAttribute("data-left-out")) return [];
-			const r = node.getBoundingClientRect();
-			const tall = (r.height * scale) / lines;
-			// With the timing of its text, such as `--i` and `--step`, so the gap arrives with it.
-			const timing = Array.from(node.style).filter((name) => name.startsWith("--")).map((name) => `${name}:${node.style.getPropertyValue(name)}`);
-			return r.width
-				? [
-						svgEl("rect", {
-							class: HOLE_CLASS,
-							"data-for": "text",
-							x: (r.left - box.left) * scale - 3 * unit,
-							y: (r.top - box.top) * scale + (r.height * scale - tall) / 2 - unit,
-							width: r.width * scale + 6 * unit,
-							height: tall + 2 * unit,
-							style: timing.join("; "),
-						}),
-					]
-				: [];
-		});
+		const under = texts.flatMap(holeUnder);
 		// A line is left out where it crosses text, rather than masked: under a mask, Safari draws everything again on each frame.
 		// A reference line also around its own label. With steps, the grid keeps a mask, so each gap can arrive at its step.
 		const boxOf = (rect: SVGElement): Box => ["x", "y", "width", "height"].map((name) => Number(rect.getAttribute(name))) as Box;
@@ -1081,7 +1118,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	// What is kept out of the badges another way stays out of that group: under its mask, a line that is drawn or fades would make
 	// Safari draw the whole group again on each frame. And the mask would wait for it. With steps, the grid keeps to the mask.
 	const loose = [REFERENCE_CLASS, LINE_CLASS, HEAD_CLASS, ...(state.plan ? [] : [GRID_CLASS])];
-	cutOut(svg, holes, VIEWBOX_WIDTH, height, undefined, loose.map((name) => `.${name}`).join(", "));
+	cutOut(svg, [...holes, ...numberHoles], VIEWBOX_WIDTH, height, undefined, loose.map((name) => `.${name}`).join(", "));
 	// Under a mask, Safari draws everything again on every frame, so every mask waits while the marks still have to build.
 	if (state.figure.hasAttribute("data-animate") && !state.figure.hasAttribute("data-steps") && !state.figure.classList.contains(SHOWN_CLASS))
 		takeMasksOff(svg);

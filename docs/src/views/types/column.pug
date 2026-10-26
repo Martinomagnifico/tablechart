@@ -204,6 +204,32 @@ block content
 								td= row[1]
 								td= row[2]
 
+	+section("Columns and a line")
+		p To show a value column as a line over the columns, add #[code data-chart="line"] to its header. The line uses the same scale as the columns. Each point is in the middle of its column, and arrives with it.
+
+		+chart(null, '5')
+			figure(data-chart="column")
+				figcaption
+					b Budget and spend
+					br
+					span thousands of euros
+				table
+					thead
+						tr
+							th Month
+							th Budget
+							th(data-chart="line") Spent
+					tbody
+						each row in [['Jan', '40', '36'], ['Feb', '42', '45'], ['Mar', '45', '41'], ['Apr', '45', '52'], ['May', '50', '47'], ['Jun', '52', '58']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+		p Use a line for values that have an order, such as months or years. The legend shows a box for the columns and a line for the line.
+		p If a number of the line is on a column, the column is cut away under the number, so the number can be read. The numbers of the columns are inside the columns if they fit. If a point of the line covers a number, or a number has no room, the number is left out. If you point at the row, or tap it, a tooltip shows the numbers of that row.
+		p A chart with a line cannot be stacked.
+
 	+section("A bar chart on narrow screens")
 		p A column chart with many rows can be shown as a bar chart when it is narrow. Set #[code --tablechart-type: bar] on the figure, in a container query or a media query. The chart is built again as a bar chart when the query applies, and as a column chart when it does not.
 

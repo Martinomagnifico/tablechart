@@ -29,7 +29,9 @@ const trend = (area: boolean): ChartType => ({
 		!area && !stacked && series === 2 && !focused ? labelHeight + 7 * unit : 0,
 
 	draw(geo: Geometry) {
-		const { rows, series, seriesValues, names, cx, y, height, unit, labelHeight, svg, stacked } = geo;
+		const { rows, series, own, seriesValues, names, cx, y, height, unit, labelHeight, svg, stacked } = geo;
+		// Over the columns of a column chart: its points come with the columns, its numbers keep clear of theirs.
+		const mixed = own.length < series.length;
 		const step = geo.shape === "step";
 		const smooth = geo.shape === "smooth";
 		const several = series.length > 1;
@@ -63,7 +65,7 @@ const trend = (area: boolean): ChartType => ({
 		});
 
 		// The line builds at an even speed, in stagger steps, and a long line takes no more than six in all.
-		const totalSteps = Math.min(last, 6);
+		const totalSteps = mixed ? last : Math.min(last, 6);
 		// A line builds in at most seven steps, however many rows it has.
 		geo.plot.style.setProperty("--count", String(totalSteps + 1));
 		const stepsPerRow = last > 0 ? totalSteps / (step ? rows.length : last) : 1;
@@ -169,7 +171,11 @@ const trend = (area: boolean): ChartType => ({
 		};
 
 		const drawPoints = () => {
-			const markers = series.map((_one, s) => (several ? markerOf(series, s) : { shape: "circle" as const, open: false }));
+			// Over columns, the first line has the first marker, as a line chart's first line does.
+			const ownSeries = own.map((s) => series[s]);
+			const markers = series.map((_one, s) =>
+				mixed ? markerOf(ownSeries, own.indexOf(s)) : several ? markerOf(series, s) : { shape: "circle" as const, open: false }
+			);
 			const point = (s: number, i: number, attrs: Record<string, string | number>) => {
 				const [px, py] = pointAt(s, i);
 				return markerEl(markers[s].shape, px, py, 4 * unit, { ...attrs, style: `${attrs.style ?? ""}${riseFrom(py)}${pointTiming(i)}` });
@@ -177,14 +183,14 @@ const trend = (area: boolean): ChartType => ({
 			const shown = (s: number) => rows.map((_row, i) => i).filter((i) => !missing(s, i));
 
 			// An open point is a hole in the lines and areas under it.
-			const holes = series.flatMap((_one, s) =>
+			const holes = own.flatMap((s) =>
 				markers[s].open
 					? shown(s).map((i) => point(s, i, { class: HOLE_CLASS, "data-row": i + 1, ...(several && { "data-series": s + 1 }) }))
 					: []
 			);
 			cutOut(svg, holes, VIEWBOX_WIDTH, height);
 
-			series.forEach((_one, s) => {
+			own.forEach((s) => {
 				for (const i of shown(s)) {
 					svg.appendChild(
 						point(s, i, {
@@ -201,10 +207,44 @@ const trend = (area: boolean): ChartType => ({
 		};
 
 		// Areas first, then every line, then the points, so a point is always on top of a line.
-		if (area) series.forEach((_one, s) => drawArea(s));
-		series.forEach((_one, s) => drawLine(s));
+		if (area) own.forEach((s) => drawArea(s));
+		own.forEach((s) => drawLine(s));
 		// A step chart has no points: its corners show where the values change.
 		if (!step) drawPoints();
+
+		// Over columns, where the column chart placed each number, with a little room around it.
+		const columnNumbers = mixed
+			? series.flatMap((_one, s) =>
+					own.includes(s)
+						? []
+						: seriesValues[s].flatMap((label) => {
+								const place = label.dataset.place;
+								if (!place || place === "none" || label.hasAttribute("data-left-out")) return [];
+								const w = sizeOf(label).width * unit;
+								const lx = (Number.parseFloat(label.style.left) / 100) * VIEWBOX_WIDTH;
+								const ly = (Number.parseFloat(label.style.top) / 100) * height;
+								const top = place === "below" ? ly : place === "inside" ? ly - labelHeight / 2 : ly - labelHeight;
+								const box: Box = [lx - w / 2 - 2 * unit, top - 3 * unit, w + 4 * unit, labelHeight + 6 * unit];
+								return [{ label, box }];
+							})
+				)
+			: [];
+		// A number of a column under a point of the line is left out; its row's tooltip shows it.
+		const overlaps = (a: Box, b: Box) => a[0] < b[0] + b[2] && b[0] < a[0] + a[2] && a[1] < b[1] + b[3] && b[1] < a[1] + a[3];
+		const pointBoxes = step
+			? []
+			: own.flatMap((s) =>
+					rows.flatMap((_row, i): Box[] => {
+						if (missing(s, i)) return [];
+						const [px, py] = pointAt(s, i);
+						return [[px - 4 * unit, py - 4 * unit, 8 * unit, 8 * unit]];
+					})
+				);
+		const columnsShown = columnNumbers.filter(({ label, box }) => {
+			const covered = pointBoxes.some((point) => overlaps(point, box));
+			if (covered) label.setAttribute("data-left-out", "");
+			return !covered;
+		});
 
 		// On a step chart, the last row from row i on that has the same value.
 		const runEnd = (s: number, i: number): number => {
@@ -234,11 +274,11 @@ const trend = (area: boolean): ChartType => ({
 
 		// With more than two lines, each number goes above its point or below it, where it covers no point and no other number.
 		// Per row the highest value places first; below zero, below comes first. A number with no room at all is left out.
-		const crowded = several && !focused && series.length > 2 && !stacked && !step;
+		const crowded = mixed ? !step : several && !focused && series.length > 2 && !stacked && !step;
 		const picks = new Map<HTMLElement, Place | null>();
 		if (crowded) {
 			const items = rows
-				.flatMap((_row, i) => series.map((_one, s) => ({ s, i, value: cellAt(s, i)?.value ?? 0 })))
+				.flatMap((_row, i) => own.map((s) => ({ s, i, value: cellAt(s, i)?.value ?? 0 })))
 				.filter(({ s, i }) => placeOf(s, i) !== "none")
 				.sort((a, b) => a.i - b.i || b.value - a.value || a.s - b.s);
 			const places = (value: number): Place[] => (value < 0 ? ["below", "above"] : ["above", "below"]);
@@ -247,14 +287,14 @@ const trend = (area: boolean): ChartType => ({
 				const [px, py] = pointAt(s, i);
 				return places(value).map((place): Box => [px - w / 2, place === "above" ? py - 7 * unit - labelHeight : py + 7 * unit, w, labelHeight]);
 			});
-			const points = series.flatMap((_one, s) =>
+			const points = own.flatMap((s) =>
 				rows.flatMap((_row, i): Box[] => {
 					if (missing(s, i)) return [];
 					const [px, py] = pointAt(s, i);
 					return [[px - 4 * unit, py - 4 * unit, 8 * unit, 8 * unit]];
 				})
 			);
-			const chosen = avoidCollisions(candidates, points, [0, 0, cx(last) + cx(0), height]);
+			const chosen = avoidCollisions(candidates, [...points, ...columnsShown.map(({ box }) => box)], [0, 0, cx(last) + cx(0), height]);
 			items.forEach(({ s, i, value }, k) => picks.set(seriesValues[s][i], chosen[k] === null ? null : places(value)[chosen[k] as number]));
 		}
 
@@ -270,8 +310,8 @@ const trend = (area: boolean): ChartType => ({
 			return stacked && Math.abs(y(bottomValue(s, i)) - y(topValue(s, i))) < labelHeight * 1.2;
 		};
 
-		seriesValues.forEach((labels, s) => {
-			labels.forEach((label, i) => {
+		own.forEach((s) => {
+			seriesValues[s].forEach((label, i) => {
 				// A number arrives when the line reaches it: its point, or the middle of its row on a step chart.
 				label.style.setProperty("--i", String(fixed(step ? (reach(i) + reach(i + 1)) / 2 : reach(i))));
 				const place = picks.get(label) ?? placeOf(s, i);
@@ -299,7 +339,7 @@ const trend = (area: boolean): ChartType => ({
 		});
 
 		// Each name just past the last point of its line, pushed apart where two lines end close together.
-		const ends = names.map((name, s) => {
+		const ends = (mixed ? [] : names).map((name, s) => {
 			let i = last;
 			while (i > 0 && missing(s, i)) i--;
 			const [px, py] = pointAt(s, i);
@@ -312,16 +352,18 @@ const trend = (area: boolean): ChartType => ({
 		// With numbers under the lower line, the rule is the foot of the plot rather than zero, unless values go below zero.
 		const belowZero = rows.some((row) => row.cells.some((cell) => !cell.missing && cell.value < 0));
 		const rule = !area && !stacked && series.length === 2 && !focused && !belowZero ? height - 2 * unit : baseline;
-		svg.appendChild(
-			svgEl("line", {
-				class: RULE_CLASS,
-				x1: 0,
-				// Past the last band is where the names are.
-				x2: cx(last) + cx(0),
-				y1: rule,
-				y2: rule,
-			})
-		);
+		// Over columns, the column chart has drawn the rule.
+		if (!mixed)
+			svg.appendChild(
+				svgEl("line", {
+					class: RULE_CLASS,
+					x1: 0,
+					// Past the last band is where the names are.
+					x2: cx(last) + cx(0),
+					y1: rule,
+					y2: rule,
+				})
+			);
 	},
 });
 

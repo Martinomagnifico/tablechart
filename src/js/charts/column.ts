@@ -12,6 +12,7 @@ const segments = (rows: Row[]): Segment[] =>
 export const column: ChartType = {
 	segments,
 	series: true,
+	lines: true,
 	legend: "box",
 	stackable: true,
 	totals: true,
@@ -60,18 +61,18 @@ export const column: ChartType = {
 			return;
 		}
 
-		if (geo.series.length > 1) {
+		if (geo.own.length > 1) {
 			const band = cx(1) - cx(0) || cx(0) * 2;
-			const layout = groupLayout(band, geo.series.length, geo.barMax);
+			const layout = groupLayout(band, geo.own.length, geo.barMax);
 			geo.plot.dataset.grouped = "";
 			// All numbers shrink together to fit above their bars, or all are left out.
-			const shown = geo.seriesValues.flat().filter((label) => label.dataset.missing === undefined);
+			const shown = geo.own.flatMap((s) => geo.seriesValues[s]).filter((label) => label.dataset.missing === undefined);
 			const fit = fitTogether(geo.plot, shown, (label) => ({ size: sizeOf(label).width * unit, room: layout.size + layout.gap * 0.5 }), "--_fit");
 			geo.rows.forEach((row, i) => {
-				geo.series.forEach((_one, s) => {
+				geo.own.forEach((s, k) => {
 					const cell = row.cells[s] ?? row.cells[0];
 					const label = geo.seriesValues[s][i];
-					const x = cx(i) + layout.offset(s);
+					const x = cx(i) + layout.offset(k);
 					if (cell.missing) {
 						label.dataset.place = "none";
 						return;
@@ -105,6 +106,9 @@ export const column: ChartType = {
 			return;
 		}
 
+		// Beside a line, the columns keep the colour of their series.
+		const own = geo.own[0];
+		const mixed = geo.own.length < geo.series.length;
 		// If any number is wider than its bar, every number goes above, so a narrow chart does not mix the two.
 		const narrow = tooWide(values, barWidth, unit);
 		const inside = segs.map(
@@ -140,6 +144,7 @@ export const column: ChartType = {
 						width: barWidth,
 						height: tall,
 						style: timing("--i", seg.slot),
+						...(mixed && seriesMark(geo, seg, own)),
 					})
 				);
 			// Measured from the end of the column towards the baseline, up or down.
@@ -154,6 +159,7 @@ export const column: ChartType = {
 			const outside = below ? end + 4 * unit : end - 4 * unit;
 			placeAt(values[i], cx(i), inside[i] ? along : outside, VIEWBOX_WIDTH, height);
 			values[i].dataset.place = inside[i] ? "inside" : below ? "below" : "outside";
+			if (mixed && inside[i]) inkOf(values[i], geo, own);
 		});
 
 		svg.appendChild(

@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.4] - Unreleased
+
+### Added
+
+- `data-chart="line"` on a column header, for a line over the columns, on the same scale. So you can compare budget and spend, for example, in one chart.
+
+
+
 ## [1.1.3] - 2026-10-26
 
 ### Changed

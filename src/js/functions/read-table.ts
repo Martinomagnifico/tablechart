@@ -52,6 +52,7 @@ export const readSeries = (figure: HTMLElement, rows: Row[], langattribute: stri
 			marker: head?.getAttribute("data-marker") ?? null,
 			line: lineOf(head?.getAttribute("data-line")),
 			group: !!head?.hasAttribute("data-group"),
+			chart: head?.getAttribute("data-chart") === "line" ? "line" : null,
 		};
 	});
 };

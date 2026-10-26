@@ -270,7 +270,8 @@ const warnNotFigure = (figures: HTMLElement[]): void => {
 
 /** Turns elements into figures with a table and translation keys, all at once, so duplicate keys are found. */
 export const prepare = async (found: HTMLElement[], config: Config): Promise<HTMLElement[]> => {
-	const figures = adoptTables(found.filter((element) => !element.hasAttribute(MADE)));
+	// A header with `data-chart="line"` is a series in a chart, not a chart.
+	const figures = adoptTables(found.filter((element) => !element.hasAttribute(MADE) && element.tagName !== "TH"));
 	warnNotFigure(figures);
 	await loadSources(figures);
 	readMarkdownRows(figures);

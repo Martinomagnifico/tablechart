@@ -40,6 +40,8 @@ export interface Series {
 	line: "dashed" | "dotted" | null;
 	/** `data-group` on the header: the cells name a group, such as "Predefined". */
 	group: boolean;
+	/** `data-chart="line"` on the header, in a chart that takes it: a line over the other marks. */
+	chart: "line" | null;
 }
 
 export interface Segment extends Row {
@@ -95,6 +97,8 @@ export interface Geometry {
 	/** Made by `build`; a chart only places them. */
 	values: HTMLElement[];
 	series: Series[];
+	/** The series this drawing draws: all of them, or in a chart with columns and a line, those of its own kind. */
+	own: number[];
 	seriesValues: HTMLElement[][];
 	/** Empty with one series. */
 	names: HTMLElement[];
@@ -133,6 +137,8 @@ export interface ChartType {
 	columns?: boolean;
 	/** An axis across and an axis up, from the first two value columns, with their headers as titles. */
 	axes?: boolean;
+	/** A series with `data-chart="line"` on its header is a line over the marks, on the same scale. */
+	lines?: boolean;
 	/** False: no numbers on the chart. They stay out of the layout, which costs a lot with many rows. */
 	numbers?: false;
 	/** Text of its own, made with the rest of the text so a translation script finds it, such as a legend. */

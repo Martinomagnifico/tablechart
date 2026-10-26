@@ -67,6 +67,14 @@ figures.push(
 	figure('data-chart="bar"', table([["a", "12", "9"], ["b", "15", "11"], ["c", "140", "120"]], ["A", "B"]) + notes('<span data-annotation="axis-break" data-from="20"></span>'))
 );
 
+// Columns with a line over them, on one scale: one column series, close values whose numbers make room, and a group of columns.
+const combo = (rows, heads) => table(rows, heads).replace(`<th>${heads.at(-1)}</th>`, `<th data-chart="line">${heads.at(-1)}</th>`);
+figures.push(
+	figure('data-chart="column" data-chart-axis', combo([["Jan", "67", "3"], ["Apr", "41", "10"], ["Jul", "74", "19"], ["Oct", "85", "12"]], ["Rain", "Heat"])),
+	figure('data-chart="column"', combo([["Q1", "120", "110"], ["Q2", "130", "142"], ["Q3", "125", "128"], ["Q4", "150", "139"]], ["Budget", "Actual"])),
+	figure('data-chart="column"', combo(three, ["X", "Y", "Aim"]))
+);
+
 // Scatter charts, an additional type: a few points, a crowded cluster whose names do not all fit, bubbles in groups, and a narrow one.
 const points = [["Apples", "12%", "3.4"], ["Quinces", "12%", "3.4"], ["Pears", "30%", "2.1"], ["Plums", "22%", "4.5"], ["Cherries", "41%", "n/a"]];
 const cluster = Array.from({ length: 30 }, (_, i) => [`Variety ${i + 1}`, String(50 + ((i * 7) % 11)), String(2 + ((i * 5) % 9) / 10)]);
