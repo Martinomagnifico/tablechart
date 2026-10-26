@@ -5,6 +5,7 @@ export { entranceOf, prepare } from "./init";
 export { adoptTables, loadSources, readMarkdownRows } from "./functions/sources";
 export { assignKeys } from "./functions/read-table";
 export {
+	AT_ONCE_CLASS,
 	type Config,
 	defaultConfig,
 	PLACED_CLASS,

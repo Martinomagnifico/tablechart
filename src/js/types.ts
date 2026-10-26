@@ -133,6 +133,8 @@ export interface ChartType {
 	columns?: boolean;
 	/** An axis across and an axis up, from the first two value columns, with their headers as titles. */
 	axes?: boolean;
+	/** False: no numbers on the chart. They stay out of the layout, which costs a lot with many rows. */
+	numbers?: false;
 	/** Text of its own, made with the rest of the text so a translation script finds it, such as a legend. */
 	text?: (input: { figure: HTMLElement; plot: HTMLElement; rows: Row[]; series: Series[]; config: Config }) => void;
 	/** With several series, always a legend, with a sample of this shape. */

@@ -83,6 +83,11 @@
 			transition-delay: calc(var(--i, 0) * #{$stagger} + 0.096 * #{$duration});
 		}
 
+		// Over the gap under a badge: as the badge arrives.
+		:where(.tablechart-grid[data-gap="badge"]) {
+			transition-delay: calc(var(--after) * #{$stagger} + 0.35s);
+		}
+
 		// A connector is revealed from left to right by a clip, so its dots stay in place.
 		// It draws as the column it leads into starts, in a third of the element time, whatever the other columns do.
 		:where(.tablechart-connector) {
@@ -175,7 +180,7 @@
 			transition-delay: calc((var(--start, 0) + 0.5 * var(--span, 0)) * #{$build});
 		}
 
-		:where(.tablechart-badge, .tablechart-hole[data-for="badge"]) {
+		:where(.tablechart-badge, .tablechart-hole[data-for="badge"], .tablechart-grid[data-gap="badge"]) {
 			transition-delay: calc(#{$build} + 0.2s);
 		}
 
@@ -278,7 +283,8 @@
 			transition: transform #{$rise} #{$easing}, opacity 0.15s ease;
 			transition-delay: 0s;
 		}
-		:where(.tablechart-value, .tablechart-name, .tablechart-grid[data-gap]) {
+		// The gaps under text; one under a badge keeps the badge's moment.
+		:where(.tablechart-value, .tablechart-name, .tablechart-grid[data-gap=""]) {
 			transition-delay: #{$rise};
 		}
 	}
@@ -324,6 +330,15 @@
 		:where(.tablechart-name, .tablechart-badge, .tablechart-centre) {
 			opacity: 1;
 			transition-property: color, border-color, background-color;
+		}
+		// A badge's own background, if it has one, is on at once as the badge arrives, and its text and outline come in on it.
+		// Faded, it would first be a grey box over the marks with the text grey in it.
+		:where(.tablechart-badge) {
+			transition-duration: 0.3s, 0.3s, 0s;
+		}
+		// The piece of gridline under a badge goes at once as the badge arrives, as the hole in the marks does.
+		:where(.tablechart-grid[data-gap="badge"]) {
+			transition-duration: 0s;
 		}
 		:where(.tablechart-name)::before {
 			transition: background-color #{$fade} ease;

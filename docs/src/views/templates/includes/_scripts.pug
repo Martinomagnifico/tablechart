@@ -1,6 +1,6 @@
 block scripts
-	- const highlighter = isProd ? `${basePath}lib/highlight.min.js` : '/node_modules/@highlightjs/cdn-assets/highlight.min.js'
-	- const lineNumbers = isProd ? `${basePath}lib/highlightjs-line-numbers.min.js` : '/node_modules/highlightjs-line-numbers.js/dist/highlightjs-line-numbers.min.js'
+	- const highlighter = `${basePath}lib/highlight.min.js`
+	- const lineNumbers = `${basePath}lib/highlightjs-line-numbers.min.js`
 
 	if isProd
 		script(src=`${basePath}assets/scripts/copybutton.js` vite-ignore defer)

@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.1.3] - 2026-10-26
+
+### Changed
+
+- Fixes charts that should be shown directly. Labels and annotations now also show immediately.
+- Trend and bracket lines stop at their badge from the start. Before, they ran through it until the chart was built.
+- Gridlines leave a gap for a badge, as they do for text. The gap appears with the badge.
+- Badge backgrounds no longer fade in. A fading background showed as a grey box over the marks.
+- The mask under a badge goes on when the marks under it are done. Before, it waited for the whole chart.
+
+### Added
+
+- `atOnce` in `setShown(state, shown, atOnce)` from `@martinomagnifico/tablechart/core`. It shows or hides a chart without transitions, with `AT_ONCE_CLASS`.
+- `numbers: false` for a chart type without numbers on the chart, such as a scatter. Its numbers then stay out of the layout.
+
+### Fixed
+
+- Legend keys no longer fade in when printing or when a chart is shown at once.
+- Removed a layout for hidden scatter plot labels to increase performance. 
+
+
+
 ## [1.1.2] - 2026-10-24
 
 ### Changed

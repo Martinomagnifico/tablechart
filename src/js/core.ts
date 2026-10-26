@@ -8,9 +8,12 @@ import { donut } from "./charts/donut";
 import { area, line } from "./charts/line";
 import { waterfall } from "./charts/waterfall";
 import {
+	AT_ONCE_CLASS,
 	AXIS_CLASS,
 	BREAK_GAP,
 	GRID_CLASS,
+	HEAD_CLASS,
+	LINE_CLASS,
 	TICK_CLASS,
 	CATEGORIES_CLASS,
 	CENTRE_CLASS,
@@ -36,7 +39,7 @@ import { fitTogether } from "./functions/labels";
 import { measureAll, sizeOf } from "./functions/measure";
 import type { Squeeze } from "./functions/scale";
 import { readSeries, readTable } from "./functions/read-table";
-import { cutOut, htmlEl, placeAt, short, svgEl } from "./functions/svg";
+import { clipAround, cutOut, htmlEl, placeAt, short, svgEl } from "./functions/svg";
 import { niceStep, readScale, type Scale, scaleOf, thin, ticksOf } from "./functions/axis";
 import type { Box } from "./functions/collision";
 import { debug } from "./functions/debug";
@@ -261,6 +264,7 @@ export const build = (
 			if (type.columns) node.dataset.decimals = String(columnDecimals[s]);
 			node.dataset.row = String(i + 1);
 			node.style.setProperty("--i", String(row.slot));
+			if (type.numbers === false && (s || i)) node.dataset.place = "none";
 			return node;
 		})
 	);
@@ -594,7 +598,9 @@ export const layout = (state: ChartState, config: Config): boolean => {
 
 	plot.classList.add(PLACED_CLASS);
 	// Undo what the last layout did to the size of the text, then read every size at once, before anything is placed.
-	for (const node of [...seriesValues.flat(), ...state.totals]) delete node.dataset.place;
+	// Without numbers on the chart, only the first is measured, for the room above.
+	const shown = type.numbers === false ? values.slice(0, 1) : [...seriesValues.flat(), ...state.totals];
+	for (const node of shown) delete node.dataset.place;
 	plot.style.removeProperty("--_fit");
 	state.categories[0]?.parentElement?.style.removeProperty("--_beside");
 
@@ -640,6 +646,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	]);
 
 	const labelHeight = (values[0] ? sizeOf(values[0]).height : 0) * unit;
+	if (type.numbers === false && values[0]) values[0].dataset.place = "none";
 	const badgeHeight = annotations[0]?.badge ? sizeOf(annotations[0].badge).height * unit : 0;
 	// Never less than `--tablechart-min-height` (200px), or what the kind needs.
 	const height = Math.max(
@@ -1055,17 +1062,26 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		for (const line of references) lineAround(line, [...under, ...holes].map(boxOf));
 		if (grid && state.plan) cutOut(svg, under, VIEWBOX_WIDTH, height, [grid]);
 		else if (grid) {
+			// Around each badge too, rather than under its mask, which only comes once the marks are still.
+			const gaps = [...under, ...holes];
 			const lines = linesIn(grid);
-			grid.setAttribute("d", lines.map(([x1, y1, x2, y2]) => piecesOf(x1, y1, x2, y2, under.map(boxOf))).join(""));
+			grid.setAttribute("d", lines.map(([x1, y1, x2, y2]) => piecesOf(x1, y1, x2, y2, gaps.map(boxOf))).join(""));
 			// Over each gap, the piece of gridline it leaves out, with the timing of its text: it fades as the text arrives.
-			for (const rect of under) {
+			// Under a badge it goes at once as the badge arrives, so the line never runs through it.
+			for (const rect of gaps) {
 				const d = piecesIn(lines, boxOf(rect));
-				if (d) grid.after(svgEl("path", { class: GRID_CLASS, "data-gap": "", d, style: rect.getAttribute("style") ?? "" }));
+				const gap = rect.dataset.for === "badge" ? "badge" : "";
+				if (d) grid.after(svgEl("path", { class: GRID_CLASS, "data-gap": gap, d, style: rect.getAttribute("style") ?? "" }));
 			}
 		}
 	}
-	// A reference line stays out of that group: under its mask, a fade would make Safari draw the whole group again on each frame.
-	cutOut(svg, holes, VIEWBOX_WIDTH, height, undefined, `.${REFERENCE_CLASS}`);
+	// A trend or a bracket is drawn while the chart builds, so it is kept out of each badge by a clip, from the start: it stops at the
+	// badge rather than running through it until the mask comes. Its arrowhead too.
+	clipAround(svg, holes, VIEWBOX_WIDTH, height, Array.from(svg.querySelectorAll<SVGElement>(`.${LINE_CLASS}, .${HEAD_CLASS}`)));
+	// What is kept out of the badges another way stays out of that group: under its mask, a line that is drawn or fades would make
+	// Safari draw the whole group again on each frame. And the mask would wait for it. With steps, the grid keeps to the mask.
+	const loose = [REFERENCE_CLASS, LINE_CLASS, HEAD_CLASS, ...(state.plan ? [] : [GRID_CLASS])];
+	cutOut(svg, holes, VIEWBOX_WIDTH, height, undefined, loose.map((name) => `.${name}`).join(", "));
 	// Under a mask, Safari draws everything again on every frame, so every mask waits while the marks still have to build.
 	if (state.figure.hasAttribute("data-animate") && !state.figure.hasAttribute("data-steps") && !state.figure.classList.contains(SHOWN_CLASS))
 		takeMasksOff(svg);
@@ -1121,18 +1137,35 @@ export const unbuild = (state: ChartState): void => {
 	state.controls?.remove();
 };
 
-/** One class, `is-shown`, starts the whole build. */
-export const setShown = (state: ChartState, shown: boolean): void => {
+/**
+ * One class, `is-shown`, starts the whole build. `atOnce` skips it: the chart lands at its end, or back at its start,
+ * without transitions, such as a chart in view when the page opens, or one hidden where nobody sees it.
+ */
+export const setShown = (state: ChartState, shown: boolean, atOnce = false): void => {
 	// The marks move back without masks too, and wait for them again on the next build.
 	if (!shown && !state.figure.hasAttribute("data-steps")) takeMasksOff(state.svg);
+	if (atOnce) {
+		state.figure.classList.add(AT_ONCE_CLASS);
+		state.figure.classList.toggle(SHOWN_CLASS, shown);
+		// Read now, so the end is what the next frame starts from, and taking the class off starts nothing.
+		void state.figure.offsetWidth;
+		if (shown) putMasksOn(state.svg);
+		requestAnimationFrame(() => state.figure.classList.remove(AT_ONCE_CLASS));
+		return;
+	}
 	state.figure.classList.toggle(SHOWN_CLASS, shown);
 	// A build without transitions, such as one shown before its first frame, gets its masks too.
 	if (shown) requestAnimationFrame(() => requestAnimationFrame(() => settleMasks(state.figure, state.svg)));
 };
 
-/** Puts the masks on once a shown chart has nothing left to move. */
+/**
+ * Puts the masks on once what they cover has nothing left to move, such as the bars under a badge. Not the whole chart: the
+ * badge, its line and its gap arrive after the marks, and each hole in a mask switches on with its badge, by its own timing.
+ */
 const settleMasks = (figure: HTMLElement, svg: SVGSVGElement): void => {
-	if (figure.classList.contains(SHOWN_CLASS) && !svg.getAnimations({ subtree: true }).length) putMasksOn(svg);
+	if (!figure.classList.contains(SHOWN_CLASS)) return;
+	const covered = Array.from(svg.querySelectorAll<SVGElement>("[data-mask]"));
+	if (covered.every((group) => !group.getAnimations({ subtree: true }).length)) putMasksOn(svg);
 };
 
 /** Takes the masks of holes off until the build is done, such as when a chart is hidden. `putMasksOn` puts them back. A donut keeps the mask of its gaps. */

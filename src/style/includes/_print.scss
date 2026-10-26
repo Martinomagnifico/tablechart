@@ -30,8 +30,16 @@
 }
 
 // While the page prints, a chart has no transitions, so one that was still building is at its end straight away.
+// The same for the moment a chart is shown or hidden at once, such as one in view when the page opens.
+// The pseudo-elements too: `*` does not reach them, and the key of a legend name is its `::before`, which has a transition of its own.
 .is-printing,
-.is-printing * {
+.is-printing *,
+.is-printing *::before,
+.is-printing *::after,
+.is-at-once,
+.is-at-once *,
+.is-at-once *::before,
+.is-at-once *::after {
 	transition: none !important;
 	animation: none !important;
 }

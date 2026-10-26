@@ -33,6 +33,8 @@ export const SR_CLASS = "tablechart-sr";
 export const MINUS_CLASS = "tablechart-minus";
 export const SHOWN_CLASS = "is-shown";
 export const PRINTING_CLASS = "is-printing";
+// For a moment, while a chart is shown or hidden at once: no transitions, so it lands at its end.
+export const AT_ONCE_CLASS = "is-at-once";
 // A chart in a sequence that has not had its turn: the whole figure waits hidden.
 export const QUEUED_CLASS = "tablechart-queued";
 export const CONTROLS_CLASS = "tablechart-controls";

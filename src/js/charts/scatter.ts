@@ -38,6 +38,7 @@ export const scatter: ChartType = {
 	categories: "beside",
 	columns: true,
 	axes: true,
+	numbers: false,
 
 	// A legend for the groups, and for the size of a bubble.
 	text({ figure, plot, rows, series, config }) {
@@ -89,12 +90,11 @@ export const scatter: ChartType = {
 	},
 
 	draw(geo) {
-		const { rows, series, x, y, frame, unit, svg, categories, seriesValues, height, config, plot } = geo;
+		const { rows, series, x, y, frame, unit, svg, categories, height, config, plot } = geo;
 		if (!x || !frame) return;
 		const fields = fieldsOf(series);
 		const groups = groupsOf(rows, fields.group);
 		const several = groups.length > 1;
-		for (const label of seriesValues.flat()) label.dataset.place = "none";
 
 		// Both sizes are across; a bubble's area follows its value, up to `--tablechart-bubble-max`.
 		const base = (geo.length("--tablechart-marker-size", "10px") ?? 10 * unit) / 2;
