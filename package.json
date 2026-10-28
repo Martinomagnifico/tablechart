@@ -46,6 +46,7 @@
     "check:variables": "node scripts/variables.mjs",
     "docs:preview": "npm run build && cd docs && rm -rf dist && npm run build && npm run preview",
     "preview": "npm run docs:preview",
+    "prebuild": "node scripts/lock-version.mjs",
     "build": "npm run clean && npm run build:lib",
     "build:lib": "vite build",
     "size": "node scripts/size.mjs",
