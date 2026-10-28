@@ -1,10 +1,32 @@
 # Changelog
 
-## [1.1.4] - Unreleased
+## [1.2.0] - 2026-10-28
 
 ### Added
 
-- `data-chart="line"` on a column header, for a line over the columns, on the same scale. So you can compare budget and spend, for example, in one chart.
+- Summaries! They need a separate import from `@martinomagnifico/tablechart/summary`. Summaries are important for screen readers and print.
+- A line over columns, with `data-chart="line"` on a column header.
+- `data-chart-values` and the `values` option: which values a line shows. A long line shows only its key values.
+- Notes: a column with `data-note`, shown as a line at its row and in the tooltip.
+- A `quadrant` annotation for scatter charts, and one step for a scatter with `data-fragment`.
+- `--tablechart-bubble-min`, so the smallest bubble stays visible.
+
+### Changed
+
+- Values on a line keep clear of the line, the points and each other, if possible.
+- Line and area charts have a tick above each name. `data-chart-ticks="false"` turns them off.
+- Scatter markers have an edge in the background colour, so they stand apart from lines and each other.
+- Bars put their numbers after the bar by default, as columns put them above. `data-chart-labels="inside"` puts them inside, as on columns.
+- Badges are rounded boxes instead of ellipses. They take less room.
+- A few columns or bars start one after the other again, and their numbers come when the column is nearly grown. Many columns still grow almost together.
+
+### Fixed
+
+- Holes in a line come with the line, not after the build.
+- A legend box is no longer shown empty before its names.
+- Triangle markers are centred on their point.
+- Names of a long line no longer wait seconds after the build.
+- Grouped columns and bars no longer grow after the first resize.
 
 
 

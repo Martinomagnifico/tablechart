@@ -127,6 +127,60 @@ block content
 		p The line is dashed. If you add #[code data-line="dotted"], it is dotted. The text of the annotation is the label, on the line. If two labels would cover each other, the second one moves beside its line, or one line lower. If the annotation has no text, there is only the line. Where the line crosses a number or a name on the chart, it stops a little before it and goes on after it.
 		p If the label has a number and the line uses #[code mean] or #[code median], Tablechart checks it, to the decimals you wrote, and shows a warning in the console if they differ. Your text is always the one shown.
 
+	+section("Quadrant")
+		p A quadrant divides a scatter chart in four, with a line up and a line across, and names each part in its outer corner. The lines are not in the middle unless you want them there: #[code data-x] and #[code data-y] say where they are, as a number, #[code mean] or #[code median]. Each name has #[code data-corner]: #[code top left], #[code top right], #[code bottom left] or #[code bottom right]. The quadrant comes with the scatter chart type, so it works once you add #[code scatter].
+
+		+chart(null, '20')
+			figure(data-chart="scatter" data-chart-grid)
+				figcaption: b Varieties at the market
+				table
+					thead
+						tr
+							th Variety
+							th Share of sales (%)
+							th Growth (%)
+					tbody
+						each row in [['Elstar', '24', '1.2'], ['Jonagold', '18', '-0.8'], ['Braeburn', '12', '2.9'], ['Gala', '9', '4.1'], ['Kanzi', '6', '6.3'], ['Granny Smith', '4', '-1.5'], ['Wellant', '3', '3.4'], ['Santana', '2', '0.4'], ['Cox', '7', '-2.2'], ['Boskoop', '11', '-0.3']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+				.chart-annotations
+					span(data-annotation="quadrant" data-x="10" data-y="1")
+						span(data-corner="top left") Rising
+						span(data-corner="top right") Stars
+						span(data-corner="bottom left") Fading
+						span(data-corner="bottom right") Steady
+
+		p The quadrant is there from the start, before the dots. Its lines are whole until the name of a dot arrives over them; then the line makes room for the name. A dot name that would cover a corner name is left out, and the tooltip of its dot still has it. Screen readers read the names of the corners with the annotations, under the table.
+		p With #[code data-fragment] on the figure, the axes and the quadrant are shown first, and all dots arrive on the next step. Then you can explain the quadrants before the data comes in. See #[a(href=url('/features/steps.html')) Step by step].
+		p The lines are dashed by default. To change them, set the #[code --tablechart-quadrant-] variables: see #[a(href=url('/reference/variables.html#annotations')) CSS variables].
+
+	+section("Notes")
+		p A note says what happened at a row, such as a “Share issue” or a “New apple press”. A note is not an annotation you write under the table, but a column in the table: a column whose header has #[code data-note]. Each cell with text is a note at its row. The chart has a line at that row, with the note at the top.
+
+		+chart(null, '5,10')
+			figure(data-chart="column")
+				figcaption
+					b Apple juice sold
+					br
+					span thousands of litres
+				table
+					thead
+						tr
+							th Quarter
+							th Litres
+							th(data-note) Note
+					tbody
+						each row in [['Q1 2024', '58', ''], ['Q2 2024', '61', ''], ['Q3 2024', '84', 'New apple press'], ['Q4 2024', '90', ''], ['Q1 2025', '88', '']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+		p The note is in the table, so a screen reader reads it with its row, a printed table has it, and a translation script translates it like any other cell. If you point at the row, or tap it, the tooltip shows the note too. A row without a note has an empty cell.
+		p A note works on a chart with its rows across: a column, line, area or waterfall chart. In a summary, #[code data-each="notes"] lists them: see #[a(href=url('/features/summary.html#notes')) Summary]. From a JSON file, a row has its note in #[code note]: see #[a(href=url('/data.html#json-structure')) Data].
+
 	+section("Break the scale")
 		p A break in the scale is not an annotation, but it is added the same way. See #[a(href=url('/features/scale-break.html')) Scale break].
 

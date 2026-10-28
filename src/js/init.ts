@@ -276,6 +276,8 @@ export const prepare = async (found: HTMLElement[], config: Config): Promise<HTM
 	await loadSources(figures);
 	readMarkdownRows(figures);
 	assignKeys(figures, config.langattribute);
+	// The table is complete now, also one from a file, so a summary can read it.
+	for (const figure of figures) figure.dispatchEvent(new CustomEvent("tablechart:table", { bubbles: true }));
 	return figures;
 };
 

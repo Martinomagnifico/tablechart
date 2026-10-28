@@ -31,6 +31,12 @@ block content
 					td: code data-chart-shape="step"
 					td Makes each value flat across its row, in a line or area chart
 				tr
+					td: code data-chart-ticks="false"
+					td Leaves out the ticks above the names under a line or area chart
+				tr
+					td: code data-chart-values="auto"
+					td Which values a line or area chart shows: #[code auto], #[code all], #[code none], or a set such as #[code first last highest lowest outliers]. #[code auto last] shows all if they fit, and else the last. See #[a(href=url('/types/line.html#which-values-are-shown')) Which values are shown].
+				tr
 					td: code data-chart-shape="smooth"
 					td Makes a line or area chart a curve through every point. #[code data-chart-shape="straight"] makes it straight when the #[code shape] option is #[code "smooth"].
 				tr
@@ -50,7 +56,7 @@ block content
 					td Puts the names of the lines in a legend. #[code data-chart-legend="false"] turns it off.
 				tr
 					td: code data-chart-labels
-					td Puts the numbers of a column chart #[code inside] or #[code outside] the columns
+					td Puts the numbers of a column or bar chart #[code inside] or #[code outside] the columns or bars
 				tr
 					td: code data-chart-aspect
 					td Sets the height of the chart as a share of its width, such as #[code 0.5]
@@ -59,7 +65,13 @@ block content
 					td The tooltip of the chart: #[code auto] only when the chart does not show all its numbers, #[code false] never, #[code true] always.
 				tr
 					td: code data-chart-table="auto"
-					td When the table is shown under the chart: #[code always], #[code print], #[code auto] (in print, when the chart does not show all its numbers) or #[code never]
+					td When the table is shown under the chart: #[code always], #[code print], #[code auto] (in print, when the chart does not show all its numbers and the table is not too long) or #[code never]
+				tr
+					td: code data-chart-ordered
+					td Says that the rows are in order, such as months, so a summary can have a change, a trend and outliers. Line and area charts are always in order.
+				tr
+					td: code data-chart-summary="auto"
+					td When the summary is shown: #[code always], #[code print], #[code auto] (in print, when the chart does not show all its numbers and its table is not printed) or #[code never]. See #[a(href=url('/features/summary.html')) Summary].
 				tr
 					td: code data-chart-axis
 					td Adds numbers along the value axis of a column, bar, line, area or waterfall chart. #[code data-chart-axis="false"] turns them off when the #[code axis] option is #[code true].
@@ -92,6 +104,12 @@ block content
 				tr
 					td: code class
 					td Is copied to the bar, the number and the name of the row
+				tr
+					td: code data-value="show"
+					td On the #[code tr] of a row: on a line or area chart, its value is always shown
+				tr
+					td: code data-short
+					td On the #[code th] of the row: a short name for under the chart, such as #[code Nov ’21] for #[code November 2021]. See #[a(href=url('/features/summary.html#short-names')) Short names].
 
 	+section("On a column header")
 		table
@@ -113,8 +131,36 @@ block content
 					td: code data-chart="line"
 					td On a column chart: shows this column as a line over the columns, on the same scale. See #[a(href=url('/types/column.html#columns-and-a-line')) Columns and a line].
 				tr
+					td: code data-note
+					td The cells of this column are notes, not values: each one is a note at its row on the chart. See #[a(href=url('/features/annotations.html#notes')) Notes].
+				tr
 					td: code data-group
 					td On a scatter chart: the cells of this column name the groups. Each group has its own colour and shape. See #[a(href=url('/types/scatter.html#groups')) Scatter].
+
+	+section("On a sentence of a summary")
+		p Each sentence is an element in a #[code div] with the class #[code chart-summary]. See #[a(href=url('/features/summary.html')) Summary].
+
+		table
+			thead
+				tr
+					th Attribute
+					th Does
+			tbody
+				tr
+					td: code data-series="2"
+					td Makes the sentence about the second value column. Without it, it is about the first.
+				tr
+					td: code data-summary="range"
+					td Shows the sentence only if that part of the summary has a result: #[code extremes], #[code range], #[code change], #[code trend], #[code outliers] or #[code notes]
+				tr
+					td: code data-none
+					td With #[code data-summary]: shows the sentence only if there is no result
+				tr
+					td: code data-when="up"
+					td With #[code data-summary="change"] or #[code "trend"]: shows the sentence only for #[code up], #[code down] or #[code flat], or for a trend also #[code unclear]
+				tr
+					td: code data-each="outliers"
+					td On an element in the sentence: repeats it for each outlier, or with #[code data-each="notes"] for each note, joined as a list
 
 	+section("On an annotation")
 		p Each annotation is a #[code span] with #[code data-annotation], in a #[code div] with the class #[code chart-annotations]. See #[a(href=url('/features/annotations.html')) Annotations].
@@ -166,6 +212,14 @@ block content
 					td: code reference
 					td: code data-line
 					td #[code dotted] makes the line dotted. It is dashed by default.
+				tr
+					td: code quadrant
+					td: code data-x, data-y
+					td On a scatter chart: where the line up and the line across are, as a number, #[code mean] or #[code median]. Without them, the middle of the axis.
+				tr
+					td: code quadrant
+					td: code data-corner
+					td On an element in the annotation: the corner of its name, such as #[code top right]
 				tr
 					td All
 					td: code data-series

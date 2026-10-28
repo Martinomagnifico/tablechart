@@ -148,6 +148,7 @@
 .lang-toggle {
 	display: inline-flex;
 	flex-wrap: wrap;
+	align-items: center;
 	gap: 0.25em;
 
 	button {
@@ -183,6 +184,11 @@
 
 .lang-toggle {
 	margin-bottom: 0.8em;
+}
+
+// The kind of data shown, next to the button that changes it.
+.trend-kind {
+	margin-inline-start: 0.5em;
 }
 
 // A button that does something to an example, such as building it again.

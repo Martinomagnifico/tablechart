@@ -13,6 +13,7 @@ export const RULE_CLASS = "tablechart-rule";
 export const CONNECTOR_CLASS = "tablechart-connector";
 export const LINE_CLASS = "tablechart-line";
 export const REFERENCE_CLASS = "tablechart-reference";
+export const QUADRANT_CLASS = "tablechart-quadrant";
 export const HEAD_CLASS = "tablechart-head";
 export const BADGE_CLASS = "tablechart-badge";
 export const BADGE_CAPTION_CLASS = "tablechart-caption";
@@ -65,6 +66,13 @@ export interface Config {
 	entrance: number;
 	/** Where a column's number goes: on the bar, or inside it. A figure overrides it with `data-chart-labels`. */
 	labels: "outside" | "inside";
+	/**
+	 * Which values a line or area chart shows: `"auto"`, all if they fit and else the first, last, highest and lowest; `"all"`;
+	 * `"none"`; or a set, such as `"first last"`. `"auto last"` shows all if they fit, and else the last. A figure overrides it with `data-chart-values`.
+	 */
+	values: string;
+	/** A tick above each name under a line or area chart, at the place of its row. A figure overrides it with `data-chart-ticks`. */
+	ticks: boolean;
 	/** How a line or area runs between points: `straight`, `step` or `smooth`. A figure overrides it with `data-chart-shape`. */
 	shape: "straight" | "step" | "smooth";
 	/** Names of several lines in a legend instead of at the end of each line. A figure overrides it with `data-chart-legend`. */
@@ -81,6 +89,10 @@ export interface Config {
 	tooltipparent: HTMLElement | string | null;
 	/** The table under the chart: `"always"`, only in `"print"`, in print when numbers are left out (`"auto"`), or `"never"`. A figure overrides it with `data-chart-table`. */
 	table: "never" | "auto" | "print" | "always";
+	/** With `auto`, the table is printed only up to this many values, rows times value columns; a longer one prints the summary instead. */
+	tablelimit: number;
+	/** The summary of a chart, in a `.chart-summary`: `"always"`, only in `"print"`, in print when the table is not (`"auto"`), or `"never"`, for screen readers only. A figure overrides it with `data-chart-summary`. */
+	summary: "never" | "auto" | "print" | "always";
 	/** The name of the total that a donut without a total row works out, for screen readers. */
 	totallabel: string;
 	/** Previous and Next buttons under a chart that steps (`data-fragment`). `false` leaves them out, for buttons of your own. */
@@ -109,6 +121,8 @@ export const defaultConfig: Config = {
 	animate: true,
 	entrance: 0.5,
 	labels: "outside",
+	values: "auto",
+	ticks: true,
 	shape: "straight",
 	legend: false,
 	axis: false,
@@ -117,6 +131,8 @@ export const defaultConfig: Config = {
 	tooltip: "auto",
 	tooltipparent: null,
 	table: "never",
+	tablelimit: 15,
+	summary: "auto",
 	totallabel: "Total",
 	controls: true,
 	previouslabel: "Previous",

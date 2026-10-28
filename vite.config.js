@@ -46,6 +46,10 @@ const iifeBuild = () => ({
       external: kit,
       output: { globals: (id) => (kit(id) ? 'Tablechart.kit' : id) }
     });
+    await iife('src/js/summary.iife.ts', 'tablechart-summary.js', {
+      external: kit,
+      output: { globals: (id) => (kit(id) ? 'Tablechart.kit' : id) }
+    });
   }
 });
 
@@ -69,6 +73,7 @@ export default defineConfig({
         tablechart: MAIN_ENTRY,
         'tablechart-core': CORE_ENTRY,
         'tablechart-additional-types': resolve(import.meta.dirname, 'src/js/additional-types.ts'),
+        'tablechart-summary': resolve(import.meta.dirname, 'src/js/summary.ts'),
       },
       formats: ['es'],
       fileName: (_format, name) => `${name}.mjs`,
@@ -90,7 +95,7 @@ export default defineConfig({
             walk(CORE_ENTRY);
           }
           // The types of all entries share one file too.
-          if (/\.d\.[mc]?ts$/.test(id)) return /[/\\](index|blocks|additional-types)\.d\.[mc]?ts$/.test(id) ? undefined : 'shared.d';
+          if (/\.d\.[mc]?ts$/.test(id)) return /[/\\](index|blocks|additional-types|summary)\.d\.[mc]?ts$/.test(id) ? undefined : 'shared.d';
           if (/\.[mc]?[jt]s$/.test(id) && id !== MAIN_ENTRY && id !== CORE_ENTRY && mainCode.has(id)) return 'shared';
         },
         chunkFileNames: chunk => chunk.name.endsWith('.d') ? 'tablechart-shared.d.mts' : 'tablechart-shared.mjs',

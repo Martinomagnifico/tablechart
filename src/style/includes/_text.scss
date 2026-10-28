@@ -267,6 +267,43 @@
 		hyphens: manual;
 		overflow-wrap: normal;
 	}
+
+	// Thinned out: each name that is shown on one line, centred under its column, over the room of the names left out.
+	&[data-thinned] :where(span) {
+		justify-self: center;
+		width: max-content;
+		white-space: nowrap;
+	}
+	// At the ends, inside the chart rather than past its edge.
+	&[data-thinned] :where(span[data-edge="start"]) {
+		justify-self: start;
+	}
+	&[data-thinned] :where(span[data-edge="end"]) {
+		justify-self: end;
+	}
+	:where(span[data-left-out]) {
+		visibility: hidden;
+	}
+
+	// Under a line or an area: a tick above each name shown, from the plot down to the name, at the place of its row.
+	&[data-ticks] :where(span:not([data-left-out])) {
+		position: relative;
+
+		&::before {
+			content: "";
+			position: absolute;
+			bottom: 100%;
+			left: var(--_tick, 50%);
+			// In the colour and width of the gridlines by default, a little stronger, as a tick is short.
+			width: var(--tablechart-tick-width, var(--tablechart-grid-width, 1px));
+			height: var(--tablechart-tick-length, calc(var(--tablechart-name-gap, 0.45em) + var(--_tick-reach, 0px)));
+			background: var(
+				--tablechart-tick-color,
+				color-mix(in oklab, var(--tablechart-grid-color, currentColor) calc(var(--tablechart-tick-opacity, 0.22) * 100%), transparent)
+			);
+			transform: translateX(-50%);
+		}
+	}
 }
 
 // On a scatter chart, each name is placed by its corner, beside its marker.

@@ -69,18 +69,18 @@
 			transition-delay: calc(var(--i) * #{$stagger});
 		}
 
-		// A gap in the gridlines under a number or name arrives with it.
-		:where(.tablechart-value, .tablechart-name, [data-chart="scatter"] .tablechart-categories span, .tablechart-hole[data-for="text"]) {
+		// A gap in the gridlines under a number or name arrives with it. `--_lag` is how far into its element's time.
+		:where(.tablechart-value, .tablechart-name, .tablechart-legend, [data-chart="scatter"] .tablechart-categories span, .tablechart-hole[data-for="text"]) {
 			opacity: 0;
 			transition: opacity #{$fade} ease;
-			transition-delay: calc(var(--i) * #{$stagger} + 0.096 * #{$duration});
+			transition-delay: calc(var(--i) * #{$stagger} + var(--_lag, 0.096) * #{$duration});
 		}
 
 		// Without steps, the piece of gridline over that gap fades as its text arrives.
-		:where(.tablechart-grid[data-gap]) {
+		:where(.tablechart-grid[data-gap], .tablechart-quadrant[data-gap]) {
 			stroke-opacity: 1;
 			transition: stroke-opacity #{$fade} ease;
-			transition-delay: calc(var(--i, 0) * #{$stagger} + 0.096 * #{$duration});
+			transition-delay: calc(var(--i, 0) * #{$stagger} + var(--_lag, 0.096) * #{$duration});
 		}
 
 		// Over the gap under a badge: as the badge arrives.
@@ -152,11 +152,20 @@
 		}
 	}
 
-	// Columns and bars: a longer, even movement with much overlap, so a long bar moves only a little on each frame, also on a large screen.
+	// Columns and bars: a longer, even movement, so a long bar moves only a little on each frame, also on a large screen.
+	// A few columns start one after the other; the more there are, the more they overlap, down to 0.06 from 40 columns.
 	:where([data-chart="column"], [data-chart="bar"]) {
 		--_element: 0.8s;
-		--_ratio: 0.06;
+		--_ratio: clamp(0.06, calc(2.4 / var(--count, 1)), 0.24);
 		--_easing: cubic-bezier(0.37, 0, 0.63, 1);
+	}
+
+	// The number of a column or bar comes when its column is nearly grown; on a line it comes as the line reaches its point.
+	:where([data-animate]:is([data-chart="column"], [data-chart="bar"])) {
+		--_lag: 0.8;
+	}
+	:where([data-animate][data-chart="waterfall"]) {
+		--_lag: 0.5;
 	}
 
 	// A waterfall grows column by column: the next starts when the one before it is at 95%. Under the maximum its columns get shorter too.
@@ -176,7 +185,7 @@
 			transition-delay: calc(var(--start, 0) * #{$build});
 		}
 
-		:where(.tablechart-value, .tablechart-grid[data-gap]) {
+		:where(.tablechart-value, .tablechart-grid[data-gap], .tablechart-quadrant[data-gap]) {
 			transition-delay: calc((var(--start, 0) + 0.5 * var(--span, 0)) * #{$build});
 		}
 
@@ -234,12 +243,13 @@
 		:where([data-chart="scatter"] .tablechart-point) {
 			transform: none;
 		}
-		:where(.tablechart-grid[data-gap]) {
+		:where(.tablechart-grid[data-gap], .tablechart-quadrant[data-gap]) {
 			stroke-opacity: 0;
 		}
 		:where(.tablechart-reference),
 		:where(.tablechart-value),
 		:where(.tablechart-name),
+		:where(.tablechart-legend),
 		:where([data-chart="scatter"] .tablechart-categories span),
 		:where(.tablechart-head),
 		:where(.tablechart-badge),
@@ -284,7 +294,7 @@
 			transition-delay: 0s;
 		}
 		// The gaps under text; one under a badge keeps the badge's moment.
-		:where(.tablechart-value, .tablechart-name, .tablechart-grid[data-gap=""]) {
+		:where(.tablechart-value, .tablechart-name, .tablechart-grid[data-gap=""], .tablechart-quadrant[data-gap=""]) {
 			transition-delay: #{$rise};
 		}
 	}
@@ -327,7 +337,7 @@
 			transition-property: color;
 		}
 		// The other text and annotations too: only paint changes, no fade of opacity.
-		:where(.tablechart-name, .tablechart-badge, .tablechart-centre) {
+		:where(.tablechart-name, .tablechart-legend, .tablechart-badge, .tablechart-centre) {
 			opacity: 1;
 			transition-property: color, border-color, background-color;
 		}
@@ -371,6 +381,11 @@
 
 	[data-animate]:not([data-steps]):not(.is-shown) :is(.tablechart-name, .tablechart-badge, .tablechart-badge .tablechart-caption, .tablechart-centre) {
 		color: transparent;
+		border-color: transparent;
+		background-color: transparent;
+	}
+	// Only the box of a legend: its names have their own colour.
+	[data-animate]:not([data-steps]):not(.is-shown) .tablechart-legend {
 		border-color: transparent;
 		background-color: transparent;
 	}

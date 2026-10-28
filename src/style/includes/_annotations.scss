@@ -24,6 +24,36 @@
 	}
 }
 
+// The lines of a quadrant, dashed and a little stronger than a reference line: a frame for the dots, there from the start.
+.tablechart-quadrant {
+	fill: none;
+	stroke: var(--tablechart-quadrant-color, var(--tablechart-annotation-color, currentColor));
+	stroke-width: var(--tablechart-quadrant-width, 1.5px);
+	stroke-dasharray: var(--tablechart-quadrant-dash, 6 4);
+	opacity: var(--tablechart-quadrant-opacity, 0.7);
+	vector-effect: non-scaling-stroke;
+}
+
+// The name of each quadrant, in its outer corner, quieter than the names of the dots.
+.tablechart-quadrant-name {
+	position: absolute;
+	color: var(--tablechart-quadrant-name-color, color-mix(in oklab, currentColor 60%, transparent));
+	font-size: var(--tablechart-quadrant-name-size, 0.85em);
+	font-weight: var(--tablechart-quadrant-name-weight, 600);
+	white-space: nowrap;
+	pointer-events: none;
+
+	&[data-corner~="right"] {
+		transform: translateX(-100%);
+	}
+	&[data-corner~="bottom"] {
+		transform: translateY(-100%);
+	}
+	&[data-corner~="bottom"][data-corner~="right"] {
+		transform: translate(-100%, -100%);
+	}
+}
+
 // Its label sits on the line, which is cut out under it.
 .tablechart-badge[data-kind="reference"] {
 	border: 0;
@@ -36,7 +66,7 @@
 	fill: var(--tablechart-annotation-color, currentColor);
 }
 
-// A 50% radius box, so the badge grows around translated text; the padding keeps the text clear of the curve.
+// A box with rounded corners, so the badge grows around translated text.
 .tablechart-badge {
 	position: absolute;
 	transform: translate(-50%, -50%);
@@ -44,8 +74,8 @@
 	background: var(--tablechart-badge-surface, none);
 	color: var(--tablechart-annotation-color, currentColor);
 	border: var(--tablechart-badge-border-width, 1px) solid currentColor;
-	border-radius: var(--tablechart-badge-radius, 50%);
-	padding: var(--tablechart-badge-padding, 0.5em 1.25em);
+	border-radius: var(--tablechart-badge-radius, 0.4em);
+	padding: var(--tablechart-badge-padding, 0.4em 0.8em);
 	white-space: nowrap;
 	line-height: 1;
 

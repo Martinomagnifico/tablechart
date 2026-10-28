@@ -41,6 +41,12 @@
 	min-width: 0;
 }
 
+.tablechart-tooltip-note {
+	margin-top: 0.3em;
+	max-width: 16em;
+	font-style: italic;
+}
+
 .tablechart-tooltip-value {
 	flex: none;
 	margin-left: auto;

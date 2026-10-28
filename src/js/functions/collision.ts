@@ -6,7 +6,7 @@ export type Box = [number, number, number, number];
 /** Above this many labels, finding room for each one costs too much; they are all left out. */
 export const MOST_LABELS = 400;
 
-const overlaps = (a: Box, b: Box): boolean =>
+export const overlaps = (a: Box, b: Box): boolean =>
 	a[0] < b[0] + b[2] && b[0] < a[0] + a[2] && a[1] < b[1] + b[3] && b[1] < a[1] + a[3];
 
 const inside = (a: Box, frame: Box): boolean =>

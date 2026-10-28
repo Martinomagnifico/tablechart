@@ -7,6 +7,8 @@
 	.demo & {
 		background: var(--demo-surface);
 	}
+
+	
 }
 
 
@@ -153,5 +155,11 @@
 		}
 
 
+	}
+}
+
+.card-content {
+	p + p {
+		margin-top: 1rem;
 	}
 }

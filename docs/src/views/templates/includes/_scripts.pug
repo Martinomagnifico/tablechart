@@ -10,11 +10,13 @@ block scripts
 		script(src=`${basePath}lib/panelset.js` vite-ignore defer)
 		script(src=`${basePath}lib/tablechart.js` vite-ignore defer)
 		script(src=`${basePath}lib/tablechart-additional-types.js` vite-ignore defer)
+		script(src=`${basePath}lib/tablechart-summary.js` vite-ignore defer)
 		script.
 			document.addEventListener('DOMContentLoaded', function () {
 				Panel.init('.docs-sidebar [data-panel]', { returnFocus: false });
 				PanelSet.init();
 				PanelControl.init();
+				Tablechart.Summary.init();
 				Tablechart.init();
 			});
 
@@ -26,13 +28,17 @@ block scripts
 		//- PanelSet for the sidebar and any tabs on a page, and Tablechart for the charts.
 		script(type="module").
 			import { Panel, PanelSet, PanelControl } from 'panelset';
-			import { addType, init } from '@martinomagnifico/tablechart';
+			import { addType, create, init } from '@martinomagnifico/tablechart';
 			import { scatter } from '@martinomagnifico/tablechart/additional-types';
+			import { Summary } from '@martinomagnifico/tablechart/summary';
 			Panel.init('.docs-sidebar [data-panel]', { returnFocus: false });
 			PanelSet.init();
 			PanelControl.init();
 			addType('scatter', scatter);
+			Summary.init();
 			init({ debug: true });
+			// As in the build, where tablechart.js gives it: for a page that makes a chart later, such as the summary demo.
+			window.Tablechart = { create };
 
 
 	//- Dismiss the drawer, and hold focus inside it while it is open. On desktop the nav is static (data-panel-static)

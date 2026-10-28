@@ -14,6 +14,7 @@ const segments = (rows: Row[]): Segment[] =>
 export const bar: ChartType = {
 	segments,
 	series: true,
+	groups: true,
 	legend: "box",
 	stackable: true,
 	totals: true,
@@ -90,13 +91,15 @@ export const bar: ChartType = {
 			: several
 				? roomFor(grouped.filter((one) => one.value < 0).map((one) => one.label))
 				: 0;
+		// A number goes after its bar, or with `labels: "inside"`, inside it if it fits, as on a column chart.
+		const fits = (label: HTMLElement, length: number) => geo.labels === "inside" && fitsLength(label, length, unit);
 		if (!several && !geo.stacked) {
 			// A narrower span can push another number out of its bar, so this repeats until the room stays the same.
 			for (let tries = 0; tries < 3; tries++) {
 				const span = right - left - room - before;
 				const outside = segs
 					.map((seg, i) => ({ seg, label: values[i] }))
-					.filter(({ seg, label }) => !fitsLength(label, lengthOf(seg.value, span), unit));
+					.filter(({ seg, label }) => !fits(label, lengthOf(seg.value, span)));
 				const after = roomFor(outside.filter(({ seg }) => seg.value >= 0).map(({ label }) => label));
 				const ahead = roomFor(outside.filter(({ seg }) => seg.value < 0).map(({ label }) => label));
 				if (after <= room && ahead <= before) break;
@@ -148,7 +151,6 @@ export const bar: ChartType = {
 		}
 
 		if (several) {
-			geo.plot.dataset.grouped = "";
 			// All numbers shrink together to fit beside their bars, or all are left out.
 			const shown = geo.seriesValues.flat().filter((label) => label.dataset.missing === undefined);
 			const fit = fitTogether(geo.plot, shown, (label) => ({ size: sizeOf(label).height * unit, room: layout.size + layout.gap * 0.5 }), "--_fit");
@@ -193,7 +195,7 @@ export const bar: ChartType = {
 		}
 
 		// A number inside its bar is as far from the end, or start, as from the top and bottom, if its bar is long enough.
-		const inside = segs.map((seg, i) => fitsLength(values[i], Math.abs(x(seg.value) - zero), unit));
+		const inside = segs.map((seg, i) => fits(values[i], Math.abs(x(seg.value) - zero)));
 
 		segs.forEach((seg, i) => {
 			const end = x(seg.value);

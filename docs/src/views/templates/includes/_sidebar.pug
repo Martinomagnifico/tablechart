@@ -12,23 +12,17 @@ aside.docs-sidebar
 	#main-nav(data-panel data-panel-axis="horizontal" data-panel-static="(min-width: 769px)" data-panel-return-focus="true")
 		.panel-wrapper
 			nav(data-panel-group data-panel-close-siblings)
-				each link, i in mainLinks
-					- let active = (link.text === pagetitle);
-					a(class=[(active ? "active" : ""), (i > 0 ? "main-link-sep" : "")].filter(Boolean).join(" ") href=url(link.href)) #{link.text}
-
-
-				each section in sections
+				//- One list, in order: a page of its own, or a group of pages. A line separates each entry from the one before it.
+				each section, i in navItems
 					if !section.title
-						//- A page of its own between the groups, such as Data.
-						.nav-section
-							a(class=(section.text === pagetitle ? "active" : "") href=url(section.href) tabindex=(section.text === pagetitle ? "-1" : false)) #{section.text}
+						- let active = (section.text === pagetitle);
+						a(class=[(active ? "active" : ""), (i > 0 ? "nav-sep" : "")].filter(Boolean).join(" ") href=url(section.href) tabindex=(active ? "-1" : false)) #{section.text}
 						- continue
 					- const sectionId = 'nav-' + section.title.toLowerCase().replace(/\s+/g, '-')
 					- const allLinks = [...(section.links || []), ...(section.examples || []), ...(section.additional || []), ...(section.integrations || [])]
 					- const isActive = allLinks.some(link => link.text === pagetitle)
-					
-					
-					.nav-section
+
+					.nav-section(class=(i > 0 ? "nav-sep" : false))
 						button.nav-section-toggle(class=isActive ? 'active' : '', aria-controls=sectionId, aria-expanded=String(isActive) )
 							span= section.title
 							+chevron(18, 'down')

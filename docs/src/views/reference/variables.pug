@@ -43,6 +43,7 @@ block content
 		+vars([
 			['--tablechart-caption-align', '<code>left</code>', 'The alignment of the title'],
 			['--tablechart-caption-gap', '<code>0.5em</code>', 'The space under the title'],
+			['--tablechart-summary-gap', '<code>0.75em</code>', 'The space above and under a summary that is shown'],
 		])
 
 	+section("Names")
@@ -131,9 +132,16 @@ block content
 			['--tablechart-annotation-color', 'The text colour', 'Annotation lines, arrowheads and badges'],
 			['--tablechart-annotation-width', '<code>1.25px</code>', 'The width of annotation lines'],
 			['--tablechart-badge-border-width', '<code>1px</code>', 'The border of the badge'],
-			['--tablechart-badge-padding', '<code>0.5em 1.25em</code>', 'The padding of the badge'],
-			['--tablechart-badge-radius', '<code>50%</code>', 'The corners of the badge'],
+			['--tablechart-badge-padding', '<code>0.4em 0.8em</code>', 'The padding of the badge'],
+			['--tablechart-badge-radius', '<code>0.4em</code>', 'The corners of the badge. <code>50%</code> makes it an ellipse.'],
 			['--tablechart-badge-surface', '<code>none</code>', 'The background of the badge'],
+			['--tablechart-quadrant-color', 'The annotation colour', 'The lines of a quadrant'],
+			['--tablechart-quadrant-width', '<code>1.5px</code>', 'The width of the lines of a quadrant'],
+			['--tablechart-quadrant-dash', '<code>6 4</code>', 'The dashes of the lines of a quadrant, as <code>stroke-dasharray</code>. <code>none</code> makes them solid.'],
+			['--tablechart-quadrant-opacity', '<code>0.7</code>', 'How strong the lines of a quadrant are'],
+			['--tablechart-quadrant-name-color', 'The text colour, lighter', 'The names in the corners of a quadrant'],
+			['--tablechart-quadrant-name-size', '<code>0.85em</code>', 'The size of those names'],
+			['--tablechart-quadrant-name-weight', '<code>600</code>', 'The weight of those names'],
 		])
 
 	+section("Baseline and scale breaks")
@@ -155,6 +163,10 @@ block content
 			['--tablechart-axis-size', 'The name size', 'The numbers and titles along the axes'],
 			['--tablechart-axis-text-color', 'The text colour', 'The colour of the numbers and titles along the axes'],
 			['--tablechart-axis-width', '<code>1px</code>', 'The width of the lines of the axes'],
+			['--tablechart-tick-color', 'The gridline colour, at <code>--tablechart-tick-opacity</code>', 'The colour of the ticks above the names under a line or area chart'],
+			['--tablechart-tick-length', 'From the baseline to the names', 'The length of those ticks'],
+			['--tablechart-tick-opacity', '<code>0.22</code>', 'How strong those ticks are, if <code>--tablechart-tick-color</code> is not set'],
+			['--tablechart-tick-width', 'As the gridlines', 'The width of those ticks'],
 			['--tablechart-grid-color', 'The text colour', 'The gridlines, with <code>data-chart-grid</code>'],
 			['--tablechart-grid-opacity', '<code>0.09</code>', 'The opacity of the gridlines'],
 			['--tablechart-grid-width', '<code>1px</code>', 'The width of the gridlines'],
@@ -163,7 +175,9 @@ block content
 	+section("Scatter")
 		+vars([
 			['--tablechart-bubble-max', '<code>24px</code>', 'How wide the largest bubble is'],
+			['--tablechart-bubble-min', '<code>6px</code>', 'How wide the smallest bubble is, so a small value stays visible'],
 			['--tablechart-marker-size', '<code>10px</code>', 'How wide a marker is, on a chart without a column for the size'],
+			['--tablechart-marker-gap', '<code>2px</code>', 'The edge in the background colour around a marker, so it stands apart from the lines and markers under it'],
 		])
 
 	+section("Tooltip")
@@ -197,7 +211,7 @@ block content
 			['--tablechart-animation-ease', 'Slow at the start and the end for columns and bars; fast at the start, settling at the end for the other types', 'The easing of bars, donuts, and lines and areas that grow'],
 			['--tablechart-animation-element-duration', '<code>0.8s</code> for columns and bars, <code>0.5s</code> for the other types', 'How long one bar, column, point or donut slice takes'],
 			['--tablechart-animation-max', 'Four times the element time', 'The longest a chart may take to build'],
-			['--tablechart-animation-stagger', '<code>0.06</code> for columns and bars, <code>0.6</code> for a waterfall, <code>0.24</code> for the other types', 'When the next element starts, as a share of the element time'],
+			['--tablechart-animation-stagger', '<code>0.24</code> for up to 10 columns or bars, down to <code>0.06</code> from 40; <code>0.6</code> for a waterfall, <code>0.24</code> for the other types', 'When the next element starts, as a share of the element time'],
 			['--tablechart-annotation-duration', '<code>0.6s</code>', 'How long an annotation line takes'],
 			['--tablechart-queue-duration', '<code>0.4s</code>', 'How long a chart in a sequence takes to fade in'],
 		])

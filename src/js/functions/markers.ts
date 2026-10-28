@@ -39,9 +39,10 @@ export const markerEl = (
 		});
 	}
 	if (shape === "triangle") {
+		// Its box is centred on the point, not its centre of mass, so a name beside it and a line through it are at its middle.
 		const half = size * 1.3;
 		return svgEl("polygon", {
-			points: `${x},${y - half} ${x + half * 0.87},${y + half / 2} ${x - half * 0.87},${y + half / 2}`,
+			points: `${x},${y - half * 0.75} ${x + half * 0.87},${y + half * 0.75} ${x - half * 0.87},${y + half * 0.75}`,
 			...attrs,
 		});
 	}

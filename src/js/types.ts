@@ -21,6 +21,13 @@ export interface Cell {
 
 export interface Row extends Cell {
 	label: string;
+	/** `data-short` on the row's header: the name under the chart, where room is short. The table and the summary have `label`. */
+	short: string | null;
+	/** `data-value="show"` on the row: its value is always shown on a line. */
+	pinned: boolean;
+	/** The text of its cell in a column with `data-note`, such as "Share issue", and its translation key. */
+	note: string | null;
+	noteKey: string | null;
 	key: string | null;
 	cells: Cell[];
 	/** Copied to everything drawn for the row, so one class styles all of it. */
@@ -50,6 +57,13 @@ export interface Segment extends Row {
 	kind: "bar" | "up" | "down" | "total";
 }
 
+/** Which values a line shows, from `data-chart-values`: all, none, a set of rows, or all if they fit and else the set. */
+export interface ValuePick {
+	mode: "auto" | "all" | "set";
+	/** `first`, `last`, `highest`, `lowest`, `outliers`. Rows with `data-value="show"` are always in the set. */
+	keys: string[];
+}
+
 /** Scales only, no pixel positions, so an annotation follows the data. */
 export interface Geometry {
 	rows: Row[];
@@ -62,6 +76,8 @@ export interface Geometry {
 	frame?: [number, number, number, number];
 	/** A chart that knows better which row is pointed at sets this, in screen pixels from the plot's corner. */
 	rowAt?: (x: number, y: number) => number | null;
+	/** Where the tooltip of a row points, in viewBox units, for a row whose mark may not be drawn, such as a point of a long line. */
+	pointOf?: (index: number) => [number, number] | null;
 	/** A CSS length set on the figure, such as `--tablechart-marker-size`, in viewBox units. */
 	length: (name: string, fallback: string) => number | null;
 	barWidth: number;
@@ -90,6 +106,8 @@ export interface Geometry {
 	insideAlign: "start" | "center" | "end" | null;
 	stacked: boolean;
 	shape: Shape;
+	/** Which values a line or an area shows. */
+	pick: ValuePick;
 	/** Empty when the chart is not stacked or its kind shows no totals. */
 	totals: HTMLElement[];
 	svg: SVGSVGElement;
@@ -110,6 +128,8 @@ export interface Geometry {
 	checks: Check[];
 	/** The labels of annotations placed so far, as left, top, width and height, so the next one finds room. */
 	taken: [number, number, number, number][];
+	/** Holes in the lines and areas, such as under an open marker: the core leaves them out with a clip, from the start. */
+	lineHoles: SVGElement[];
 }
 
 export interface Check {
@@ -139,6 +159,8 @@ export interface ChartType {
 	axes?: boolean;
 	/** A series with `data-chart="line"` on its header is a line over the marks, on the same scale. */
 	lines?: boolean;
+	/** Several series side by side, as groups of bars: their numbers are smaller, so the plot is marked `data-grouped` before anything is measured. */
+	groups?: boolean;
 	/** False: no numbers on the chart. They stay out of the layout, which costs a lot with many rows. */
 	numbers?: false;
 	/** Text of its own, made with the rest of the text so a translation script finds it, such as a legend. */
@@ -161,6 +183,8 @@ export interface ChartType {
 	draw: (geo: Geometry) => void;
 	/** The lines of the tooltip of a row. Default: each value with the name of its series, and the total of a stack. */
 	tooltip?: (state: ChartState, index: number, config: Config) => TooltipLine[];
+	/** Annotations that come with this type, such as `quadrant` with `scatter`; `addType` adds them. */
+	annotations?: Record<string, AnnotationType>;
 }
 
 /** One line of a tooltip, under the name of the row. */
@@ -212,6 +236,8 @@ export interface ChartState {
 	rowAt: ((x: number, y: number) => number | null) | null;
 	/** As percentages: left, top, width and height. */
 	rowBox: ((index: number) => [number, number, number, number]) | null;
+	/** Where the tooltip of a row points, in viewBox units; set by a chart such as a line. */
+	pointOf: ((index: number) => [number, number] | null) | null;
 	annotations: {
 		spec: HTMLElement;
 		type: AnnotationType;

@@ -1,7 +1,7 @@
 {
   "name": "@martinomagnifico/tablechart",
-  "version": "1.1.4",
-  "description": "Simple charts from an HTML or Markdown table: column, bar, line, area, waterfall and donut, with annotations. A chart builds when it scrolls into view.",
+  "version": "1.2.0",
+  "description": "Simple charts from an HTML or Markdown table: column, bar, line, area, waterfall, donut and scatter plot. Accessibility first.",
   "type": "module",
   "sideEffects": [
     "**/*.css",
@@ -23,6 +23,10 @@
     "./additional-types": {
       "types": "./dist/tablechart-additional-types.d.mts",
       "import": "./dist/tablechart-additional-types.mjs"
+    },
+    "./summary": {
+      "types": "./dist/tablechart-summary.d.mts",
+      "import": "./dist/tablechart-summary.mjs"
     },
     "./style.css": "./dist/tablechart.css"
   },
@@ -47,6 +51,8 @@
     "size": "node scripts/size.mjs",
     "test": "npm run build && node test/speed.test.mjs",
     "test:layout": "node test/layout.test.mjs",
+    "lab": "node lab/pdf/lab.mjs",
+    "lab:pdf": "node lab/pdf/lab.mjs --pdf",
     "prepack": "npm run build",
     "clean": "rm -rf dist"
   },
@@ -62,6 +68,7 @@
   "license": "MIT",
   "devDependencies": {
     "@vituum/vite-plugin-pug": "^2.0.1",
+    "liquidjs": "^10.30.0",
     "rolldown-plugin-dts": "^0.28.8",
     "sass": "^1.97.3",
     "terser": "^5.46.0",

@@ -13,6 +13,7 @@ export const column: ChartType = {
 	segments,
 	series: true,
 	lines: true,
+	groups: true,
 	legend: "box",
 	stackable: true,
 	totals: true,
@@ -64,7 +65,6 @@ export const column: ChartType = {
 		if (geo.own.length > 1) {
 			const band = cx(1) - cx(0) || cx(0) * 2;
 			const layout = groupLayout(band, geo.own.length, geo.barMax);
-			geo.plot.dataset.grouped = "";
 			// All numbers shrink together to fit above their bars, or all are left out.
 			const shown = geo.own.flatMap((s) => geo.seriesValues[s]).filter((label) => label.dataset.missing === undefined);
 			const fit = fitTogether(geo.plot, shown, (label) => ({ size: sizeOf(label).width * unit, room: layout.size + layout.gap * 0.5 }), "--_fit");

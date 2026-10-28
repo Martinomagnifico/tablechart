@@ -2,10 +2,11 @@ import { sizeOf } from "../functions/measure";
 import { AREA_CLASS, AREA_FILL_CLASS, HOLE_CLASS, POINT_CLASS, RULE_CLASS, SERIES_CLASS, VIEWBOX_WIDTH } from "../config";
 import { stackOf } from "../functions/groups";
 import { markerEl, markerOf } from "../functions/markers";
-import { spread } from "../functions/labels";
-import { avoidCollisions, type Box } from "../functions/collision";
+import { boxOf, spread, stepOf } from "../functions/labels";
+import { avoidCollisions, overlaps, type Box } from "../functions/collision";
 import { curveTo, fixed, tangentsWithGaps } from "../functions/smooth";
 import { cutOut, placeAt, svgEl } from "../functions/svg";
+import { trendOf } from "../functions/trend";
 import type { Cell, ChartType, Geometry, Row, Segment } from "../types";
 
 type Point = [number, number];
@@ -170,7 +171,8 @@ const trend = (area: boolean): ChartType => ({
 			}
 		};
 
-		const drawPoints = () => {
+		// `at` says which rows of a series get a point.
+		const drawPoints = (at: (s: number, i: number) => boolean) => {
 			// Over columns, the first line has the first marker, as a line chart's first line does.
 			const ownSeries = own.map((s) => series[s]);
 			const markers = series.map((_one, s) =>
@@ -180,7 +182,7 @@ const trend = (area: boolean): ChartType => ({
 				const [px, py] = pointAt(s, i);
 				return markerEl(markers[s].shape, px, py, 4 * unit, { ...attrs, style: `${attrs.style ?? ""}${riseFrom(py)}${pointTiming(i)}` });
 			};
-			const shown = (s: number) => rows.map((_row, i) => i).filter((i) => !missing(s, i));
+			const shown = (s: number) => rows.map((_row, i) => i).filter((i) => !missing(s, i) && at(s, i));
 
 			// An open point is a hole in the lines and areas under it.
 			const holes = own.flatMap((s) =>
@@ -188,7 +190,9 @@ const trend = (area: boolean): ChartType => ({
 					? shown(s).map((i) => point(s, i, { class: HOLE_CLASS, "data-row": i + 1, ...(several && { "data-series": s + 1 }) }))
 					: []
 			);
-			cutOut(svg, holes, VIEWBOX_WIDTH, height);
+			// Left out of the lines with a clip, by the core, from the start; growing lines keep the mask, which follows them.
+			if (svg.closest("[data-animate]")?.getAttribute("data-animate") === "grow") cutOut(svg, holes, VIEWBOX_WIDTH, height);
+			else geo.lineHoles.push(...holes);
 
 			own.forEach((s) => {
 				for (const i of shown(s)) {
@@ -206,11 +210,9 @@ const trend = (area: boolean): ChartType => ({
 			});
 		};
 
-		// Areas first, then every line, then the points, so a point is always on top of a line.
+		// Areas first, then every line, then the points, so a point is always on top of a line. The points come once the values are known.
 		if (area) own.forEach((s) => drawArea(s));
 		own.forEach((s) => drawLine(s));
-		// A step chart has no points: its corners show where the values change.
-		if (!step) drawPoints();
 
 		// Over columns, where the column chart placed each number, with a little room around it.
 		const columnNumbers = mixed
@@ -220,17 +222,12 @@ const trend = (area: boolean): ChartType => ({
 						: seriesValues[s].flatMap((label) => {
 								const place = label.dataset.place;
 								if (!place || place === "none" || label.hasAttribute("data-left-out")) return [];
-								const w = sizeOf(label).width * unit;
-								const lx = (Number.parseFloat(label.style.left) / 100) * VIEWBOX_WIDTH;
-								const ly = (Number.parseFloat(label.style.top) / 100) * height;
-								const top = place === "below" ? ly : place === "inside" ? ly - labelHeight / 2 : ly - labelHeight;
-								const box: Box = [lx - w / 2 - 2 * unit, top - 3 * unit, w + 4 * unit, labelHeight + 6 * unit];
-								return [{ label, box }];
+								const [x, y, w, h] = boxOf(label, unit, VIEWBOX_WIDTH, height);
+								return [{ label, box: [x - 2 * unit, y - 3 * unit, w + 4 * unit, h + 6 * unit] as Box }];
 							})
 				)
 			: [];
 		// A number of a column under a point of the line is left out; its row's tooltip shows it.
-		const overlaps = (a: Box, b: Box) => a[0] < b[0] + b[2] && b[0] < a[0] + a[2] && a[1] < b[1] + b[3] && b[1] < a[1] + a[3];
 		const pointBoxes = step
 			? []
 			: own.flatMap((s) =>
@@ -253,6 +250,30 @@ const trend = (area: boolean): ChartType => ({
 			return end;
 		};
 
+		const flip = (place: "above" | "below") => (place === "above" ? "below" : "above");
+		// How much of the line next to a point runs through its number, above or below it: at a dip, the line runs through
+		// the number above, so it goes below.
+		const crosses = (s: number, i: number, place: "above" | "below"): number => {
+			const [px, py] = pointAt(s, i);
+			const w = sizeOf(seriesValues[s][i]).width * unit;
+			const box: Box = [px - w / 2, place === "above" ? py - 7 * unit - labelHeight : py + 7 * unit, w, labelHeight];
+			if (box[1] + labelHeight > height) return Number.POSITIVE_INFINITY;
+			return [i - 1, i + 1]
+				.filter((j) => j >= 0 && j <= last && !missing(s, j))
+				.flatMap((j) => piecesOf(s, i, j, 0))
+				.filter((piece) => overlaps(piece, box)).length;
+		};
+		// The line between two of its points, as small boxes along it, close enough together that a value cannot fit between them.
+		const piecesOf = (s: number, i: number, j: number, clear: number): Box[] => {
+			const [x1, y1] = pointAt(s, i);
+			const [x2, y2] = pointAt(s, j);
+			const steps = Math.max(1, Math.ceil(Math.hypot(x2 - x1, y2 - y1) / (3 * unit)));
+			return Array.from({ length: steps + 1 }, (_n, k): Box => {
+				const t = k / steps;
+				return [x1 + (x2 - x1) * t - clear, y1 + (y2 - y1) * t - clear, 2 * clear, 2 * clear];
+			});
+		};
+
 		const placeOf = (s: number, i: number): Place => {
 			const cell = cellAt(s, i);
 			if (!cell || cell.missing) return "none";
@@ -262,7 +283,7 @@ const trend = (area: boolean): ChartType => ({
 			if (stacked) return "middle";
 			// Below zero, a number goes under its point, away from the zero line.
 			const alone = cell.value < 0 ? "below" : "above";
-			if (!several || focused || series.length > 2) return alone;
+			if (!several || focused || series.length > 2) return area || step || crosses(s, i, alone) <= crosses(s, i, flip(alone)) ? alone : flip(alone);
 			const other = cellAt(1 - s, i);
 			if (!other || other.missing) return alone;
 			// The higher of two goes above its point; on a tie, the first does.
@@ -338,10 +359,149 @@ const trend = (area: boolean): ChartType => ({
 			});
 		});
 
-		// Each name just past the last point of its line, pushed apart where two lines end close together.
-		const ends = (mixed ? [] : names).map((name, s) => {
+		// Which values are shown: all, or a set, such as the first, last, highest and lowest, and the rows with `data-value="show"`.
+		// With `auto`, all if they fit, and else the set. A value that is not shown is left out, so its row's tooltip has it.
+		// In order of priority: where two would touch, the later one is dropped, with its point.
+		const keyRows = (s: number): Set<number> => {
+			const order = rows.flatMap((row, i) => (row.pinned && !missing(s, i) ? [i] : []));
+			const known = rows.map((_row, i) => i).filter((i) => !missing(s, i));
+			const value = (i: number) => cellAt(s, i)?.value ?? 0;
+			const { keys } = geo.pick;
+			if (known.length) {
+				if (keys.includes("last")) order.push(known[known.length - 1]);
+				if (keys.includes("first")) order.push(known[0]);
+				if (keys.includes("highest")) order.push(known.reduce((a, b) => (value(b) > value(a) ? b : a)));
+				if (keys.includes("lowest")) order.push(known.reduce((a, b) => (value(b) < value(a) ? b : a)));
+				// The values far from the trend, as Summary finds them, so the chart shows the months a summary names.
+				if (keys.includes("outliers")) order.push(...(trendOf(known.map((i) => ({ x: i, y: value(i) })))?.outside.map((p) => p.x) ?? []));
+			}
+			const kept: number[] = [];
+			for (const i of order) {
+				const label = seriesValues[s][i];
+				if (kept.includes(i) || label.dataset.place === "none") continue;
+				if (kept.every((k) => stepOf([seriesValues[s][k], label], unit, VIEWBOX_WIDTH, height) === 1)) kept.push(i);
+			}
+			return new Set(kept);
+		};
+		// They fit if no two touch. A value the chart already left out, to keep it clear of another line or a column, does not count.
+		const fitsAll = (s: number) => {
+			const placed = seriesValues[s].filter((label) => label.dataset.place !== "none" && !label.hasAttribute("data-left-out"));
+			return stepOf(placed, unit, VIEWBOX_WIDTH, height) === 1;
+		};
+		// The last row of a line with a value.
+		const lastOf = (s: number) => {
 			let i = last;
 			while (i > 0 && missing(s, i)) i--;
+			return i;
+		};
+		// Per series, the rows whose value is shown; null for all of them.
+		const showing = new Map<number, Set<number> | null>();
+		for (const s of own) {
+			const all = geo.pick.mode === "all" || (geo.pick.mode === "auto" && fitsAll(s));
+			const set = all ? null : keyRows(s);
+			showing.set(s, set);
+			if (set) seriesValues[s].forEach((label, i) => {
+				if (label.dataset.place !== "none" && !set.has(i)) label.setAttribute("data-left-out", "");
+			});
+		}
+
+		// The values of a set each find a place: above, below, before or after their point, clear of every line, of the names at
+		// the ends of the lines and of each other, in the order of the set. A value at a dip tries below first, where its line
+		// does not run. A value with no room is left out; its row's tooltip still has it.
+		if (!stacked && !step && own.some((s) => showing.get(s))) {
+			const right = cx(last) + cx(0);
+			const clear = 2 * unit;
+			const along: Box[] = own.flatMap((s) =>
+				rows.flatMap((_row, i) => (i === last || missing(s, i) || missing(s, i + 1) ? [] : piecesOf(s, i, i + 1, clear)))
+			);
+			// The names at the ends of the lines, where they will be.
+			const nameHeight = (names[0] ? sizeOf(names[0]).height : 0) * unit;
+			const ends = own.flatMap((s): Box[] => {
+				const name = names[s];
+				if (!name) return [];
+				let i = last;
+				while (i > 0 && missing(s, i)) i--;
+				const [px, py] = pointAt(s, i);
+				return [[px + 10 * unit, py - nameHeight / 2, sizeOf(name).width * unit, nameHeight]];
+			});
+			// Above or below its point, or a line of text further, if the line or another value is in the way; or beside it.
+			type Spot = "outside" | "below" | "outside far" | "below far" | "after" | "before";
+			const items = own.flatMap((s) => [...(showing.get(s) ?? [])].map((i) => ({ s, i })));
+			const spotsOf = ({ s, i }: { s: number; i: number }): Spot[] => {
+				const value = cellAt(s, i)?.value ?? 0;
+				const before = i > 0 && !missing(s, i - 1) ? cellAt(s, i - 1)?.value : undefined;
+				const after = i < last && !missing(s, i + 1) ? cellAt(s, i + 1)?.value : undefined;
+				const dip = (before ?? after) !== undefined && (before === undefined || value <= before) && (after === undefined || value <= after);
+				return dip
+					? ["below", "outside", "below far", "outside far", "after", "before"]
+					: ["outside", "below", "outside far", "below far", "after", "before"];
+			};
+			const boxOf = ({ s, i }: { s: number; i: number }, spot: Spot): Box => {
+				const w = sizeOf(seriesValues[s][i]).width * unit;
+				const h = labelHeight;
+				const [px, py] = pointAt(s, i);
+				// Above and below, moved in at the edges, as a value at the end of a line is.
+				const middle = Math.min(Math.max(px - w / 2, 0), right - w);
+				if (spot === "outside") return [middle, py - 7 * unit - h, w, h];
+				if (spot === "below") return [middle, py + 7 * unit, w, h];
+				if (spot === "outside far") return [middle, py - 7 * unit - 2 * h, w, h];
+				if (spot === "below far") return [middle, py + 7 * unit + h, w, h];
+				if (spot === "after") return [px + 7 * unit, py - h / 2, w, h];
+				return [px - 7 * unit - w, py - h / 2, w, h];
+			};
+			const spots = items.map(spotsOf);
+			// A place clear of everything; else one that only crosses a line, which can still be read, but never another value or a name.
+			const inside = (a: Box) => a[0] >= 0 && a[1] >= 0 && a[0] + a[2] <= right && a[1] + a[3] <= height - 2 * unit;
+			// A value never covers a point: the points of the values shown, with a little room around them.
+			const points: Box[] = items.map(({ s, i }) => {
+				const [px, py] = pointAt(s, i);
+				return [px - 6 * unit, py - 6 * unit, 12 * unit, 12 * unit];
+			});
+			const placed: Box[] = [];
+			// A value that crosses a line gets a hole in the line under it, so it can be read.
+			const crossing = new Set<number>();
+			const chosen = items.map((item, k) => {
+				const boxes = spots[k].map((spot) => boxOf(item, spot));
+				const free = (box: Box) => inside(box) && ![...placed, ...ends, ...points].some((other) => overlaps(box, other));
+				let pick = boxes.findIndex((box) => free(box) && !along.some((piece) => overlaps(box, piece)));
+				if (pick < 0) {
+					pick = boxes.findIndex(free);
+					if (pick >= 0) crossing.add(k);
+				}
+				if (pick >= 0) placed.push(boxes[pick]);
+				return pick < 0 ? null : pick;
+			});
+			items.forEach((item, k) => {
+				const label = seriesValues[item.s][item.i];
+				label.toggleAttribute("data-cut", crossing.has(k));
+				const pick = chosen[k];
+				if (pick === null) return label.setAttribute("data-left-out", "");
+				const spot = spots[k][pick];
+				const [bx, by, bw, bh] = boxOf(item, spot);
+				const place = spot.split(" ")[0];
+				label.dataset.place = place;
+				// Where each place is anchored: the foot of a value above, the top of one below, the side of one beside.
+				const x = place === "after" ? bx : place === "before" ? bx + bw : bx + bw / 2;
+				const y = place === "outside" ? by + bh : place === "below" ? by : by + bh / 2;
+				placeAt(label, x, y, VIEWBOX_WIDTH, height);
+			});
+		}
+		// A step chart has no points: its corners show where the values change. With all values, a line whose points would cover
+		// each other has none either. With a set, each value shown has its point.
+		if (!step) drawPoints((s, i) => {
+			const set = showing.get(s);
+			return set ? set.has(i) : band >= 10 * unit;
+		});
+
+		// The tooltip of a row points at its highest point, also where no point is drawn.
+		geo.pointOf = (i) => {
+			const tops = own.filter((s) => !missing(s, i)).map((s) => pointAt(s, i));
+			return tops.length ? tops.reduce((a, b) => (b[1] < a[1] ? b : a)) : null;
+		};
+
+		// Each name just past the last point of its line, pushed apart where two lines end close together.
+		const ends = (mixed ? [] : names).map((name, s) => {
+			const i = lastOf(s);
 			const [px, py] = pointAt(s, i);
 			const end = step ? px + band / 2 : px;
 			return { name, x: end + 10 * unit, y: stacked ? (py + y(bottomValue(s, i))) / 2 : py };

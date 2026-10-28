@@ -19,13 +19,23 @@
 		page-break-before: avoid;
 	}
 
-	// `data-chart-table`: the table under the chart in print, or only when the chart leaves numbers out.
+	// `data-chart-table`: the table under the chart in print, or only when the chart leaves numbers out and the table is not too long.
 	[data-table="print"] > :where(table),
 	[data-table="always"] > :where(table),
-	[data-table="auto"][data-left-out] > :where(table) {
+	[data-table="auto"][data-left-out]:not([data-long]) > :where(table) {
 		display: table;
 		position: static;
 		clip-path: none;
+	}
+
+	// `data-chart-summary`: the summary in print, or only when the chart leaves numbers out and the table is not printed.
+	// On paper there is nothing only for screen readers: text that is hidden from sight does not reach a PDF.
+	[data-summary="print"] > :where(.chart-summary),
+	[data-summary="always"] > :where(.chart-summary),
+	[data-summary="auto"][data-left-out]:not([data-table="print"], [data-table="always"], [data-table="auto"]:not([data-long])) > :where(.chart-summary) {
+		position: static;
+		clip-path: none;
+		margin-top: var(--tablechart-summary-gap, 1.5em);
 	}
 }
 

@@ -40,7 +40,7 @@ block content
 					td The time that one element (a bar, column or point) transitions: 0.8s for columns and bars by default, 0.5s for the other types.
 				tr
 					td: code --tablechart-animation-stagger
-					td When the next element starts. It is a ratio of the #[code --tablechart-animation-element-duration]: 0.06 of it for columns and bars by default, 0.6 for a waterfall, and 0.24 for the other types. At 1, each element starts when the one before it is finished. At 0, all elements start together.
+					td When the next element starts. It is a ratio of the #[code --tablechart-animation-element-duration]: For columns and bars by default 0.24 of it up to 10 columns, less with more columns, down to 0.06 from 40 columns. 0.6 for a waterfall, and 0.24 for the other types. At 1, each element starts when the one before it is finished. At 0, all elements start together.
 				tr
 					td: code --tablechart-animation-max
 					td The longest a whole chart may take to build: four times the element time by default. It is a ceiling, never a target: a small chart is not slowed down. Above it, the starts move closer together; each element keeps its own time. A waterfall shortens its columns instead, so they keep their order. Numbers fade in for at most a quarter of the maximum, and at most 0.6s.

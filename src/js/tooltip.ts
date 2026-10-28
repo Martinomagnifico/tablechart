@@ -1,6 +1,7 @@
-import { PLACED_CLASS, SHOWN_CLASS } from "./config";
+import { PLACED_CLASS, SHOWN_CLASS, VIEWBOX_WIDTH } from "./config";
 import type { Config } from "./config";
 import { place } from "./functions/place";
+import { noteCell } from "./functions/read-table";
 import type { ChartState, TooltipLine } from "./types";
 
 const TIP_CLASS = "tablechart-tooltip";
@@ -144,8 +145,17 @@ const rowLines = (state: ChartState, index: number, config: Config): TooltipLine
 };
 
 // Above the marks of the row; a donut's slice is a whole ring, so there the number beside it.
+// On a line, its point, also where no point is drawn.
 const anchorOf = (state: ChartState, index: number): DOMRect => {
 	if (state.type.centre && state.values[index]) return state.values[index].getBoundingClientRect();
+	const point = state.pointOf?.(index);
+	if (point) {
+		const svg = state.svg.getBoundingClientRect();
+		const scale = svg.width / VIEWBOX_WIDTH;
+		// A point is drawn with a radius of 4 units.
+		const r = 4 * scale * (VIEWBOX_WIDTH / state.plot.clientWidth);
+		return new DOMRect(svg.left + point[0] * scale - r, svg.top + point[1] * scale - r, 2 * r, 2 * r);
+	}
 	const marks = state.svg.querySelectorAll(`[data-row="${index + 1}"]:not(.tablechart-connector, .tablechart-leader)`);
 	let box: DOMRect | null = null;
 	for (const mark of marks) {
@@ -209,14 +219,20 @@ const show = (state: ChartState, index: number, config: Config): void => {
 		}
 		return node;
 	};
-	const name = state.categories[index]?.textContent ?? state.rows[index].label;
+	// The full name in the table, also after a translation; the name under the chart may be a short one.
+	const head = state.figure.querySelectorAll("tbody tr")[index]?.querySelector("th");
+	const name = head?.textContent?.trim() || state.categories[index]?.textContent || state.rows[index].label;
 	// With one value and no series name, the name of the row and its value share a line.
 	const single = lines.length === 1 && !lines[0].name;
 	// Names without values, such as on a scatter chart, are a list of their own, without a title.
 	const names = lines.every((one) => one.name && !one.value);
+	// The note of the row, from the table, under its values.
+	const noteText = noteCell(state.figure, index)?.textContent?.trim();
+	const noted = noteText ? [Object.assign(document.createElement("div"), { className: `${TIP_CLASS}-note`, textContent: noteText })] : [];
 	content.replaceChildren(
 		...(names ? [] : [line(name, single ? lines[0].value : "", undefined, true)]),
-		...(single ? [] : lines.map(({ name, value, colour, sample }) => line(name, value, colour, false, sample)))
+		...(single ? [] : lines.map(({ name, value, colour, sample }) => line(name, value, colour, false, sample))),
+		...noted
 	);
 
 	const style = getComputedStyle(state.figure);

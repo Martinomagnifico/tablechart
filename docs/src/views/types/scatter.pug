@@ -36,7 +36,7 @@ block content
 		p If a row has no number in one of the two columns, it has no marker. The row stays in the table.
 
 	+section("Bubbles")
-		p If there is a third value column, it sets the size of each marker: the area of a marker matches its value. The largest marker is #[code --tablechart-bubble-max] wide, #[code 24px] by default. The header of the column is shown in the legend, with a small and a large circle.
+		p If there is a third value column, it sets the size of each marker: the area of a marker matches its value. The largest marker is #[code --tablechart-bubble-max] wide, #[code 24px] by default. A small value never gets a marker smaller than #[code --tablechart-bubble-min], #[code 6px] by default, so it stays visible. The header of the column is shown in the legend, with a small and a large circle.
 
 		+chart(null, '5')
 			figure(data-chart="scatter")

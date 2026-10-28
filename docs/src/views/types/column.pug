@@ -51,7 +51,7 @@ block content
 							// …one row per column
 
 	+section("Numbers inside the columns")
-		p Add #[code data-chart-labels="inside"] to show each number inside its column, at the top. To move it, see #[a(href=url('/styling/text.html')) Text]. If a column is too short for its number, the number is shown above it.
+		p Add #[code data-chart-labels="inside"] to show each number inside its column, at the top. To align it at the bottom of the column or in the middle instead, see #[a(href=url('/styling/text.html')) Text]. If a column is too short for its number, the number is shown above it.
 
 		.card
 			.demo
@@ -229,6 +229,31 @@ block content
 		p Use a line for values that have an order, such as months or years. The legend shows a box for the columns and a line for the line.
 		p If a number of the line is on a column, the column is cut away under the number, so the number can be read. The numbers of the columns are inside the columns if they fit. If a point of the line covers a number, or a number has no room, the number is left out. If you point at the row, or tap it, a tooltip shows the numbers of that row.
 		p A chart with a line cannot be stacked.
+
+	+section("Many columns")
+		-
+			const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+			// Two years of visitors to the farm shop.
+			const visits = Array.from({ length: 24 }, (_, i) => [
+				`${months[i % 12]} ${2024 + Math.floor(i / 12)}`,
+				`${months[i % 12].slice(0, 3)} ’${24 + Math.floor(i / 12)}`,
+				String(Math.round(60 + i * 1.5 + 25 * Math.cos(((i % 12) - 6) / 6 * Math.PI))),
+			]);
+		p With many columns, only every second, third or more number is shown, so they do not touch, and the names under the chart get smaller or fewer. Give a row a short name for under the chart with #[code data-short]; the table keeps the full name for a screen reader. See #[a(href=url('/types/line.html#many-rows')) Many rows].
+
+		.card
+			.demo
+				figure(data-chart="column")
+					figcaption: b Visitors to the farm shop
+					table
+						tbody
+							each row in visits
+								tr
+									th(data-short=row[1])= row[0]
+									td= row[2]
+
+			+codeblock('HTML').
+				<tr><th data-short="#{visits[0][1]}">#{visits[0][0]}</th><td>#{visits[0][2]}</td></tr>
 
 	+section("A bar chart on narrow screens")
 		p A column chart with many rows can be shown as a bar chart when it is narrow. Set #[code --tablechart-type: bar] on the figure, in a container query or a media query. The chart is built again as a bar chart when the query applies, and as a column chart when it does not.

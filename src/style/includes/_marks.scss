@@ -88,10 +88,13 @@
 	}
 }
 
-// On a scatter chart, a line in the background colour sets apart markers that overlap.
+// On a scatter chart, an edge in the background colour sets apart markers that overlap, and a marker on a gridline or a
+// line of a quadrant. It is behind the fill, so the marker keeps its size; `--tablechart-marker-gap` is its width.
 :where([data-chart="scatter"]) .tablechart-point {
 	stroke: var(--tablechart-surface, Canvas);
-	stroke-width: 1px;
+	stroke-width: calc(2 * var(--tablechart-marker-gap, 2px));
+	stroke-linejoin: round;
+	paint-order: stroke;
 	vector-effect: non-scaling-stroke;
 }
 
@@ -111,7 +114,7 @@
 }
 
 // The piece of gridline over a gap under text: only there while the chart builds, until its text arrives.
-:where(.tablechart-grid[data-gap]) {
+:where(.tablechart-grid[data-gap], .tablechart-quadrant[data-gap]) {
 	stroke-opacity: 0;
 }
 

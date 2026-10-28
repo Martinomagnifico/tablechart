@@ -21,8 +21,9 @@ const ANNOTATIONS = ["axis-break", "trend", "bracket"];
  * `data-fragment` on the figure makes every row a step; on a row, a column header, a cell or an annotation, that one.
  * Rows with the same `data-fragment-index` share a step. A row without either is there from the start.
  * Cells without `data-fragment-index` go column by column, so one line is shown point by point before the next.
+ * `together`, for a scatter chart: `data-fragment` on the figure brings all rows on one step, after the axes and a quadrant.
  */
-export const planSteps = (figure: HTMLElement): StepPlan | null => {
+export const planSteps = (figure: HTMLElement, together = false): StepPlan | null => {
 	const everyRow = figure.hasAttribute("data-fragment");
 	const trs = Array.from(figure.querySelectorAll("tbody tr"));
 	const heads = Array.from(figure.querySelector("thead tr:last-child")?.children ?? []).slice(1);
@@ -32,6 +33,7 @@ export const planSteps = (figure: HTMLElement): StepPlan | null => {
 	const asks = (element: Element) => element.hasAttribute("data-fragment");
 	const tds = trs.map((tr) => Array.from(tr.querySelectorAll(":scope > td")));
 	if (!everyRow && !trs.some(asks) && !heads.some(asks) && !tds.flat().some(asks) && !specs.some(asks)) return null;
+	if (together && !everyRow) return null;
 
 	const indexes: (string | null)[] = [];
 	const byIndex = new Map<string, number>();
@@ -52,8 +54,11 @@ export const planSteps = (figure: HTMLElement): StepPlan | null => {
 	// A donut's total is the number in the middle, not a slice: it has no step of its own and comes with the last slice.
 	const donut = figure.getAttribute("data-chart") === "donut";
 	const middle = (tr: Element) => donut && tr.getAttribute("data-kind") === "total";
+	// A scatter chart: one step for all its rows.
+	const one = together ? stepFor(figure.getAttribute("data-fragment-index")) : -1;
 	const rows = trs.map((tr) => {
 		if (middle(tr)) return { step: null, slot: 0 };
+		if (together) return { step: one, slot: filled[one]++ };
 		if (!everyRow && !asks(tr)) return { step: null, slot: unstepped++ };
 		const step = stepFor(tr.getAttribute("data-fragment-index"));
 		return { step, slot: filled[step]++ };
@@ -133,8 +138,10 @@ export const applySteps = (state: ChartState): void => {
 		return steps.some((step) => step === null) ? null : Math.min(...(steps as number[]));
 	};
 	const totals = new Set<Element>(state.totals);
+	// A scatter chart keeps the timing its drawing gave each dot: from left to right, in a few stagger steps.
+	const ownTiming = Boolean(state.type.axes);
 	const set = (element: HTMLElement | SVGElement, step: number | null, name: string, place: number) => {
-		element.style.setProperty(name, String(place));
+		if (!(ownTiming && name === "--i")) element.style.setProperty(name, String(place));
 		element.style.removeProperty("--d");
 		if (step === null) element.style.removeProperty("--step");
 		else element.style.setProperty("--step", String(step));
@@ -200,7 +207,7 @@ export const applySteps = (state: ChartState): void => {
 	// The stagger shrinks for the most elements that arrive on one step.
 	const slots = [...plan.rows, ...plan.cells.flat()].map((one) => one.slot + 1);
 	const whole = plan.series.some((one) => one.step !== null) ? plan.rows.length : 1;
-	state.plot.style.setProperty("--count", String(Math.max(whole, ...slots)));
+	if (!ownTiming) state.plot.style.setProperty("--count", String(Math.max(whole, ...slots)));
 	// The closing total of a waterfall grows from the last connector down to the baseline, if that connector is there.
 	// If the column before it comes on a later step, the total grows from the baseline instead, like the first one.
 	const bars = state.figure.querySelectorAll<SVGElement>(`.${BAR_CLASS}`);
