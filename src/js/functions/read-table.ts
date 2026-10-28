@@ -17,15 +17,36 @@ const readCell = (td: Element | null): Cell => {
 	};
 };
 
-/** Every cell after the label is a value, one per series; the row's own value is its first. */
-export const readTable = (figure: HTMLElement, langattribute: string | false = "data-i18n"): Row[] =>
-	Array.from(figure.querySelectorAll("tbody tr")).map((tr, i) => {
+/** The columns, counted among the cells of a row, whose header has `data-note`: their cells are notes, not values. */
+export const noteColumns = (figure: HTMLElement): number[] =>
+	Array.from(figure.querySelector("thead tr:last-child")?.children ?? [])
+		.slice(1)
+		.flatMap((head, i) => (head.hasAttribute("data-note") ? [i] : []));
+
+/** The note of a row, as the table has it now, also after a translation: its cell, or null. */
+export const noteCell = (figure: HTMLElement, index: number): HTMLTableCellElement | null => {
+	const columns = noteColumns(figure);
+	const tds = figure.querySelectorAll("tbody tr")[index]?.querySelectorAll("td") ?? [];
+	const cell = columns.map((c) => tds[c]).find((td) => td?.textContent?.trim());
+	return cell ?? null;
+};
+
+/** Every cell after the label is a value, one per series; the row's own value is its first. A note column is not. */
+export const readTable = (figure: HTMLElement, langattribute: string | false = "data-i18n"): Row[] => {
+	const notes = noteColumns(figure);
+	return Array.from(figure.querySelectorAll("tbody tr")).map((tr, i) => {
 		const th = tr.querySelector("th");
-		const cells = Array.from(tr.querySelectorAll("td")).map(readCell);
+		const tds = Array.from(tr.querySelectorAll("td"));
+		const cells = tds.filter((_td, c) => !notes.includes(c)).map(readCell);
 		if (!cells.length) cells.push(readCell(null));
+		const note = notes.map((c) => tds[c]).find((td) => td?.textContent?.trim());
 		return {
 			...cells[0],
 			label: (th?.textContent || "").trim(),
+			note: note?.textContent?.trim() ?? null,
+			noteKey: (langattribute && note?.getAttribute(langattribute)) || null,
+			short: th?.getAttribute("data-short") || null,
+			pinned: tr.getAttribute("data-value") === "show",
 			key: (langattribute && th?.getAttribute(langattribute)) || null,
 			cells,
 			classes: Array.from(tr.classList),
@@ -33,9 +54,10 @@ export const readTable = (figure: HTMLElement, langattribute: string | false = "
 			slot: i,
 		};
 	});
+};
 
 const seriesHeads = (figure: HTMLElement): Element[] =>
-	Array.from(figure.querySelector("thead tr:last-child")?.children ?? []).slice(1);
+	Array.from(figure.querySelector("thead tr:last-child")?.children ?? []).slice(1).filter((head) => !head.hasAttribute("data-note"));
 
 const lineOf = (value: string | null | undefined): "dashed" | "dotted" | null =>
 	value === "dashed" || value === "dotted" ? value : null;
@@ -96,6 +118,15 @@ export const assignKeys = (figures: HTMLElement[], langattribute: string | false
 				if (!groups.includes(name)) groups.push(name);
 				if (!td.getAttribute(langattribute)) td.setAttribute(langattribute, `${prefix}-group${groups.indexOf(name) + 1}`);
 			});
+		});
+		// A note has a key by its row, such as `harvest-note14`.
+		const notes = noteColumns(figure);
+		figure.querySelectorAll("tbody tr").forEach((tr, row) => {
+			const tds = tr.querySelectorAll("td");
+			for (const c of notes) {
+				const td = tds[c];
+				if (td?.textContent?.trim() && !td.getAttribute(langattribute)) td.setAttribute(langattribute, `${prefix}-note${row + 1}`);
+			}
 		});
 		debug?.log?.(
 			`Keys for "${prefix}" written onto ${figure.querySelectorAll("tbody th").length} rows`

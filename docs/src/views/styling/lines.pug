@@ -37,16 +37,16 @@ block content
 								td= row[1]
 
 	+section("The badge")
-		p The badge of a bracket or trend arrow is an ellipse by default. These variables set its corners, padding and background.
+		p The badge of an annotation, such as a bracket, a trend arrow or a note, is a box with rounded corners by default. These variables set its corners, padding and background. For an ellipse, set the corners to #[code 50%], with more padding at the sides, so the text stays clear of the curve:
 
 		+style.
-			.pill {
-				--tablechart-badge-radius: 0.4em;
-				--tablechart-badge-padding: 0.4em 0.8em;
+			.ellipse {
+				--tablechart-badge-radius: 50%;
+				--tablechart-badge-padding: 0.5em 1.25em;
 			}
 
 		+chart(null, '1')
-			figure.pill(data-chart="column")
+			figure.ellipse(data-chart="column")
 				table
 					tbody
 						each row in [['Last season', '251.5'], ['This season', '279.6']]

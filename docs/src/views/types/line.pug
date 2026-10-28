@@ -80,7 +80,7 @@ block content
 								td= row[1]
 
 	+section("Several lines")
-		p Each value column is a line. The column header is the name of the line, shown at the end of the line.
+		p Each value column is a line. The column header is the name of the line, shown at the end of the line. If the lines end close together, and their names and values crowd each other there, show the names in a legend instead: see #[a(href=url('/features/legends.html')) Legends].
 
 		+chart(null, '5')
 			figure(data-chart="line")
@@ -222,6 +222,116 @@ block content
 							tr(data-kind=row[2])
 								th= row[0]
 								td= row[1]
+
+	+section("Many rows")
+		-
+			const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+			// Three years of apple juice sold: more each year, most in winter.
+			const juice = Array.from({ length: 36 }, (_, i) => [
+				`${months[i % 12]} ${2023 + Math.floor(i / 12)}`,
+				`${months[i % 12].slice(0, 3)} ’${23 + Math.floor(i / 12)}`,
+				(20 + i * 0.35 + 4 * Math.cos(((i % 12) / 6) * Math.PI) + ((i * 7) % 5) * 0.4).toFixed(1),
+			]);
+		p A chart with many rows has little room for each number and name. Tablechart then shows fewer of them:
+
+		ul
+			li If the values of a line would touch, only a few are shown: the first, the last, the highest, the lowest and the values far from the trend. If you point at a row, or tap it, a tooltip shows its value. See #[a(href='#which-values-are-shown') Which values are shown].
+			li If the names under the chart do not fit, they get smaller, down to 70%. If they still do not fit, only every second, third or more is shown, evenly spaced, at full size. A name at an end moves in, so it stays inside the chart.
+			li Each name has a tick above it, at the place of its row, so you can see which point it belongs to, also when it moved in. They have the colour and width of the gridlines, a little stronger. #[code --tablechart-tick-color], #[code --tablechart-tick-opacity] and #[code --tablechart-tick-width] change them. #[code data-chart-ticks="false"], or the #[code ticks] option, turns the ticks off.
+			li A point is shown where a value is. If all values are shown and the points would touch each other, the line has no points.
+
+		p A short name under the chart needs less room. Give a row its full name in the table, which a screen reader and the tooltip read, and a short name for under the chart with #[code data-short].
+
+		.card
+			.demo
+				figure(data-chart="line")
+					figcaption
+						b Apple juice sold
+						br
+						span thousands of litres per month
+					table
+						tbody
+							each row in juice
+								tr
+									th(data-short=row[1])= row[0]
+									td= row[2]
+
+			+codeblock('HTML', null, '4-5').
+				<figure data-chart="line">
+					<table>
+						<tbody>
+							<tr><th data-short="#{juice[0][1]}">#{juice[0][0]}</th><td>#{juice[0][2]}</td></tr>
+							<tr><th data-short="#{juice[1][1]}">#{juice[1][0]}</th><td>#{juice[1][2]}</td></tr>
+							<!-- …one row per month, 36 in all -->
+						</tbody>
+					</table>
+				</figure>
+
+		p A row with a translation key, such as #[code juice-row11], gets the key #[code juice-row11-short] for its short name under the chart. Give your translation script a short name for that key too.
+		p For a long table, a summary can say in a few sentences what a listener needs, such as the highest value and the trend. See #[a(href=url('/features/summary.html')) Summary].
+
+	+section("Which values are shown")
+		-
+			const names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+			// Three years of apple juice sold, with a new apple press from March 2024.
+			const pressed = Array.from({ length: 36 }, (_, i) => [
+				`${names[i % 12]} ${2023 + Math.floor(i / 12)}`,
+				`${names[i % 12].slice(0, 3)} ’${23 + Math.floor(i / 12)}`,
+				(20 + i * 0.35 + 4 * Math.cos(((i % 12) / 6) * Math.PI) + ((i * 7) % 5) * 0.4).toFixed(1),
+				i === 14,
+			]);
+		p A value for every row is too much on a line with many rows. With #[code data-chart-values], or the #[code values] option for all charts, you choose which values a line or an area chart shows:
+
+		table
+			thead
+				tr
+					th Value
+					th Shows
+			tbody
+				tr
+					td: code auto
+					td All values if they fit, and else the first, the last, the highest, the lowest and the outliers. The default.
+				tr
+					td: code all
+					td All values. If they would touch, every second, third or more.
+				tr
+					td: code none
+					td No values. Use it with #[code data-chart-axis], so the values can be read along the axis.
+				tr
+					td: code first last highest lowest outliers
+					td Only these. Use any of them, in any order. #[code outliers] are the values more than 25% from the trend, as in a #[a(href=url('/features/summary.html#trend-and-outliers')) summary].
+				tr
+					td: code auto last
+					td All values if they fit, and else only the ones after #[code auto].
+
+		p A row with #[code data-value="show"] always shows its value, such as the month a new press came into use. A point is shown where a value is. Each value goes above, below or beside its point, where it is clear of the lines, the names and the other values; a value at a dip tries below first. If there is no such place, it may cross a line, which then stops under the value, but it never covers another value, a name or a point. If two values would still touch, the one that matters less is left out, with its point: first a row with #[code data-value="show"] is kept, then the last value, the first, the highest, the lowest and the outliers.
+
+		.card
+			.demo
+				figure(data-chart="line" data-chart-values="auto last")
+					figcaption
+						b Apple juice sold
+						br
+						span thousands of litres per month
+					table
+						tbody
+							each row in pressed
+								tr(data-value=row[3] ? 'show' : false)
+									th(data-short=row[1])= row[0]
+									td= row[2]
+
+			+codeblock('HTML', null, '1,5').
+				<figure data-chart="line" data-chart-values="auto last">
+					<table>
+						<tbody>
+							<tr><th data-short="Jan ’23">January 2023</th><td>#{pressed[0][2]}</td></tr>
+							<tr data-value="show"><th data-short="Mar ’24">March 2024</th><td>#{pressed[14][2]}</td></tr>
+							<!-- …one row per month, 36 in all -->
+						</tbody>
+					</table>
+				</figure>
+
+		p A value that is not shown is in the tooltip of its row, and in the table for screen readers. In print, #[code data-chart-table="auto"] prints the table, or the summary if the table is long. See #[a(href=url('/features/summary.html')) Summary].
 
 	+section("Axis and gridlines")
 		p By default there is no value axis: the numbers on the points show the values. To add numbers along the axis, on the left, add #[code data-chart-axis]. To add a light line at each of those numbers, add #[code data-chart-grid]. You can add one of them, or both. To add them to every chart, set the #[code axis] and #[code grid] options to #[code true].

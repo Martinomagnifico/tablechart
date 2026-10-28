@@ -52,6 +52,8 @@ $reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px 
 		}
 		:where(.tablechart-value),
 		:where(.tablechart-name),
+		:where(.tablechart-legend),
+		:where([data-chart="scatter"] .tablechart-categories span),
 		:where(.tablechart-head),
 		:where(.tablechart-badge),
 		:where(.tablechart-centre),

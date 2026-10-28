@@ -13,6 +13,7 @@ import {
 	sizeOf,
 	VIEWBOX_WIDTH,
 } from "../kit";
+import { quadrant } from "../annotations/quadrant";
 import type { ChartType, Row, Series } from "../types";
 
 const SHAPES: Shape[] = ["circle", "triangle", "square", "diamond"];
@@ -39,6 +40,7 @@ export const scatter: ChartType = {
 	columns: true,
 	axes: true,
 	numbers: false,
+	annotations: { quadrant },
 
 	// A legend for the groups, and for the size of a bubble.
 	text({ figure, plot, rows, series, config }) {
@@ -86,7 +88,7 @@ export const scatter: ChartType = {
 				node.style.setProperty("--palette", `var(--tablechart-color-${g + 1})`);
 			});
 		if (size !== undefined) entry(series[size].name, series[size].key).dataset.marker = "size";
-		figure.appendChild(legend);
+		plot.after(legend);
 	},
 
 	draw(geo) {
@@ -96,9 +98,10 @@ export const scatter: ChartType = {
 		const groups = groupsOf(rows, fields.group);
 		const several = groups.length > 1;
 
-		// Both sizes are across; a bubble's area follows its value, up to `--tablechart-bubble-max`.
+		// Both sizes are across; a bubble's area follows its value, from `--tablechart-bubble-min` up to `--tablechart-bubble-max`.
 		const base = (geo.length("--tablechart-marker-size", "10px") ?? 10 * unit) / 2;
 		const most = (geo.length("--tablechart-bubble-max", "24px") ?? 24 * unit) / 2;
+		const least = (geo.length("--tablechart-bubble-min", "") ?? base * 1.2) / 2;
 		const sizeCell = (row: Row) => (fields.size === undefined ? undefined : row.cells[fields.size]);
 		const top = largest(rows.map((row) => Math.abs(sizeCell(row)?.value ?? 0)));
 		const marks = rows.flatMap((row, i) => {
@@ -106,7 +109,7 @@ export const scatter: ChartType = {
 			const up = row.cells[fields.y];
 			if (!across || !up || across.missing || up.missing) return [];
 			const cell = sizeCell(row);
-			const r = cell && !cell.missing && top > 0 ? Math.max(base * 0.6, Math.sqrt(Math.abs(cell.value) / top) * most) : base;
+			const r = cell && !cell.missing && top > 0 ? Math.max(least, Math.sqrt(Math.abs(cell.value) / top) * most) : base;
 			const g = several ? groups.indexOf(row.cells[fields.group]?.raw ?? "") : -1;
 			return [{ i, px: x(across.value), py: y(up.value), r, g }];
 		});

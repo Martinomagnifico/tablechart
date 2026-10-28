@@ -80,7 +80,11 @@
 		}
 	}
 
-	nav a.main-link-sep {
+	// A line between the entries of the sidebar, pages and groups alike.
+	.nav-section {
+		position: relative;
+	}
+	nav :where(a, .nav-section).nav-sep {
 		position: relative;
 		&::before {
 			content: "";
@@ -88,20 +92,6 @@
 			top: calc(-0.5 * var(--padding-medium));
 			left: 0;
 			right: 0;
-			border-top: 1px solid var(--border-default);
-			pointer-events: none;
-		}
-	}
-
-	.nav-section {
-		position: relative;
-		&:before {
-			content: "";
-			position: absolute;
-			top: calc(-0.5 * var(--padding-medium));
-			left: 0;
-			right: 0;
-			bottom: 0;
 			border-top: 1px solid var(--border-default);
 			pointer-events: none;
 		}

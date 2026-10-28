@@ -55,7 +55,15 @@ block content
 				tr
 					td: code labels
 					td: code "outside"
-					td Where the number of a column goes: #[code "outside"], above the column, or #[code "inside"]. #[code data-chart-labels] on a figure sets it for one chart.
+					td Where the number of a column or bar goes: #[code "outside"], above the column or after the bar, or #[code "inside"]. #[code data-chart-labels] on a figure sets it for one chart.
+				tr
+					td: code ticks
+					td: code true
+					td A tick above each name under a line or area chart, at the place of its row. #[code data-chart-ticks] on a figure sets it for one chart.
+				tr
+					td: code values
+					td: code "auto"
+					td Which values a line or area chart shows: #[code "auto"], #[code "all"], #[code "none"], or a set such as #[code "first last highest lowest outliers"]. #[code data-chart-values] on a figure sets it for one chart. See #[a(href=url('/types/line.html#which-values-are-shown')) Which values are shown].
 				tr
 					td: code shape
 					td: code "straight"
@@ -88,6 +96,14 @@ block content
 					td: code table
 					td: code "never"
 					td When the table is shown under the chart: #[code "always"], only in #[code "print"], in print when the chart does not show all its numbers (#[code "auto"]), or #[code "never"]. #[code data-chart-table] on a figure sets it for one chart. See #[a(href=url('/features/accessibility.html')) Accessibility].
+				tr
+					td: code tablelimit
+					td: code 15
+					td With #[code table: "auto"], the most values a printed table has, rows times value columns. A longer table is not printed, and the summary is printed instead. See #[a(href=url('/features/summary.html#on-paper')) Summary].
+				tr
+					td: code summary
+					td: code "auto"
+					td When the summary is shown: #[code "always"], only in #[code "print"], in print when the chart does not show all its numbers and its table is not printed (#[code "auto"]), or #[code "never"], for screen readers only. #[code data-chart-summary] on a figure sets it for one chart. See #[a(href=url('/features/summary.html')) Summary].
 				tr
 					td: code totallabel
 					td: code "Total"

@@ -22,12 +22,20 @@
 	position: relative;
 
 	:where(table),
-	:where(.chart-annotations) {
+	:where(.chart-annotations),
+	:where(.chart-summary) {
 		position: absolute;
 		inset-inline: 0;
 		top: 0;
 		margin: 0;
 		clip-path: inset(50%);
+	}
+
+	// `data-chart-summary="always"`: the sentences of the summary, also on screen, where the author put them.
+	&[data-summary="always"] > :where(.chart-summary) {
+		position: static;
+		clip-path: none;
+		margin-top: var(--tablechart-summary-gap, 1.5em);
 	}
 
 	// `data-chart-table="always"`: the table under the chart, also on screen.
@@ -56,6 +64,10 @@
 		:where(.chart-annotations) {
 			position: static;
 			clip-path: none;
+		}
+		// Without a script the sentences are not filled, so a screen reader would read the placeholders.
+		:where(.chart-summary) {
+			display: none;
 		}
 	}
 

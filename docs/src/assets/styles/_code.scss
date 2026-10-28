@@ -128,9 +128,12 @@ pre code.live-code {
 			padding-left: 10px;
 		}
 
-		// In a code block with data-lines, the other lines are dimmed.
-		pre[data-lines] & tr:not(.is-highlighted) td {
-			opacity: 0.5;
+		// In a code block with data-lines, the other lines are grey, without syntax colours. Not faded, so they stay readable.
+		pre[data-lines] & tr:not(.is-highlighted) .hljs-ln-code {
+			&,
+			* {
+				color: var(--code-dim);
+			}
 		}
 	}
 	&-attribute, &-doctag, &-keyword, &-meta &-keyword,
@@ -139,9 +142,13 @@ pre code.live-code {
 	}
 }
 
+// Grey, for code that matters less: 4.5:1 or more on the code background, also under the dark mode's 80%.
+:root {
+	--code-dim: light-dark(oklch(0.5 0 0), oklch(0.8 0 0));
+}
+
 .hljs-code, .hljs-comment, .hljs-formula {
-	color: light-dark(var(--text-muted), white);
-	opacity: 0.8;
+	color: var(--code-dim);
 }
 
 

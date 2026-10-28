@@ -2,14 +2,14 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Features | Accessibility"
-	- pagedescription = "Accessibility in Tablechart: every chart is also a real table, for screen readers, print and PDF."
+	- pagedescription = "Accessibility in Tablechart: every chart is also a real table, for screen readers, print and PDF, and a long table can have a summary."
 
 block content
 	.lane
 		.container
 			.page-header
 				h1 Accessibility
-				p.lead Every chart is also a real table: for screen readers, for print and PDF, and when JavaScript does not run.
+				p.lead Every chart is also a real table: for screen readers, for print and PDF, and when JavaScript does not run. A long table can have a summary.
 
 	+section("What a screen reader gets")
 		p The table stays in the page. It is hidden from sight, but screen readers read it like any other table: the names of the rows and columns, and every number. The drawing is hidden from screen readers, with #[code aria-hidden="true"], so they do not read everything twice.
@@ -42,8 +42,22 @@ block content
 		p A screen reader does not read a line break. So Tablechart puts a full stop before each #[code br] in the title, hidden from sight, and a screen reader pauses between the title and the subtitle. If the line already ends with a full stop, a question mark, a colon or a comma, nothing is added.
 		p If the chart has no #[code figcaption], add #[code aria-label] to the figure, such as #[code aria-label="Apples picked, in thousands"].
 
+	+section("A summary for a long table")
+		p A table is a good alternative to a chart, up to a point. Someone who sees a chart of 60 months sees the highest month and the trend at a glance. Someone who listens to its table hears 60 names and 60 numbers, one after the other, and cannot remember a number from four rows back. To find the highest month, they have to go through every row.
+		p A summary gives a listener what the chart gives at a glance: a few sentences with, for example, the highest and the lowest value, the change from the first value to the last, the trend, and the values far from it. You write the sentences, and Tablechart fills in the numbers from the table, formatted as on the chart.
+
+		+codeblock('HTML').
+			<div class="chart-summary">
+				<p>The highest price was {highest.value}, in {highest.name}.</p>
+				<p data-summary="trend">Without the outliers, the trend is {trend}: from {trend.from} to {trend.to}.</p>
+			</div>
+
+		p A screen reader reads the summary right after the title of the chart. The table stays, for a listener who wants every number. The summary is real text in the page, so it can be shown to everyone too, and translated like any other text.
+		p On paper, the summary is often the only alternative a long table has: text that is hidden on the page does not reach a PDF, and a table of 60 rows can take a page of its own. See #[a(href='#in-print-and-pdf') In print and PDF].
+		p Write a summary for every chart with more than about 15 values. See #[a(href=url('/features/summary.html')) Summary].
+
 	+section("Numbers that do not fit")
-		p Some charts do not show all their numbers: a stack with small parts, a narrow chart, or a line chart with lines close together. The numbers are still in the table, so screen readers read them. Pointing at a row, or tapping it, shows them in a tooltip.
+		p Some charts do not show all their numbers: a stack with small parts, a narrow chart, a chart with many rows, or a line chart with lines close together. The numbers are still in the table, so screen readers read them. Pointing at a row, or tapping it, shows them in a tooltip.
 		p To show the table under the chart as well, add #[code data-chart-table="always"] to the figure. This chart has three lines close together, so it leaves numbers out. The table under it has them all.
 
 		+chart(null, '1')
@@ -81,7 +95,7 @@ block content
 				tr
 					td: code auto
 					td Hidden
-					td Shown, if the chart does not show all its numbers
+					td Shown, if the chart does not show all its numbers, and the table has no more than 15 values
 				tr
 					td: code print
 					td Hidden
@@ -92,6 +106,7 @@ block content
 					td Shown
 
 		p If your pages become PDFs, use #[code auto]. Then a table only takes room on the page when the chart needs it.
+		p With #[code auto], a table with more than 15 values is not printed, and the summary is printed instead. A chart that has neither on paper has no alternative in the PDF. See #[a(href='#a-summary-for-a-long-table') A summary for a long table].
 
 		+codeblock('JS').
 			init({ table: "auto" });
@@ -169,5 +184,5 @@ block content
 		p Set the #[code lang] attribute on the #[code html] element, such as #[code lang="en"]. Screen readers use it to read the text in the right language, and Tablechart uses it to format the numbers. See #[a(href=url('/features/numbers.html')) Numbers].
 
 	+section("Standards")
-		p Websites in the European Union must meet the European Accessibility Act, which refers to the standard EN 301 549, and through it to WCAG 2.1 at level AA. For a chart, the most important requirements are a text alternative (WCAG 1.1.1) and information that is available as structure (WCAG 1.3.1). A real data table meets both, and Tablechart keeps that table in the page.
+		p Websites in the European Union must meet the European Accessibility Act, which refers to the standard EN 301 549, and through it to WCAG 2.1 at level AA. For a chart, the most important requirements are a text alternative (WCAG 1.1.1) and information that is available as structure (WCAG 1.3.1). A real data table meets both, and Tablechart keeps that table in the page. For a long table, a summary is the alternative a listener can use, and in a PDF it is often the only one.
 		p Tablechart helps with these requirements, but whether a website meets them depends on the whole website. Test your own pages, for example with a screen reader.

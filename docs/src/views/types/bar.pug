@@ -12,7 +12,7 @@ block content
 				p.lead Bars laid sideways, for long names.
 
 	+section("Bar chart")
-		p Each row of the table is a bar. The names are shown to the left of the bars, so a long name fits on one line.
+		p Each row of the table is a bar. The number is shown after it. The names are shown to the left of the bars, where a long name has more room than under a column. If a name is still too long, it wraps onto a second line. See #[a(href='#long-names') Long names].
 
 		+chart
 			figure(data-chart="bar")
@@ -27,12 +27,26 @@ block content
 								th= row[0]
 								td= row[1]
 
-	+section("Numbers")
-		p If a bar is long enough, its number is shown inside it. If not, the number is shown after the bar.
+	+section("Numbers inside the bars")
+		p Add #[code data-chart-labels="inside"] to show each number inside its bar, at the end. To align it at the start of the bar or in the middle instead, see #[a(href=url('/styling/text.html')) Text]. If a bar is too short for its number, the number is shown after it.
+
+		.card
+			.demo
+				figure(data-chart="bar" data-chart-labels="inside")
+					table
+						tbody
+							each row in [['Bramley seedling', '31.4'], ['Cox’s orange pippin', '27.8'], ['Egremont russet', '18.2'], ['Discovery', '12.6'], ['Worcester pearmain', '9.1']]
+								tr
+									th= row[0]
+									td= row[1]
+
+			+codeblock('HTML')
+				figure(data-chart="bar" data-chart-labels="inside")
 
 	+section("Long names")
 		p A name beside a bar takes at most 40% of the width of the chart. A longer name wraps onto more lines, and the chart gets taller if it needs to. To change the width, set #[code --tablechart-name-max], such as #[code 30%].
 		p A long word is hyphenated if the page has a #[code lang] attribute, such as #[code lang="en"].
+		p Or give the row a short name for the chart with #[code data-short], such as #[code &lt;th data-short="Cox"&gt;Cox’s Orange Pippin&lt;/th&gt;]. The table, and so a screen reader, keeps the full name. See #[a(href=url('/types/line.html#many-rows')) Many rows].
 
 	+section("Below zero")
 		p A bar with a value below zero goes to the left of the zero line, with its number before it.

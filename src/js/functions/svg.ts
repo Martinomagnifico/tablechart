@@ -52,6 +52,12 @@ const defsOf = (svg: SVGSVGElement): SVGDefsElement => {
 
 /** The outline of a hole `rect`, its rounded corners included, so a badge of 50% radius leaves an ellipse. */
 const outlineOf = (rect: SVGElement): string => {
+	// An open marker: a circle, or a polygon such as a diamond.
+	if (rect.tagName === "circle") {
+		const [cx, cy, r] = ["cx", "cy", "r"].map((name) => Number(rect.getAttribute(name)) || 0);
+		return `M${short(cx - r)},${short(cy)}a${short(r)},${short(r)} 0 1 0 ${short(2 * r)},0a${short(r)},${short(r)} 0 1 0 ${short(-2 * r)},0z`;
+	}
+	if (rect.tagName === "polygon") return `M${(rect.getAttribute("points") ?? "").trim().split(/\s+/).join("L")}z`;
 	const [x, y, w, h, rx0, ry0] = ["x", "y", "width", "height", "rx", "ry"].map((name) => Number(rect.getAttribute(name)) || 0);
 	const rx = Math.min(rx0, w / 2);
 	const ry = Math.min(ry0, h / 2);

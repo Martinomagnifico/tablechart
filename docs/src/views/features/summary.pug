@@ -1,0 +1,594 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Features | Summary"
+	- pagedescription = "A summary in Tablechart: sometimes a fallback table is just too long to follow or to print."
+
+block content
+	-
+		const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		// Each month by its full name in the table, and its short name under the chart: [name, short, month, short month].
+		const month = (i) => [`${months[i % 12]} ${2021 + Math.floor(i / 12)}`, `${months[i % 12].slice(0, 3)} ’${21 + Math.floor(i / 12)}`, months[i % 12], months[i % 12].slice(0, 3)];
+		// Five years of fruit sold: apples peak in autumn, oranges in winter.
+		const fruit = Array.from({ length: 60 }, (_, i) => {
+			const m = i % 12;
+			const apples = 48 + 22 * Math.cos(((m - 9) / 6) * Math.PI) + i * 0.2 + ((i * 7) % 5) - 2;
+			const oranges = 40 + 18 * Math.cos((m / 6) * Math.PI) + i * 0.1 + ((i * 3) % 4) - 1.5;
+			return [...month(i), apples.toFixed(1), oranges.toFixed(1)];
+		});
+		const lastYear = fruit.slice(48);
+		// The price of a kilo of apples: a slow rise, with a spring frost in 2023 and a glut in the autumn of 2024.
+		const prices = Array.from({ length: 60 }, (_, i) => {
+			const shock = i === 28 ? 1.45 : i === 45 ? 0.62 : 1;
+			const price = (1.2 + i * 0.011 + (((i * 5) % 7) - 3) * 0.012) * shock;
+			return [...month(i), `€${price.toFixed(2)}`];
+		});
+
+	.lane
+		.container
+			.page-header
+				h1 Summary
+				p.lead Sometimes a fallback table is just too long to follow or to print.
+
+	+section("Why?")
+		p Tablechart keeps the original (or JSON generated) tables inside the #[code figure] elements, alongside the generated charts. Screenreaders can read it. But sometimes you will want to summarize the data for easier consumption.
+
+		.card.no-padding
+			div(role="tablist").tabs
+				button(role="tab" aria-controls="too-much-online") Interactive
+				button(role="tab" aria-controls="too-much-print") In a PDF
+
+			.card-content(data-panelset)
+				.panel-wrapper
+					div(role="tabpanel" id="too-much-online" class="active")
+						p Imagine a nice line chart. Imagine that it has 60 data points, one for each month. Tablechart will suppress the values inside the chart itself if there is a danger of overlapping values, and tooltips may help in that case. But screen readers can not do that. And they can not reasd the chart. They rely on the table inside the figure to access the data.
+						p A screenreader will still have access to the full table inside the figure, ensuring that all data points are available for those who need them. However, 60 rows can be overwhelming to navigate sequentially, which is why a summary is useful.
+
+					div(role="tabpanel" id="too-much-print")
+						p Charts can be used in a PDF, but only sighted users may understand them. If the PDF is on a computer, screen readers can read the text, but not the chart.
+						p This is why Tablechart keeps the table available so that it may be shown under (or near) the chart. However, such a table can take up a lot of space. This makes a summary useful for conveying the key information without overwhelming the layout.
+
+
+		p A summary says in a few sentences what matters, such as the highest and the lowest value. You write the sentences. Tablechart fills in the numbers from the table, formatted as on the chart.
+
+	+section("Example")
+		p The sentences are in a #[code div] with the class #[code chart-summary], in the figure. A placeholder in braces, such as #[code {highest.value}], is filled with a value from the table. This chart has #[code data-chart-summary="always"], so the summary is also shown on the page.
+
+		.card
+			.demo
+				figure(data-chart="line" data-chart-shape="smooth" data-chart-summary="always")
+					figcaption
+						b Comparing apples and oranges
+						br
+						span tonnes sold per month
+					table
+						thead
+							tr
+								th Month
+								th Apples
+								th Oranges
+						tbody
+							each row in fruit
+								tr
+									th(data-short=row[1])= row[0]
+									td= row[4]
+									td= row[5]
+					.chart-summary
+						p Most apples were sold in {highest.name}: {highest.value} tonnes. The fewest in {lowest.name}: {lowest.value} tonnes.
+						p(data-series="2") Most oranges were sold in {highest.name}: {highest.value} tonnes. The fewest in {lowest.name}: {lowest.value} tonnes.
+						p(data-summary="range") Over {rows} months, between {range.from} and {range.to} tonnes of apples were sold a month.
+
+			+codeblock('HTML', null, '13-17').
+				<figure data-chart="line" data-chart-shape="smooth" data-chart-summary="always">
+					<figcaption><b>Comparing apples and oranges</b><br><span>tonnes sold per month</span></figcaption>
+					<table>
+						<thead>
+							<tr><th>Month</th><th>Apples</th><th>Oranges</th></tr>
+						</thead>
+						<tbody>
+							<tr><th data-short="#{fruit[0][1]}">#{fruit[0][0]}</th><td>#{fruit[0][4]}</td><td>#{fruit[0][5]}</td></tr>
+							<tr><th data-short="#{fruit[1][1]}">#{fruit[1][0]}</th><td>#{fruit[1][4]}</td><td>#{fruit[1][5]}</td></tr>
+							<!-- …one row per month, 60 in all -->
+						</tbody>
+					</table>
+					<div class="chart-summary">
+						<p>Most apples were sold in {highest.name}: {highest.value} tonnes. The fewest in {lowest.name}: {lowest.value} tonnes.</p>
+						<p data-series="2">Most oranges were sold in {highest.name}: {highest.value} tonnes. The fewest in {lowest.name}: {lowest.value} tonnes.</p>
+						<p data-summary="range">Over {rows} months, between {range.from} and {range.to} tonnes of apples were sold a month.</p>
+					</div>
+				</figure>
+
+		p The summary is where you put it in the figure. Here it is under the table, so it is under the chart. A screen reader reads it right after the title of the chart.
+		p Each month has its full name in the table, which a screen reader and the summary read, and a short name under the chart, in #[code data-short]. See #[a(href='#short-names') Short names].
+
+	+section("Start the summary")
+		p The summary is a separate import, so a page without summaries does not load it. Start it before #[code init()].
+
+		+codeblock('JS').
+			import { init } from "@martinomagnifico/tablechart";
+			import { Summary } from "@martinomagnifico/tablechart/summary";
+
+			Summary.init();
+			init();
+
+		p With a script tag, load #[code tablechart-summary.js] after #[code tablechart.js].
+
+		+codeblock('HTML').
+			<script src="tablechart.js"></script>
+			<script src="tablechart-summary.js"></script>
+			<script>
+				Tablechart.Summary.init();
+				Tablechart.init();
+			</script>
+
+	+section("Placeholders")
+		table
+			thead
+				tr
+					th Placeholder
+					th Is
+			tbody
+				tr
+					td: code {highest.name}
+					td The name of the row with the highest value. If two rows have it, the first.
+				tr
+					td: code {highest.value}
+					td The highest value
+				tr
+					td: code {lowest.name}
+					td The name of the row with the lowest value
+				tr
+					td: code {lowest.value}
+					td The lowest value
+				tr
+					td: code {range.from}
+					td The lowest value
+				tr
+					td: code {range.to}
+					td The highest value
+				tr
+					td: code {range.difference}
+					td The highest value less the lowest
+				tr
+					td: code {first.name}, #[code {first.value}]
+					td The first row with a number, and its value
+				tr
+					td: code {last.name}, #[code {last.value}]
+					td The last row with a number, and its value
+				tr
+					td: code {change.difference}
+					td How much the last value differs from the first
+				tr
+					td: code {change.percent}
+					td The same, as a percentage of the first value
+				tr
+					td: code {change}
+					td #[code up], #[code down] or #[code flat], from the first value to the last
+				tr
+					td: code {trend}
+					td #[code up], #[code down], #[code flat] or #[code unclear]: the direction of a straight line through all values
+				tr
+					td: code {trend.percent}
+					td How much that line rises or falls over all rows, as a percentage of where it starts
+				tr
+					td: code {trend.from}, #[code {trend.to}]
+					td Where that line starts and ends
+				tr
+					td: code {outliers.count}
+					td How many values are far from that line
+				tr
+					td: code {outliers.percent}
+					td How far a value must be from the line to be an outlier: #[code 25%] by default
+				tr
+					td: code {flat.percent}
+					td How little the line must rise or fall to be flat: #[code 5%] by default
+				tr
+					td: code {title}
+					td The title of the chart: the bold text of the #[code figcaption], or all of it
+				tr
+					td: code {rows}
+					td The number of rows
+				tr
+					td: code {series}
+					td The name of the value column
+
+		p A number is written as on the chart: in the language of the page, with the decimals of its column, and with the text around it in the table, such as #[code %]. A row with #[code data-kind="total"] does not count.
+		p If a sentence has a placeholder that does not exist, the placeholder stays as you wrote it, and the console says so.
+		p If your template engine uses single braces itself, use other characters:
+
+		+codeblock('JS').
+			Summary.init({ delimiters: ["[[", "]]"] });
+
+	+section("Which sentences are shown")
+		p A sentence is about the first value column. With #[code data-series="2"], it is about the second.
+		p A sentence with #[code data-summary] is shown only if that part of the summary has a result. #[code extremes] has the highest and the lowest value, and #[code range] has the range. With #[code data-none], a sentence is shown only if there is no result, such as when no row has a number yet.
+
+		+codeblock('HTML').
+			<div class="chart-summary">
+				<p data-summary="extremes">The highest was {highest.value}, in {highest.name}.</p>
+				<p data-summary="extremes" data-none>There are no numbers yet.</p>
+			</div>
+
+		p A sentence without #[code data-summary] is always shown.
+		p With #[code data-when], a sentence is shown only for one outcome of #[code change] or #[code trend]: #[code up], #[code down] or #[code flat], and for a trend also #[code unclear]. A sentence for each outcome is easier to translate than a word in the middle of a sentence.
+
+		+codeblock('HTML').
+			<p data-summary="trend" data-when="up">The price went up.</p>
+			<p data-summary="trend" data-when="down">The price went down.</p>
+			<p data-summary="trend" data-when="flat">The price stayed about the same.</p>
+			<p data-summary="trend" data-when="unclear">The price went up and down, without a clear trend.</p>
+
+		p #[code {trend}] and #[code {change}] are words too, for a single sentence. The #[code words] option sets them, such as #[code Summary.init({ words: { up: "rising", down: "falling", flat: "stable" } })].
+
+	+section("Trend and outliers")
+		p The trend is a straight line through all values. With fewer than 4 rows, there is no trend. The trend is:
+
+		ul
+			li #[code up] or #[code down], if the line rises or falls by 5% of the average value or more, and that is not chance: the slope of the line is large compared to how far the values are from it. With few rows that takes a steeper rise than with many.
+			li #[code flat], if the line rises or falls by less than 5%, and the values stay close to it: on average within 5% of the average value.
+			li #[code unclear] otherwise: the values go up and down more than the line does, so a straight line does not say much about them.
+
+		p Whether a slope is chance is the slope over its standard error, against the threshold of the t-test at 95%. That is 4.3 with 4 rows, about 2.2 with 12, and 2.0 from 30 rows on.
+		p A value more than 25% away from the line is an outlier. An outlier pulls the line towards itself, so the line is drawn again without the outliers, and the trend is that second line. If more than a fifth of the values are that far from the line, they are not outliers: the values are spread wide, and they all count. The #[code flat] and #[code outliers] options set the two percentages. If the values go below and above zero, such as profit and loss, the percentages are of the range of the values.
+
+		.card
+			.demo
+				figure(data-chart="line" data-chart-summary="always")
+					figcaption
+						b The price of apples
+						br
+						span per kilo
+					table
+						thead
+							tr
+								th Month
+								th Price
+						tbody
+							each row in prices
+								tr
+									th(data-short=row[1])= row[0]
+									td= row[4]
+					.chart-summary
+						p(data-summary="change" data-when="up") From {first.name} to {last.name}, the price went up by {change.percent}, from {first.value} to {last.value}.
+						p(data-summary="change" data-when="down") From {first.name} to {last.name}, the price went down by {change.percent}, from {first.value} to {last.value}.
+						p(data-summary="trend") #[span(data-summary="outliers") Without the outliers, the]#[span(data-summary="outliers" data-none) The] trend is {trend}: from {trend.from} to {trend.to}.
+						p(data-summary="outliers") {outliers.count|one:One month is|other:# months are} more than {outliers.percent} from the trend: #[span(data-each="outliers") {name} ({value}, {deviation} {side} the trend)].
+						p(data-summary="outliers" data-none) No month is more than {outliers.percent} from the trend.
+
+			+codeblock('HTML').
+				<div class="chart-summary">
+					<p data-summary="change" data-when="up">From {first.name} to {last.name}, the price went up by {change.percent}, from {first.value} to {last.value}.</p>
+					<p data-summary="change" data-when="down">From {first.name} to {last.name}, the price went down by {change.percent}, from {first.value} to {last.value}.</p>
+					<p data-summary="trend"><span data-summary="outliers">Without the outliers, the</span><span data-summary="outliers" data-none>The</span>
+						trend is {trend}: from {trend.from} to {trend.to}.</p>
+					<p data-summary="outliers">{outliers.count|one:One month is|other:# months are} more than {outliers.percent} from the trend:
+						<span data-each="outliers">{name} ({value}, {deviation} {side} the trend)</span>.</p>
+					<p data-summary="outliers" data-none>No month is more than {outliers.percent} from the trend.</p>
+				</div>
+
+		p An element with #[code data-each="outliers"] is repeated for each outlier, and the outliers are joined as a list in the language of the page: "A, B and C". In it, #[code {name}] and #[code {value}] are those of the outlier, #[code {expected}] is the value of the line there, #[code {deviation}] is how far the value is from it, and #[code {side}] is #[code above] or #[code below].
+		p #[code {outliers.count|one:One month is|other:# months are}] picks the words for the number, by the rules of the language of the page. #[code #] is the number. English has #[code one] and #[code other]; other languages also have #[code zero], #[code two], #[code few] and #[code many].
+		p Say what an outlier is, so the reader knows what "far" means: #[code {outliers.percent}] is the percentage from the #[code outliers] option.
+		p Without a clear trend there is nothing to be far from, so there are no outliers either, and their sentences are not shown.
+		p A trend is a straight line, so it is for values without a season. Apples sold, as in the first example, go up and down every year, and many months would be far from a straight line.
+
+	+section("Four kinds of trend")
+		-
+			// The first data: a clear rise, with one month far above it.
+			const kinds = Array.from({ length: 24 }, (_, i) => [...month(i + 36), (80 + i * 2.5 + (((i * 7) % 5) - 2) * 1.5 + (i === 9 ? 40 : 0)).toFixed(1)]);
+		p The button makes new data for the chart, of one kind at a time: a trend up, down, flat or unclear. The summary is filled again for each, and shows the sentence for that kind.
+
+		.lang-toggle.trend-toggle(role="group" aria-label="Data of the example")
+			button(type="button") Swap data
+			span.trend-kind(aria-live="polite") Up
+
+		.card
+			.demo
+				figure#trend-kinds(data-chart="line" data-chart-summary="always")
+					figcaption
+						b Apples sold at the market
+						br
+						span crates per month
+					table
+						thead
+							tr
+								th Month
+								th Crates
+						tbody
+							each row in kinds
+								tr
+									th(data-short=row[1])= row[0]
+									td= row[4]
+					.chart-summary
+						p(data-summary="trend" data-when="up") #[span(data-summary="outliers") Without the outliers, sales]#[span(data-summary="outliers" data-none) Sales] went up by {trend.percent}, from {trend.from} to {trend.to} crates a month.
+						p(data-summary="trend" data-when="down") #[span(data-summary="outliers") Without the outliers, sales]#[span(data-summary="outliers" data-none) Sales] went down by {trend.percent}, from {trend.from} to {trend.to} crates a month.
+						p(data-summary="trend" data-when="flat") #[span(data-summary="outliers") Without the outliers, sales]#[span(data-summary="outliers" data-none) Sales] stayed about the same, at around {trend.to} crates a month.
+						p(data-summary="trend" data-when="unclear") Sales went up and down, without a clear trend.
+						p(data-summary="outliers") {outliers.count|one:One month was|other:# months were} more than {outliers.percent} from the trend: #[span(data-each="outliers") {name} ({value})].
+
+			+codeblock('HTML').
+				<div class="chart-summary">
+					<p data-summary="trend" data-when="up"><span data-summary="outliers">Without the outliers, sales</span><span data-summary="outliers" data-none>Sales</span>
+						went up by {trend.percent}, from {trend.from} to {trend.to} crates a month.</p>
+					<p data-summary="trend" data-when="down"><span data-summary="outliers">Without the outliers, sales</span><span data-summary="outliers" data-none>Sales</span>
+						went down by {trend.percent}, from {trend.from} to {trend.to} crates a month.</p>
+					<p data-summary="trend" data-when="flat"><span data-summary="outliers">Without the outliers, sales</span><span data-summary="outliers" data-none>Sales</span>
+						stayed about the same, at around {trend.to} crates a month.</p>
+					<p data-summary="trend" data-when="unclear">Sales went up and down, without a clear trend.</p>
+					<p data-summary="outliers">{outliers.count|one:One month was|other:# months were} more than {outliers.percent} from the trend:
+						<span data-each="outliers">{name} ({value})</span>.</p>
+				</div>
+
+		p A part of a sentence can have #[code data-summary] too, with #[code data-when] and #[code data-none], and is then shown by the same rules. Here, "Without the outliers, sales" is shown only if there are outliers, and "Sales" only if there are none.
+
+		script.
+			(function () {
+				var figure = document.getElementById('trend-kinds');
+				// As written, before Tablechart and the summary change it: each new chart starts from this.
+				var source = figure.outerHTML;
+				var names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+				var labels = { up: 'Up', down: 'Down', flat: 'Flat', unclear: 'Unclear' };
+				// A shuffle bag: the four kinds in a random order, then again, never the same one twice in a row.
+				// So every eight clicks show each kind at least once.
+				var bag = [];
+				var last = 'up';
+				var next = function () {
+					if (!bag.length) {
+						bag = Object.keys(labels).sort(function () { return Math.random() - 0.5; });
+						if (bag[0] === last) bag.push(bag.shift());
+					}
+					last = bag.shift();
+					return last;
+				};
+				var between = function (a, b) { return a + Math.random() * (b - a); };
+				// Takes out the slope of its own, so a flat or unclear kind is not tilted by chance.
+				var level = function (list) {
+					var n = list.length, mx = (n - 1) / 2, my = list.reduce(function (a, b) { return a + b; }, 0) / n, sxy = 0, sxx = 0;
+					list.forEach(function (y, x) { sxy += (x - mx) * (y - my); sxx += (x - mx) * (x - mx); });
+					return list.map(function (y, x) { return y - my - (sxy / sxx) * (x - mx); });
+				};
+				var noise = function (n, size) {
+					var list = [];
+					for (var i = 0; i < n; i++) list.push((Math.random() - 0.5) * 2 * size);
+					return level(list);
+				};
+				// Each time another length, level, steepness and kind of ups and downs.
+				var data = function (kind, n) {
+					var base = between(40, 160);
+					// No month far from the trend, or one to three, apart from each other.
+					var count = [0, 0, 1, 1, 2, 3][Math.floor(Math.random() * 6)];
+					var spikes = [];
+					while (spikes.length < count) {
+						var at = Math.floor(between(2, n - 2));
+						if (spikes.every(function (s) { return Math.abs(s - at) > 2; })) spikes.push(at);
+					}
+					// Up by about half the level, or down to a third or half of the value, so no month sells fewer than none.
+					var spike = function (i, value, side) {
+						if (spikes.indexOf(i) < 0) return value;
+						return side > 0 ? value + base * between(0.45, 0.7) : value * between(0.3, 0.5);
+					};
+					if (kind === 'up' || kind === 'down') {
+						var sign = kind === 'up' ? 1 : -1;
+						var start = sign > 0 ? base * between(0.5, 0.8) : base * between(1.2, 1.6);
+						var step = (base * between(0.02, 0.045)) * sign;
+						return noise(n, base * between(0.02, 0.06)).map(function (y, i) { return spike(i, start + i * step + y, sign); });
+					}
+					if (kind === 'flat') {
+						return noise(n, base * between(0.01, 0.03)).map(function (y, i) { return spike(i, base + y, Math.random() < 0.5 ? 1 : -1); });
+					}
+					var shape = Math.floor(Math.random() * 3);
+					var wave = between(4, 9);
+					var swing = level(Array.from({ length: n }, function (_, i) {
+						if (shape === 0) return (Math.random() - 0.5) * 2;
+						if (shape === 1) return Math.sin((i / wave) * Math.PI * 2);
+						return -Math.abs(i - n / 2) / (n / 2);
+					}));
+					var top = Math.max.apply(null, swing.map(Math.abs));
+					return swing.map(function (y) { return base + (y / top) * base * between(0.35, 0.45); });
+				};
+				document.querySelector('.trend-toggle button').addEventListener('click', function () {
+					var kind = next();
+					var holder = document.createElement('div');
+					holder.innerHTML = source;
+					var fresh = holder.firstElementChild;
+					var n = Math.floor(between(18, 37));
+					var first = Math.floor(between(0, 12)) + 12 * Math.floor(between(0, 3));
+					fresh.querySelector('tbody').innerHTML = data(kind, n).map(function (value, i) {
+						var m = first + i, name = names[m % 12], year = 2022 + Math.floor(m / 12);
+						return '<tr><th data-short="' + name.slice(0, 3) + ' ’' + String(year).slice(2) + '">' + name + ' ' + year + '</th><td>' + value.toFixed(1) + '</td></tr>';
+					}).join('');
+					if (Math.random() < 0.5) fresh.setAttribute('data-chart-shape', 'smooth');
+					var old = document.getElementById('trend-kinds');
+					old.tablechart && old.tablechart.destroy();
+					old.replaceWith(fresh);
+					Tablechart.create(fresh);
+					document.querySelector('.trend-kind').textContent = labels[kind];
+				});
+			})();
+
+	+section("Notes")
+		p If the table has a column of notes, with #[code data-note] on its header, #[code data-each="notes"] lists them. In it, #[code {name}] is the name of the row and #[code {note}] its note. #[code {notes.count}] is how many there are. See #[a(href=url('/features/annotations.html#notes')) Notes].
+
+		+codeblock('HTML').
+			<p data-summary="notes">{notes.count|one:One month has|other:# months have} a note:
+				<span data-each="notes">{name} ({note})</span>.</p>
+
+	+section("Rows in order")
+		p A change and a trend only make sense if the rows are in order, such as months or years. The rows of a line or an area chart are. On another chart, add #[code data-chart-ordered] to the figure. Without it, the sentences of #[code change], #[code trend] and #[code outliers] are not shown, also not the ones with #[code data-none].
+
+		+codeblock('HTML').
+			<figure data-chart="column" data-chart-ordered>
+
+	+section("Short names")
+		p A screen reader, the summary and the tooltip read the names in the table. Under the chart there may be little room. Give a row a short name with #[code data-short], and the chart shows that instead.
+
+		+codeblock('HTML').
+			<tr><th data-short="Nov ’21">November 2021</th><td>83.4</td></tr>
+
+		p The summary always uses the full name, so a listener hears "November 2021". For how names fit under a chart with many rows, see #[a(href=url('/types/line.html#many-rows')) Many rows].
+
+	+section("Who sees what")
+		p #[code data-chart-summary] on the figure, or the #[code summary] option for all charts, says when the summary is shown. It takes the same values as #[code data-chart-table].
+
+		table
+			thead
+				tr
+					th Value
+					th On screen
+					th In print and PDF
+			tbody
+				tr
+					td: code never
+					td For screen readers only
+					td Not printed
+				tr
+					td: code auto
+					td For screen readers only
+					td Printed, if the chart leaves numbers out and its table is not printed. The default.
+				tr
+					td: code print
+					td For screen readers only
+					td Printed
+				tr
+					td: code always
+					td Shown
+					td Printed
+
+		p A screen reader always reads the summary, right after the title of the chart. The buttons change #[code data-chart-summary] on this chart, and then call #[code refresh()].
+
+		.lang-toggle.summary-toggle(role="group" aria-label="Who sees the summary")
+			button(type="button" data-summary-value="always" aria-pressed="true") always
+			button(type="button" data-summary-value="never" aria-pressed="false") never
+
+		.card
+			.demo
+				figure#apples-shown(data-chart="column" data-chart-summary="always")
+					figcaption
+						b Apples sold in 2025
+						br
+						span tonnes
+					table
+						thead
+							tr
+								th Month
+								th Apples
+						tbody
+							each row in lastYear
+								tr
+									th(data-short=row[3])= row[2]
+									td= row[4]
+					.chart-summary
+						p Most apples were sold in {highest.name}: {highest.value} tonnes. The fewest in {lowest.name}: {lowest.value} tonnes.
+
+		script.
+			document.querySelectorAll('.summary-toggle button').forEach(function (button) {
+				button.addEventListener('click', function () {
+					var figure = document.getElementById('apples-shown');
+					figure.setAttribute('data-chart-summary', button.dataset.summaryValue);
+					figure.tablechart?.refresh();
+					button.parentElement.querySelectorAll('button').forEach(function (other) {
+						other.setAttribute('aria-pressed', String(other === button));
+					});
+				});
+			});
+
+	+section("On paper")
+		p On paper there is nothing only for screen readers: text that is hidden on the page does not reach a PDF. So in print, a chart that leaves numbers out needs its table or its summary.
+		p With #[code data-chart-table="auto"], the table is printed if it has no more than 15 values, rows times value columns. A listener who hears more numbers than that loses track, so a longer table is not printed, and the summary is printed instead. The #[code tablelimit] option sets the number.
+
+		+codeblock('JS').
+			init({ table: "auto", tablelimit: 24 });
+
+		p If a chart prints neither its table nor a summary, the numbers it leaves out are not on paper at all.
+		p In the print preview of this page, the charts above print their summaries, because they have #[code data-chart-summary="always"].
+
+	+section("Translation")
+		p The sentence with its placeholders is the template. It stays in the page, hidden, with its translation key, so a translation script can translate it. Tablechart writes the filled sentence right after it, without the key, so the script does not overwrite the numbers.
+		p When a template changes, or the #[code lang] attribute of the page, the sentence is filled again. A name in a sentence keeps its own translation key, so it is translated too. See #[a(href=url('/features/translation.html')) Translation].
+		p The buttons do what a translation script does: they replace the text of each element with a key, and then set the #[code lang] attribute of the page.
+		p This page has no real translation engine. The buttons use a small script that only knows the words of this example, as a demo. On your site, use your own translation solution. 
+		//-p In a Reveal.js presentation, you can use #[a(href='https://github.com/martinomagnifico/reveal.js-internation') reveal.js-internation] by yours truly.
+
+		.lang-toggle.fruit-toggle(role="group" aria-label="Language of the example")
+			button(type="button" data-lang="en" aria-pressed="true") English
+			button(type="button" data-lang="nl" aria-pressed="false") Nederlands
+			button(type="button" data-lang="es" aria-pressed="false") Español
+
+		.card
+			.demo
+				figure#fruit(data-chart="column" data-chart-keys="fruit" data-chart-summary="always")
+					figcaption
+						b(data-i18n="fruit-title") Apples and oranges in 2025
+						br
+						span(data-i18n="fruit-unit") tonnes sold
+					table
+						thead
+							tr
+								th(data-i18n="fruit-month") Month
+								th Apples
+								th Oranges
+						tbody
+							each row in lastYear
+								tr
+									th(data-short=row[3])= row[2]
+									td= row[4]
+									td= row[5]
+					.chart-summary
+						p(data-i18n="fruit-s1") Most apples were sold in {highest.name}: {highest.value} tonnes.
+						p(data-i18n="fruit-s2" data-series="2") Most oranges were sold in {highest.name}: {highest.value} tonnes.
+
+			+codeblock('HTML').
+				<div class="chart-summary">
+					<p data-i18n="fruit-s1">Most apples were sold in {highest.name}: {highest.value} tonnes.</p>
+					<p data-i18n="fruit-s2" data-series="2">Most oranges were sold in {highest.name}: {highest.value} tonnes.</p>
+				</div>
+
+			+codeblock('JSON', 'nl.json').
+				{
+					"fruit-s1": "De meeste appels werden verkocht in {highest.name}: {highest.value} ton.",
+					"fruit-s2": "De meeste sinaasappels werden verkocht in {highest.name}: {highest.value} ton."
+				}
+
+		script.
+			(function () {
+				var words = {
+					en: { 'fruit-title': 'Apples and oranges in 2025', 'fruit-unit': 'tonnes sold', 'fruit-month': 'Month', 'fruit-col1': 'Apples', 'fruit-col2': 'Oranges', 'fruit-s1': 'Most apples were sold in {highest.name}: {highest.value} tonnes.', 'fruit-s2': 'Most oranges were sold in {highest.name}: {highest.value} tonnes.' },
+					nl: { 'fruit-title': 'Appels en sinaasappels in 2025', 'fruit-unit': 'ton verkocht', 'fruit-month': 'Maand', 'fruit-col1': 'Appels', 'fruit-col2': 'Sinaasappels', 'fruit-s1': 'De meeste appels werden verkocht in {highest.name}: {highest.value} ton.', 'fruit-s2': 'De meeste sinaasappels werden verkocht in {highest.name}: {highest.value} ton.' },
+					es: { 'fruit-title': 'Manzanas y naranjas en 2025', 'fruit-unit': 'toneladas vendidas', 'fruit-month': 'Mes', 'fruit-col1': 'Manzanas', 'fruit-col2': 'Naranjas', 'fruit-s1': 'Las manzanas más vendidas fueron en {highest.name}: {highest.value} toneladas.', 'fruit-s2': 'Las naranjas más vendidas fueron en {highest.name}: {highest.value} toneladas.' }
+				};
+				// The names of the months, long and short, as a translation file would have them.
+				Object.keys(words).forEach(function (lang) {
+					var long = new Intl.DateTimeFormat(lang, { month: 'long' });
+					var short = new Intl.DateTimeFormat(lang, { month: 'short' });
+					for (var m = 0; m < 12; m++) {
+						words[lang]['fruit-row' + (m + 1)] = long.format(new Date(2025, m, 1));
+						words[lang]['fruit-row' + (m + 1) + '-short'] = short.format(new Date(2025, m, 1));
+					}
+				});
+				document.querySelectorAll('.fruit-toggle button').forEach(function (button) {
+					button.addEventListener('click', function () {
+						var lang = button.dataset.lang;
+						document.querySelectorAll('#fruit [data-i18n]').forEach(function (element) {
+							var text = words[lang][element.getAttribute('data-i18n')];
+							if (text) element.textContent = text;
+						});
+						document.documentElement.lang = lang;
+						button.parentElement.querySelectorAll('button').forEach(function (other) {
+							other.setAttribute('aria-pressed', String(other === button));
+						});
+					});
+				});
+			})();
+
+	+section("PDFs made on a server")
+		p A report is often a PDF that a server makes: a template is filled with the data of one client, and a headless browser, such as Puppeteer or Playwright, prints the page. JavaScript runs, so the charts and the summaries are there.
+		p A chart is laid out once, for the width it has, and the browser does not lay it out again to print. So lay the page out as on paper before it loads: with the print styles, at the width of the paper less its margins. For A4 with margins of 16 mm, that is 673 pixels.
+
+		+codeblock('JS').
+			await page.emulateMediaType("print");
+			await page.setViewport({ width: 673, height: 1000 });
+			await page.goto(url);
+			await page.pdf({ format: "A4", tagged: true, outline: true });
+
+		p With #[code tagged: true], the headings and the tables are in the structure of the PDF, so a screen reader can go through a printed table as a table.
+		p Template engines such as Twig, Liquid and Handlebars use double braces, such as #[code {{ client.name }}]. They leave #[code {highest.value}] alone, so the server fills its part, and the browser fills the summary.

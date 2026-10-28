@@ -65,7 +65,7 @@ block content
 		p The options are the same as for #[code init()]. #[code selector] is not used.
 
 	+section("addType()")
-		p #[code addType()] adds one of the additional types. The first argument is the value of #[code data-chart], the second the type. Add it before #[code init()] or #[code create()]. See #[a(href=url('/types/additional-types.html')) Extras].
+		p #[code addType()] adds one of the additional types. The first argument is the value of #[code data-chart], the second the type. Add it before #[code init()] or #[code create()]. A type can bring annotations of its own: adding #[code scatter] also adds #[code quadrant]. See #[a(href=url('/types/additional-types.html')) Additional types].
 
 		+codeblock('JS').
 			import { addType, init } from "@martinomagnifico/tablechart";
@@ -178,6 +178,65 @@ block content
 			<script>
 				Tablechart.init();
 			</script>
+
+	+section("Summary")
+		p The summary is a separate import. See #[a(href=url('/features/summary.html')) Summary].
+
+		+codeblock('JS').
+			import { Summary } from "@martinomagnifico/tablechart/summary";
+
+			Summary.init({ delimiters: ["{", "}"] });
+
+		table
+			thead
+				tr
+					th Function
+					th Does
+			tbody
+				tr
+					td: code Summary.init(options)
+					td Fills the summary of every chart, and again when its table is ready or changes, and when a translation changes a sentence or the language of the page
+				tr
+					td: code Summary.fill(figure)
+					td Fills the summary of one chart again, from its table as it is now
+
+		table
+			thead
+				tr
+					th Option
+					th Default
+					th Sets
+			tbody
+				tr
+					td: code selector
+					td: code "[data-chart]:not(th)"
+					td The charts that can have a summary
+				tr
+					td: code delimiters
+					td: code ["{", "}"]
+					td The characters around a placeholder
+				tr
+					td: code langattribute
+					td: code "data-i18n"
+					td The attribute for translation keys. A name in a sentence keeps its key.
+				tr
+					td: code locale
+					td The language of the page
+					td The locale for numbers and lists
+				tr
+					td: code flat
+					td: code 5
+					td A change or a trend of less than this percentage is #[code flat]
+				tr
+					td: code outliers
+					td: code 25
+					td A value more than this percentage away from the trend is an outlier
+				tr
+					td: code words
+					td: code { up: "up", … }
+					td The words for #[code {trend}], #[code {change}] and #[code {side}]: #[code up], #[code down], #[code flat], #[code unclear], #[code above] and #[code below]
+
+		p With a script tag, #[code tablechart-summary.js] adds #[code Tablechart.Summary].
 
 	+section("Defaults")
 		p #[code defaultConfig] holds the default options.

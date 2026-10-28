@@ -1,5 +1,5 @@
 {
-    "mainLinks": [
+    "navItems": [
         {
             "text": "Intro",
             "href": "/intro.html"
@@ -11,9 +11,11 @@
         {
             "text": "Get started",
             "href": "/get-started.html"
-        }
-    ],
-    "sections": [
+        },
+        {
+            "text": "Data",
+            "href": "/data.html"
+        },
         {
             "title": "Chart types",
             "linksLabel": "Overview",
@@ -71,10 +73,6 @@
             ]
         },
         {
-            "text": "Data",
-            "href": "/data.html"
-        },
-        {
             "title": "Features",
             "links": [
                 {
@@ -111,6 +109,11 @@
                     "text": "Features | Step by step",
                     "label": "Step by step",
                     "href": "/features/steps.html"
+                },
+                {
+                    "text": "Features | Summary",
+                    "label": "Summary",
+                    "href": "/features/summary.html"
                 },
                 {
                     "text": "Features | Tooltips",

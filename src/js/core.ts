@@ -1,5 +1,6 @@
 import { axisBreak } from "./annotations/axis-break";
 import { bracket } from "./annotations/bracket";
+import { note } from "./annotations/note";
 import { reference } from "./annotations/reference";
 import { trend } from "./annotations/trend";
 import { bar } from "./charts/bar";
@@ -8,6 +9,7 @@ import { donut } from "./charts/donut";
 import { area, line } from "./charts/line";
 import { waterfall } from "./charts/waterfall";
 import {
+	AREA_CLASS,
 	AT_ONCE_CLASS,
 	AXIS_CLASS,
 	BREAK_GAP,
@@ -24,7 +26,10 @@ import {
 	PLOT_CLASS,
 	HOLE_CLASS,
 	VALUES_CLASS,
+	QUADRANT_CLASS,
 	REFERENCE_CLASS,
+	RULE_CLASS,
+	SERIES_CLASS,
 	LIBRARY_NAME,
 	SR_CLASS,
 	MINUS_CLASS,
@@ -35,7 +40,7 @@ import {
 import { decimalsIn, largest, splitSign } from "./functions/format";
 import { markerOf } from "./functions/markers";
 import { stackReach, stackTotal } from "./functions/groups";
-import { fitTogether } from "./functions/labels";
+import { fitTogether, keepInside, thinOut } from "./functions/labels";
 import { measureAll, sizeOf } from "./functions/measure";
 import type { Squeeze } from "./functions/scale";
 import { readSeries, readTable } from "./functions/read-table";
@@ -45,14 +50,17 @@ import type { Box } from "./functions/collision";
 import { debug } from "./functions/debug";
 import { applySteps, makeControls, planSteps, stepTo } from "./steps";
 import { attachTooltip, releaseTooltip } from "./tooltip";
-import type { AnnotationType, ChartState, ChartType, Geometry, Motion, Row, Shape } from "./types";
+import type { AnnotationType, ChartState, ChartType, Geometry, Motion, Row, Shape, ValuePick } from "./types";
 
 const CHARTS: Record<string, ChartType> = { area, bar, column, donut, line, waterfall };
 /** Adds a chart type for `data-chart="name"`, such as one from `@martinomagnifico/tablechart/additional-types`, before `init()`. */
+// A chart type can bring annotations of its own, such as the quadrant of a scatter chart.
 export const addType = (name: string, type: ChartType): void => {
 	CHARTS[name] = type;
+	Object.assign(ANNOTATIONS, type.annotations);
+	ANNOTATION_NAMES.splice(0, Infinity, ...Object.keys(ANNOTATIONS));
 };
-const ANNOTATIONS: Record<string, AnnotationType> = { "axis-break": axisBreak, trend, bracket, reference };
+const ANNOTATIONS: Record<string, AnnotationType> = { "axis-break": axisBreak, trend, bracket, reference, note };
 export const ANNOTATION_NAMES = Object.keys(ANNOTATIONS);
 
 /** Three passes: keys, then every text element, then geometry. Geometry makes no text, so a translation script that sweeps once finds it all. */
@@ -250,7 +258,10 @@ export const build = (
 	plot.setAttribute("aria-hidden", "true");
 	const svg = svgEl("svg", { role: "presentation", focusable: "false" });
 	plot.appendChild(svg);
-	figure.appendChild(plot);
+	// The chart goes where the table is, so the author decides what is above and under it, such as a summary.
+	const spot = figure.querySelector(":scope > table");
+	const put = (node: HTMLElement) => (spot ? spot.before(node) : figure.append(node));
+	put(plot);
 
 	// The marks take their decimal places from the marks alone; the middle keeps the total's own.
 	const marked = type.centre ? rows.filter((r) => !r.isTotal) : rows;
@@ -368,8 +379,9 @@ export const build = (
 	for (const [i, row] of rows.entries()) {
 		const span = document.createElement("span");
 		span.classList.add(...row.classes);
-		span.textContent = row.label;
-		if (row.key && config.langattribute) span.setAttribute(config.langattribute, row.key);
+		// The short name, if the row has one; its key then ends in `-short`, so a translation script gives it a short name too.
+		span.textContent = row.short ?? row.label;
+		if (row.key && config.langattribute) span.setAttribute(config.langattribute, row.short ? `${row.key}-short` : row.key);
 		if (type.centre) {
 			span.dataset.kind = row.isTotal ? "total" : "slice";
 			if (!row.isTotal) {
@@ -383,8 +395,9 @@ export const build = (
 		span.dataset.row = String(i + 1);
 		categories.appendChild(span);
 	}
-	(beside ? plot : figure).appendChild(categories);
-	if (legend) figure.appendChild(legend);
+	if (beside) plot.appendChild(categories);
+	else put(categories);
+	if (legend) put(legend);
 
 	// The headers of the first two value columns are the titles of the axes; layout makes the numbers along them.
 	const fields = series.filter((one) => !one.group);
@@ -408,8 +421,10 @@ export const build = (
 	type.text?.({ figure, plot, rows, series, config });
 
 	// A chart that steps (`data-fragment`) builds a step at a time, from left to right. Without animation it is shown whole.
-	const plan = animated(figure, config) && !type.axes ? planSteps(figure) : null;
-	if (type.axes && figure.querySelector("[data-fragment]")) debug.log(`A ${kind} chart has no steps, so it is shown whole.`, figure);
+	// A scatter chart has one step: the whole chart arrives together, after its axes and a quadrant, with `data-fragment` on the figure.
+	const plan = animated(figure, config) ? planSteps(figure, Boolean(type.axes)) : null;
+	if (type.axes && figure.querySelector("tbody [data-fragment], thead [data-fragment]"))
+		debug.log(`A ${kind} chart has one step, with data-fragment on the figure; its rows and columns have no steps of their own.`, figure);
 	if (plan) figure.setAttribute("data-steps", "");
 	const keys = figure.getAttribute("data-chart-keys");
 	const controls =
@@ -420,17 +435,7 @@ export const build = (
 					config.langattribute
 				)
 			: null;
-	if (controls) figure.appendChild(controls);
-
-	// The table under the chart, on screen, in print, or in print when numbers are left out.
-	const asked = figure.getAttribute("data-chart-table");
-	const table = asked && TABLES.includes(asked) ? asked : config.table;
-	if (table === "never") figure.removeAttribute("data-table");
-	else {
-		figure.setAttribute("data-table", table);
-		const own = figure.querySelector(":scope > table");
-		if (own) figure.append(own);
-	}
+	if (controls) put(controls);
 
 	const annotations = Array.from(figure.querySelectorAll<HTMLElement>("[data-annotation]"))
 		.map((spec) => {
@@ -457,6 +462,18 @@ export const build = (
 			};
 		})
 		.filter((a): a is NonNullable<typeof a> => a !== null);
+	// A row with a cell in a column with `data-note` gets a note on a chart with its rows across. The note is in the table,
+	// with its row, so it is not written again for screen readers.
+	if (!beside && !type.centre && !type.axes)
+		for (const [i, row] of rows.entries()) {
+			if (!row.note) continue;
+			const spec = document.createElement("span");
+			spec.dataset.annotation = "note";
+			spec.dataset.row = String(i + 1);
+			spec.textContent = row.note;
+			if (row.noteKey) spec.setAttribute("data-i18n", row.noteKey);
+			annotations.push({ spec, type: note, badge: note.create(spec, plot), series: 0, after: rows.length });
+		}
 
 	if (animated(figure, config)) figure.setAttribute("data-animate", motionOf(figure, kind, config, Boolean(plan)));
 
@@ -479,6 +496,7 @@ export const build = (
 		totalCell,
 		rowAt: null,
 		rowBox: null,
+		pointOf: null,
 		annotations,
 		checks: [],
 		plan,
@@ -572,9 +590,40 @@ const textHoles = (plot: HTMLElement, unit: number) => {
 	};
 };
 
+const VALUE_KEYS = ["first", "last", "highest", "lowest", "outliers"];
+
+/** `data-chart-values`, such as `auto`, `none` or `first last`: which values a line shows. `none` is the empty set. */
+const pickOf = (figure: HTMLElement, config: Config): ValuePick => {
+	const words = (figure.getAttribute("data-chart-values") ?? config.values).trim().toLowerCase().split(/\s+/).filter(Boolean);
+	for (const word of words)
+		if (!["auto", "all", "none", ...VALUE_KEYS].includes(word))
+			console.warn(`[${LIBRARY_NAME}] data-chart-values knows no "${word}". It takes auto, all, none, ${VALUE_KEYS.join(", ")}.`);
+	const keys = words.filter((word) => VALUE_KEYS.includes(word));
+	if (words.includes("all")) return { mode: "all", keys: [] };
+	if (words.includes("none")) return { mode: "set", keys: [] };
+	if (words.includes("auto") || !keys.length) return { mode: "auto", keys: keys.length ? keys : VALUE_KEYS };
+	return { mode: "set", keys };
+};
+
+/**
+ * Where the table and the summary are shown: on screen, in print, or in print when numbers are left out. Read at each layout,
+ * so a page that changes `data-chart-table` or `data-chart-summary` only needs `refresh()`. The table is already right under the chart.
+ */
+const showTable = ({ figure, rows, series }: ChartState, config: Config): void => {
+	const asked = figure.getAttribute("data-chart-table");
+	const table = asked && TABLES.includes(asked) ? asked : config.table;
+	if (table === "never") figure.removeAttribute("data-table");
+	else figure.setAttribute("data-table", table);
+	const summary = figure.getAttribute("data-chart-summary");
+	figure.setAttribute("data-summary", summary && TABLES.includes(summary) ? summary : config.summary);
+	// With more values than `tablelimit`, a table is too long to print with `auto`: the summary is printed instead.
+	figure.toggleAttribute("data-long", rows.length * series.filter((one) => !one.group).length > config.tablelimit);
+};
+
 /** Pass 3. Needs layout; makes no text, only places it. */
 export const layout = (state: ChartState, config: Config): boolean => {
 	const { plot, svg, rows, type, values, series, seriesValues, names, annotations } = state;
+	showTable(state, config);
 	// A figure's own `data-chart-aspect` beats the kind's and the page's.
 	const ownAspect = Number.parseFloat(state.figure.dataset.chartAspect ?? "");
 	const aspect = ownAspect > 0 ? ownAspect : (type.aspect ?? config.aspect);
@@ -645,8 +694,14 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	// Undo what the last layout did to the size of the text, then read every size at once, before anything is placed.
 	// Without numbers on the chart, only the first is measured, for the room above.
 	const shown = type.numbers === false ? values.slice(0, 1) : [...seriesValues.flat(), ...state.totals];
-	for (const node of shown) delete node.dataset.place;
+	for (const node of shown) {
+		delete node.dataset.place;
+		node.removeAttribute("data-left-out");
+		node.removeAttribute("data-cut");
+	}
 	plot.style.removeProperty("--_fit");
+	// Grouped numbers are smaller. Marked before they are measured, so the first layout measures them as every later one does.
+	plot.toggleAttribute("data-grouped", !!type.groups && !state.stacked && series.filter((one) => !one.chart && !one.group).length > 1);
 	state.categories[0]?.parentElement?.style.removeProperty("--_beside");
 
 	// The numbers along the axes, for a first guess at the room. Once they are measured, some may be left out.
@@ -748,7 +803,9 @@ export const layout = (state: ChartState, config: Config): boolean => {
 
 	const lineSeries = series.flatMap((one, s) => (one.chart ? [s] : []));
 	// A line over the columns has its numbers above its points, which needs more room.
-	const headroom = Math.max(type.headroom?.(room) ?? labelHeight, lineSeries.length ? (line.headroom?.(room) ?? 0) : 0);
+	// Notes are at the top, over the marks.
+	const noteRoom = rows.some((row) => row.note) ? badgeHeight + 4 * unit : 0;
+	const headroom = Math.max(type.headroom?.(room) ?? labelHeight, lineSeries.length ? (line.headroom?.(room) ?? 0) : 0) + noteRoom;
 	const floor = 2 * unit + (type.footroom?.(room) ?? 0) + (depth < 0 ? labelHeight + 4 * unit : 0);
 	const top = headroom;
 
@@ -948,6 +1005,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		domain: valueScale ? [valueScale.min, valueScale.max] : null,
 		stacked: state.stacked,
 		shape: shapeOf(state.figure, config),
+		pick: pickOf(state.figure, config),
 		totals: state.totals,
 		svg,
 		plot,
@@ -961,6 +1019,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		config,
 		checks: state.checks,
 		taken: [],
+		lineHoles: [],
 	};
 
 	// How many elements start one after the other, so the stagger can shrink under `--tablechart-animation-max`.
@@ -984,6 +1043,17 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		line.draw({ ...geo, own: lineSeries });
 	} else type.draw(geo);
 	if (geo.rowAt) state.rowAt = geo.rowAt;
+	state.pointOf = geo.pointOf ?? null;
+	// A name comes with the end of the marks: on a chart that builds in fewer stagger steps than it has rows, such as a line, sooner.
+	const staggered = Number(plot.style.getPropertyValue("--count")) || rows.length;
+	for (const name of state.figure.querySelectorAll<HTMLElement>(`.${NAME_CLASS}`))
+		name.style.setProperty("--i", String(Math.min(rows[rows.length - 1].slot, staggered - 1)));
+	// Numbers that overlap, such as on a long line, are thinned out. Grouped and stacked numbers have rules of their own.
+	if (!state.stacked && !plot.hasAttribute("data-grouped"))
+		for (const labels of seriesValues) {
+			keepInside(labels, unit, VIEWBOX_WIDTH);
+			thinOut(labels, unit, VIEWBOX_WIDTH, height);
+		}
 
 	// The numbers along the value axis, fewer where two would touch, and none in the cut of a broken scale.
 	if (along && valueScale) {
@@ -1043,16 +1113,81 @@ export const layout = (state: ChartState, config: Config): boolean => {
 
 	// Before anything reads styles, so new marks start at their step and do not transition to it.
 	applySteps(state);
+	// A legend comes with its first name, so its box is never empty. With steps, a name in no step is there with the axes.
+	for (const legend of state.figure.querySelectorAll<HTMLElement>(`.${LEGEND_CLASS}`)) {
+		const names = Array.from(legend.children) as HTMLElement[];
+		if (state.plan) for (const name of names) if (!name.style.getPropertyValue("--step")) name.style.setProperty("--i", "0");
+		const steps = names.map((name) => Number.parseFloat(name.style.getPropertyValue("--step")));
+		legend.style.setProperty("--i", String(Math.min(...names.map((name) => Number(name.style.getPropertyValue("--i")) || 0))));
+		if (steps.length && steps.every(Number.isFinite)) legend.style.setProperty("--step", String(Math.min(...steps)));
+		else legend.style.removeProperty("--step");
+	}
 
 	// Names under the plot shrink together, down to 70%, if one is wider than its column.
+	// If they still do not fit, every second, third or more is shown, at full size, centred under its column.
 	const nameRow = state.categories[0]?.parentElement;
 	if (nameRow && type.categories !== "beside" && !type.centre) {
-		fitTogether(
-			nameRow,
-			state.categories.filter((name) => name.offsetParent !== null),
-			(name) => ({ size: name.scrollWidth, room: name.clientWidth }),
-			"--_name-fit"
-		);
+		// Held at its height while the names are measured at full size, so the page under it does not move for a moment.
+		nameRow.style.height = `${nameRow.offsetHeight}px`;
+		nameRow.removeAttribute("data-thinned");
+		for (const name of state.categories) {
+			name.removeAttribute("data-left-out");
+			name.removeAttribute("data-edge");
+		}
+		const names = state.categories.filter((name) => name.offsetParent !== null);
+		const fit = fitTogether(nameRow, names, (name) => ({ size: name.scrollWidth, room: name.clientWidth }), "--_name-fit");
+		if (!fit && names.length > 1) {
+			// The room of one column, without the padding of the row, which a name with its own padding may be wider than.
+			const rowStyle = getComputedStyle(nameRow);
+			const column = (nameRow.clientWidth - Number.parseFloat(rowStyle.paddingLeft) - Number.parseFloat(rowStyle.paddingRight)) / rows.length;
+			nameRow.style.setProperty("--_name-fit", "1");
+			nameRow.setAttribute("data-thinned", "");
+			const widest = largest(names.map((name) => name.offsetWidth));
+			const gap = 8;
+			// A name at an end is inside the chart rather than centred, so it reaches further: the step leaves room for that too,
+			// and the names stay evenly spaced.
+			const step = Math.max(Math.ceil((widest + gap) / column), Math.ceil((1.5 * widest + gap) / column - 0.5), 1);
+			names.forEach((name, i) => {
+				if (i % step) name.setAttribute("data-left-out", "");
+			});
+			const kept = names.filter((name) => !name.hasAttribute("data-left-out"));
+			const first = kept[0];
+			const last = kept.at(-1);
+			// Only a name that would stick out past the chart is moved in.
+			const box = nameRow.getBoundingClientRect();
+			const sticksOut = [first, last].map((name) => name?.getBoundingClientRect());
+			if (first && sticksOut[0] && sticksOut[0].left < box.left) first.setAttribute("data-edge", "start");
+			if (last && last !== first && sticksOut[1] && sticksOut[1].right > box.right - Number.parseFloat(rowStyle.paddingRight)) {
+				last.setAttribute("data-edge", "end");
+				// The last name is not always in the last column; if it now touches the one before it, it is left out.
+				const before = kept.at(-2);
+				if (before && before.getBoundingClientRect().right + gap > last.getBoundingClientRect().left) last.setAttribute("data-left-out", "");
+			}
+		}
+		// Under a line or an area, a tick above each name shown, at the place of its row: also where the name moved in at an edge.
+		const ticked = (type === line || type === area) && turnedOn(state.figure, "data-chart-ticks", config.ticks);
+		nameRow.toggleAttribute("data-ticks", ticked);
+		nameRow.style.removeProperty("--_tick-reach");
+		if (ticked) {
+			// Up to the baseline, a little above the foot of the plot; not to a zero line in the middle, with values below zero.
+			const rule = Number(svg.querySelector(`.${RULE_CLASS}`)?.getAttribute("y1") ?? height);
+			const reach = height - rule;
+			if (reach > 0 && reach < 10 * unit) nameRow.style.setProperty("--_tick-reach", `${short(reach / unit)}px`);
+			const box = nameRow.getBoundingClientRect();
+			// In the row's own pixels, also on a slide that is scaled.
+			const scale = box.width / (nameRow.offsetWidth || 1);
+			const rowStyle = getComputedStyle(nameRow);
+			const pad = Number.parseFloat(rowStyle.paddingLeft);
+			const column = (nameRow.clientWidth - pad - Number.parseFloat(rowStyle.paddingRight)) / rows.length;
+			state.categories.forEach((name, i) => {
+				if (name.hasAttribute("data-left-out")) name.style.removeProperty("--_tick");
+				else {
+					const left = (name.getBoundingClientRect().left - box.left) / scale - nameRow.clientLeft;
+					name.style.setProperty("--_tick", `${short(pad + (i + 0.5) * column - left)}px`);
+				}
+			});
+		}
+		nameRow.style.height = "";
 	}
 
 	// A badge is a hole in the marks under it, so the background shows through.
@@ -1087,37 +1222,54 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	// Reference lines too, so a line across a chart stops at the names and numbers it would cross.
 	const grid = svg.querySelector<SVGElement>(`.${GRID_CLASS}`);
 	const references = Array.from(svg.querySelectorAll<SVGElement>(`.${REFERENCE_CLASS}`));
+	// The lines of a quadrant are there from the start, as the gridlines are, and get their gaps the same way.
+	const framing = [...(grid ? [grid] : []), ...svg.querySelectorAll<SVGElement>(`:scope > .${QUADRANT_CLASS}`)];
 	const holeUnder = textHoles(plot, unit);
+	// A growing line keeps its holes in the mask, which follows it as it grows.
+	const grows = state.figure.getAttribute("data-animate") === "grow";
+	const crossing = seriesValues.flat().filter((label) => label.hasAttribute("data-cut")).flatMap(holeUnder);
 	// The numbers of a line over columns are holes in the columns under them, as a badge is.
-	const numberHoles = lineSeries.flatMap((s) => seriesValues[s].flatMap(holeUnder));
-	if (grid || references.length) {
+	const numberHoles = [...lineSeries.flatMap((s) => seriesValues[s].flatMap(holeUnder)), ...(grows ? crossing : [])];
+	if (framing.length || references.length) {
 		const texts = [...seriesValues.flat(), ...state.totals, ...(type.categories === "beside" ? state.categories : [])];
 		const under = texts.flatMap(holeUnder);
 		// A line is left out where it crosses text, rather than masked: under a mask, Safari draws everything again on each frame.
 		// A reference line also around its own label. With steps, the grid keeps a mask, so each gap can arrive at its step.
 		const boxOf = (rect: SVGElement): Box => ["x", "y", "width", "height"].map((name) => Number(rect.getAttribute(name))) as Box;
 		for (const line of references) lineAround(line, [...under, ...holes].map(boxOf));
-		if (grid && state.plan) cutOut(svg, under, VIEWBOX_WIDTH, height, [grid]);
-		else if (grid) {
-			// Around each badge too, rather than under its mask, which only comes once the marks are still.
-			const gaps = [...under, ...holes];
-			const lines = linesIn(grid);
-			grid.setAttribute("d", lines.map(([x1, y1, x2, y2]) => piecesOf(x1, y1, x2, y2, gaps.map(boxOf))).join(""));
-			// Over each gap, the piece of gridline it leaves out, with the timing of its text: it fades as the text arrives.
-			// Under a badge it goes at once as the badge arrives, so the line never runs through it.
-			for (const rect of gaps) {
-				const d = piecesIn(lines, boxOf(rect));
-				const gap = rect.dataset.for === "badge" ? "badge" : "";
-				if (d) grid.after(svgEl("path", { class: GRID_CLASS, "data-gap": gap, d, style: rect.getAttribute("style") ?? "" }));
+		if (framing.length && state.plan) cutOut(svg, under, VIEWBOX_WIDTH, height, framing);
+		else
+			for (const path of framing) {
+				// Around each badge too, rather than under its mask, which only comes once the marks are still.
+				const gaps = [...under, ...holes];
+				const lines = linesIn(path);
+				path.setAttribute("d", lines.map(([x1, y1, x2, y2]) => piecesOf(x1, y1, x2, y2, gaps.map(boxOf))).join(""));
+				// Over each gap, the piece of line it leaves out, with the timing of its text: it fades as the text arrives.
+				// Under a badge it goes at once as the badge arrives, so the line never runs through it.
+				for (const rect of gaps) {
+					const d = piecesIn(lines, boxOf(rect));
+					const gap = rect.dataset.for === "badge" ? "badge" : "";
+					if (d) path.after(svgEl("path", { class: path.getAttribute("class") ?? GRID_CLASS, "data-gap": gap, d, style: rect.getAttribute("style") ?? "" }));
+				}
 			}
-		}
 	}
 	// A trend or a bracket is drawn while the chart builds, so it is kept out of each badge by a clip, from the start: it stops at the
 	// badge rather than running through it until the mask comes. Its arrowhead too.
 	clipAround(svg, holes, VIEWBOX_WIDTH, height, Array.from(svg.querySelectorAll<SVGElement>(`.${LINE_CLASS}, .${HEAD_CLASS}`)));
+	// The holes in the lines and areas, under open markers and values that cross a line, are there as the lines arrive.
+	// A line has its own clip as it sweeps in, so it gets a group for this one.
+	if (!grows && (geo.lineHoles.length || crossing.length)) {
+		const lines = Array.from(svg.querySelectorAll<SVGElement>(`.${SERIES_CLASS}`)).map((path) => {
+			const group = svgEl("g", {});
+			path.before(group);
+			group.append(path);
+			return group;
+		});
+		clipAround(svg, [...geo.lineHoles, ...crossing], VIEWBOX_WIDTH, height, [...lines, ...svg.querySelectorAll<SVGElement>(`.${AREA_CLASS}`)]);
+	}
 	// What is kept out of the badges another way stays out of that group: under its mask, a line that is drawn or fades would make
 	// Safari draw the whole group again on each frame. And the mask would wait for it. With steps, the grid keeps to the mask.
-	const loose = [REFERENCE_CLASS, LINE_CLASS, HEAD_CLASS, ...(state.plan ? [] : [GRID_CLASS])];
+	const loose = [REFERENCE_CLASS, QUADRANT_CLASS, LINE_CLASS, HEAD_CLASS, ...(state.plan ? [] : [GRID_CLASS])];
 	cutOut(svg, [...holes, ...numberHoles], VIEWBOX_WIDTH, height, undefined, loose.map((name) => `.${name}`).join(", "));
 	// Under a mask, Safari draws everything again on every frame, so every mask waits while the marks still have to build.
 	if (state.figure.hasAttribute("data-animate") && !state.figure.hasAttribute("data-steps") && !state.figure.classList.contains(SHOWN_CLASS))

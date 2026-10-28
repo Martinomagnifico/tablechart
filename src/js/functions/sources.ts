@@ -6,6 +6,10 @@ import { ANNOTATION_NAMES } from "../core";
 
 interface SourceRow {
 	label: string;
+	/** The name under the chart, where room is short, such as `"Nov ’21"` for `"November 2021"`. */
+	short?: string;
+	/** A note at this row, such as `"Share issue"`: a cell in a column with `data-note`. */
+	note?: string;
 	/** A string keeps its decimal places and the text around the number: `"1.0"`, `"71.8%"`. */
 	value?: string | number | null;
 	values?: (string | number | null)[];
@@ -155,9 +159,10 @@ export const adoptTables = (figures: HTMLElement[]): HTMLElement[] =>
 	});
 
 // An author's header row is kept; otherwise the file's names make one, if it has them.
-const tableFrom = (rows: SourceRow[], series: string[], label: string, table = document.createElement("table")): HTMLTableElement => {
+const tableFrom = (rows: SourceRow[], series: string[], label: string, table = document.createElement("table"), noteName = "Note"): HTMLTableElement => {
 	for (const old of table.querySelectorAll(":scope > tbody, :scope > tfoot, :scope > tr")) old.remove();
-	if (!table.tHead && (series.length || label)) {
+	const noted = rows.some((row) => row.note);
+	if (!table.tHead && (series.length || label || noted)) {
 		const head = table.createTHead().insertRow();
 		const corner = document.createElement("th");
 		corner.textContent = label;
@@ -175,9 +180,21 @@ const tableFrom = (rows: SourceRow[], series: string[], label: string, table = d
 		if (row.kind === "total") tr.dataset.kind = "total";
 		const th = document.createElement("th");
 		th.textContent = String(row.label ?? "");
+		if (row.short) th.dataset.short = row.short;
 		tr.append(th);
 		for (const value of row.values ?? [row.value ?? null])
 			tr.insertCell().textContent = value === null ? "" : String(value);
+		if (noted) tr.insertCell().textContent = row.note ?? "";
+	}
+	// The notes are a column of their own, after the values, with a header that says so; one the author wrote is kept.
+	const head = table.tHead?.rows[table.tHead.rows.length - 1];
+	if (noted && head && !head.querySelector("[data-note]")) {
+		const values = Math.max(...rows.map((row) => (row.values ?? [row.value]).length));
+		while (head.cells.length < values + 1) head.append(document.createElement("th"));
+		const th = document.createElement("th");
+		th.dataset.note = "";
+		th.textContent = noteName;
+		head.append(th);
 	}
 	return table;
 };
@@ -212,7 +229,7 @@ export const loadSources = async (figures: HTMLElement[]): Promise<void> => {
 						? data.series.map(String)
 						: [];
 					const label = typeof data?.label === "string" ? data.label : "";
-					const table = tableFrom(rows, series, label, authored ?? undefined);
+					const table = tableFrom(rows, series, label, authored ?? undefined, typeof data?.note === "string" ? data.note : undefined);
 					if (!authored) {
 						const caption = figure.querySelector(":scope > figcaption");
 						if (caption) caption.after(table);
