@@ -17,6 +17,10 @@
             "href": "/data.html"
         },
         {
+            "text": "Accessibility",
+            "href": "/accessibility.html"
+        },
+        {
             "title": "Chart types",
             "linksLabel": "Overview",
             "links": [
@@ -75,11 +79,6 @@
         {
             "title": "Features",
             "links": [
-                {
-                    "text": "Features | Accessibility",
-                    "label": "Accessibility",
-                    "href": "/features/accessibility.html"
-                },
                 {
                     "text": "Features | Animated parents",
                     "label": "Animated parents",

@@ -1,7 +1,7 @@
 extends /views/templates/layouts/_base
 
 append variables
-	- pagetitle = "Features | Accessibility"
+	- pagetitle = "Accessibility"
 	- pagedescription = "Accessibility in Tablechart: every chart is also a real table, for screen readers, print and PDF, and a long table can have a summary."
 
 block content
@@ -9,11 +9,11 @@ block content
 		.container
 			.page-header
 				h1 Accessibility
-				p.lead Every chart is also a real table: for screen readers, for print and PDF, and when JavaScript does not run. A long table can have a summary.
+				p.lead Tablecharts intends to be as inclusive as possible. Here are some accessibility benefits.
 
 	+section("What a screen reader gets")
-		p The table stays in the page. It is hidden from sight, but screen readers read it like any other table: the names of the rows and columns, and every number. The drawing is hidden from screen readers, with #[code aria-hidden="true"], so they do not read everything twice.
-		p The button shows the table that a screen reader reads, under the chart.
+		p The table stays on the page. It is hidden from sight, but screen readers read it like any other table: the names of the rows and columns, and every value. The chart is hidden from screen readers, with #[code aria-hidden="true"], so they do not read everything twice.
+		p This button shows the table that a screen reader reads out loud:
 
 		.lang-toggle(role="group" aria-label="The table of the example")
 			button.show-table(type="button" aria-pressed="false") Show the table
