@@ -499,3 +499,8 @@ hr {
 		}
 	}
 }
+
+// The row names of the comparison on the intro page are short, so they never wrap.
+.docs-content table.compare td:first-child {
+	white-space: nowrap;
+}

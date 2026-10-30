@@ -116,7 +116,7 @@ block content
 
 		.width-toggle.lang-toggle(role="group" aria-label="Width of the example")
 			button(type="button" data-width="" aria-pressed="true") Wide
-			button(type="button" data-width="360px" aria-pressed="false") Narrow
+			button(type="button" data-width="min(360px, 60%)" aria-pressed="false") Narrow
 		+chart(null, '1')
 			.text-box
 				figure(data-chart="column")

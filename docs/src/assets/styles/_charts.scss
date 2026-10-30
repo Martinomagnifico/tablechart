@@ -210,7 +210,8 @@
 	--tablechart-surface: inherit;
 }
 
-// The boxes that the Wide and Narrow buttons narrow, in the middle of their example.
+// The boxes that the Wide and Narrow buttons narrow, in the middle of their example. On a phone, Narrow is 60% of the width.
+.size-box,
 .type-box,
 .text-box {
 	margin-inline: auto;
