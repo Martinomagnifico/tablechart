@@ -29,7 +29,7 @@ block content
 
 	+section("The number in the middle")
 		p If a row has #[code data-kind="total"], its value is shown in the middle, and it is not a slice. If there is no total row, the middle shows the sum of the slices.
-		p Screen readers read the table, not the middle of the ring. So if there is no total row, Tablechart adds a hidden row to the bottom of the table with the sum, named "Total". To use another name, set the #[code totallabel] option. With #[code data-chart-keys], the name gets a translation key that ends in #[code -total].
+		p Screen readers read the table, not the middle of the ring. So if there is no total row, Tablechart adds a hidden row to the bottom of the table with the sum, named "Total". If you want to use another name, set the #[code totallabel] option. With #[code data-chart-keys], the name gets a translation key that ends in #[code -total].
 
 		+chart(null, '4')
 			figure(data-chart="donut")
@@ -70,4 +70,4 @@ block content
 				</figure>
 
 	+section("Next")
-		p By default, all slices use one colour, each one a bit lighter. To set a colour for each slice, see #[a(href=url('/styling/colours.html')) Colours].
+		p By default, all slices use one colour, each one a bit lighter. If you want to set a colour for each slice, see #[a(href=url('/styling/colours.html')) Colours].

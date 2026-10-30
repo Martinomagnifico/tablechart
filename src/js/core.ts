@@ -47,6 +47,7 @@ import { readSeries, readTable } from "./functions/read-table";
 import { clipAround, cutOut, htmlEl, placeAt, short, svgEl } from "./functions/svg";
 import { niceStep, readScale, type Scale, scaleOf, thin, ticksOf } from "./functions/axis";
 import type { Box } from "./functions/collision";
+import { inkInside } from "./functions/colour";
 import { debug } from "./functions/debug";
 import { applySteps, makeControls, planSteps, stepTo } from "./steps";
 import { attachTooltip, releaseTooltip } from "./tooltip";
@@ -395,6 +396,8 @@ export const build = (
 		span.dataset.row = String(i + 1);
 		categories.appendChild(span);
 	}
+	// How many slices share the colour steps, for a range from one colour to another.
+	if (type.centre) figure.style.setProperty("--_slice-count", String(slice));
 	if (beside) plot.appendChild(categories);
 	else put(categories);
 	if (legend) put(legend);
@@ -541,6 +544,12 @@ const insideAlign = (figure: HTMLElement): Geometry["insideAlign"] => {
 	return asked === "start" || asked === "center" || asked === "end" ? asked : null;
 };
 
+/** Where the numbers of columns and bars go. With a line over the columns, inside them where they fit, as the line takes the room above. */
+const labelsOf = (figure: HTMLElement, config: Config, withLine: boolean): Geometry["labels"] =>
+	figure.dataset.chartLabels === "inside" || (figure.dataset.chartLabels !== "outside" && (config.labels === "inside" || withLine))
+		? "inside"
+		: "outside";
+
 const cssLength = (figure: HTMLElement, unit: number, name: string, fallback: string) => {
 	const style = getComputedStyle(figure);
 	const raw = style.getPropertyValue(name).trim() || fallback;
@@ -624,6 +633,10 @@ const showTable = ({ figure, rows, series }: ChartState, config: Config): void =
 export const layout = (state: ChartState, config: Config): boolean => {
 	const { plot, svg, rows, type, values, series, seriesValues, names, annotations } = state;
 	showTable(state, config);
+	// With an end colour, lines and slices go from the first colour to the end colour, rather than lighter towards the background.
+	const style = getComputedStyle(state.figure);
+	state.figure.toggleAttribute("data-series-range", !!style.getPropertyValue("--tablechart-series-color-end").trim());
+	state.figure.toggleAttribute("data-slice-range", !!style.getPropertyValue("--tablechart-slice-color-end").trim());
 	// A figure's own `data-chart-aspect` beats the kind's and the page's.
 	const ownAspect = Number.parseFloat(state.figure.dataset.chartAspect ?? "");
 	const aspect = ownAspect > 0 ? ownAspect : (type.aspect ?? config.aspect);
@@ -759,6 +772,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 			rows: rows.length,
 			series: series.length,
 			stacked: state.stacked,
+			labels: labelsOf(state.figure, config, series.some((one) => one.chart)),
 		}) ?? 0
 	);
 
@@ -992,12 +1006,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		badgeHeight,
 		after: rows.length,
 		note: 0,
-		// With a line over the columns, the numbers of the columns go inside them where they fit, as the line takes the room above.
-		labels:
-			state.figure.dataset.chartLabels === "inside" ||
-			(state.figure.dataset.chartLabels !== "outside" && (config.labels === "inside" || lineSeries.length > 0))
-				? "inside"
-				: "outside",
+		labels: labelsOf(state.figure, config, lineSeries.length > 0),
 		insideAlign: insideAlign(state.figure),
 		breakAt,
 		squeeze: compress,
@@ -1291,6 +1300,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		(type.columns ? [state.categories] : [...seriesValues, state.totals]).some((all) => all.some((label) => !skip(label) && !seen(label) && !covered(label, all)))
 	);
 
+	inkInside(state.figure);
 	return true;
 };
 

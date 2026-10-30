@@ -56,8 +56,8 @@
 		}
 
 		:where(.tablechart-hole[data-for="badge"]) {
-			transition: opacity 0.3s ease;
-			transition-delay: calc(var(--after) * #{$stagger} + 0.35s);
+			transition: opacity calc(0.3s / #{$speed}) ease;
+			transition-delay: calc(var(--after) * #{$stagger} + calc(0.35s / #{$speed}));
 		}
 
 		// A marker grows from its middle, and its name arrives with it.
@@ -85,7 +85,7 @@
 
 		// Over the gap under a badge: as the badge arrives.
 		:where(.tablechart-grid[data-gap="badge"]) {
-			transition-delay: calc(var(--after) * #{$stagger} + 0.35s);
+			transition-delay: calc(var(--after) * #{$stagger} + calc(0.35s / #{$speed}));
 		}
 
 		// A connector is revealed from left to right by a clip, so its dots stay in place.
@@ -122,55 +122,48 @@
 
 		:where(.tablechart-break[data-part="edge"]) {
 			stroke-opacity: 0;
-			transition: stroke-opacity 0.2s ease;
+			transition: stroke-opacity calc(0.2s / #{$speed}) ease;
 			transition-delay: calc((var(--after) + 0.9) * #{$stagger});
 		}
 
 		:where(.tablechart-line) {
 			stroke-dasharray: var(--len);
 			stroke-dashoffset: var(--len);
-			transition: stroke-dashoffset var(--tablechart-annotation-duration, 0.6s) #{$easing};
+			transition: stroke-dashoffset calc(var(--tablechart-annotation-duration, 0.6s) / #{$speed}) #{$easing};
 			transition-delay: calc(var(--after) * #{$stagger});
 		}
 
 		:where(.tablechart-reference) {
 			opacity: 0;
-			transition: opacity 0.3s ease;
-			transition-delay: calc(var(--after) * #{$stagger} + 0.35s);
+			transition: opacity calc(0.3s / #{$speed}) ease;
+			transition-delay: calc(var(--after) * #{$stagger} + calc(0.35s / #{$speed}));
 		}
 
 		:where(.tablechart-head) {
 			opacity: 0;
-			transition: opacity 0.2s ease;
-			transition-delay: calc(var(--after) * #{$stagger} + 0.55s);
+			transition: opacity calc(0.2s / #{$speed}) ease;
+			transition-delay: calc(var(--after) * #{$stagger} + calc(0.55s / #{$speed}));
 		}
 
 		:where(.tablechart-badge) {
 			opacity: 0;
-			transition: opacity 0.3s ease;
-			transition-delay: calc(var(--after) * #{$stagger} + 0.35s);
+			transition: opacity calc(0.3s / #{$speed}) ease;
+			transition-delay: calc(var(--after) * #{$stagger} + calc(0.35s / #{$speed}));
 		}
-	}
-
-	// Columns and bars: a longer, even movement, so a long bar moves only a little on each frame, also on a large screen.
-	// A few columns start one after the other; the more there are, the more they overlap, down to 0.06 from 40 columns.
-	:where([data-chart="column"], [data-chart="bar"]) {
-		--_element: 0.8s;
-		--_ratio: clamp(0.06, calc(2.4 / var(--count, 1)), 0.24);
-		--_easing: cubic-bezier(0.37, 0, 0.63, 1);
 	}
 
 	// The number of a column or bar comes when its column is nearly grown; on a line it comes as the line reaches its point.
 	:where([data-animate]:is([data-chart="column"], [data-chart="bar"])) {
-		--_lag: 0.8;
+		--_lag: 0.75;
 	}
 	:where([data-animate][data-chart="waterfall"]) {
 		--_lag: 0.5;
 	}
 
-	// A waterfall grows column by column: the next starts when the one before it is at 95%. Under the maximum its columns get shorter too.
+	// A waterfall grows column by column: its stagger is 2.4 times that of other charts, so 0.6 by default, and the next column starts
+	// when the one before it is nearly done. Under the maximum its columns get shorter too, so they keep their order.
 	:where([data-chart="waterfall"]:not([data-animate="sweep"])) {
-		--_ratio: 0.6;
+		--_factor: var(--tablechart-waterfall-stagger-factor, 2.4);
 		--_keep: 1;
 	}
 
@@ -190,7 +183,7 @@
 		}
 
 		:where(.tablechart-badge, .tablechart-hole[data-for="badge"], .tablechart-grid[data-gap="badge"]) {
-			transition-delay: calc(#{$build} + 0.2s);
+			transition-delay: calc(#{$build} + calc(0.2s / #{$speed}));
 		}
 
 		:where(.tablechart-break[data-part="edge"]) {
@@ -221,7 +214,7 @@
 		}
 
 		:where(.tablechart-badge, .tablechart-hole[data-for="badge"]) {
-			transition-delay: calc(var(--after) * #{$step-time} + 0.2s);
+			transition-delay: calc(var(--after) * #{$step-time} + calc(0.2s / #{$speed}));
 		}
 	}
 
@@ -290,7 +283,7 @@
 		:where(.tablechart-point, .tablechart-hole:not([data-for])) {
 			opacity: 0;
 			transform: translateY(var(--rise, 0));
-			transition: transform #{$rise} #{$easing}, opacity 0.15s ease;
+			transition: transform #{$rise} #{$easing}, opacity calc(0.15s / #{$speed}) ease;
 			transition-delay: 0s;
 		}
 		// The gaps under text; one under a badge keeps the badge's moment.

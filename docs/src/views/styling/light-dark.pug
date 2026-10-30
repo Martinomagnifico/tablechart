@@ -45,7 +45,7 @@ block content
 				--tablechart-bar-color: light-dark(seagreen, palegreen);
 			}
 
-		p #[code light-dark()] only works if the page says it has a light and a dark mode, with #[code color-scheme]. To follow the setting of the system, set it on #[code :root]:
+		p #[code light-dark()] only works if the page says it has a light and a dark mode, with #[code color-scheme]. If you want to follow the setting of the system, set it on #[code :root]:
 
 		+codeblock('CSS').
 			:root {
@@ -125,7 +125,7 @@ block content
 			}
 
 	+section("Numbers inside bars")
-		p The number inside a bar is dark or light, whichever reads on the colour of the bar. You do not need to set it for light and dark mode. To set it yourself, use #[code --tablechart-bar-value-color], #[code --tablechart-up-value-color], #[code --tablechart-down-value-color] or #[code --tablechart-total-value-color].
+		p The number inside a bar is in the background colour if that has a contrast of 4.5:1 with the bar. If not, it is black or white, whichever has more contrast. You do not need to set it for light and dark mode. If you want to set it yourself, use #[code --tablechart-bar-value-color], #[code --tablechart-up-value-color], #[code --tablechart-down-value-color] or #[code --tablechart-total-value-color].
 
 	+section("Background")
 		p The background colour of a chart, #[code --tablechart-surface], is the background the browser uses for the page: white in light mode and dark in dark mode. Lighter lines and slices are mixed with it. If your page has another background, set #[code --tablechart-surface] with two values as well. See #[a(href=url('/styling/background.html')) Background].

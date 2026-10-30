@@ -51,7 +51,7 @@ block content
 							// …one row per column
 
 	+section("Numbers inside the columns")
-		p Add #[code data-chart-labels="inside"] to show each number inside its column, at the top. To align it at the bottom of the column or in the middle instead, see #[a(href=url('/styling/text.html')) Text]. If a column is too short for its number, the number is shown above it.
+		p If you want each number inside its column, at the top, add #[code data-chart-labels="inside"]. If you want it at the bottom of the column or in the middle, see #[a(href=url('/styling/text.html')) Text]. If a column is too short for its number, the number is shown above it.
 
 		.card
 			.demo
@@ -75,8 +75,8 @@ block content
 				figure(data-chart="column" data-chart-labels="inside")
 
 	+section("Height")
-		p The height of a chart is a share of its width. Set it with #[code data-chart-aspect]. The default is #[code 0.38].
-		p On a narrow screen, a chart is never less high than #[code --tablechart-min-height]: #[code 200px] by default. Below that width, the height stays the same. Use #[code px], #[code em] or #[code rem], or #[code none] for no minimum.
+		p The height of a chart is a share of its width, set with #[code data-chart-aspect]. The default is #[code 0.38].
+		p On a narrow screen, a chart is never less high than #[code --tablechart-min-height]: #[code 200px] by default. Below that width, the height stays the same. It can be in #[code px], #[code em] or #[code rem], or #[code none] for no minimum.
 
 		+chart(null, '1')
 			figure(data-chart="column" data-chart-aspect="0.6")
@@ -151,17 +151,17 @@ block content
 								td= row[1]
 								td= row[2]
 
-		p Each column of a group is a bit lighter than the one before it. To set a colour for each, use a #[a(href=url('/styling/colours.html')) palette]. A class on a row styles its whole group, as the Granny Johnson does here:
+		p Each column of a group is a bit lighter than the one before it. If you want to set a colour for each, use a #[a(href=url('/styling/colours.html')) palette]. A class on a row styles its whole group, as the Granny Johnson does here:
 
 		+style.
 			.granny {
-				--tablechart-bar-color: #7fb03f;
+				--tablechart-bar-color: light-dark(#3a6413, #7fb03f);
 			}
 
 		p If the numbers are wider than their columns, they all get smaller together, down to 70% of their size. If they still do not fit, none of them are shown. If you point at the row, or tap it, a tooltip shows the numbers of that row.
 
 	+section("Stacked columns")
-		p Add #[code data-chart-stack] to the figure. The values of a row are shown on top of each other, the first value column at the bottom. Values below zero are stacked down from the baseline. The total of the row is above the column.
+		p If the figure has #[code data-chart-stack], the values of a row are shown on top of each other, the first value column at the bottom. Values below zero are stacked down from the baseline. The total of the row is above the column.
 
 		+chart(null, '1')
 			figure(data-chart="column" data-chart-stack)
@@ -205,7 +205,7 @@ block content
 								td= row[2]
 
 	+section("Columns and a line")
-		p To show a value column as a line over the columns, add #[code data-chart="line"] to its header. The line uses the same scale as the columns. Each point is in the middle of its column, and arrives with it.
+		p If you want to show a value column as a line over the columns, add #[code data-chart="line"] to its header. The line uses the same scale as the columns. Each point is in the middle of its column, and arrives with it.
 
 		+chart(null, '5')
 			figure(data-chart="column")
@@ -226,7 +226,7 @@ block content
 								td= row[1]
 								td= row[2]
 
-		p Use a line for values that have an order, such as months or years. The legend shows a box for the columns and a line for the line.
+		p A line suits values that have an order, such as months or years. The legend shows a box for the columns and a line for the line.
 		p If a number of the line is on a column, the column is cut away under the number, so the number can be read. The numbers of the columns are inside the columns if they fit. If a point of the line covers a number, or a number has no room, the number is left out. If you point at the row, or tap it, a tooltip shows the numbers of that row.
 		p A chart with a line cannot be stacked.
 
@@ -239,7 +239,7 @@ block content
 				`${months[i % 12].slice(0, 3)} ’${24 + Math.floor(i / 12)}`,
 				String(Math.round(60 + i * 1.5 + 25 * Math.cos(((i % 12) - 6) / 6 * Math.PI))),
 			]);
-		p With many columns, only every second, third or more number is shown, so they do not touch, and the names under the chart get smaller or fewer. Give a row a short name for under the chart with #[code data-short]; the table keeps the full name for a screen reader. See #[a(href=url('/types/line.html#many-rows')) Many rows].
+		p With many columns, only every second, third or more number is shown, so they do not touch, and the names under the chart get smaller or fewer. If a row has a short name in #[code data-short], that name goes under the chart, and the table keeps the full name for a screen reader. See #[a(href=url('/types/line.html#many-rows')) Many rows].
 
 		.card
 			.demo
@@ -256,7 +256,7 @@ block content
 				<tr><th data-short="#{visits[0][1]}">#{visits[0][0]}</th><td>#{visits[0][2]}</td></tr>
 
 	+section("A bar chart on narrow screens")
-		p A column chart with many rows can be shown as a bar chart when it is narrow. Set #[code --tablechart-type: bar] on the figure, in a container query or a media query. The chart is built again as a bar chart when the query applies, and as a column chart when it does not.
+		p A column chart with many rows can be shown as a bar chart when it is narrow. If the figure has #[code --tablechart-type: bar] in a container query or a media query, the chart is built again as a bar chart when the query applies, and as a column chart when it does not.
 
 		+style.
 			.type-box {
@@ -315,7 +315,7 @@ block content
 					span(data-annotation="axis-break" data-from="20")
 
 	+section("Axis and gridlines")
-		p By default there is no value axis: the numbers on the columns show the values. To add numbers along the axis, on the left, add #[code data-chart-axis]. To add a light line at each of those numbers, add #[code data-chart-grid]. You can add one of them, or both. To add them to every chart, set the #[code axis] and #[code grid] options to #[code true].
+		p By default there is no value axis: the numbers on the columns show the values. If you want numbers along the axis, on the left, add #[code data-chart-axis]. If you want a light line at each of those numbers, add #[code data-chart-grid]. You can add one of them, or both. If you want to add them to every chart, set the #[code axis] and #[code grid] options to #[code true].
 
 		+chart(null, '1')
 			figure(data-chart="column" data-chart-axis data-chart-grid)
@@ -327,7 +327,7 @@ block content
 								th= row[0]
 								td= row[1]
 
-		p If a chart has an axis or gridlines, its scale ends on a number of the axis. To set the scale yourself, add #[code data-chart-scale], such as #[code data-chart-scale="0 100"]. To change how the axis and gridlines look, see #[a(href=url('/styling/axes.html')) Axes and gridlines].
+		p If a chart has an axis or gridlines, its scale ends on a number of the axis. If you want to set the scale yourself, add #[code data-chart-scale], such as #[code data-chart-scale="0 100"]. If you want to change how the axis and gridlines look, see #[a(href=url('/styling/axes.html')) Axes and gridlines].
 
 	+section("Next")
 		p #[a(href=url('/features/annotations.html')) Annotations] add a bracket or a trend arrow to a column chart.

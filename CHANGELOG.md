@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.2.2] - 2026-10-30
+
+### Added
+
+- An animation playground in the docs, under Styling: sliders for the speed, the stagger and the time of a chart, with the CSS to copy. It shows how the settings work together before you set them.
+- `--tablechart-animation-min`, the shortest a chart takes to build: 0.5s by default. A chart with few columns no longer looks rushed.
+- `--tablechart-waterfall-stagger-factor`, how many times the stagger a waterfall has: 2.4 by default, so it still builds column by column.
+- `--tablechart-series-color-end` and `--tablechart-slice-color-end`, with `--tablechart-series-color-start` and `--tablechart-slice-color-start` as other names for the first colour: lines, parts and slices go from one colour to another in even steps. If both ends have enough contrast, every step in between has it too.
+- `--tablechart-animation-speed`, to make every chart faster or slower, such as `1.25` for a quarter faster. All times scale together.
+
+
+### Changed
+
+- The parts of a stacked column or bar have a gap of 1px between them, but not at the zero line. Two parts in similar colours stay apart. `--tablechart-stack-gap` sets it.
+- A number inside a bar has at least 4.5:1 with the bar: in the background colour if that has enough, else a bit lighter or darker, else black or white. Before, a number on a middle colour could have less than 4.5:1.
+- With `debug`, the console warns about a line, slice or bar with a contrast below 3:1 with the background. That is the minimum for parts of a chart (WCAG 1.4.11).
+
+### Fixed
+
+- Every chart type has the same animation defaults: 0.4s per element, a stagger of 0.25, `ease-in-out`, and 0.5s to 2s for a whole chart. In 1.2.0, a column chart with 10 or more columns took up to 3s.
+
+
+
 ## [1.2.0] - 2026-10-28
 
 ### Added

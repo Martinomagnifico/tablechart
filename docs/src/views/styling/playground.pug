@@ -1,0 +1,176 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Styling | Animation playground"
+	- pagedescription = "Try the animation settings of Tablechart with sliders, and copy the CSS."
+
+//- The styles are in assets/styles/_playground.scss, the script in assets/scripts/playground.js.
+
+mixin rows(list)
+	table
+		tbody
+			each row in list
+				tr
+					th= row[0]
+					td= row[1]
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Animation playground
+				p.lead Tweak the animation settings, and copy the resulting CSS variables.
+
+	+section("Try it")
+		p If you move a slider and release it, the charts build again. The sliders stay in view while the page scrolls. A setting that is not changed keeps its default.
+
+		p The pink part of a slider shows where the other setting holds it back, for the number of columns and bars under the sliders. The stagger and the maximum depend on each other: the more columns or bars a chart has, the sooner the maximum moves the starts closer together.
+		p The maximum always wins. If it holds the stagger back, a hollow mark on the stagger slider shows the stagger that is used, and the value beside the slider shows both, such as 0.6 → 0.10. Your CSS keeps the stagger you set: on a chart with fewer columns, it is used as it is.
+
+
+
+		.playground-bar
+			.playground-controls
+				.playground-row
+					label(for="pg-min") Min total time
+					input#pg-min(type="range" min="0" max="3" step="0.05" value="0.5" data-var="--tablechart-animation-min" data-unit="s")
+					output(for="pg-min")
+					span.lang-toggle
+						button.playground-reset(type="button" data-for="pg-min") Reset
+				.playground-row
+					label(for="pg-max") Max total time
+					input#pg-max(type="range" min="0.5" max="6" step="0.05" value="2" data-var="--tablechart-animation-max" data-unit="s")
+					output(for="pg-max")
+					span.lang-toggle
+						button.playground-reset(type="button" data-for="pg-max") Reset
+				.playground-row
+					label(for="pg-speed") Speed
+					input#pg-speed(type="range" min="0.5" max="2" step="0.05" value="1" data-var="--tablechart-animation-speed" data-unit="")
+					output(for="pg-speed")
+					span.lang-toggle
+						button.playground-reset(type="button" data-for="pg-speed") Reset
+				.playground-row
+					label(for="pg-element") Element time
+					input#pg-element(type="range" min="0.2" max="2" step="0.01" value="0.4" data-var="--tablechart-animation-element-duration" data-unit="s")
+					output(for="pg-element")
+					span.lang-toggle
+						button.playground-reset(type="button" data-for="pg-element") Reset
+				.playground-row
+					label(for="pg-stagger") Stagger
+					span.playground-track
+						input#pg-stagger(type="range" min="0" max="1" step="0.01" value="0.25" data-var="--tablechart-animation-stagger" data-unit="")
+						span.playground-used(hidden aria-hidden="true")
+					output(for="pg-stagger")
+					span.lang-toggle
+						button.playground-reset(type="button" data-for="pg-stagger") Reset
+				.playground-row
+					label(for="pg-ease") Easing
+					select#pg-ease.styled-select(data-var="--tablechart-animation-ease" data-unit="")
+						button
+							selectedcontent
+							+chevron(18, 'down')
+						option.choice(value="") ease-in-out
+						option.choice(value="cubic-bezier(0.37, 0, 0.63, 1)") Even
+						option.choice(value="cubic-bezier(0.26, 0.86, 0.44, 0.985)") Fast start
+						option.choice(value="ease-out") ease-out
+						option.choice(value="linear") linear
+			.playground-count
+				.playground-row
+					label(for="pg-count") Show cols/bars
+					input#pg-count(type="range" min="2" max="40" step="1" value="10")
+					output(for="pg-count") 10
+					span
+				p.playground-count-note Only for this preview. The more, the sooner the maximum limits the stagger.
+			.playground-actions
+				span.lang-toggle
+					button.playground-reset-all(type="button") All defaults
+				button.btn.solid.playground-build(type="button") Build again
+
+		.playground-charts
+			.card.playground-columns
+				.demo
+					figure#pg-column(data-chart="column")
+						figcaption: b Columns
+						+rows(Array.from({ length: 10 }, (_, i) => [String(i + 1), String(20 + ((i * 37) % 60))]))
+				p.playground-result
+
+			.grid-2
+				div
+					.card
+						.demo
+							figure#pg-bar(data-chart="bar")
+								figcaption: b Bars
+								+rows(Array.from({ length: 10 }, (_, i) => [String(i + 1), String(20 + ((i * 37) % 60))]))
+				div
+					.card
+						.demo
+							figure(data-chart="line")
+								figcaption: b Line
+								+rows([['Jan', '42'], ['Feb', '45'], ['Mar', '51'], ['Apr', '49'], ['May', '58'], ['Jun', '63'], ['Jul', '61'], ['Aug', '67'], ['Sep', '72'], ['Oct', '70'], ['Nov', '76'], ['Dec', '81']])
+				div
+					.card
+						.demo
+							figure(data-chart="donut")
+								figcaption: b Donut
+								+rows([['Elstar', '42'], ['Jonagold', '28'], ['Braeburn', '18'], ['Gala', '12']])
+				div
+					.card
+						.demo
+							figure(data-chart="waterfall")
+								figcaption: b Waterfall
+								table
+									tbody
+										tr(data-kind="total")
+											th Start
+											td 120
+										tr
+											th Sold
+											td -45
+										tr
+											th Picked
+											td 60
+										tr
+											th Spoiled
+											td -12
+										tr(data-kind="total")
+											th End
+											td 123
+						p.playground-card-note A waterfall multiplies the stagger by 2.4, so it builds column by column. If you want it to build like the other charts, set #[code --tablechart-waterfall-stagger-factor] to #[code 1].
+
+	+section("The settings")
+		dl.playground-settings
+			dt Speed
+			dd Faster or slower than the defaults, as a factor: 1.25 is a quarter faster, 0.8 is slower. Every time is divided by it, also an element time or a maximum you set. Default: 1.
+			dt Element time
+			dd How long one bar, column, point or slice takes. Default: 0.4s.
+			dt Stagger
+			dd When the next element starts, as a share of the element time. At 0 all start together, at 1 each waits for the one before it. Default: 0.25. Note that a waterfall multiplies it by 2.4, so it builds column by column. If you want it to build like the other charts, set #[code --tablechart-waterfall-stagger-factor] to #[code 1].
+				span.playground-limit(data-limit="stagger")
+			dt Minimum
+			dd The shortest a whole chart takes. If a chart would end sooner, its columns and their starts slow down together until it takes this long. Default: 0.5s.
+				span.playground-limit(data-limit="min")
+			dt Maximum
+			dd The longest a whole chart may take. Above it, the starts move closer together. Default: 2s.
+				span.playground-limit(data-limit="max")
+			dt Easing
+			dd How a movement speeds up and slows down. Default: ease-in-out.
+
+
+
+	+section("Your CSS")
+		p Only the settings you changed are in it.
+
+		.code-block
+			.code-header
+				| CSS
+				button.copy Copy
+			pre
+				code.live-code.language-css.playground-css
+
+		p The settings are kept in this browser only, so they are still here when you come back. They do not go anywhere else. If you want to use them on your own site, in a Reveal.js presentation or with Tablechart from npm, add the CSS to your own stylesheet. On #[code :root] they hold for every chart on the page. You can also put them on one figure, or on a section with several charts. In Reveal.js, #[code .reveal] works as well.
+
+	//- Its script runs before Tablechart starts, so it can keep the column and bar charts as written.
+	if isProd
+		script(src=`${basePath}assets/scripts/playground.js` vite-ignore defer)
+	else
+		script(type="module" src="/src/assets/scripts/playground.js")

@@ -28,7 +28,7 @@ block content
 								td= row[1]
 
 	+section("Smooth")
-		p Add #[code data-chart-shape="smooth"] to the figure. The line is a curve through every point. It never goes higher or lower than the points on either side of it, so the curve shows no peak or dip that is not in the data, and a flat stretch stays flat.
+		p If the figure has #[code data-chart-shape="smooth"], the line is a curve through every point. It never goes higher or lower than the points on either side of it, so the curve shows no peak or dip that is not in the data, and a flat stretch stays flat.
 
 		+chart(null, '1')
 			figure(data-chart="line" data-chart-shape="smooth")
@@ -43,10 +43,10 @@ block content
 								th= row[0]
 								td= row[1]
 
-		p To make every line and area smooth, set the #[code shape] option to #[code "smooth"]. Then #[code data-chart-shape="straight"] makes one chart straight again.
+		p If you want to make every line and area smooth, set the #[code shape] option to #[code "smooth"]. Then #[code data-chart-shape="straight"] makes one chart straight again.
 
 	+section("Grow")
-		p Add #[code data-chart-animate="grow"] to the figure. The line grows from zero instead of from left to right. The points move with it, and the numbers appear when it is done.
+		p If the figure has #[code data-chart-animate="grow"], the line grows from zero instead of from left to right. The points move with it, and the numbers appear when it is done.
 
 		+chart(null, '1')
 			figure(data-chart="line" data-chart-shape="smooth" data-chart-animate="grow")
@@ -61,7 +61,7 @@ block content
 								th= row[0]
 								td= row[1]
 
-		p To make every line and area grow, set the #[code animate] option to #[code "grow"]. A chart with triggered steps (like from Reveal.js fragments) still builds from left to right. See #[a(href=url('/styling/animation.html')) Animation].
+		p If you want to make every line and area grow, set the #[code animate] option to #[code "grow"]. A chart with triggered steps (like from Reveal.js fragments) still builds from left to right. See #[a(href=url('/styling/animation.html')) Animation].
 
 	+section("Below zero")
 		p A line can cross zero. A number below zero is shown under its point, and a grey line marks zero.
@@ -127,7 +127,7 @@ block content
 								td= row[3]
 								td= row[4]
 
-		p To choose the point of a line, add #[code data-marker] to its column header: #[code circle], #[code square] or #[code diamond]. Add #[code open] for an open point, such as #[code data-marker="diamond open"].
+		p If you want another point on a line, add #[code data-marker] to its column header: #[code circle], #[code square] or #[code diamond]. If you want an open point, add #[code open], such as #[code data-marker="diamond open"].
 
 		+chart(null, '4')
 			figure(data-chart="line" data-chart-legend)
@@ -147,7 +147,7 @@ block content
 		p An open point is cut out of the line, so the background shows through it.
 
 	+section("Dashed and dotted lines")
-		p Add #[code data-line="dashed"] or #[code data-line="dotted"] to the column header of a line. The legend shows the same line.
+		p If the column header of a line has #[code data-line="dashed"] or #[code data-line="dotted"], the line is dashed or dotted. The legend shows the same line.
 
 		+chart(null, '5')
 			figure(data-chart="line" data-chart-legend)
@@ -170,10 +170,10 @@ block content
 								td= row[4]
 
 		p #[code --tablechart-series-dash] and #[code --tablechart-series-dot] set the pattern, in pixels: #[code 6 4] and #[code 0 4] by default.
-		p To give each line its own colour, use a #[a(href=url('/styling/colours.html')) palette].
+		p If you want to give each line its own colour, use a #[a(href=url('/styling/colours.html')) palette].
 
 	+section("Highlight a line")
-		p Add #[code data-kind="focus"] to the header of a line. That line keeps its colour and shows its numbers. The other lines are shown fainter.
+		p If the header of a line has #[code data-kind="focus"], that line keeps its colour and shows its numbers. The other lines are shown fainter.
 
 		+chart(null, '4')
 			figure(data-chart="line")
@@ -193,7 +193,7 @@ block content
 								td= row[3]
 
 	+section("Steps")
-		p Add #[code data-chart-shape="step"] to the figure. Each value is a flat line across the width of its row, and the line goes straight up or down to the next row. A step line has no points. A number is shown only where the value changes, in the middle of the rows that have that value.
+		p If the figure has #[code data-chart-shape="step"], each value is a flat line across the width of its row, and the line goes straight up or down to the next row. A step line has no points. A number is shown only where the value changes, in the middle of the rows that have that value.
 
 		+chart(null, '1')
 			figure(data-chart="line" data-chart-shape="step")
@@ -209,7 +209,7 @@ block content
 								td= row[1]
 
 	+section("Stacked lines")
-		p Add #[code data-chart-stack] to the figure. Each line starts on top of the one before it. For stacked lines, an #[a(href=url('/types/area.html')) area chart] is usually easier to read.
+		p If the figure has #[code data-chart-stack], each line starts on top of the one before it. For stacked lines, an #[a(href=url('/types/area.html')) area chart] is usually easier to read.
 
 	+section("Missing values")
 		p If a cell has no number, such as #[code n/a], the line has a gap there.
@@ -240,7 +240,7 @@ block content
 			li Each name has a tick above it, at the place of its row, so you can see which point it belongs to, also when it moved in. They have the colour and width of the gridlines, a little stronger. #[code --tablechart-tick-color], #[code --tablechart-tick-opacity] and #[code --tablechart-tick-width] change them. #[code data-chart-ticks="false"], or the #[code ticks] option, turns the ticks off.
 			li A point is shown where a value is. If all values are shown and the points would touch each other, the line has no points.
 
-		p A short name under the chart needs less room. Give a row its full name in the table, which a screen reader and the tooltip read, and a short name for under the chart with #[code data-short].
+		p A short name under the chart needs less room. A row can have its full name in the table, which a screen reader and the tooltip read, and a short name for under the chart in #[code data-short].
 
 		.card
 			.demo
@@ -267,7 +267,7 @@ block content
 					</table>
 				</figure>
 
-		p A row with a translation key, such as #[code juice-row11], gets the key #[code juice-row11-short] for its short name under the chart. Give your translation script a short name for that key too.
+		p A row with a translation key, such as #[code juice-row11], gets the key #[code juice-row11-short] for its short name under the chart. A translation script then needs a short name for that key too.
 		p For a long table, a summary can say in a few sentences what a listener needs, such as the highest value and the trend. See #[a(href=url('/features/summary.html')) Summary].
 
 	+section("Which values are shown")
@@ -296,10 +296,10 @@ block content
 					td All values. If they would touch, every second, third or more.
 				tr
 					td: code none
-					td No values. Use it with #[code data-chart-axis], so the values can be read along the axis.
+					td No values. With #[code data-chart-axis], the values can be read along the axis.
 				tr
 					td: code first last highest lowest outliers
-					td Only these. Use any of them, in any order. #[code outliers] are the values more than 25% from the trend, as in a #[a(href=url('/features/summary.html#trend-and-outliers')) summary].
+					td Only these, any of them, in any order. #[code outliers] are the values more than 25% from the trend, as in a #[a(href=url('/features/summary.html#trend-and-outliers')) summary].
 				tr
 					td: code auto last
 					td All values if they fit, and else only the ones after #[code auto].
@@ -334,7 +334,7 @@ block content
 		p A value that is not shown is in the tooltip of its row, and in the table for screen readers. In print, #[code data-chart-table="auto"] prints the table, or the summary if the table is long. See #[a(href=url('/features/summary.html')) Summary].
 
 	+section("Axis and gridlines")
-		p By default there is no value axis: the numbers on the points show the values. To add numbers along the axis, on the left, add #[code data-chart-axis]. To add a light line at each of those numbers, add #[code data-chart-grid]. You can add one of them, or both. To add them to every chart, set the #[code axis] and #[code grid] options to #[code true].
+		p By default there is no value axis: the numbers on the points show the values. If you want numbers along the axis, on the left, add #[code data-chart-axis]. If you want a light line at each of those numbers, add #[code data-chart-grid]. You can add one of them, or both. If you want to add them to every chart, set the #[code axis] and #[code grid] options to #[code true].
 
 		+chart(null, '1')
 			figure(data-chart="line" data-chart-axis data-chart-grid)
@@ -349,7 +349,7 @@ block content
 								th= row[0]
 								td= row[1]
 
-		p If a chart has an axis or gridlines, its scale ends on a number of the axis. To set the scale yourself, add #[code data-chart-scale], such as #[code data-chart-scale="0 100"]. To change how the axis and gridlines look, see #[a(href=url('/styling/axes.html')) Axes and gridlines].
+		p If a chart has an axis or gridlines, its scale ends on a number of the axis. If you want to set the scale yourself, add #[code data-chart-scale], such as #[code data-chart-scale="0 100"]. If you want to change how the axis and gridlines look, see #[a(href=url('/styling/axes.html')) Axes and gridlines].
 
 	+section("Next")
-		p To show the names in a row under the chart, see #[a(href=url('/features/legends.html')) Legends].
+		p If you want to show the names in a row under the chart, see #[a(href=url('/features/legends.html')) Legends].

@@ -18,6 +18,7 @@
 	}
 }
 
+// Between the parts of a stack is a gap of `--tablechart-stack-gap`, so two parts in similar colours stay apart.
 .tablechart-piece {
 	fill: #{$seriesink};
 }
@@ -158,4 +159,12 @@
 		stroke-linejoin: round;
 		vector-effect: non-scaling-stroke;
 	}
+}
+
+// With an end colour, each line, bar or slice is a step from the first colour to the end colour, in even steps.
+:where([data-series-range]) * {
+	--_series-range: color-mix(in oklab, #{$seriesbase} calc(100% - var(--n, 0) / max(var(--_series-count, 2) - 1, 1) * 100%), var(--tablechart-series-color-end));
+}
+:where([data-slice-range]) * {
+	--_slice-range: color-mix(in oklab, var(--tablechart-slice-color, var(--tablechart-slice-color-start, currentColor)) calc(100% - var(--n, 0) / max(var(--_slice-count, 2) - 1, 1) * 100%), var(--tablechart-slice-color-end));
 }

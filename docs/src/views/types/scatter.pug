@@ -14,7 +14,7 @@ block content
 
 	+section("Scatter chart")
 		p Each row is a marker. The first value column is the position across, the second the position up. The headers of those two columns are the titles of the axes. The name of the row is shown next to its marker.
-		p The scatter chart is an additional type. To use it, load it before the charts are made. See #[a(href="#load-it") Load it].
+		p The scatter chart is an additional type. If you want to use it, load it before the charts are made. See #[a(href="#load-it") Load it].
 
 		+chart(null, '1,5')
 			figure(data-chart="scatter")
@@ -59,7 +59,7 @@ block content
 		p If two markers overlap, the smaller one is on top.
 
 	+section("Groups")
-		p To show groups, add #[code data-group] to the header of a column with names, such as "Eating" and "Cooking". Each group then has its own colour, its own shape (a circle, a triangle, a square or a diamond) and an entry in the legend. The colours are #[code --tablechart-color-1], #[code --tablechart-color-2] and so on. See #[a(href=url('/styling/colours.html')) Colours].
+		p If you want to show groups, add #[code data-group] to the header of a column with names, such as "Eating" and "Cooking". Each group then has its own colour, its own shape (a circle, a triangle, a square or a diamond) and an entry in the legend. The colours are #[code --tablechart-color-1], #[code --tablechart-color-2] and so on. See #[a(href=url('/styling/colours.html')) Colours].
 
 		+chart(null, '5')
 			figure.scatter-colours(data-chart="scatter")
@@ -93,7 +93,7 @@ block content
 		p If there is room, a name is shown to the right of its marker. If not, it goes to the left, above, below, or to one of the corners. A name does not cover a marker or another name, and stays inside the axes. Larger markers get their place first.
 		p If a name has no room at all, it is left out. The chart then has a tooltip: if you point at a marker, its name is shown. See #[a(href=url('/features/tooltips.html')) Tooltips].
 		p If rows have the same two numbers, their markers are in the same place. They then share one name, with the number of the other rows, such as #[strong Boskoop +1] above. The tooltip of that marker shows all their names.
-		p To turn the names off, add #[code data-chart-names="false"]. The tooltip then shows the name of the marker you point at. To turn them off on every scatter chart, set the #[code names] option to #[code false].
+		p If you want to turn the names off, add #[code data-chart-names="false"]. The tooltip then shows the name of the marker you point at. If you want to turn them off on every scatter chart, set the #[code names] option to #[code false].
 
 		+codeblock('HTML').
 			<figure data-chart="scatter" data-chart-names="false">
@@ -101,7 +101,7 @@ block content
 		p If a chart has more than 400 markers, no names are placed. They are all left out, and the tooltip shows them.
 
 	+section("Axes")
-		p To set the axis up yourself, add #[code data-chart-scale]. If you give two numbers, they are where the axis starts and ends. If you give three or more, they are the numbers along the axis. #[code data-chart-scale-x] does the same for the axis across. #[code data-chart-scale-y] is another name for #[code data-chart-scale].
+		p If you want to set the axis up yourself, add #[code data-chart-scale]. If you give two numbers, they are where the axis starts and ends. If you give three or more, they are the numbers along the axis. #[code data-chart-scale-x] does the same for the axis across. #[code data-chart-scale-y] is another name for #[code data-chart-scale].
 
 		+chart(null, '1')
 			figure(data-chart="scatter" data-chart-scale-x="0 100" data-chart-scale="0 0.5 1 1.5 2")
@@ -122,7 +122,7 @@ block content
 		p If you do not give numbers, the axis goes up in steps of 1, 2 or 5 times 10, 100 and so on. If the chart is narrow, it shows fewer numbers, so they do not touch.
 
 	+section("Gridlines")
-		p To add a light line at each number along both axes, add #[code data-chart-grid]. To add them to every chart, set the #[code grid] option to #[code true].
+		p If you want a light line at each number along both axes, add #[code data-chart-grid]. If you want to add them to every chart, set the #[code grid] option to #[code true].
 
 		+chart(null, '1')
 			figure(data-chart="scatter" data-chart-grid)
@@ -165,4 +165,4 @@ block content
 		p A scatter chart has no steps, no stacks and no break in the scale. If a figure has one of those, the chart is shown whole. For a stack or a break, the console shows a warning. For steps, it shows a message if the #[code debug] option is on.
 
 	+section("Next")
-		p To set the colours of the groups, see #[a(href=url('/styling/colours.html')) Colours]. For all the attributes, see #[a(href=url('/reference/attributes.html')) Attributes].
+		p If you want to set the colours of the groups, see #[a(href=url('/styling/colours.html')) Colours]. For all the attributes, see #[a(href=url('/reference/attributes.html')) Attributes].

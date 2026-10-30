@@ -12,7 +12,7 @@ block content
 				p.lead The names of the lines or slices, in a row under the chart.
 
 	+section("Legend for several lines")
-		p On a line chart with several lines, the names are shown at the end of the lines. Add #[code data-chart-legend] to the figure to show them in a legend under the chart instead. Each name has a short sample of its line.
+		p On a line chart with several lines, the names are shown at the end of the lines. If you want them in a legend under the chart instead, add #[code data-chart-legend] to the figure. Each name has a short sample of its line.
 
 		+chart(null, '1')
 			figure(data-chart="line" data-chart-legend)
@@ -32,7 +32,7 @@ block content
 								td= row[2]
 								td= row[3]
 
-		p To use a legend for every chart, set the #[code legend] option. Then #[code data-chart-legend="false"] turns it off for one chart.
+		p If you want to use a legend for every chart, set the #[code legend] option. Then #[code data-chart-legend="false"] turns it off for one chart.
 
 		+codeblock('JS').
 			init({ legend: true });

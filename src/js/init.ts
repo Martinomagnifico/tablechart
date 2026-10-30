@@ -2,6 +2,8 @@ import "../style/tablechart.scss";
 
 import { type Config, defaultConfig, LIBRARY_NAME, PRINTING_CLASS } from "./config";
 import { animated, build, layout, putMasksOn, relabel, setShown, unbuild } from "./core";
+import { inkInside } from "./functions/colour";
+import { checkContrast, checkTextContrast } from "./functions/contrast";
 import { debug } from "./functions/debug";
 import { assignKeys } from "./functions/read-table";
 import { adoptTables, loadSources, readMarkdownRows } from "./functions/sources";
@@ -182,6 +184,10 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		const width = state.plot.clientWidth;
 		if (!width || width === placed) return;
 		if (!debug.timed("Layout", state.figure, () => layout(state, config))) return;
+		if (debug.enabled && !placed) {
+			checkContrast(state.figure);
+			checkTextContrast(state.figure);
+		}
 		placed = width;
 		void show();
 	};
@@ -285,7 +291,18 @@ const make = (figure: HTMLElement, config: Config): TablechartChart | null => {
 	const state = debug.timed("Building", figure, () => build(figure, config));
 	if (!state) return null;
 	figure.setAttribute(MADE, "");
+	followScheme();
 	return watch(state, config);
+};
+
+// A switch between light and dark changes the colours, not the sizes: the numbers inside bars get their colour again.
+let following = false;
+const followScheme = (): void => {
+	if (following || typeof matchMedia !== "function") return;
+	following = true;
+	matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+		for (const figure of document.querySelectorAll<HTMLElement>(`[${MADE}]`)) inkInside(figure);
+	});
 };
 
 /** Makes a chart of one figure; returns the existing chart if there is one, or null without data. */

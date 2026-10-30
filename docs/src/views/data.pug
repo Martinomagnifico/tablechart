@@ -76,13 +76,13 @@ block content
 					td Makes a line dashed or dotted
 
 	+section("A JSON file or endpoint")
-		p Add #[code data-chart-src] with the address of a JSON file. Tablechart reads the file and makes a table from it, and then Tablechart creates the chart from that table. If you #[strong also] had an HTML table in there, that is then replaced, unless it has a #[em header row]: see #[a(href="#missing-names") Missing names]. The table is made by JavaScript, so without JavaScript there is no table: see #[a(href=url('/accessibility.html')) Accessibility].
+		p If the figure has #[code data-chart-src] with the address of a JSON file, Tablechart reads the file and makes a table from it, and then Tablechart creates the chart from that table. If you #[strong also] had an HTML table in there, that is then replaced, unless it has a #[em header row]: see #[a(href="#missing-names") Missing names]. The table is made by JavaScript, so without JavaScript there is no table: see #[a(href=url('/accessibility.html')) Accessibility].
 
 		+chart(null, '1')
 			figure(data-chart="column" data-chart-src=url('/data/apples.json'))
 				figcaption: b Apples sold by variety
 
-		p A browser cannot read a file from a page that is opened from your computer, with an address that starts with #[code file://]. Open the page from a server.
+		p A browser cannot read a file from a page that is opened from your computer, with an address that starts with #[code file://]. So the page needs to come from a server.
 
 		h3#json-structure JSON structure
 		p The rows can be written in two ways. As a list of rows, each with its #[code label] and its #[code value], or its #[code values] if there are more value columns:
@@ -102,7 +102,7 @@ block content
 		+codeblock('JSON').
 			{ "Elstar": ["118", "131"], "Jonagold": ["140", "135"], "Braeburn": ["109", "121"] }
 
-		p To name the columns too, put the rows, in either way, in an object with #[code rows]. #[code series] has the names of the value columns, and #[code label] the name of the first column:
+		p If you want to name the columns too, put the rows, in either way, in an object with #[code rows]. #[code series] has the names of the value columns, and #[code label] the name of the first column:
 
 		+codeblock('JSON').
 			{
@@ -115,7 +115,7 @@ block content
 				]
 			}
 
-		p Write a value as a string, such as #[code "1.0"], to keep its decimals. A row in a list with #[code "kind": "total"] is a total. A row with #[code "short"] has a short name under the chart, and a row with #[code "note"] a note, such as #[code { "label": "March 2024", "value": "34.1", "note": "Share issue" }]. The table then gets a column of notes, named by #[code "note"] in the object with #[code rows], or else #[code Note]. See #[a(href=url('/features/annotations.html#notes')) Notes]. In names with values, names that are whole numbers, such as #[code "2022"], come first and from low to high, whatever their order in the file. Other names keep their order.
+		p If you want a value to keep its decimals, write it as a string, such as #[code "1.0"]. A row in a list with #[code "kind": "total"] is a total. A row with #[code "short"] has a short name under the chart, and a row with #[code "note"] a note, such as #[code { "label": "March 2024", "value": "34.1", "note": "Share issue" }]. The table then gets a column of notes, named by #[code "note"] in the object with #[code rows], or else #[code Note]. See #[a(href=url('/features/annotations.html#notes')) Notes]. In names with values, names that are whole numbers, such as #[code "2022"], come first and from low to high, whatever their order in the file. Other names keep their order.
 
 		h3#missing-names Missing names
 
@@ -172,4 +172,4 @@ block content
 		p In the first column, a name in #[code **bold**] makes the row a total. In the header, a name in bold is highlighted.
 
 	+section("Next")
-		p To change how the numbers are shown, see #[a(href=url('/features/numbers.html')) Numbers].
+		p If you want to change how the numbers are shown, see #[a(href=url('/features/numbers.html')) Numbers].

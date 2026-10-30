@@ -3,7 +3,7 @@ import { largest } from "../functions/format";
 import { sizeOf } from "../functions/measure";
 import { BAR_CLASS, RULE_CLASS, VIEWBOX_WIDTH } from "../config";
 import { timing } from "../functions/timing";
-import { groupLayout, inkOf, seriesMark, stackMarks, stackOf, stackReach } from "../functions/groups";
+import { gapAfter, groupLayout, inkOf, seriesMark, stackMarks, stackOf, stackReach } from "../functions/groups";
 import { fitsLength, fitTogether } from "../functions/labels";
 import { placeAt, svgEl, withRow } from "../functions/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
@@ -23,9 +23,11 @@ export const bar: ChartType = {
 	aspect: 0.5,
 
 	// Tall enough for a number beside every bar and for every name, also one that wraps.
-	minHeight: ({ labelHeight, nameHeight, rows, series, stacked }) => {
+	// A row is as high as its name and the number after its bar; a number inside a bar, or a group of bars each with its number, needs more.
+	minHeight: ({ labelHeight, nameHeight, rows, series, stacked, labels }) => {
 		const bar = labelHeight * 1.1;
-		const band = series > 1 && !stacked ? (bar * (series + 0.15 * (series - 1))) / 0.7 : bar / 0.58;
+		const band =
+			series > 1 && !stacked ? (bar * (series + 0.15 * (series - 1))) / 0.7 : stacked || labels === "inside" ? bar / 0.58 : bar;
 		return rows * Math.max(band, nameHeight * 1.2);
 	},
 
@@ -115,6 +117,7 @@ export const bar: ChartType = {
 		geo.x = x;
 
 		if (geo.stacked) {
+			const stackGap = geo.length("--tablechart-stack-gap", "1px") ?? unit;
 			geo.rows.forEach((row, i) => {
 				const reach = stackReach(row, geo.series.length);
 				const piece = stackMarks(geo, row, i, { "data-grow": "right" }, reach.bottom < 0 ? `${zero - x(reach.bottom)}px center` : "");
@@ -126,7 +129,10 @@ export const bar: ChartType = {
 					if (cell.missing || to === from) return;
 					const start = Math.min(x(from), x(to));
 					const end = Math.max(x(from), x(to));
-					piece(s, { x: start, y: top, width: Math.max(end - start, 1), height: thickness, ...(to < from && { "data-grow": "left" }) });
+					// A gap in the background colour before the next piece, at the far end; the end at zero stays on the baseline.
+					const gap = gapAfter(pieces, s) ? Math.min(stackGap, (end - start) / 2) : 0;
+					const [shownStart, shownEnd] = x(to) > x(from) ? [start, end - gap] : [start + gap, end];
+					piece(s, { x: shownStart, y: top, width: Math.max(shownEnd - shownStart, 1), height: thickness, ...(to < from && { "data-grow": "left" }) });
 					// A number too big for its piece is left out until its row is pointed at.
 					label.dataset.place = "inside";
 					label.toggleAttribute(

@@ -102,7 +102,7 @@ block content
 		p Each month has its full name in the table, which a screen reader and the summary read, and a short name under the chart, in #[code data-short]. See #[a(href='#short-names') Short names].
 
 	+section("Start the summary")
-		p The summary is a separate import, so a page without summaries does not load it. Start it before #[code init()].
+		p The summary is a separate import, so a page without summaries does not load it. It needs to start before #[code init()].
 
 		+codeblock('JS').
 			import { init } from "@martinomagnifico/tablechart";
@@ -420,7 +420,7 @@ block content
 			<figure data-chart="column" data-chart-ordered>
 
 	+section("Short names")
-		p A screen reader, the summary and the tooltip read the names in the table. Under the chart there may be little room. Give a row a short name with #[code data-short], and the chart shows that instead.
+		p A screen reader, the summary and the tooltip read the names in the table. Under the chart there may be little room. If a row has a short name in #[code data-short], the chart shows that instead.
 
 		+codeblock('HTML').
 			<tr><th data-short="Nov ’21">November 2021</th><td>83.4</td></tr>

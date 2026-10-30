@@ -87,6 +87,10 @@ export const inkOf = (label: HTMLElement, geo: Geometry, s: number): void => {
 	label.style.setProperty("--palette", `var(--tablechart-color-${s + 1})`);
 };
 
+/** Whether another piece of the stack starts where this one ends, so this one leaves a gap at its far end. Not at zero, not at the end. */
+export const gapAfter = (pieces: StackPiece[], k: number): boolean =>
+	pieces.some((other, j) => j !== k && !other.cell.missing && other.to !== other.from && other.from === pieces[k].to);
+
 /** The pieces of a stack are in one group, so it grows as one bar. */
 export const stackMarks = (
 	geo: Geometry,

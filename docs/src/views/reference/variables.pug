@@ -26,7 +26,7 @@ block content
 				p.lead Every CSS variable, and what it sets.
 
 	+section("Chart")
-		p Every variable is optional. Set them on #[code :root], on a class or on a chart. See #[a(href=url('/styling/index.html')) Styling]. Variables that set the same part of a chart start the same way, such as #[code --tablechart-name-] for all names.
+		p Every variable is optional. They can be set on #[code :root], on a class or on a chart. See #[a(href=url('/styling/index.html')) Styling]. Variables that set the same part of a chart start the same way, such as #[code --tablechart-name-] for all names.
 
 		+vars([
 			['--tablechart-color', 'The text colour', 'The colour of text and marks'],
@@ -71,8 +71,8 @@ block content
 		+vars([
 			['--tablechart-bar-color', 'The text colour', 'All bars and a single line'],
 			['--tablechart-bar-max', '<code>60px</code>', 'The widest a bar may be'],
-			['--tablechart-bar-value-color', 'Dark or light, whichever reads on the bar', 'The number inside a bar'],
-			['--tablechart-piece-value-color', 'Dark or light, whichever reads on the part', 'The number inside a part of a stacked column or bar'],
+			['--tablechart-bar-value-color', 'The background colour if it has 4.5:1 with the bar, else black or white', 'The number inside a bar'],
+			['--tablechart-piece-value-color', 'The background colour if it has 4.5:1 with the part, else black or white', 'The number inside a part of a stacked column or bar'],
 		])
 
 	+section("Waterfall")
@@ -82,11 +82,11 @@ block content
 			['--tablechart-connector-opacity', '<code>0.55</code>', 'The opacity of that line'],
 			['--tablechart-connector-width', '<code>1px</code>', 'The width of that line'],
 			['--tablechart-down-color', 'The bar colour', 'Falling steps'],
-			['--tablechart-down-value-color', 'Dark or light, whichever reads on the step', 'The number inside a falling step'],
+			['--tablechart-down-value-color', 'The background colour if it has 4.5:1 with the step, else black or white', 'The number inside a falling step'],
 			['--tablechart-total-color', 'The bar colour', 'Totals'],
-			['--tablechart-total-value-color', 'Dark or light, whichever reads on the total', 'The number inside a total'],
+			['--tablechart-total-value-color', 'The background colour if it has 4.5:1 with the total, else black or white', 'The number inside a total'],
 			['--tablechart-up-color', 'The bar colour', 'Rising steps'],
-			['--tablechart-up-value-color', 'Dark or light, whichever reads on the step', 'The number inside a rising step'],
+			['--tablechart-up-value-color', 'The background colour if it has 4.5:1 with the step, else black or white', 'The number inside a rising step'],
 		])
 
 	+section("Lines and areas")
@@ -95,6 +95,8 @@ block content
 			['--tablechart-area-opacity', '<code>0.25</code>, <code>0.5</code> when stacked', 'The opacity of that fill'],
 			['--tablechart-point-color', 'The colour of its line', 'The points on a line'],
 			['--tablechart-series-color', 'The bar colour', 'Lines without a palette. Each next line is lighter'],
+			['--tablechart-series-color-end', 'None', 'An end colour: the lines or parts then go from the first colour to this one, in even steps'],
+			['--tablechart-series-color-start', 'The bar colour', 'Another name for <code>--tablechart-series-color</code>, to go with the end colour. If both are set, <code>--tablechart-series-color</code> is used'],
 			['--tablechart-series-dash', '<code>6 4</code>', 'The pattern of a dashed line, in pixels'],
 			['--tablechart-series-dot', '<code>0 4</code>', 'The pattern of a dotted line, in pixels'],
 			['--tablechart-series-fade', '<code>30%</code>', 'How much lighter each next line is'],
@@ -112,8 +114,11 @@ block content
 			['--tablechart-leader-opacity', '<code>0.45</code>', 'The opacity of that line'],
 			['--tablechart-leader-width', '<code>1px</code>', 'The width of that line'],
 			['--tablechart-slice-color', 'The text colour', 'Slices without a palette. Each next slice is lighter'],
+			['--tablechart-slice-color-end', 'None', 'An end colour: the slices then go from the slice colour to this one, in even steps'],
+			['--tablechart-slice-color-start', 'The text colour', 'Another name for <code>--tablechart-slice-color</code>, to go with the end colour. If both are set, <code>--tablechart-slice-color</code> is used'],
 			['--tablechart-slice-fade', '<code>15%</code>', 'How much lighter each next slice is'],
 			['--tablechart-slice-gap', '<code>4</code>', 'The gap between slices. It grows with the ring'],
+			['--tablechart-stack-gap', '<code>1px</code>', 'The gap between the parts of a stacked column or bar, in the background colour'],
 			['--tablechart-slice-min', '<code>20%</code>', 'The lightest a slice may be'],
 		])
 
@@ -208,10 +213,13 @@ block content
 		p See #[a(href=url('/styling/animation.html')) Animation].
 
 		+vars([
-			['--tablechart-animation-ease', 'Slow at the start and the end for columns and bars; fast at the start, settling at the end for the other types', 'The easing of bars, donuts, and lines and areas that grow'],
-			['--tablechart-animation-element-duration', '<code>0.8s</code> for columns and bars, <code>0.5s</code> for the other types', 'How long one bar, column, point or donut slice takes'],
-			['--tablechart-animation-max', 'Four times the element time', 'The longest a chart may take to build'],
-			['--tablechart-animation-stagger', '<code>0.24</code> for up to 10 columns or bars, down to <code>0.06</code> from 40; <code>0.6</code> for a waterfall, <code>0.24</code> for the other types', 'When the next element starts, as a share of the element time'],
+			['--tablechart-animation-ease', '<code>ease-in-out</code>', 'The easing of bars, donuts, and lines and areas that grow'],
+			['--tablechart-animation-element-duration', '<code>0.4s</code>', 'How long one bar, column, point or donut slice takes'],
+			['--tablechart-animation-max', '<code>2s</code>', 'The longest a chart may take to build'],
+			['--tablechart-animation-min', '<code>0.5s</code>', 'The shortest a chart takes to build'],
+			['--tablechart-animation-speed', '<code>1</code>', 'Faster or slower than the defaults of each chart type, as a factor, such as <code>1.25</code>'],
+			['--tablechart-animation-stagger', '<code>0.25</code>', 'When the next element starts, as a share of the element time'],
+			['--tablechart-waterfall-stagger-factor', '<code>2.4</code>', 'How many times the stagger a waterfall has, so it builds column by column'],
 			['--tablechart-annotation-duration', '<code>0.6s</code>', 'How long an annotation line takes'],
 			['--tablechart-queue-duration', '<code>0.4s</code>', 'How long a chart in a sequence takes to fade in'],
 		])

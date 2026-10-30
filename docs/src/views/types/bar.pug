@@ -28,7 +28,7 @@ block content
 								td= row[1]
 
 	+section("Numbers inside the bars")
-		p Add #[code data-chart-labels="inside"] to show each number inside its bar, at the end. To align it at the start of the bar or in the middle instead, see #[a(href=url('/styling/text.html')) Text]. If a bar is too short for its number, the number is shown after it.
+		p If you want each number inside its bar, at the end, add #[code data-chart-labels="inside"]. If you want it at the start of the bar or in the middle, see #[a(href=url('/styling/text.html')) Text]. If a bar is too short for its number, the number is shown after it.
 
 		.card
 			.demo
@@ -44,7 +44,7 @@ block content
 				figure(data-chart="bar" data-chart-labels="inside")
 
 	+section("Long names")
-		p A name beside a bar takes at most 40% of the width of the chart. A longer name wraps onto more lines, and the chart gets taller if it needs to. To change the width, set #[code --tablechart-name-max], such as #[code 30%].
+		p A name beside a bar takes at most 40% of the width of the chart. A longer name wraps onto more lines, and the chart gets taller if it needs to. If you want to change the width, set #[code --tablechart-name-max], such as #[code 30%].
 		p A long word is hyphenated if the page has a #[code lang] attribute, such as #[code lang="en"].
 		p Or give the row a short name for the chart with #[code data-short], such as #[code &lt;th data-short="Cox"&gt;Cox’s Orange Pippin&lt;/th&gt;]. The table, and so a screen reader, keeps the full name. See #[a(href=url('/types/line.html#many-rows')) Many rows].
 
@@ -108,7 +108,7 @@ block content
 								td= row[2]
 
 	+section("Stacked bars")
-		p Add #[code data-chart-stack] to the figure. The values of a row are shown one after the other in one bar, the first value column on the left. Values below zero are stacked to the left of the zero line. The total of the row is after the bar.
+		p If the figure has #[code data-chart-stack], the values of a row are shown one after the other in one bar, the first value column on the left. Values below zero are stacked to the left of the zero line. The total of the row is after the bar.
 
 		+chart(null, '1')
 			figure(data-chart="bar" data-chart-stack)
@@ -166,7 +166,7 @@ block content
 					span(data-annotation="axis-break" data-from="20")
 
 	+section("Axis and gridlines")
-		p By default there is no value axis: the numbers on the bars show the values. To add numbers along the axis, under the bars, add #[code data-chart-axis]. To add a light line at each of those numbers, add #[code data-chart-grid]. You can add one of them, or both. To add them to every chart, set the #[code axis] and #[code grid] options to #[code true].
+		p By default there is no value axis: the numbers on the bars show the values. If you want numbers along the axis, under the bars, add #[code data-chart-axis]. If you want a light line at each of those numbers, add #[code data-chart-grid]. You can add one of them, or both. If you want to add them to every chart, set the #[code axis] and #[code grid] options to #[code true].
 
 		+chart(null, '1')
 			figure(data-chart="bar" data-chart-axis data-chart-grid)
@@ -181,7 +181,7 @@ block content
 								th= row[0]
 								td= row[1]
 
-		p If a chart has an axis or gridlines, its scale ends on a number of the axis. To set the scale yourself, add #[code data-chart-scale], such as #[code data-chart-scale="0 100"]. To change how the axis and gridlines look, see #[a(href=url('/styling/axes.html')) Axes and gridlines].
+		p If a chart has an axis or gridlines, its scale ends on a number of the axis. If you want to set the scale yourself, add #[code data-chart-scale], such as #[code data-chart-scale="0 100"]. If you want to change how the axis and gridlines look, see #[a(href=url('/styling/axes.html')) Axes and gridlines].
 
 	+section("Next")
 		p For short names, a #[a(href=url('/types/column.html')) column chart] uses less height.

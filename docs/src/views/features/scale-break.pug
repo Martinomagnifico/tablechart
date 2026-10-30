@@ -23,7 +23,7 @@ block content
 				p.lead Part of the scale shown smaller, so the small values have room next to a very large one.
 
 	+section("Which charts")
-		p If one value is much larger than the others, the other bars are very short. Add a break: part of the scale is then shown smaller, and the small values get more room. The bars that run through the break are cut, so you can see they are not to scale there. Every bar shows its number.
+		p If one value is much larger than the others, the other bars are very short. With a break, part of the scale is shown smaller, and the small values get more room. The bars that run through the break are cut, so you can see they are not to scale there. Every bar shows its number.
 		p A break works on column, bar and waterfall charts. With several bars per row, each bar is cut, and a stack is cut as a whole. On a line or area chart a break would cut through nothing, so there, and on a donut, it is left out, and the console says so. A chart with values below zero cannot have a break either.
 
 	+section("Column")
@@ -53,7 +53,7 @@ block content
 					span(data-annotation="axis-break" data-from="20" data-to="160")
 
 	+section("Straight or zigzag")
-		p The cut is two slanted lines by default, as in the charts above. Add #[code data-mark="zigzag"] to draw it as a zigzag: up, down and up again across a column, and right, left and right again down a bar.
+		p The cut is two slanted lines by default, as in the charts above. If you want a zigzag, add #[code data-mark="zigzag"]: up, down and up again across a column, and right, left and right again down a bar.
 
 		+chart(null, '10')
 			+regions("column", "zigzag")

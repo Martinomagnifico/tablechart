@@ -9,7 +9,7 @@ block content
 		.container
 			.page-header
 				h1 Get started
-				p.lead Install Tablechart, write the markup and start it.
+				p.lead How to install Tablechart, write the markup and start it.
 
 	+section("Install")
 		+installWizard('Tablechart', 'init')
@@ -75,7 +75,7 @@ block content
 		p #[code data-chart] sets the chart type: #[code column], #[code bar], #[code line], #[code area], #[code waterfall] or #[code donut], or an #[a(href=url('/types/additional-types.html')) additional type] such as #[code scatter].
 
 	+section("Start it")
-		p Call #[code init()] once the page has loaded. It makes a chart of every figure with #[code data-chart].
+		p #[code init()] needs to run once the page has loaded. It makes a chart of every figure with #[code data-chart].
 
 		+codeblock('JS').
 			import { init } from '@martinomagnifico/tablechart';
@@ -83,7 +83,7 @@ block content
 
 			init();
 
-		p To change when a chart builds, pass options. See #[a(href=url('/reference/options.html')) Options].
+		p If you want to change when a chart builds, pass options. See #[a(href=url('/reference/options.html')) Options].
 
 		+codeblock('JS').
 			init({

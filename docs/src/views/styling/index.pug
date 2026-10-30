@@ -31,7 +31,7 @@ block content
 									td= row[1]
 
 	+section("Where to set it")
-		p Charts are styled with CSS variables. To style every chart on a page, set them on #[code :root]. To style one chart, or the charts in one part of the page, set them on a class.
+		p Charts are styled with CSS variables. If you want to style every chart on a page, set them on #[code :root]. If you want to style one chart, or the charts in one part of the page, set them on a class.
 
 		+codeblock('CSS').
 			:root {
@@ -47,7 +47,7 @@ block content
 			figure(data-chart="column" style="--tablechart-bar-color: #e4572e")
 
 	+section("Make one bar stand out")
-		p A class on a row of the table is copied to everything drawn for that row: its bar, its number and its name. Use it to give one bar its own colour, and its number its own font. The font here is Roboto Slab, from Google Fonts.
+		p A class on a row of the table is copied to everything drawn for that row: its bar, its number and its name. So one bar can have its own colour, and its number its own font. The font here is Roboto Slab, from Google Fonts.
 
 		+style.
 			.granny {

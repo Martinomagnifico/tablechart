@@ -12,7 +12,7 @@ block content
 				p.lead A bracket, a trend arrow or a reference line, placed by the data.
 
 	+section("How to add an annotation")
-		p Put a #[code div] with the class #[code chart-annotations] inside the chart. Each annotation in it is a #[code span] with #[code data-annotation]. An annotation is placed by the data, so if you change a number, the annotation moves with it.
+		p Annotations go in a #[code div] with the class #[code chart-annotations] inside the chart. Each annotation in it is a #[code span] with #[code data-annotation]. An annotation is placed by the data, so if you change a number, the annotation moves with it.
 
 		+codeblock('HTML')
 			figure(data-chart="column")
@@ -54,7 +54,7 @@ block content
 
 	+section("Trend")
 		p A trend arrow runs from the first value to the last. #[code data-at] sets where the badge is along the arrow, from #[code 0] to #[code 1].
-		p Set #[code data-years] to the number of years. Tablechart calculates the yearly rate, and shows a warning in the console if it is different from yours. Your number is always the one shown.
+		p If you set #[code data-years] to the number of years, Tablechart calculates the yearly rate, and shows a warning in the console if it is different from yours. Your number is always the one shown.
 		p A #[code span] with the class #[code tablechart-caption] is shown above the badge.
 
 		+chart(null, '12')
@@ -75,7 +75,7 @@ block content
 						span +12%
 
 	+section("Reference line")
-		p A reference line marks a value, such as a target or the mean. To put it on the value axis, add #[code data-value]. The line then goes across a column, line or area chart, and up a bar chart. #[code data-value] is a number, #[code mean] or #[code median]. The mean and the median are of the values in the table.
+		p A reference line marks a value, such as a target or the mean. If you want to put it on the value axis, add #[code data-value]. The line then goes across a column, line or area chart, and up a bar chart. #[code data-value] is a number, #[code mean] or #[code median]. The mean and the median are of the values in the table.
 
 		+chart(null, '11')
 			figure(data-chart="column")
@@ -104,7 +104,7 @@ block content
 					span(data-annotation="reference" data-name="mean") Mean 4.3
 					span(data-annotation="reference" data-name="median" data-line="dotted") Median 4
 
-		p On a scatter chart, #[code data-value] is a value on the axis across, so the line goes up. To put the line across, at a value on the axis up, add #[code data-axis="y"]. The mean and the median are then of the column of that axis.
+		p On a scatter chart, #[code data-value] is a value on the axis across, so the line goes up. If you want to put the line across, at a value on the axis up, add #[code data-axis="y"]. The mean and the median are then of the column of that axis.
 
 		+chart(null, '13')
 			figure(data-chart="scatter")
@@ -154,7 +154,7 @@ block content
 
 		p The quadrant is there from the start, before the dots. Its lines are whole until the name of a dot arrives over them; then the line makes room for the name. A dot name that would cover a corner name is left out, and the tooltip of its dot still has it. Screen readers read the names of the corners with the annotations, under the table.
 		p With #[code data-fragment] on the figure, the axes and the quadrant are shown first, and all dots arrive on the next step. Then you can explain the quadrants before the data comes in. See #[a(href=url('/features/steps.html')) Step by step].
-		p The lines are dashed by default. To change them, set the #[code --tablechart-quadrant-] variables: see #[a(href=url('/reference/variables.html#annotations')) CSS variables].
+		p The lines are dashed by default. If you want to change them, set the #[code --tablechart-quadrant-] variables: see #[a(href=url('/reference/variables.html#annotations')) CSS variables].
 
 	+section("Notes")
 		p A note says what happened at a row, such as a “Share issue” or a “New apple press”. A note is not an annotation you write under the table, but a column in the table: a column whose header has #[code data-note]. Each cell with text is a note at its row. The chart has a line at that row, with the note at the top.

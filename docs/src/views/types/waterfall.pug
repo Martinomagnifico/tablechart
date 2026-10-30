@@ -12,7 +12,7 @@ block content
 				p.lead Steps between totals.
 
 	+section("Steps and totals")
-		p Add #[code data-kind="total"] to a row to make it a total. A total starts at the baseline. The other rows are steps up or down from the running total. A negative number is a step down.
+		p A row with #[code data-kind="total"] is a total. A total starts at the baseline. The other rows are steps up or down from the running total. A negative number is a step down.
 
 		+chart(null, '5,9')
 			figure(data-chart="waterfall")
@@ -76,7 +76,7 @@ block content
 					span(data-annotation="axis-break" data-from="20" data-to="160")
 
 	+section("Axis and gridlines")
-		p By default there is no value axis: the numbers on the columns show the values. To add numbers along the axis, on the left, add #[code data-chart-axis]. To add a light line at each of those numbers, add #[code data-chart-grid]. You can add one of them, or both. To add them to every chart, set the #[code axis] and #[code grid] options to #[code true].
+		p By default there is no value axis: the numbers on the columns show the values. If you want numbers along the axis, on the left, add #[code data-chart-axis]. If you want a light line at each of those numbers, add #[code data-chart-grid]. You can add one of them, or both. If you want to add them to every chart, set the #[code axis] and #[code grid] options to #[code true].
 
 		+chart(null, '1')
 			figure(data-chart="waterfall" data-chart-axis data-chart-grid)
@@ -91,7 +91,7 @@ block content
 								th= row[0]
 								td= row[1]
 
-		p If a chart has an axis or gridlines, its scale ends on a number of the axis. To set the scale yourself, add #[code data-chart-scale], such as #[code data-chart-scale="0 100"]. To change how the axis and gridlines look, see #[a(href=url('/styling/axes.html')) Axes and gridlines].
+		p If a chart has an axis or gridlines, its scale ends on a number of the axis. If you want to set the scale yourself, add #[code data-chart-scale], such as #[code data-chart-scale="0 100"]. If you want to change how the axis and gridlines look, see #[a(href=url('/styling/axes.html')) Axes and gridlines].
 
 	+section("Next")
-		p To set the colours of rising steps, falling steps and totals, see #[a(href=url('/styling/colours.html')) Colours].
+		p If you want to set the colours of rising steps, falling steps and totals, see #[a(href=url('/styling/colours.html')) Colours].

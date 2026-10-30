@@ -12,8 +12,8 @@ block content
 				p.lead The background, text, border, corners and shadow of the tooltip.
 
 	+section("Where to set the variables")
-		p The tooltip is not inside the chart in the page: there is one tooltip for the whole page, at the end of the page. So it reads the variables of the chart when it opens. Set them on the chart, on a class or on #[code :root], as other variables. The font, the text size and the colour scheme come from the chart too.
-		p The charts on this page show all their numbers, so they have #[code data-chart-tooltip="true"] to have a tooltip anyway. Point at them to see it. See #[a(href=url('/features/tooltips.html')) Tooltips] for what a tooltip shows.
+		p The tooltip is not inside the chart in the page: there is one tooltip for the whole page, at the end of the page. So it reads the variables of the chart when it opens. They can be set on the chart, on a class or on #[code :root], as other variables. The font, the text size and the colour scheme come from the chart too.
+		p The charts on this page show all their numbers, so they have #[code data-chart-tooltip="true"] to have a tooltip anyway. If you point at them, the tooltip shows. See #[a(href=url('/features/tooltips.html')) Tooltips] for what a tooltip shows.
 
 	+section("The variables")
 		table
@@ -95,7 +95,7 @@ block content
 								td= row[2]
 
 	+section("Light and dark")
-		p The tooltip follows the colour scheme of the chart. To set a colour for each scheme, use #[code light-dark()] in a variable, as for the chart itself. See #[a(href=url('/styling/light-dark.html')) Light and dark].
+		p The tooltip follows the colour scheme of the chart. If you want to set a colour for each scheme, use #[code light-dark()] in a variable, as for the chart itself. See #[a(href=url('/styling/light-dark.html')) Light and dark].
 
 		+codeblock('CSS').
 			:root {

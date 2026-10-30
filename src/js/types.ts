@@ -175,6 +175,7 @@ export interface ChartType {
 		rows: number;
 		series: number;
 		stacked: boolean;
+		labels: Geometry["labels"];
 	}) => number;
 	/** Room under the baseline for numbers that hang below a mark near it. */
 	footroom?: (geo: HeadroomInput) => number;

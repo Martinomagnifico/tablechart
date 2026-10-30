@@ -75,12 +75,12 @@ block content
 			})();
 
 	+section("Earlier or later")
-		p By default, the chart builds when the element around it is halfway. Add #[code data-chart-entrance] to the figure to choose another moment, from #[code 0] to #[code 1]. With #[code 0], the chart builds as soon as the element starts to move. With #[code 1], it builds when the element is in.
+		p By default, the chart builds when the element around it is halfway. If you want another moment, add #[code data-chart-entrance] to the figure, from #[code 0] to #[code 1]. With #[code 0], the chart builds as soon as the element starts to move. With #[code 1], it builds when the element is in.
 
 		+codeblock('HTML').
 			<figure data-chart="column" data-chart-entrance="0.25">
 
-		p To set it for every chart, use the #[code entrance] option.
+		p If you want to set it for every chart, use the #[code entrance] option.
 
 		+codeblock('JS').
 			init({ entrance: 0.25 });

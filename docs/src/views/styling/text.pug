@@ -12,7 +12,7 @@ block content
 				p.lead The font and the sizes of the text in a chart.
 
 	+section("Font")
-		p All text in a chart is HTML, so it uses the font of the page. To use another font in a chart, set #[code font-family] on it.
+		p All text in a chart is HTML, so it uses the font of the page. If you want to use another font in a chart, set #[code font-family] on it.
 
 	+section("Sizes")
 		p #[code --tablechart-font-size] sets the size of all text in a chart: #[code 1em] by default. The other sizes are relative to it.
@@ -58,7 +58,7 @@ block content
 					td The space under the title: 0.5em by default.
 
 	+section("Text colours")
-		p By default, all text in a chart has the text colour of the chart. To give some of it another colour, set one of these variables.
+		p By default, all text in a chart has the text colour of the chart. If you want to give some of it another colour, set one of these variables.
 
 		table
 			thead
@@ -76,7 +76,15 @@ block content
 					td: code --tablechart-axis-text-color
 					td The numbers and titles along the axes. See #[a(href=url('/styling/axes.html')) Axes and gridlines].
 
-	+section("Numbers inside the bars")
+	+section("Numbers inside bars or columns")
+		p A number #[em inside] a bar or column should have a contrast of at least 4.5:1 with it, as text needs. Tablechart tries to achieve that in this order:
+		ul
+			li If the bar or column, or the part of a stack, has at least 4.5:1 with the background colour of the chart, the number gets that background colour.
+			li If not, the number gets lighter than the background colour, just as much as needed, up to white. On a dark background, it gets darker, up to black.
+			li If even that is not enough, the number is inverted: black instead of white, or white instead of black.
+		p So on a stack of parts in a dark colour and lighter steps of it, the numbers are in the background colour on the dark parts, and a bit lighter on the lighter ones. If the colours of the page change, such as from light to dark mode, the numbers get their colour again.
+		p If you want a colour of your own, set #[code --tablechart-bar-value-color], or #[code --tablechart-piece-value-color] for the parts of a stack. Tablechart then uses that colour, without checking its contrast. With the #[code debug] option, the console warns about a number inside a bar or column with less than 4.5:1.
+
 		p #[code --tablechart-value-align] sets where a number inside its bar goes: #[code start], where the bar starts, #[code center], or #[code end], where it ends. On a waterfall, a step down ends at the bottom. The number is as far from the start or end as the widest number is from the sides. Columns and bars use #[code end] by default, a waterfall #[code center].
 
 		+style.
@@ -94,7 +102,7 @@ block content
 								td= row[1]
 
 	+section("Smaller text on narrow charts")
-		p With many columns on a narrow screen, smaller text lets more numbers fit. Short names under the chart help too: see #[a(href=url('/types/line.html#many-rows')) Many rows]. Make the element around the chart a container, and set #[code --tablechart-font-size] with #[code clamp()] and #[code cqi], a share of the width of the container. In this example, the text is full size from 500px wide, and gets smaller below that, down to 75%.
+		p With many columns on a narrow screen, smaller text lets more numbers fit. Short names under the chart help too: see #[a(href=url('/types/line.html#many-rows')) Many rows]. If the element around the chart is a container, #[code --tablechart-font-size] can use #[code clamp()] and #[code cqi], a share of the width of the container. In this example, the text is full size from 500px wide, and gets smaller below that, down to 75%.
 
 		+style.
 			.text-box {

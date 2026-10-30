@@ -29,9 +29,9 @@ block content
 	+section("Showing axes and gridlines")
 		p Axes and gridlines are not always shown by default. For all charts with a horizontal or vertical value axis, the main axis (the 'baseline') is always shown. You can see that in for example the column and line chart, it is at the bottom, in the bar chart it is at the left. But the value axis is not shown by default, unless the chart type really requires it, such as a #[a(href=url('/types/scatter.html')) scatter chart].
 		
-		p To turn the axes on, add #[code data-chart-axis]. To turn the grid on, add #[code data-chart-grid]. That works for every type except the donut.
+		p If you want to turn the axes on, add #[code data-chart-axis]. If you want to turn the grid on, add #[code data-chart-grid]. That works for every type except the donut.
 		
-		p To turn it on by default via the config, use the #[code axis] and #[code grid] options.
+		p If you want to turn it on by default via the config, use the #[code axis] and #[code grid] options.
 
 		+chart(null, '1')
 			figure(data-chart="line" data-chart-axis data-chart-grid)
@@ -47,7 +47,7 @@ block content
 
 	+section("The scale")
 		p If a chart has an axis or gridlines, its scale ends on a number of the axis. For example, if the highest value is 84 and the numbers on the axis go up by 10, the scale ends at 90.
-		p To set the scale yourself, add #[code data-chart-scale] to the figure, with the number where the scale starts and the number where it ends. Tablechart then chooses the numbers on the axis between them.
+		p If you want to set the scale yourself, add #[code data-chart-scale] to the figure, with the number where the scale starts and the number where it ends. Tablechart then chooses the numbers on the axis between them.
 
 		+codeblock('HTML').
 			<figure data-chart="column" data-chart-axis data-chart-scale="0 100">
@@ -110,7 +110,7 @@ block content
 				+varieties
 
 	+section("Dashed gridlines")
-		p The gridlines are one #[code path] with the class #[code tablechart-grid]. To set more than the variables, such as dashes, use CSS on that class. A dash is in pixels, at any size of the chart.
+		p The gridlines are one #[code path] with the class #[code tablechart-grid]. If you want to set more than the variables, such as dashes, use CSS on that class. A dash is in pixels, at any size of the chart.
 
 		+style.
 			.dashed-grid .tablechart-grid {
@@ -123,7 +123,7 @@ block content
 				+varieties
 
 	+section("The numbers and titles")
-		p #[code --tablechart-axis-size] sets the size of the numbers and the titles along the axes. To style them separately, use the class #[code tablechart-tick] for the numbers and #[code tablechart-axis-title] for the titles.
+		p #[code --tablechart-axis-size] sets the size of the numbers and the titles along the axes. If you want to style them separately, use the class #[code tablechart-tick] for the numbers and #[code tablechart-axis-title] for the titles.
 
 		+style.
 			.small-axes {
@@ -138,7 +138,7 @@ block content
 				+varieties
 
 		p If the numbers are smaller, there is room for more of them, so the axis may show more numbers.
-		p To make the numbers lighter or darker than the names, set #[code --tablechart-axis-text-color]. The names have their own colour, #[code --tablechart-name-color].
+		p If you want to make the numbers lighter or darker than the names, set #[code --tablechart-axis-text-color]. The names have their own colour, #[code --tablechart-name-color].
 
 		+style.
 			.light-axes {
@@ -155,7 +155,7 @@ block content
 								td= row[1]
 
 	+section("Light and dark")
-		p By default, the axes and gridlines use the text colour, so they change with the colour scheme. To set a colour for each scheme, use #[code light-dark()]. See #[a(href=url('/styling/light-dark.html')) Light and dark].
+		p By default, the axes and gridlines use the text colour, so they change with the colour scheme. If you want to set a colour for each scheme, use #[code light-dark()]. See #[a(href=url('/styling/light-dark.html')) Light and dark].
 
 		+codeblock('CSS').
 			:root {

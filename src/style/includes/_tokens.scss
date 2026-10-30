@@ -8,45 +8,57 @@ $duration: var(--_dur);
 $stagger: var(--_stg);
 $fade: var(--_fade);
 $easing: var(--_ease);
+$speed: var(--_speed);
 
 // On an animated figure and its plot: the plot sets `--count`, the number of elements that start one after the other.
 @mixin timing {
-	// The time of one element. A chart can set its own default with `--_element`.
-	--_el: var(--tablechart-animation-element-duration, var(--_element, 0.5s));
-	// A ceiling on the build of one chart, never a target: four elements by default.
-	--_max: var(--tablechart-animation-max, calc(4 * var(--_el)));
-	// The stagger as a share of the element time. A chart can set its own default with `--_ratio`.
-	--_r: var(--tablechart-animation-stagger, var(--_ratio, 0.24));
-	// Under the maximum, a chart with `--_keep: 1` shortens its elements too, so their starts keep the same share of their time.
-	--_dur: min(var(--_el), calc(var(--_max) / (1 + var(--_keep, 0) * (var(--count, 1) - 1) * var(--_r))));
-	// The gap between two starts; under the maximum only this gives.
-	--_stg: min(calc(var(--_r) * var(--_el)), max(0s, calc((var(--_max) - var(--_dur)) / max(var(--count, 1) - 1, 1))));
+	// Faster or slower than the defaults of each chart type, as a factor: 1.25 is a quarter faster. Every time is divided by it.
+	--_speed: var(--tablechart-animation-speed, 1);
+	// The same for every chart type: an element takes 0.4s, the next starts a quarter of that later, and a chart takes 0.5s to 2s.
+	--_el: calc(var(--tablechart-animation-element-duration, 0.4s) / var(--_speed));
+	// A ceiling on the build of one chart, never a target: with many elements, their starts move closer together.
+	--_max: calc(var(--tablechart-animation-max, 2s) / var(--_speed));
+	// A floor under the build of one chart: if it would end sooner, its elements and their starts all slow down until it takes this long.
+	--_min: calc(var(--tablechart-animation-min, 0.5s) / var(--_speed));
+	// The stagger as a share of the element time. A chart type can multiply it with `--_factor`, as a waterfall does.
+	--_r: calc(var(--tablechart-animation-stagger, 0.25) * var(--_factor, 1));
+	// The time of one element: longer if the chart would end before the minimum. Under the maximum, a chart with `--_keep: 1`
+	// shortens its elements too, so their starts keep the same share of their time.
+	--_dur: min(
+		max(var(--_el), calc(var(--_min) / (1 + (var(--count, 1) - 1) * var(--_r)))),
+		calc(var(--_max) / (1 + var(--_keep, 0) * (var(--count, 1) - 1) * var(--_r)))
+	);
+	// The gap between two starts, as a share of the element time; under the maximum the starts move closer together.
+	--_stg: min(calc(var(--_r) * var(--_dur)), max(0s, calc((var(--_max) - var(--_dur)) / max(var(--count, 1) - 1, 1))));
 	// How long a number or point takes to fade in: never more than a quarter of the maximum, or 0.6s.
-	--_fade: min(var(--_dur), calc(var(--_max) / 4), 0.6s);
-	--_ease: var(--tablechart-animation-ease, var(--_easing, cubic-bezier(0.26, 0.86, 0.44, 0.985)));
+	--_fade: min(var(--_dur), calc(var(--_max) / 4), calc(0.6s / var(--_speed)));
+	--_ease: var(--tablechart-animation-ease, ease-in-out);
 }
 
 // The background behind the chart; lighter colours are mixed with it.
 $surface: "var(--tablechart-surface, Canvas)";
 
-// A number inside a bar: near black on a light bar, near white on a dark one.
+// A number inside a bar: black on a light bar, white on a dark one. Switched at the lightness where both have the same contrast,
+// so one of them always has at least 4.5:1 with the bar.
 @function ink($fill) {
-	@return "oklch(from #{$fill} calc(0.18 + 0.8 * clamp(0, (0.68 - l) * 1000, 1)) 0 0)";
+	@return "oklch(from #{$fill} clamp(0, (0.564 - l) * 1000, 1) 0 0)";
 }
 $barfill: "var(--tablechart-bar-color, currentColor)";
 
 // The size of every name.
 $namesize: "var(--tablechart-name-size, 0.95em)";
 
-// A slice uses `--tablechart-color-n`, or the slice colour a step lighter per slice, down to a minimum.
-$sliceink: "var(--palette, color-mix(in oklab, var(--tablechart-slice-color, currentColor) max(var(--tablechart-slice-min, 20%), calc(100% - var(--n) * var(--tablechart-slice-fade, 15%))), #{$surface}))";
+// A slice uses `--tablechart-color-n`, or a step of the range to `--tablechart-slice-color-end`, or the slice colour a step lighter
+// per slice, down to a minimum.
+$sliceink: "var(--palette, var(--_slice-range, color-mix(in oklab, var(--tablechart-slice-color, var(--tablechart-slice-color-start, currentColor)) max(var(--tablechart-slice-min, 20%), calc(100% - var(--n) * var(--tablechart-slice-fade, 15%))), #{$surface})))";
 
 // Lines do the same; a line out of focus is lighter still. `--tablechart-series-own-color` sets one line's colour.
-$seriesbase: "var(--tablechart-series-color, var(--tablechart-bar-color, currentColor))";
+// `--tablechart-series-color-start` is the same colour by another name, to go with `--tablechart-series-color-end`.
+$seriesbase: "var(--tablechart-series-color, var(--tablechart-series-color-start, var(--tablechart-bar-color, currentColor)))";
 // The last line is never lighter than `--tablechart-series-min`.
 $seriesmin: "var(--tablechart-series-min, 40%)";
 $seriesfade: "min(var(--tablechart-series-fade, 30%), calc((100% - #{$seriesmin}) / max(var(--_series-count, 2) - 1, 1)))";
-$seriesown: "var(--palette, color-mix(in oklab, #{$seriesbase} max(#{$seriesmin}, calc((100% - var(--n, 0) * #{$seriesfade}) * (1 - var(--m, 0)) + var(--m, 0) * 100%)), #{$surface}))";
+$seriesown: "var(--palette, var(--_series-range, color-mix(in oklab, #{$seriesbase} max(#{$seriesmin}, calc((100% - var(--n, 0) * #{$seriesfade}) * (1 - var(--m, 0)) + var(--m, 0) * 100%)), #{$surface})))";
 $seriesink: "var(--tablechart-series-own-color, color-mix(in oklab, #{$seriesown} calc(100% - var(--m, 0) * (100% - var(--tablechart-series-muted-share, 45%))), #{$surface}))";
 
 // A legend is as wide as its items and centred, and wraps when they do not fit.

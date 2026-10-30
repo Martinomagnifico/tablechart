@@ -28,7 +28,7 @@ block content
 								td= row[1]
 
 	+section("Smooth")
-		p Add #[code data-chart-shape="smooth"] to the figure. The top of each area is a curve through every point, which never goes higher or lower than the points on either side of it. In a stack, each area follows the curve of the one below it.
+		p If the figure has #[code data-chart-shape="smooth"], the top of each area is a curve through every point, which never goes higher or lower than the points on either side of it. In a stack, each area follows the curve of the one below it.
 
 		+chart(null, '1')
 			figure(data-chart="area" data-chart-shape="smooth")
@@ -44,7 +44,7 @@ block content
 								td= row[1]
 
 	+section("Grow")
-		p Add #[code data-chart-animate="grow"] to the figure. The area grows from zero instead of from left to right. The points move with it, and the numbers appear when it is done.
+		p If the figure has #[code data-chart-animate="grow"], the area grows from zero instead of from left to right. The points move with it, and the numbers appear when it is done.
 
 		+chart(null, '1')
 			figure(data-chart="area" data-chart-shape="smooth" data-chart-animate="grow")
@@ -59,7 +59,7 @@ block content
 								th= row[0]
 								td= row[1]
 
-		p To make every line and area grow, set the #[code animate] option to #[code "grow"]. A chart with triggered steps (like from Reveal.js fragments) still builds from left to right. See #[a(href=url('/styling/animation.html')) Animation].
+		p If you want to make every line and area grow, set the #[code animate] option to #[code "grow"]. A chart with triggered steps (like from Reveal.js fragments) still builds from left to right. See #[a(href=url('/styling/animation.html')) Animation].
 
 	+section("Below zero")
 		p Below zero, the area hangs down from the zero line, and a number is shown under its point.
@@ -99,7 +99,7 @@ block content
 		p The numbers work as in a #[a(href=url('/types/line.html')) line chart]. With two areas, the number of the lower point is below it. If there is no room for it above zero, it is above the point.
 
 	+section("Highlight an area")
-		p Add #[code data-kind="focus"] to the header of a column. That area keeps its colour and shows its numbers. The other areas are shown fainter.
+		p If the header of a column has #[code data-kind="focus"], that area keeps its colour and shows its numbers. The other areas are shown fainter.
 
 		+chart(null, '4')
 			figure(data-chart="area")
@@ -119,7 +119,7 @@ block content
 								td= row[3]
 
 	+section("Change the fill")
-		p The fill has the colour of the line, at 25% opacity. To change it, set these variables.
+		p The fill has the colour of the line, at 25% opacity. If you want to change it, set these variables.
 
 		table
 			thead
@@ -144,7 +144,7 @@ block content
 								td= row[1]
 
 	+section("Stacked areas")
-		p Add #[code data-chart-stack] to the figure. Each area starts on top of the one before it, the first value column at the bottom. A value below zero takes its area down from the one before it. Each number is shown in the middle of its area, if there is room for it. If you point at the row, or tap it, a tooltip shows the numbers of that row.
+		p If the figure has #[code data-chart-stack], each area starts on top of the one before it, the first value column at the bottom. A value below zero takes its area down from the one before it. Each number is shown in the middle of its area, if there is room for it. If you point at the row, or tap it, a tooltip shows the numbers of that row.
 
 		+chart(null, '1')
 			figure(data-chart="area" data-chart-stack)
@@ -188,7 +188,7 @@ block content
 								td= row[2]
 
 	+section("Steps")
-		p Add #[code data-chart-shape="step"] to the figure. Each value is flat across the width of its row, and the line goes straight up or down to the next row. A number is shown only where the value changes, in the middle of the rows that have that value. If a number is wider than those rows, it is left out. If you point at the row, or tap it, a tooltip shows the numbers of that row.
+		p If the figure has #[code data-chart-shape="step"], each value is flat across the width of its row, and the line goes straight up or down to the next row. A number is shown only where the value changes, in the middle of the rows that have that value. If a number is wider than those rows, it is left out. If you point at the row, or tap it, a tooltip shows the numbers of that row.
 
 		+chart(null, '1')
 			figure(data-chart="area" data-chart-stack data-chart-shape="step" data-chart-legend)
@@ -222,7 +222,7 @@ block content
 								td= row[1]
 
 	+section("Axis and gridlines")
-		p By default there is no value axis: the numbers on the points show the values. To add numbers along the axis, on the left, add #[code data-chart-axis]. To add a light line at each of those numbers, add #[code data-chart-grid]. You can add one of them, or both. To add them to every chart, set the #[code axis] and #[code grid] options to #[code true].
+		p By default there is no value axis: the numbers on the points show the values. If you want numbers along the axis, on the left, add #[code data-chart-axis]. If you want a light line at each of those numbers, add #[code data-chart-grid]. You can add one of them, or both. If you want to add them to every chart, set the #[code axis] and #[code grid] options to #[code true].
 
 		+chart(null, '1')
 			figure(data-chart="area" data-chart-axis data-chart-grid)
@@ -237,7 +237,7 @@ block content
 								th= row[0]
 								td= row[1]
 
-		p If a chart has an axis or gridlines, its scale ends on a number of the axis. To set the scale yourself, add #[code data-chart-scale], such as #[code data-chart-scale="0 100"]. To change how the axis and gridlines look, see #[a(href=url('/styling/axes.html')) Axes and gridlines].
+		p If a chart has an axis or gridlines, its scale ends on a number of the axis. If you want to set the scale yourself, add #[code data-chart-scale], such as #[code data-chart-scale="0 100"]. If you want to change how the axis and gridlines look, see #[a(href=url('/styling/axes.html')) Axes and gridlines].
 
 	+section("Next")
-		p To show the names in a row under the chart, see #[a(href=url('/features/legends.html')) Legends].
+		p If you want to show the names in a row under the chart, see #[a(href=url('/features/legends.html')) Legends].

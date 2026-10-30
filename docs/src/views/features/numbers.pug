@@ -25,7 +25,7 @@ block content
 								td= row[1]
 
 	+section("Decimals")
-		p All numbers on a chart have the same number of decimals: the most that any cell has. To show one decimal, write one in at least one cell, such as #[code 3.0].
+		p All numbers on a chart have the same number of decimals: the most that any cell has. If you want to show one decimal, write one in at least one cell, such as #[code 3.0].
 
 		+chart(null, '6')
 			figure(data-chart="column")
@@ -40,7 +40,7 @@ block content
 		p In the middle of a donut, the total keeps its own decimals.
 
 	+section("Thousands")
-		p Write numbers without a thousands separator, such as #[code 12500]. Tablechart adds the separator of the language of the page. A comma or a point in a number is read as the decimal separator, so #[code 12,500] is read as 12.5.
+		p Numbers in the table have no thousands separator, such as #[code 12500]. Tablechart adds the separator of the language of the page. A comma or a point in a number is read as the decimal separator, so #[code 12,500] is read as 12.5.
 
 		+chart(null, '5-7')
 			figure(data-chart="bar")
@@ -82,7 +82,7 @@ block content
 				});
 			});
 
-		p To use one language for all charts, whatever the page says, set the #[code locale] option.
+		p If you want to use one language for all charts, whatever the page says, set the #[code locale] option.
 
 		+codeblock('JS').
 			init({ locale: "nl" });
@@ -106,4 +106,4 @@ block content
 		p If you point at a row, or tap it, a tooltip shows all the numbers of that row. See #[a(href=url('/features/tooltips.html')) Tooltips].
 
 	+section("Next")
-		p To put the numbers inside the columns, see #[a(href=url('/types/column.html')) Column]. To change their size and colour, see #[a(href=url('/styling/text.html')) Text].
+		p If you want to put the numbers inside the columns, see #[a(href=url('/types/column.html')) Column]. If you want to change their size and colour, see #[a(href=url('/styling/text.html')) Text].

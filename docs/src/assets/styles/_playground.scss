@@ -1,0 +1,222 @@
+// The animation playground (styling/playground.html): the bar of sliders, the coloured tracks and the preview.
+
+// The sliders, in a bar that stays at the top of the screen while the charts scroll under it.
+.playground-bar {
+	position: relative;
+	z-index: 3;
+	display: grid;
+	// The same as the space under the line above the buttons.
+	gap: 1rem;
+	margin-bottom: var(--standard-padding);
+	padding: 1rem;
+	border: 1px solid var(--border-default);
+	border-radius: 1rem;
+	background: var(--bg-surface);
+	box-shadow: 0 0.5rem 1.5rem -1rem rgb(0 0 0 / 0.35);
+}
+@media (min-width: 769px) {
+	.playground-bar {
+		position: sticky;
+		top: 0.75rem;
+	}
+}
+// The number of columns comes first: the pink parts and the hollow mark depend on it.
+.playground-count {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	align-items: center;
+	gap: 0.4rem 1.5rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--border-default);
+}
+.playground-count .playground-row {
+	grid-template-columns: max-content minmax(0, 1fr) 2.75rem auto;
+}
+.playground-count-note {
+	margin: 0;
+	color: var(--text-muted);
+	font-size: 0.85rem;
+	line-height: 1.35;
+}
+@media (max-width: 1000px) {
+	.playground-count {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+.playground-controls {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.4rem 1.5rem;
+}
+@media (max-width: 1000px) {
+	.playground-controls {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+.playground-row {
+	display: grid;
+	grid-template-columns: 6.5rem minmax(0, 1fr) 2.75rem auto;
+	align-items: center;
+	gap: 0.6rem;
+}
+.playground-bar .lang-toggle {
+	margin: 0;
+}
+// As large as Build again beside it: the same height, text and corners, with the border inside the padding.
+.playground-actions .lang-toggle button {
+	min-height: 40px;
+	padding: calc(0.5rem - 2px) calc(1rem - 2px);
+	border-radius: 4px;
+	font-size: 1rem;
+	line-height: 1.5;
+	font-weight: 500;
+}
+.playground-reset:disabled {
+	opacity: 0.35;
+	cursor: default;
+	pointer-events: none;
+}
+.playground-row select {
+	grid-column: 2 / -1;
+	padding-block: 0.3rem;
+}
+.playground-row label {
+	font-weight: 600;
+}
+.playground-row output {
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+}
+// The stagger that is used, when another setting changes it, on a small line under the value.
+.playground-row output small {
+	display: block;
+	font-size: 0.75rem;
+	line-height: 1.1;
+	color: var(--text-muted);
+	white-space: nowrap;
+}
+.playground-row output.is-default {
+	color: var(--text-muted);
+}
+// The track is filled up to the thumb, has a tick at the default, and shows in the colour of a demo's border the values that another setting holds back, from --from-at to --to-at.
+.playground-row input[type="range"] {
+	--thumb: 18px;
+	--from-at: 100%;
+	--to-at: 100%;
+	--default-at: -10px;
+	--tick: color-mix(in oklab, currentColor 55%, transparent);
+	--value-at: 0%;
+	--track: color-mix(in oklab, currentColor 18%, transparent);
+	--fill: var(--btn-primary-bg-normal);
+	--limit: var(--special-demoblock);
+	-webkit-appearance: none;
+	appearance: none;
+	display: block;
+	width: 100%;
+	height: var(--thumb);
+	margin: 0;
+	padding: 0;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+}
+.playground-row input[type="range"]::-webkit-slider-runnable-track {
+	height: 6px;
+	border-radius: 3px;
+	background: linear-gradient(to right, transparent calc(var(--default-at) - 1px), var(--tick) 0 calc(var(--default-at) + 1px), transparent 0), linear-gradient(to right, transparent var(--from-at), var(--limit) 0 var(--to-at), transparent 0), linear-gradient(to right, var(--fill) var(--value-at), var(--track) 0);
+}
+.playground-row input[type="range"]::-moz-range-track {
+	height: 6px;
+	border-radius: 3px;
+	background: linear-gradient(to right, transparent calc(var(--default-at) - 1px), var(--tick) 0 calc(var(--default-at) + 1px), transparent 0), linear-gradient(to right, transparent var(--from-at), var(--limit) 0 var(--to-at), transparent 0), linear-gradient(to right, var(--fill) var(--value-at), var(--track) 0);
+}
+.playground-row input[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: var(--thumb);
+	height: var(--thumb);
+	margin-top: calc(3px - var(--thumb) / 2);
+	border: none;
+	border-radius: 50%;
+	background: var(--btn-primary-bg-normal);
+}
+.playground-row input[type="range"]::-moz-range-thumb {
+	width: var(--thumb);
+	height: var(--thumb);
+	border: none;
+	border-radius: 50%;
+	background: var(--btn-primary-bg-normal);
+}
+.playground-row input[type="range"]:focus-visible {
+	outline: 2px solid var(--btn-primary-bg-normal);
+	outline-offset: 4px;
+}
+// A hollow mark on the stagger track at the stagger that is used, when the maximum holds it back.
+.playground-track {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+.playground-used {
+	position: absolute;
+	top: 50%;
+	left: var(--used-at, 0%);
+	width: 14px;
+	height: 14px;
+	border: 2px solid var(--btn-primary-bg-normal);
+	border-radius: 50%;
+	background: var(--bg-surface);
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
+.playground-used[hidden] {
+	display: none;
+}
+.playground-limit {
+	display: block;
+	margin-top: 0.3rem;
+}
+.playground-limit:empty {
+	display: none;
+}
+.playground-columns {
+	margin-bottom: var(--standard-padding);
+}
+.playground-card-note {
+	margin: 0;
+	font-size: 0.9rem;
+}
+.playground-result {
+	margin: 0;
+	font-variant-numeric: tabular-nums;
+}
+.playground-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.5rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--border-default);
+}
+.playground-settings dt {
+	font-weight: 600;
+}
+.playground-settings dd {
+	margin: 0 0 0.8rem;
+}
+.playground-charts .no-motion,
+.playground-charts .no-motion * {
+	transition: none !important;
+}
+// On a phone: the name, the value and Reset on one line, the slider under them.
+@media (max-width: 600px) {
+	.playground-row {
+		grid-template-columns: minmax(0, 1fr) auto auto;
+	}
+	.playground-row input,
+	.playground-row .playground-track,
+	.playground-row select {
+		grid-column: 1 / -1;
+		grid-row: 2;
+	}
+}

@@ -19,7 +19,7 @@
 	}
 	&[data-place="inside"] {
 		transform: translate(-50%, -50%);
-		color: var(--tablechart-bar-value-color, #{ink($barfill)});
+		color: var(--tablechart-bar-value-color, var(--_ink, #{ink($barfill)}));
 	}
 
 	&[data-place="around"] {
@@ -56,16 +56,16 @@
 		visibility: hidden;
 	}
 	&[data-place="inside"][data-kind="up"] {
-		color: var(--tablechart-up-value-color, #{ink("var(--tablechart-up-color, #{$barfill})")});
+		color: var(--tablechart-up-value-color, var(--_ink, #{ink("var(--tablechart-up-color, #{$barfill})")}));
 	}
 	&[data-place="inside"][data-kind="down"] {
-		color: var(--tablechart-down-value-color, #{ink("var(--tablechart-down-color, #{$barfill})")});
+		color: var(--tablechart-down-value-color, var(--_ink, #{ink("var(--tablechart-down-color, #{$barfill})")}));
 	}
 	&[data-place="inside"][data-series] {
-		color: var(--tablechart-piece-value-color, #{ink($seriesink)});
+		color: var(--tablechart-piece-value-color, var(--_ink, #{ink($seriesink)}));
 	}
 	&[data-place="inside"][data-kind="total"] {
-		color: var(--tablechart-total-value-color, #{ink("var(--tablechart-total-color, #{$barfill})")});
+		color: var(--tablechart-total-value-color, var(--_ink, #{ink("var(--tablechart-total-color, #{$barfill})")}));
 	}
 }
 

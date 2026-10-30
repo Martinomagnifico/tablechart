@@ -33,7 +33,7 @@ block content
 					td: code root
 					td The element to look for charts in. #[code document] by default.
 
-		p If you call #[code init()] again, it skips the figures that are already charts. To make charts of figures that are added to the page later, call it again with the element that holds them as #[code root], or use #[code create()].
+		p If you call #[code init()] again, it skips the figures that are already charts. If you want to make charts of figures that are added to the page later, call it again with the element that holds them as #[code root], or use #[code create()].
 
 	+section("What it returns")
 		table
@@ -65,7 +65,7 @@ block content
 		p The options are the same as for #[code init()]. #[code selector] is not used.
 
 	+section("addType()")
-		p #[code addType()] adds one of the additional types. The first argument is the value of #[code data-chart], the second the type. Add it before #[code init()] or #[code create()]. A type can bring annotations of its own: adding #[code scatter] also adds #[code quadrant]. See #[a(href=url('/types/additional-types.html')) Additional types].
+		p #[code addType()] adds one of the additional types. The first argument is the value of #[code data-chart], the second the type. It needs to come before #[code init()] or #[code create()]. A type can bring annotations of its own: adding #[code scatter] also adds #[code quadrant]. See #[a(href=url('/types/additional-types.html')) Additional types].
 
 		+codeblock('JS').
 			import { addType, init } from "@martinomagnifico/tablechart";
@@ -143,7 +143,7 @@ block content
 					td Makes everything in the chart, with its text. It needs no width.
 				tr
 					td: code layout()
-					td Places everything. Run it again when the width changes.
+					td Places everything. It needs to run again when the width changes.
 				tr
 					td: code setShown()
 					td Starts the animation, or shows the chart whole.
@@ -158,7 +158,7 @@ block content
 					td Shows a chart that steps up to a step. A presentation plugin calls it for its own steps, with #[code controls] set to #[code false].
 
 		p #[code build()] also gives the chart its tooltip, as the #[code tooltip] option says. #[code unbuild()] closes it.
-		p #[code init()] and #[code create()] get every chart ready for print. With the building blocks, do that yourself before the page prints: add #[code PRINTING_CLASS] to the figure, so the chart has no transitions, and show it. Remove the class after printing.
+		p #[code init()] and #[code create()] get every chart ready for print. With the building blocks, do that yourself before the page prints: add #[code PRINTING_CLASS] to the figure, so the chart has no transitions, and show it. After printing, the class can go again.
 
 		+codeblock('JS').
 			import { setShown, PRINTING_CLASS } from "@martinomagnifico/tablechart/core";

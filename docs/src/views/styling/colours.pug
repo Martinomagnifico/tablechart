@@ -29,7 +29,7 @@ block content
 								td= row[1]
 
 	+section("Waterfall colours")
-		p Set the colours of rising steps, falling steps and totals. The number inside a bar is dark or light, whichever reads on the colour of the bar.
+		p These set the colours of rising steps, falling steps and totals. The number inside a bar is in the background colour if that has a contrast of 4.5:1 with the bar. If not, it is black or white, whichever has more contrast.
 
 		+style.
 			.warm {
@@ -48,7 +48,7 @@ block content
 								td= row[1]
 
 	+section("A palette")
-		p Set #[code --tablechart-color-1], #[code --tablechart-color-2] and on. Donut slices use them in order. If a colour is not set, that slice uses the default.
+		p Donut slices use #[code --tablechart-color-1], #[code --tablechart-color-2] and on, in order. If a colour is not set, that slice uses the default.
 
 		+style.
 			.fruity {
@@ -119,3 +119,47 @@ block content
 				tr
 					td: code --tablechart-series-own-color
 					td The colour of one line, set on [data-series="2"] and so on.
+
+	+section("A range of colours")
+		p If you set an end colour, the lines, the parts of a stack or the slices go from the first colour to the end colour, in even steps, instead of getting lighter. With two lines they are the first and the end colour; with three there is also the colour exactly in between, and so on.
+		p If both colours have a contrast of at least 3:1 with the background, and both are darker than the background, or both lighter, every colour in between has that too. If both have at least 4.5:1, the numbers inside the parts can stay in the background colour.
+
+		+style.
+			.dark-range {
+				--tablechart-bar-color: #0b5d66;
+				--tablechart-series-color-end: #1f3a8a;
+			}
+
+		+chart(null, '1')
+			figure.dark-range(data-chart="column" data-chart-stack)
+				figcaption
+					b Apples sold
+					br
+					span thousands
+				table
+					thead
+						tr
+							th Year
+							th Farm shop
+							th Market
+							th Online
+					tbody
+						each row in [['2023', '64', '38', '22'], ['2024', '71', '45', '30'], ['2025', '69', '57', '26'], ['2026', '80', '62', '41']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+								td= row[3]
+
+		table
+			thead
+				tr
+					th Variable
+					th Sets
+			tbody
+				tr
+					td: code --tablechart-series-color-end
+					td The colour of the last line or part. The first is #[code --tablechart-series-color], or the bar colour. #[code --tablechart-series-color-start] is another name for the first colour, to go with the end colour.
+				tr
+					td: code --tablechart-slice-color-end
+					td The colour of the last slice. The first is #[code --tablechart-slice-color]. #[code --tablechart-slice-color-start] is another name for it, to go with the end colour.

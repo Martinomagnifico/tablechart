@@ -16,7 +16,7 @@ block content
 		p Numbers are not translated. They are formatted for the language of the page. See #[a(href=url('/features/numbers.html')) Numbers].
 
 	+section("Translation keys")
-		p Many translation scripts find text by a translation key in an attribute, such as #[code data-i18n]. Add #[code data-chart-keys] to the figure, and Tablechart adds translation keys to the names in the table. The value of #[code data-chart-keys] is the start of each key: #[code -row1], #[code -row2] and so on for the names of the rows, and #[code -col1], #[code -col2] and so on for the column headers. The names in the chart get the same keys.
+		p Many translation scripts find text by a translation key in an attribute, such as #[code data-i18n]. If the figure has #[code data-chart-keys], Tablechart adds translation keys to the names in the table. The value of #[code data-chart-keys] is the start of each key: #[code -row1], #[code -row2] and so on for the names of the rows, and #[code -col1], #[code -col2] and so on for the column headers. The names in the chart get the same keys.
 
 		+codeblock('HTML').
 			<figure data-chart="column" data-chart-keys="apples">
@@ -30,7 +30,7 @@ block content
 
 		p If a cell already has a key, Tablechart keeps it. The title and the badges are your own HTML, so give them a key yourself.
 		p Without #[code data-chart-keys], Tablechart adds no translation keys.
-		p To use another attribute for the keys, set the #[code langattribute] option. To add no keys at all, also on figures with #[code data-chart-keys], set it to #[code false].
+		p If you want to use another attribute for the keys, set the #[code langattribute] option. If you want to add no keys at all, also on figures with #[code data-chart-keys], set it to #[code false].
 
 		+codeblock('JS').
 			init({ langattribute: "data-key" });
@@ -94,7 +94,7 @@ block content
 			});
 
 	+section("When to translate")
-		p Tablechart makes the names in the chart when it starts. Run your translation script after #[code init()] has finished. #[code init()] returns a promise.
+		p Tablechart makes the names in the chart when it starts. So a translation script needs to run after #[code init()] has finished. #[code init()] returns a promise.
 
 		+codeblock('JS').
 			import { init } from "@martinomagnifico/tablechart";
@@ -113,4 +113,4 @@ block content
 			tablechart.refresh();
 
 	+section("Next")
-		p To check what screen readers read, see #[a(href=url('/accessibility.html')) Accessibility].
+		p If you want to check what screen readers read, see #[a(href=url('/accessibility.html')) Accessibility].

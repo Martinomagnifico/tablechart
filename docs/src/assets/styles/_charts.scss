@@ -111,11 +111,14 @@
 // so a variable read inside the card would give the card's colour.
 :root {
 	--chart-accent: var(--btn-primary-bg-normal);
+	// The charts: the site's teal, and in dark mode a lighter tint of it, so the first three steps have 3:1 with the background.
+	--chart-ink: light-dark(var(--color-tint-600), var(--color-tint-400));
 }
 
 :where(.tablechart, [data-chart]) {
-	--tablechart-bar-color: var(--chart-accent);
-	--tablechart-slice-color: var(--chart-accent);
+	--tablechart-bar-color: var(--chart-ink);
+	--tablechart-slice-color: var(--chart-ink);
+	--tablechart-series-fade: 15%;
 }
 
 // A donut is as tall as it is wide, so on its own it gets a narrower box.

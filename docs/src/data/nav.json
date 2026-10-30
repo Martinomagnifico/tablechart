@@ -144,6 +144,11 @@
                     "href": "/styling/animation.html"
                 },
                 {
+                    "text": "Styling | Animation playground",
+                    "label": "Animation playground",
+                    "href": "/styling/playground.html"
+                },
+                {
                     "text": "Styling | Axes and gridlines",
                     "label": "Axes and gridlines",
                     "href": "/styling/axes.html"

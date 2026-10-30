@@ -21,7 +21,7 @@ block content
 				p.lead A chart that shows its rows one step at a time.
 
 	+section("Steps")
-		p Add #[code data-fragment] to the figure. The chart then starts empty, and each step shows one more row. Tablechart puts a Previous and a Next button under the chart.
+		p If the figure has #[code data-fragment], the chart starts empty, and each step shows one more row. Tablechart puts a Previous and a Next button under the chart.
 
 		+chart(null, '1')
 			+seasons({ "data-fragment": "" })
@@ -29,7 +29,7 @@ block content
 		p The table stays complete, so screen readers read every row, whatever step the chart is at. Without animation, or on paper, a chart shows all its steps at once.
 
 	+section("Rows that are there from the start")
-		p Add #[code data-fragment] to some rows instead of the figure. Rows without it are there from the start, and the others arrive one step each.
+		p If only some rows have #[code data-fragment], rows without it are there from the start, and the others arrive one step each.
 
 		+chart(null, '5-7')
 			figure(data-chart="waterfall")
@@ -71,7 +71,7 @@ block content
 								td= row[2]
 
 	+section("Point by point")
-		p Add #[code data-fragment] to cells. Each cell arrives on a step of its own, and cells without it are there from the start. The steps go down each column of the table: one line point by point, then the next.
+		p If cells have #[code data-fragment], each cell arrives on a step of its own, and cells without it are there from the start. The steps go down each column of the table: one line point by point, then the next.
 
 		+chart(null, '7-10')
 			figure(data-chart="line")
@@ -106,7 +106,7 @@ block content
 								td(data-fragment)= row[2]
 
 	+section("Your own buttons")
-		p Set the #[code controls] option to #[code false] to leave the buttons out, and step the chart from your own script. Each chart has #[code next()], #[code previous()] and #[code stepTo(step)], and #[code step] and #[code steps] say where it is. The figure sends a #[code tablechart:step] event at each step.
+		p If you want to step the chart from your own script, set the #[code controls] option to #[code false]: the buttons are then left out. Each chart has #[code next()], #[code previous()] and #[code stepTo(step)], and #[code step] and #[code steps] say where it is. The figure sends a #[code tablechart:step] event at each step.
 
 		+codeblock('JS').
 			const { charts } = await init({ controls: false });
