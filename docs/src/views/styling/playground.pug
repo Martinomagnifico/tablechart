@@ -22,7 +22,7 @@ block content
 				p.lead Tweak the animation settings, and copy the resulting CSS variables.
 
 	+section("Try it")
-		p If you move a slider and release it, the charts build again. The sliders stay in view while the page scrolls. A setting that is not changed keeps its default.
+		p If you change a setting and press Set, the charts in view build again. The other charts build with the new settings when they are scrolled into view. On a wide screen, the sliders stay in view while the page scrolls. A setting that is not changed keeps its default.
 
 		p The pink part of a slider shows where the other setting holds it back, for the number of columns and bars under the sliders. The stagger and the maximum depend on each other: the more columns or bars a chart has, the sooner the maximum moves the starts closer together.
 		p The maximum always wins. If it holds the stagger back, a hollow mark on the stagger slider shows the stagger that is used, and the value beside the slider shows both, such as 0.6 → 0.10. Your CSS keeps the stagger you set: on a chart with fewer columns, it is used as it is.
@@ -84,7 +84,7 @@ block content
 			.playground-actions
 				span.lang-toggle
 					button.playground-reset-all(type="button") All defaults
-				button.btn.solid.playground-build(type="button") Build again
+				button.btn.solid.playground-build(type="button") Set
 
 		.playground-charts
 			.card.playground-columns

@@ -14,6 +14,10 @@
 	};
 
 	var valueOf = function (control) { return control.value + control.dataset.unit; };
+	// Set is off until a setting differs from the one the charts last built with.
+	var setButton = document.querySelector('.playground-build');
+	var settings = function () { return JSON.stringify(Object.keys(chosen).sort().map(function (name) { return [name, chosen[name]]; })); };
+	var built = settings();
 
 	// The column chart of the preview, as written, so it can be made again with another number of columns.
 	var count = document.getElementById('pg-count');
@@ -131,31 +135,35 @@
 			else charts.style.removeProperty(name);
 		});
 		var lines = Object.keys(chosen).map(function (name) { return '  ' + name + ': ' + chosen[name] + ';'; });
+		setButton.disabled = settings() === built;
 		css.textContent = lines.length ? ':root {\n' + lines.join('\n') + '\n}' : '/* All settings are at their defaults: there is nothing to add. */';
 		limits();
 	};
 
-	// Every chart builds again from the start, with the settings as they are now.
+	// The charts in view build again with the settings as they are now; the others build when they are scrolled to.
 	var build = function () {
-		var figures = charts.querySelectorAll('figure[data-chart]');
+		built = settings();
+		setButton.disabled = true;
+		var figures = Array.from(charts.querySelectorAll('figure[data-chart]'));
+		var inView = figures.filter(function (figure) {
+			var box = figure.getBoundingClientRect();
+			return box.bottom > 0 && box.top < window.innerHeight;
+		});
 		figures.forEach(function (figure) { figure.classList.add('no-motion'); figure.classList.remove('is-shown'); });
 		void charts.offsetWidth;
-		figures.forEach(function (figure) { figure.classList.remove('no-motion'); figure.classList.add('is-shown'); });
+		figures.forEach(function (figure) { figure.classList.remove('no-motion'); });
+		inView.forEach(function (figure) { figure.classList.add('is-shown'); });
 	};
 
 	controls.forEach(function (control) {
 		var name = control.dataset.var;
-		// While a slider moves, only its number follows; the charts build when it is let go.
 		control.addEventListener('input', function () {
 			// Back on the default value is the default: it leaves the CSS, and Reset has nothing to do.
 			if (control.value === '' || (control.type === 'range' && control.value === control.defaultValue)) delete chosen[name];
 			else chosen[name] = valueOf(control);
 			show();
 		});
-		control.addEventListener('change', function () {
-			save();
-			build();
-		});
+		control.addEventListener('change', save);
 	});
 
 	document.querySelectorAll('.playground-reset').forEach(function (button) {
@@ -165,7 +173,6 @@
 			control.value = control.defaultValue;
 			save();
 			show();
-			build();
 		});
 	});
 	document.querySelector('.playground-reset-all').addEventListener('click', function () {
@@ -173,9 +180,8 @@
 		controls.forEach(function (control) { control.value = control.tagName === 'SELECT' ? '' : control.defaultValue; });
 		save();
 		show();
-		build();
 	});
-	document.querySelector('.playground-build').addEventListener('click', build);
+	setButton.addEventListener('click', build);
 
 	show();
 })();

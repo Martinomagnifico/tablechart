@@ -62,7 +62,7 @@
 .playground-bar .lang-toggle {
 	margin: 0;
 }
-// As large as Build again beside it: the same height, text and corners, with the border inside the padding.
+// As large as Set beside it: the same height, text and corners, with the border inside the padding.
 .playground-actions .lang-toggle button {
 	min-height: 40px;
 	padding: calc(0.5rem - 2px) calc(1rem - 2px);
@@ -71,7 +71,8 @@
 	line-height: 1.5;
 	font-weight: 500;
 }
-.playground-reset:disabled {
+.playground-reset:disabled,
+.playground-build:disabled {
 	opacity: 0.35;
 	cursor: default;
 	pointer-events: none;
