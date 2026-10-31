@@ -65,7 +65,7 @@
 			transform: scale(0);
 			transform-box: fill-box;
 			transform-origin: center;
-			transition: transform #{$duration} #{$easing}, opacity #{$fade} ease;
+			transition: transform #{$duration} var(--tablechart-marker-ease, #{$easing}), opacity #{$fade} ease;
 			transition-delay: calc(var(--i) * #{$stagger});
 		}
 
@@ -363,6 +363,15 @@
 		:where(.tablechart-hole:not([data-for])) {
 			transition: opacity 0s linear;
 			transition-delay: calc(var(--i) * #{$stagger} + 0.048 * #{$duration} + 0.7 * #{$fade});
+		}
+	}
+
+	// Once built, a later change of colour, such as to dark mode, is at once rather than with the timing of the build.
+	:where([data-animate].is-built:not([data-steps])) {
+		#{$label},
+		:where(.tablechart-name, .tablechart-legend, .tablechart-badge, .tablechart-centre, .tablechart-reference, .tablechart-head),
+		:where(.tablechart-name)::before {
+			transition: none;
 		}
 	}
 

@@ -8,6 +8,7 @@ const TIP_CLASS = "tablechart-tooltip";
 // A child of body does not inherit the chart's variables, so these are copied from the chart when it opens.
 const COPIED = [
 	"--tablechart-surface",
+	"--_surface",
 	"--tablechart-tooltip-surface",
 	"--tablechart-tooltip-color",
 	"--tablechart-tooltip-border",

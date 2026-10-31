@@ -9,123 +9,45 @@ block content
 		.container
 			.page-header
 				h1 Accessibility
-				p.lead Tablecharts intends to be as inclusive as possible. Here are some accessibility benefits.
+				p.lead Tablechart intends to be as inclusive as possible. This page follows the four principles of WCAG: perceivable, operable, understandable and robust.
 
-	+section("Contrast")
-		p A bar, a line, a slice or a part of a stack needs a contrast of at least 3:1 with the background, so it can be seen well. A number #[em inside] a bar is text, and needs 4.5:1 with the bar. These are the requirements of WCAG 1.4.11 and 1.4.3.
+	+section("Perceivable")
+		p The parts and numbers of a chart can be seen or heard: with enough contrast, not only by colour, as a table for screen readers, on paper and at any size.
+
+		h3(id="contrast") Contrast
+		p A bar, a line, a slice or a part of a stack needs a contrast of at least 3:1 with the background, so it can be seen well. A value #[em inside] a bar or column is still text, and needs 4.5:1 contrast with the bar. These are the requirements of WCAG 1.4.11 and 1.4.3.
 		ul
-			li A number #[em inside] a bar or column always has at least 4.5:1 with it: Tablechart chooses its colour in a fixed order. See #[a(href=url('/styling/text.html#numbers-inside-bars-or-columns')) Numbers inside bars or columns].
+			li A number #[em inside] a bar or column gets at least 5:1 with it where possible, a little more than the 4.5:1 that is needed, so it is easier to read. It is in one of two colours that you can set, or else black or white. #[code --tablechart-value-contrast] sets the 5:1. With APCA it is Lc 60, see below. See #[a(href=url('/styling/text.html#numbers-inside-bars-or-columns')) Numbers inside bars or columns].
 			li The parts of a stack and the slices of a donut have a gap in the background colour between them. So two parts in similar colours do not need contrast with each other, only with the background.
 			li Without a palette, each next line, part or slice is lighter than the one before it, so it has less contrast with the background. With many lines or slices, the last ones can have less than 3:1. If so, a palette or a range of colours helps: if both ends of a range have at least 3:1 with the background, every step between them has too. See #[a(href=url('/styling/colours.html#a-range-of-colours')) A range of colours].
 			li If you set your own colours, they need the same contrast with the background: 3:1 for a bar or a line.
-		p If you set the #[code debug] option, the console warns about each line, bar, slice or number inside a bar with too little contrast, with its name and the contrast it has.
+		p The console warns about each line, bar, slice or number inside a bar with too little contrast, with its name and the contrast it has. The check runs for every chart once it is laid out, also without the #[code debug] option, because a printed page or a PDF has the same colours.
 
-		+codeblock('JS').
-			init({ debug: true });
-
-	+section("What a screen reader gets")
-		p The table stays on the page. It is hidden from sight, but screen readers read it like any other table: the names of the rows and columns, and every value. The chart is hidden from screen readers, with #[code aria-hidden="true"], so they do not read everything twice.
-		p This button shows the table that a screen reader reads out loud:
-
-		.lang-toggle(role="group" aria-label="The table of the example")
-			button.show-table(type="button" aria-pressed="false") Show the table
-		+chart(null, '1')
-			figure#a11y-table(data-chart="column" data-chart-table="print")
-				figcaption
-					b Apples picked
-					br
-					span thousands
-				table
-					tbody
-						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '41']]
-							tr
-								th= row[0]
-								td= row[1]
-
-		script.
-			document.querySelector('.show-table').addEventListener('click', function () {
-				var figure = document.getElementById('a11y-table');
-				var shown = this.getAttribute('aria-pressed') !== 'true';
-				figure.setAttribute('data-table', shown ? 'always' : 'print');
-				this.setAttribute('aria-pressed', String(shown));
-			});
-
-		p If the chart has a title in a #[code figcaption], Tablechart makes it the name of the figure and of the table, with #[code aria-labelledby]. So a screen reader that jumps to the table also reads the title and the unit. If the figure or the table already has a name, with #[code aria-label], #[code aria-labelledby] or a #[code caption], it keeps that name.
-		p A screen reader does not read a line break. So Tablechart puts a full stop before each #[code br] in the title, hidden from sight, and a screen reader pauses between the title and the subtitle. If the line already ends with a full stop, a question mark, a colon or a comma, nothing is added.
-		p If the chart has no #[code figcaption], add #[code aria-label] to the figure, such as #[code aria-label="Apples picked, in thousands"].
-
-	+section("A summary for a long table")
-		p A table is a good alternative to a chart, up to a point. Someone who sees a chart of 60 months sees the highest month and the trend at a glance. Someone who listens to its table hears 60 names and 60 numbers, one after the other, and cannot remember a number from four rows back. To find the highest month, they have to go through every row.
-		p A summary gives a listener what the chart gives at a glance: a few sentences with, for example, the highest and the lowest value, the change from the first value to the last, the trend, and the values far from it. You write the sentences, and Tablechart fills in the numbers from the table, formatted as on the chart.
-
-		+codeblock('HTML').
-			<div class="chart-summary">
-				<p>The highest price was {highest.value}, in {highest.name}.</p>
-				<p data-summary="trend">Without the outliers, the trend is {trend}: from {trend.from} to {trend.to}.</p>
-			</div>
-
-		p A screen reader reads the summary right after the title of the chart. The table stays, for a listener who wants every number. The summary is real text in the page, so it can be shown to everyone too, and translated like any other text.
-		p On paper, the summary is often the only alternative a long table has: text that is hidden on the page does not reach a PDF, and a table of 60 rows can take a page of its own. See #[a(href='#in-print-and-pdf') In print and PDF].
-		p A chart with more than about 15 values needs a summary. See #[a(href=url('/features/summary.html')) Summary].
-
-	+section("Numbers that do not fit")
-		p Some charts do not show all their numbers: a stack with small parts, a narrow chart, a chart with many rows, or a line chart with lines close together. The numbers are still in the table, so screen readers read them. Pointing at a row, or tapping it, shows them in a tooltip.
-		p If you want to show the table under the chart as well, add #[code data-chart-table="always"] to the figure. This chart has three lines close together, so it leaves numbers out. The table under it has them all.
-
-		+chart(null, '1')
-			figure(data-chart="line" data-chart-table="always")
-				figcaption: b Apples per tree
-				table
-					thead
-						tr
-							th Year
-							th North
-							th South
-							th East
-					tbody
-						each row in [['2018', '41', '38', '35'], ['2019', '45', '44', '42'], ['2020', '48', '47', '49'], ['2021', '52', '50', '51'], ['2022', '55', '56', '53'], ['2023', '58', '57', '59'], ['2024', '61', '60', '62'], ['2025', '64', '66', '63']]
-							tr
-								th= row[0]
-								td= row[1]
-								td= row[2]
-								td= row[3]
-
-	+section("In print and PDF")
-		p On screen, the tooltip shows numbers that are left out. On paper there is no tooltip, so a chart that leaves numbers out also needs its table. #[code data-chart-table], or the #[code table] option for all charts, says when the table is shown under the chart:
-
+		h4 WCAG 2 or APCA
+		p By default, Tablechart measures contrast as WCAG 2 does, with a ratio such as 4.5:1. That is the standard that most accessibility rules ask for now. APCA, the method in the draft of WCAG 3, follows what people see more closely. On a middle colour, such as a teal or a brown, WCAG 2 often prefers black text where white is easier to read.
+		p If you want APCA, set #[code --tablechart-contrast-wcag] to #[code 3]. Tablechart then uses APCA for everything: to choose the colour of a number inside a bar, and for the warnings in the console. Contrast is then a value such as Lc 60.
 		table
 			thead
 				tr
-					th Value
-					th On screen
-					th In print and PDF
+					th
+					th WCAG 2, the default
+					th APCA, with #[code 3]
 			tbody
 				tr
-					td: code never
-					td Hidden
-					td Hidden. The default.
+					td A bar, line or slice needs
+					td 3:1
+					td Lc 30
 				tr
-					td: code auto
-					td Hidden
-					td Shown, if the chart does not show all its numbers, and the table has no more than 15 values
+					td A number inside a bar needs
+					td 4.5:1, or 3:1 if it is large
+					td Lc 60, or Lc 45 if it is large
 				tr
-					td: code print
-					td Hidden
-					td Always shown
-				tr
-					td: code always
-					td Shown
-					td Shown
+					td A number inside a bar aims for
+					td 5:1
+					td Lc 60
+		p With APCA, a page can have text that an audit tool for WCAG 2 reports, because those tools measure the WCAG 2 way.
 
-		p If your pages become PDFs, use #[code auto]. Then a table only takes room on the page when the chart needs it.
-		p With #[code auto], a table with more than 15 values is not printed, and the summary is printed instead. A chart that has neither on paper has no alternative in the PDF. See #[a(href='#a-summary-for-a-long-table') A summary for a long table].
-
-		+codeblock('JS').
-			init({ table: "auto" });
-
-		p Whether numbers are left out depends on the width of the chart. #[code auto] uses the width the chart has on the page.
-
-	+section("Not only colour")
+		h3(id="not-only-colour") Not only colour
 		p Lines are told apart by their points as well: filled and open circles, squares and diamonds. A line can also be dashed or dotted. The button shows the chart without colour, as some people see it.
 
 		.lang-toggle(role="group" aria-label="Colour of the example")
@@ -169,28 +91,138 @@ block content
 				this.setAttribute('aria-pressed', String(grey));
 			});
 
+		h3(id="what-a-screen-reader-gets") What a screen reader gets
+		p The table stays on the page. It is hidden from sight, but screen readers read it like any other table: the names of the rows and columns, and every value. The chart is hidden from screen readers, with #[code aria-hidden="true"], so they do not read everything twice.
+		p This button shows the table that a screen reader reads out loud:
 
-	+section("The total of a donut")
+		.lang-toggle(role="group" aria-label="The table of the example")
+			button.show-table(type="button" aria-pressed="false") Show the table
+		+chart(null, '1')
+			figure#a11y-table(data-chart="column" data-chart-table="print")
+				figcaption
+					b Apples picked
+					br
+					span thousands
+				table
+					tbody
+						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '41']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		script.
+			document.querySelector('.show-table').addEventListener('click', function () {
+				var figure = document.getElementById('a11y-table');
+				var shown = this.getAttribute('aria-pressed') !== 'true';
+				figure.setAttribute('data-table', shown ? 'always' : 'print');
+				this.setAttribute('aria-pressed', String(shown));
+			});
+
+		p If the chart has a title in a #[code figcaption], Tablechart makes it the name of the figure and of the table, with #[code aria-labelledby]. So a screen reader that jumps to the table also reads the title and the unit. If the figure or the table already has a name, with #[code aria-label], #[code aria-labelledby] or a #[code caption], it keeps that name.
+		p A screen reader does not read a line break. So Tablechart puts a full stop before each #[code br] in the title, hidden from sight, and a screen reader pauses between the title and the subtitle. If the line already ends with a full stop, a question mark, a colon or a comma, nothing is added.
+		p If the chart has no #[code figcaption], add #[code aria-label] to the figure, such as #[code aria-label="Apples picked, in thousands"].
+
+		h3(id="a-summary-for-a-long-table") A summary for a long table
+		p A table is a good alternative to a chart, up to a point. Someone who sees a chart of 60 months sees the highest month and the trend at a glance. Someone who listens to its table hears 60 names and 60 numbers, one after the other, and cannot remember a number from four rows back. To find the highest month, they have to go through every row.
+		p A summary gives a listener what the chart gives at a glance: a few sentences with, for example, the highest and the lowest value, the change from the first value to the last, the trend, and the values far from it. You write the sentences, and Tablechart fills in the numbers from the table, formatted as on the chart.
+
+		+codeblock('HTML').
+			<div class="chart-summary">
+				<p>The highest price was {highest.value}, in {highest.name}.</p>
+				<p data-summary="trend">Without the outliers, the trend is {trend}: from {trend.from} to {trend.to}.</p>
+			</div>
+
+		p A screen reader reads the summary right after the title of the chart. The table stays, for a listener who wants every number. The summary is real text in the page, so it can be shown to everyone too, and translated like any other text.
+		p On paper, the summary is often the only alternative a long table has: text that is hidden on the page does not reach a PDF, and a table of 60 rows can take a page of its own. See #[a(href='#in-print-and-pdf') In print and PDF].
+		p A chart with more than about 15 values needs a summary. See #[a(href=url('/features/summary.html')) Summary].
+
+		h3(id="numbers-that-do-not-fit") Numbers that do not fit
+		p Some charts do not show all their numbers: a stack with small parts, a narrow chart, a chart with many rows, or a line chart with lines close together. The numbers are still in the table, so screen readers read them. Pointing at a row, or tapping it, shows them in a tooltip.
+		p If you want to show the table under the chart as well, add #[code data-chart-table="always"] to the figure. This chart has three lines close together, so it leaves numbers out. The table under it has them all.
+
+		+chart(null, '1')
+			figure(data-chart="line" data-chart-table="always")
+				figcaption: b Apples per tree
+				table
+					thead
+						tr
+							th Year
+							th North
+							th South
+							th East
+					tbody
+						each row in [['2018', '41', '38', '35'], ['2019', '45', '44', '42'], ['2020', '48', '47', '49'], ['2021', '52', '50', '51'], ['2022', '55', '56', '53'], ['2023', '58', '57', '59'], ['2024', '61', '60', '62'], ['2025', '64', '66', '63']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+								td= row[3]
+
+		h3(id="the-total-of-a-donut") The total of a donut
 		p If a donut has no total row, the number in the middle is the sum of the slices. Tablechart adds it to the table, in a hidden row at the bottom, so screen readers read it with a name: "Total, 74.5". The #[code totallabel] option sets the name.
 
-	+section("Annotations")
+		h3(id="annotations") Annotations
 		p The text of an annotation, such as #[code +24%] on a bracket, stays in the page under the table, hidden from sight. Screen readers read it there. The badge in the drawing is hidden from them.
 
-	+section("Without JavaScript")
-		p If JavaScript does not run, there is no chart. The table is then shown instead, with its title.
-		p A chart with #[code data-chart-src] has no table until JavaScript has read the JSON file. If JavaScript does not run, or the file cannot be read, there is no table and no chart. If you want to be sure that the data is always available, write the table in the HTML instead of as a JSON data source.
+		h3(id="in-print-and-pdf") In print and PDF
+		p On screen, the tooltip shows numbers that are left out. On paper there is no tooltip, so a chart that leaves numbers out also needs its table. #[code data-chart-table], or the #[code table] option for all charts, says when the table is shown under the chart:
 
-	+section("Keyboard")
-		p The table is the way to the numbers for screen readers, and they move through it with their own keys. The tooltip only works with a pointer or a tap. If people who use a keyboard, without a screen reader, must be able to read every number, show the table with #[code data-chart-table="always"].
+		table
+			thead
+				tr
+					th Value
+					th On screen
+					th In print and PDF
+			tbody
+				tr
+					td: code never
+					td Hidden
+					td Hidden. The default.
+				tr
+					td: code auto
+					td Hidden
+					td Shown, if the chart does not show all its numbers, and the table has no more than 15 values
+				tr
+					td: code print
+					td Hidden
+					td Always shown
+				tr
+					td: code always
+					td Shown
+					td Shown
 
-	+section("Zoom and text size")
+		p If your pages become PDFs, use #[code auto]. Then a table only takes room on the page when the chart needs it.
+		p With #[code auto], a table with more than 15 values is not printed, and the summary is printed instead. A chart that has neither on paper has no alternative in the PDF. See #[a(href='#a-summary-for-a-long-table') A summary for a long table].
+
+		+codeblock('JS').
+			init({ table: "auto" });
+
+		p Whether numbers are left out depends on the width of the chart. #[code auto] uses the width the chart has on the page.
+
+		h3(id="zoom-and-text-size") Zoom and text size
 		p All text is HTML, sized in #[code em]. It follows the text size and the zoom of the browser, and stays sharp. Long names beside the bars of a bar chart wrap onto more lines.
 
-	+section("Motion")
+	+section("Operable")
+		p How a chart is used with a keyboard or a pointer, and its movement for visitors who ask for less.
+
+		h3(id="keyboard") Keyboard
+		p The table is the way to the numbers for screen readers, and they move through it with their own keys. The tooltip only works with a pointer or a tap. If people who use a keyboard, without a screen reader, must be able to read every number, show the table with #[code data-chart-table="always"].
+
+		h3(id="motion") Motion
 		p If the visitor has asked for reduced motion in their system settings, charts are shown without animation.
 
-	+section("Language")
+	+section("Understandable")
+		p Text is read in the language of the page, and numbers have the format of that language.
+
+		h3(id="language") Language
 		p If the #[code html] element has a #[code lang] attribute, such as #[code lang="en"], screen readers use it to read the text in the right language, and Tablechart uses it to format the numbers. See #[a(href=url('/features/numbers.html')) Numbers].
+
+	+section("Robust")
+		p A chart is a real table in the page, so it also works without JavaScript.
+
+		h3(id="without-javascript") Without JavaScript
+		p If JavaScript does not run, there is no chart. The table is then shown instead, with its title.
+		p A chart with #[code data-chart-src] has no table until JavaScript has read the JSON file. If JavaScript does not run, or the file cannot be read, there is no table and no chart. If you want to be sure that the data is always available, write the table in the HTML instead of as a JSON data source.
 
 	+section("Standards")
 		p Websites in the European Union must meet the European Accessibility Act, which refers to the standard EN 301 549, and through it to WCAG 2.1 at level AA. For a chart, the most important requirements are a text alternative (WCAG 1.1.1) and information that is available as structure (WCAG 1.3.1). A real data table meets both, and Tablechart keeps that table in the page. For a long table, a summary is the alternative a listener can use, and in a PDF it is often the only one.

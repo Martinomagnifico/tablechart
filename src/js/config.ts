@@ -36,6 +36,8 @@ export const SHOWN_CLASS = "is-shown";
 export const PRINTING_CLASS = "is-printing";
 // For a moment, while a chart is shown or hidden at once: no transitions, so it lands at its end.
 export const AT_ONCE_CLASS = "is-at-once";
+// Once a shown chart has finished building: a later change of colour, such as to dark mode, no longer waits for the build.
+export const BUILT_CLASS = "is-built";
 // A chart in a sequence that has not had its turn: the whole figure waits hidden.
 export const QUEUED_CLASS = "tablechart-queued";
 export const CONTROLS_CLASS = "tablechart-controls";

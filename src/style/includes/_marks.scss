@@ -92,7 +92,7 @@
 // On a scatter chart, an edge in the background colour sets apart markers that overlap, and a marker on a gridline or a
 // line of a quadrant. It is behind the fill, so the marker keeps its size; `--tablechart-marker-gap` is its width.
 :where([data-chart="scatter"]) .tablechart-point {
-	stroke: var(--tablechart-surface, Canvas);
+	stroke: var(--tablechart-surface, var(--_surface, Canvas));
 	stroke-width: calc(2 * var(--tablechart-marker-gap, 2px));
 	stroke-linejoin: round;
 	paint-order: stroke;

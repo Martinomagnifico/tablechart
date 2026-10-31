@@ -15,7 +15,7 @@
 	border-radius: var(--tablechart-tooltip-radius, 0.4em);
 	// Lighter than the chart's background, with a clear shadow, so it stands out from what is behind it.
 	// White in light mode; in dark mode a little lighter than the chart's background. It follows the chart's colour scheme.
-	background: var(--tablechart-tooltip-surface, light-dark(#fff, oklch(from var(--tablechart-surface, Canvas) calc(l + 0.06) c h)));
+	background: var(--tablechart-tooltip-surface, light-dark(#fff, oklch(from var(--tablechart-surface, var(--_surface, Canvas)) calc(l + 0.06) c h)));
 	color: var(--tablechart-tooltip-color, var(--_color, CanvasText));
 	box-shadow: var(--tablechart-tooltip-shadow, 0 1px 3px rgb(0 0 0 / 0.12), 0 6px 18px rgb(0 0 0 / 0.18));
 	line-height: 1.35;

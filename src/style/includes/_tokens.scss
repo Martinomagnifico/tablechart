@@ -35,8 +35,8 @@ $speed: var(--_speed);
 	--_ease: var(--tablechart-animation-ease, ease-in-out);
 }
 
-// The background behind the chart; lighter colours are mixed with it.
-$surface: "var(--tablechart-surface, Canvas)";
+// The background behind the chart, measured as `--_surface`; lighter colours are mixed with it.
+$surface: "var(--tablechart-surface, var(--_surface, Canvas))";
 
 // A number inside a bar: black on a light bar, white on a dark one. Switched at the lightness where both have the same contrast,
 // so one of them always has at least 4.5:1 with the bar.

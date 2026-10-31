@@ -101,6 +101,10 @@
 	--_room: 0.5;
 }
 
+:where([data-chart="scatter"]) {
+	--_room: 0.62;
+}
+
 .tablechart-plot {
 	position: relative;
 

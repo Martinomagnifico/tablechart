@@ -2,7 +2,8 @@
 //
 //   npm run check:variables
 //
-// Old names (the warning map in src/js/init.ts) and the palette numbers after --tablechart-color-1 are left out.
+// Old names (OLD in src/js/functions/contrast.ts, not documented until they go in 1.3.0) and the palette numbers after
+// --tablechart-color-1 are left out.
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -20,8 +21,7 @@ const source = files(join(ROOT, 'src'))
 	.map((file) => readFileSync(file, 'utf8'))
 	.join('\n');
 
-const init = readFileSync(join(ROOT, 'src/js/init.ts'), 'utf8');
-const oldNames = new Set([...init.matchAll(/\["(--tablechart-[\w-]+)", "--tablechart-/g)].map((m) => m[1]));
+const oldNames = new Set(['bar', 'piece', 'up', 'down', 'total'].map((kind) => `--tablechart-${kind}-value-color`));
 
 const used = new Set(
 	[...source.matchAll(/--tablechart-[\w-]*\w/g)]

@@ -77,13 +77,69 @@ block content
 					td The numbers and titles along the axes. See #[a(href=url('/styling/axes.html')) Axes and gridlines].
 
 	+section("Numbers inside bars or columns")
-		p A number #[em inside] a bar or column should have a contrast of at least 4.5:1 with it, as text needs. Tablechart tries to achieve that in this order:
-		ul
-			li If the bar or column, or the part of a stack, has at least 4.5:1 with the background colour of the chart, the number gets that background colour.
-			li If not, the number gets lighter than the background colour, just as much as needed, up to white. On a dark background, it gets darker, up to black.
-			li If even that is not enough, the number is inverted: black instead of white, or white instead of black.
-		p So on a stack of parts in a dark colour and lighter steps of it, the numbers are in the background colour on the dark parts, and a bit lighter on the lighter ones. If the colours of the page change, such as from light to dark mode, the numbers get their colour again.
-		p If you want a colour of your own, set #[code --tablechart-bar-value-color], or #[code --tablechart-piece-value-color] for the parts of a stack. Tablechart then uses that colour, without checking its contrast. With the #[code debug] option, the console warns about a number inside a bar or column with less than 4.5:1.
+		p A number #[em inside] a bar or column needs a contrast of at least 4.5:1 with it, as text does. Tablechart aims for 5:1, so the number is easier to read.
+		p By default, a number has the background colour of the chart, so it looks cut out of the bar, or the text colour of the chart:
+
+		table
+			thead
+				tr
+					th
+					th Number on a dark bar
+					th Number on a light bar
+			tbody
+				tr
+					td Light background
+					td The background colour
+					td The text colour
+				tr
+					td Dark background
+					td The text colour
+					td The background colour
+				tr
+					td Set with
+					td: code --tablechart-value-on-dark
+					td: code --tablechart-value-on-light
+
+		p Tablechart measures the background colour. See #[a(href=url('/styling/background.html')) Background].
+		p For each number, Tablechart takes the one of these two colours that has more contrast with its bar, its part of a stack or its step of a waterfall. If that has less than 5:1, the number gets to be black or white instead, whichever reaches 5:1. On a middle colour, where neither does but both reach 4.5:1, it gets to be white, because white is easier to read there. If the colours of the page change, such as from light to dark mode, the numbers get their colour again.
+		p If you want other colours, such as those of your brand, set #[code --tablechart-value-on-dark] for the numbers on dark bars, and #[code --tablechart-value-on-light] for the numbers on light bars. They replace the two default colours. The contrast is checked in the same way: if your colour has less than 5:1 with a bar, the number on that bar gets to be black or white, to achieve better contrast. If you want another goal than 5:1, set #[code --tablechart-value-contrast], such as #[code 7] for 7:1. With APCA, the goal is Lc 60, and the setting is an Lc value, such as #[code 75]. See #[a(href=url('/accessibility.html#contrast')) Contrast].
+
+		style.
+			.demo:has(.inside-choice) {
+				color-scheme: light;
+			}
+			.inside-choice {
+				color: #003646;
+				--tablechart-color-1: #003646;
+				--tablechart-color-2: #047b74;
+				--tablechart-color-3: #3f8dbf;
+				--tablechart-color-4: #b07d1e;
+				--tablechart-color-5: #a87264;
+			}
+
+		.card
+			.demo
+				figure.inside-choice(data-chart="bar" data-chart-stack)
+					figcaption
+						b How do visitors rate each apple?
+						br
+						span % of votes
+					table
+						thead
+							tr
+								th Variety
+								th Love it
+								th Like it
+								th Fine
+								th Not keen
+								th Dislike it
+						tbody
+							each row in [['Elstar', '34', '22', '18', '14', '12'], ['Jonagold', '28', '25', '20', '15', '12'], ['Granny Johnson', '18', '20', '24', '20', '18']]
+								tr
+									th= row[0]
+									each value in row.slice(1)
+										td= value
+			p In this example, the text colour of the chart is navy, and nothing else is set. The numbers on dark bars have the measured background colour, the pink of the card, and the numbers on light bars have the navy of the text. The numbers on the navy parts are pink. On the teal parts, pink has less than 5:1, so the numbers there get to be white. On the blue, amber and brown parts, navy has less than 5:1, so the numbers there get to be black.
 
 		p #[code --tablechart-value-align] sets where a number inside its bar goes: #[code start], where the bar starts, #[code center], or #[code end], where it ends. On a waterfall, a step down ends at the bottom. The number is as far from the start or end as the widest number is from the sides. Columns and bars use #[code end] by default, a waterfall #[code center].
 
@@ -102,14 +158,14 @@ block content
 								td= row[1]
 
 	+section("Smaller text on narrow charts")
-		p With many columns on a narrow screen, smaller text lets more numbers fit. Short names under the chart help too: see #[a(href=url('/types/line.html#many-rows')) Many rows]. If the element around the chart is a container, #[code --tablechart-font-size] can use #[code clamp()] and #[code cqi], a share of the width of the container. In this example, the text is full size from 500px wide, and gets smaller below that, down to 75%.
+		p With many columns on a narrow screen, smaller text lets more numbers fit. Short names under the chart help too: see #[a(href=url('/types/line.html#many-rows')) Many rows]. If the element around the chart is a container, #[code --tablechart-name-size] can use #[code clamp()] and #[code cqi], a share of the width of the container. The numbers are 1.3 times the name size, so they follow. In this example, the names and numbers are full size from 500px wide, and get smaller below that, down to 75%. The title keeps its size.
 
 		+style.
 			.text-box {
 				container-type: inline-size;
 			}
 			.text-box > [data-chart] {
-				--tablechart-font-size: clamp(0.75em, 3.2cqi, 1em);
+				--tablechart-name-size: clamp(0.7em, 3cqi, 0.95em);
 			}
 
 		p The buttons change the width of the example.
@@ -128,18 +184,6 @@ block content
 									th= row[0]
 									td= row[1]
 
-		script.
-			document.querySelectorAll('.width-toggle').forEach(function (group) {
-				var box = group.nextElementSibling.querySelector('.text-box');
-				group.querySelectorAll('button').forEach(function (button) {
-					button.addEventListener('click', function () {
-						box.style.maxWidth = button.dataset.width;
-						group.querySelectorAll('button').forEach(function (other) {
-							other.setAttribute('aria-pressed', String(other === button));
-						});
-					});
-				});
-			});
 
 		p Much smaller than that, text gets hard to read. Numbers that still do not fit are left out, and shown in the tooltip when you point at their row.
 

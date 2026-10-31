@@ -284,19 +284,6 @@ block content
 									th= row[0]
 									td= row[1]
 
-		script.
-			document.querySelectorAll('.width-toggle:not([data-ready])').forEach(function (group) {
-				var box = group.nextElementSibling.querySelector('.type-box');
-				group.dataset.ready = '';
-				group.querySelectorAll('button').forEach(function (button) {
-					button.addEventListener('click', function () {
-						box.style.maxWidth = button.dataset.width;
-						group.querySelectorAll('button').forEach(function (other) {
-							other.setAttribute('aria-pressed', String(other === button));
-						});
-					});
-				});
-			});
 
 		p #[code --tablechart-type] works for column and bar charts. It can also turn a bar chart into a column chart, with #[code --tablechart-type: column].
 

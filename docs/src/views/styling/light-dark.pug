@@ -125,7 +125,7 @@ block content
 			}
 
 	+section("Numbers inside bars")
-		p The number inside a bar is in the background colour if that has a contrast of 4.5:1 with the bar. If not, it is black or white, whichever has more contrast. You do not need to set it for light and dark mode. If you want to set it yourself, use #[code --tablechart-bar-value-color], #[code --tablechart-up-value-color], #[code --tablechart-down-value-color] or #[code --tablechart-total-value-color].
+		p A number inside a bar gets its colour again when the colour scheme changes, with at least 5:1 with its bar where possible. You do not need to set it for light and dark mode. See #[a(href=url('/styling/text.html#numbers-inside-bars-or-columns')) Numbers inside bars or columns].
 
 	+section("Background")
-		p The background colour of a chart, #[code --tablechart-surface], is the background the browser uses for the page: white in light mode and dark in dark mode. Lighter lines and slices are mixed with it. If your page has another background, set #[code --tablechart-surface] with two values as well. See #[a(href=url('/styling/background.html')) Background].
+		p Tablechart measures the background colour behind a chart, and measures it again when the colour scheme changes. Lighter lines and slices are mixed with it. See #[a(href=url('/styling/background.html')) Background].

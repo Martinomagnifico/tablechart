@@ -65,6 +65,14 @@ $reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px 
 		:where(.tablechart-break[data-part="edge"]) {
 			stroke-opacity: #{$shown};
 		}
+		// A marker grows as its step is shown, not when the chart is shown, while it is still hidden.
+		:where([data-chart="scatter"] .tablechart-point) {
+			transform: scale(#{$shown});
+		}
+		// The piece of gridline over the gap under a number or name goes as its step is shown.
+		:where(.tablechart-grid[data-gap], .tablechart-quadrant[data-gap]) {
+			stroke-opacity: calc(1 - #{$shown});
+		}
 		:where(.tablechart-line) {
 			stroke-dashoffset: calc(var(--len) * (1 - #{$shown}));
 		}

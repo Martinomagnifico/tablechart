@@ -1,6 +1,6 @@
 {
   "name": "@martinomagnifico/tablechart",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Simple charts from an HTML or Markdown table: column, bar, line, area, waterfall, donut and scatter plot. Accessibility first.",
   "type": "module",
   "sideEffects": [

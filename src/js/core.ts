@@ -11,6 +11,7 @@ import { waterfall } from "./charts/waterfall";
 import {
 	AREA_CLASS,
 	AT_ONCE_CLASS,
+	BUILT_CLASS,
 	AXIS_CLASS,
 	BREAK_GAP,
 	GRID_CLASS,
@@ -47,7 +48,7 @@ import { readSeries, readTable } from "./functions/read-table";
 import { clipAround, cutOut, htmlEl, placeAt, short, svgEl } from "./functions/svg";
 import { niceStep, readScale, type Scale, scaleOf, thin, ticksOf } from "./functions/axis";
 import type { Box } from "./functions/collision";
-import { inkInside } from "./functions/colour";
+import { inkInside, measureSurface } from "./functions/colour";
 import { debug } from "./functions/debug";
 import { applySteps, makeControls, planSteps, stepTo } from "./steps";
 import { attachTooltip, releaseTooltip } from "./tooltip";
@@ -1243,24 +1244,22 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		const texts = [...seriesValues.flat(), ...state.totals, ...(type.categories === "beside" ? state.categories : [])];
 		const under = texts.flatMap(holeUnder);
 		// A line is left out where it crosses text, rather than masked: under a mask, Safari draws everything again on each frame.
-		// A reference line also around its own label. With steps, the grid keeps a mask, so each gap can arrive at its step.
+		// A reference line also around its own label.
 		const boxOf = (rect: SVGElement): Box => ["x", "y", "width", "height"].map((name) => Number(rect.getAttribute(name))) as Box;
 		for (const line of references) lineAround(line, [...under, ...holes].map(boxOf));
-		if (framing.length && state.plan) cutOut(svg, under, VIEWBOX_WIDTH, height, framing);
-		else
-			for (const path of framing) {
-				// Around each badge too, rather than under its mask, which only comes once the marks are still.
-				const gaps = [...under, ...holes];
-				const lines = linesIn(path);
-				path.setAttribute("d", lines.map(([x1, y1, x2, y2]) => piecesOf(x1, y1, x2, y2, gaps.map(boxOf))).join(""));
-				// Over each gap, the piece of line it leaves out, with the timing of its text: it fades as the text arrives.
-				// Under a badge it goes at once as the badge arrives, so the line never runs through it.
-				for (const rect of gaps) {
-					const d = piecesIn(lines, boxOf(rect));
-					const gap = rect.dataset.for === "badge" ? "badge" : "";
-					if (d) path.after(svgEl("path", { class: path.getAttribute("class") ?? GRID_CLASS, "data-gap": gap, d, style: rect.getAttribute("style") ?? "" }));
-				}
+		for (const path of framing) {
+			// Around each badge too, rather than under its mask, which only comes once the marks are still.
+			const gaps = [...under, ...holes];
+			const lines = linesIn(path);
+			path.setAttribute("d", lines.map(([x1, y1, x2, y2]) => piecesOf(x1, y1, x2, y2, gaps.map(boxOf))).join(""));
+			// Over each gap, the piece of line it leaves out, with the timing and step of its text: it fades as the text arrives.
+			// Under a badge it goes at once as the badge arrives, so the line never runs through it.
+			for (const rect of gaps) {
+				const d = piecesIn(lines, boxOf(rect));
+				const gap = rect.dataset.for === "badge" ? "badge" : "";
+				if (d) path.after(svgEl("path", { class: path.getAttribute("class") ?? GRID_CLASS, "data-gap": gap, d, style: rect.getAttribute("style") ?? "" }));
 			}
+		}
 	}
 	// A trend or a bracket is drawn while the chart builds, so it is kept out of each badge by a clip, from the start: it stops at the
 	// badge rather than running through it until the mask comes. Its arrowhead too.
@@ -1277,8 +1276,8 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		clipAround(svg, [...geo.lineHoles, ...crossing], VIEWBOX_WIDTH, height, [...lines, ...svg.querySelectorAll<SVGElement>(`.${AREA_CLASS}`)]);
 	}
 	// What is kept out of the badges another way stays out of that group: under its mask, a line that is drawn or fades would make
-	// Safari draw the whole group again on each frame. And the mask would wait for it. With steps, the grid keeps to the mask.
-	const loose = [REFERENCE_CLASS, QUADRANT_CLASS, LINE_CLASS, HEAD_CLASS, ...(state.plan ? [] : [GRID_CLASS])];
+	// Safari draw the whole group again on each frame. And the mask would wait for it.
+	const loose = [REFERENCE_CLASS, QUADRANT_CLASS, LINE_CLASS, HEAD_CLASS, GRID_CLASS];
 	cutOut(svg, [...holes, ...numberHoles], VIEWBOX_WIDTH, height, undefined, loose.map((name) => `.${name}`).join(", "));
 	// Under a mask, Safari draws everything again on every frame, so every mask waits while the marks still have to build.
 	if (state.figure.hasAttribute("data-animate") && !state.figure.hasAttribute("data-steps") && !state.figure.classList.contains(SHOWN_CLASS))
@@ -1300,6 +1299,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		(type.columns ? [state.categories] : [...seriesValues, state.totals]).some((all) => all.some((label) => !skip(label) && !seen(label) && !covered(label, all)))
 	);
 
+	measureSurface(state.figure);
 	inkInside(state.figure);
 	return true;
 };
@@ -1343,18 +1343,34 @@ export const unbuild = (state: ChartState): void => {
 export const setShown = (state: ChartState, shown: boolean, atOnce = false): void => {
 	// The marks move back without masks too, and wait for them again on the next build.
 	if (!shown && !state.figure.hasAttribute("data-steps")) takeMasksOff(state.svg);
+	state.figure.classList.remove(BUILT_CLASS);
 	if (atOnce) {
 		state.figure.classList.add(AT_ONCE_CLASS);
 		state.figure.classList.toggle(SHOWN_CLASS, shown);
 		// Read now, so the end is what the next frame starts from, and taking the class off starts nothing.
 		void state.figure.offsetWidth;
 		if (shown) putMasksOn(state.svg);
+		state.figure.classList.toggle(BUILT_CLASS, shown);
 		requestAnimationFrame(() => state.figure.classList.remove(AT_ONCE_CLASS));
 		return;
 	}
 	state.figure.classList.toggle(SHOWN_CLASS, shown);
 	// A build without transitions, such as one shown before its first frame, gets its masks too.
-	if (shown) requestAnimationFrame(() => requestAnimationFrame(() => settleMasks(state.figure, state.svg)));
+	if (shown)
+		requestAnimationFrame(() =>
+			requestAnimationFrame(() => {
+				settleMasks(state.figure, state.svg);
+				whenBuilt(state.figure);
+			})
+		);
+};
+
+/** Marks a shown chart as built once every transition of its build has ended, or was cut short. */
+const whenBuilt = (figure: HTMLElement): void => {
+	const running = figure.getAnimations({ subtree: true }).map((animation) => animation.finished.catch(() => undefined));
+	void Promise.all(running).then(() => {
+		if (figure.classList.contains(SHOWN_CLASS)) figure.classList.add(BUILT_CLASS);
+	});
 };
 
 /**

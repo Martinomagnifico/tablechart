@@ -2,8 +2,8 @@ import "../style/tablechart.scss";
 
 import { type Config, defaultConfig, LIBRARY_NAME, PRINTING_CLASS } from "./config";
 import { animated, build, layout, putMasksOn, relabel, setShown, unbuild } from "./core";
-import { inkInside } from "./functions/colour";
-import { checkContrast, checkTextContrast } from "./functions/contrast";
+import { inkInside, measureSurface } from "./functions/colour";
+import { checkContrast, checkOldColours, checkTextContrast } from "./functions/contrast";
 import { debug } from "./functions/debug";
 import { assignKeys } from "./functions/read-table";
 import { adoptTables, loadSources, readMarkdownRows } from "./functions/sources";
@@ -148,6 +148,8 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 	let kind = kindFor(state.figure);
 	// The width it was last laid out at; null until it is laid out.
 	let placed: number | null = null;
+	// The contrast is checked once per chart, also when it is laid out again from scratch.
+	let checked = false;
 	let inView = false;
 	let waiting = false;
 
@@ -184,22 +186,23 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		const width = state.plot.clientWidth;
 		if (!width || width === placed) return;
 		if (!debug.timed("Layout", state.figure, () => layout(state, config))) return;
-		if (debug.enabled && !placed) {
+		if (!checked) {
+			checked = true;
 			checkContrast(state.figure);
 			checkTextContrast(state.figure);
+			checkOldColours(state.figure);
 		}
 		placed = width;
 		void show();
 	};
 
-	let queued = false;
+	// Laid out before the frame is painted, so a chart at a new width is never shown scaled. The layout changes the height of the
+	// figure, so it is watched again from the next frame: that is not a new resize, and no "ResizeObserver loop" error comes.
+	let destroyed = false;
 	const resizer = new ResizeObserver(() => {
-		if (queued) return;
-		queued = true;
-		requestAnimationFrame(() => {
-			queued = false;
-			place();
-		});
+		place();
+		resizer.unobserve(state.figure);
+		requestAnimationFrame(() => destroyed || resizer.observe(state.figure));
 	});
 
 	const scroll = new IntersectionObserver(
@@ -249,6 +252,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 			return state.plan?.count ?? 0;
 		},
 		destroy() {
+			destroyed = true;
 			resizer.disconnect();
 			scroll.disconnect();
 			window.removeEventListener("beforeprint", print);
@@ -295,13 +299,16 @@ const make = (figure: HTMLElement, config: Config): TablechartChart | null => {
 	return watch(state, config);
 };
 
-// A switch between light and dark changes the colours, not the sizes: the numbers inside bars get their colour again.
+// A switch between light and dark changes the colours, not the sizes: the background is measured again, and the numbers inside bars follow.
 let following = false;
 const followScheme = (): void => {
 	if (following || typeof matchMedia !== "function") return;
 	following = true;
 	matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-		for (const figure of document.querySelectorAll<HTMLElement>(`[${MADE}]`)) inkInside(figure);
+		for (const figure of document.querySelectorAll<HTMLElement>(`[${MADE}]`)) {
+			measureSurface(figure);
+			inkInside(figure);
+		}
 	});
 };
 

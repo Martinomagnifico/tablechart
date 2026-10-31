@@ -44,3 +44,6 @@ head
 			link(rel="stylesheet", href=`${basePath}lib/panelset.css`)
 			if isProd
 				link(rel="stylesheet", href=`${basePath}lib/tablechart.css`)
+			else
+				//- Also while developing, so a table is not shown before the script has run.
+				link(rel="stylesheet", href="/src/assets/styles/_tablechart-source.scss")

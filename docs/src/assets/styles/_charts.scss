@@ -1,13 +1,7 @@
-// Charts on the docs pages use the text colour and the background of the page.
-// These rules are wrapped in :where(), so a class in an example overrides them.
+// Charts on the docs pages use the text colour of the page; Tablechart measures the background.
+// Wrapped in :where(), so a class in an example overrides it.
 :where(.tablechart, [data-chart]) {
-	--tablechart-surface: var(--bg-surface);
 	color: var(--text-default);
-}
-
-// A chart in a demo card uses the background of the card.
-:where(.demo [data-chart]) {
-	--tablechart-surface: var(--demo-surface-tint);
 }
 
 // The charts on the start page, each in a box of its own, with the donut in the middle.

@@ -1,5 +1,34 @@
 # Changelog
 
+## [1.2.3] - 2026-10-31
+
+### Added
+
+- `checkContrast` and `checkTextContrast` in `@martinomagnifico/tablechart/core`. A script that builds its own charts, can check their contrast too.
+- `--tablechart-value-on-dark` and `--tablechart-value-on-light`, the two colours a number inside a bar chooses from, such as ivory and navy. If neither has enough contrast with the bar, the number gets to be black or white.
+- `--tablechart-value-contrast`, the contrast a number inside a bar needs: 5:1 by default, a little more than the 4.5:1 that WCAG asks, so it is easier to read.
+- `--tablechart-contrast-wcag: 3` measures contrast with APCA, from the draft of WCAG 3, for the number colours and the warnings alike. It follows what people see more closely than WCAG 2, which stays the default.
+- `--tablechart-marker-ease`, the easing with which a scatter marker grows. With a `linear()` curve, markers can bounce in.
+
+### Changed
+
+- Tablechart measures the background behind a chart, such as a card or a slide, so `--tablechart-surface` is only needed on an image or a gradient. Before, a chart in a card needed it by hand.
+- The contrast check runs for every chart, not only with `debug`. A printed page or a PDF has the same colours as the screen.
+
+### Deprecated
+
+- `--tablechart-bar-value-color`, `-piece-`, `-up-`, `-down-` and `-total-value-color` still work, but go in 1.3.0, and the console warns about them. They set one colour without a contrast check; `--tablechart-value-on-dark` and `--tablechart-value-on-light` replace them.
+
+### Fixed
+
+- A chart whose width changes is laid out before the next frame is shown. Before, it was shown scaled for a frame or two, so the page jumped.
+- After a chart is built, a change of colour, such as to dark mode, changes its text at once. Before, the text took the time of the whole build again.
+- A scatter chart keeps the room it needs before it is laid out. Before, the page moved down by about a third of its width when it appeared.
+- On a scatter chart with steps, a marker grows at its step. Before, it only faded in, because it had grown while still hidden.
+- A chart with steps and gridlines or a quadrant builds smoothly in Safari. Its lines now stop around the text as they do without steps; the mask they had made Safari draw the chart again on every frame.
+
+
+
 ## [1.2.2] - 2026-10-30
 
 ### Added

@@ -142,6 +142,27 @@ block content
 
 		p #[code --tablechart-grid-color], #[code --tablechart-grid-opacity] and #[code --tablechart-grid-width] set how the gridlines look. #[code --tablechart-axis-color], #[code --tablechart-axis-width] and #[code --tablechart-axis-size] set the axes and the text along them. See #[a(href=url('/styling/axes.html')) Axes and gridlines].
 
+	+section("Elastic markers")
+		p A marker grows from its middle as the chart builds, with the easing of the chart. #[code --tablechart-marker-ease] sets the easing of the markers only. If it goes above 1, a marker grows a bit too large and settles, and with a #[code linear()] curve it bounces a few times. A bounce is easier to see with a longer element time, such as #[code 1.2s]. The element time can be as long as the maximum, #[code 2s] by default.
+
+		+chart(null, '1')
+			figure(data-chart="scatter" data-chart-grid style="--tablechart-marker-ease: linear(0, 0.64 10%, 1.11 20%, 1.21 28%, 1.11 40%, 0.98 52%, 0.95 62%, 0.98 75%, 1.01 88%, 1); --tablechart-animation-element-duration: 1.2s")
+				figcaption: b Elastic markers
+				table
+					thead
+						tr
+							th Variety
+							th Harvest per tree (kg)
+							th Price per kg (€)
+					tbody
+						each row in varieties.slice(0, 6)
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+		p If you want one overshoot without the bounces, a #[code cubic-bezier()] with a value above 1 works too, such as #[code cubic-bezier(0.34, 1.56, 0.64, 1)]. #[code linear()] works in Safari 17.2, Chrome 113 and Firefox 112, and later. See #[a(href=url('/styling/animation.html')) Animation].
+
 	+section("Load it")
 		p The scatter chart is not in the main script. It is an additional type, in a script of its own. See #[a(href=url('/types/additional-types.html')) Additional types].
 

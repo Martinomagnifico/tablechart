@@ -55,6 +55,7 @@
 	&[data-left-out] {
 		visibility: hidden;
 	}
+	// The `-value-color` variables of the numbers inside bars are old and go in 1.3.0; `--_ink` replaces them.
 	&[data-place="inside"][data-kind="up"] {
 		color: var(--tablechart-up-value-color, var(--_ink, #{ink("var(--tablechart-up-color, #{$barfill})")}));
 	}

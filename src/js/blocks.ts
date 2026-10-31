@@ -4,6 +4,7 @@ export { stepTo, type StepPlan } from "./steps";
 export { entranceOf, prepare } from "./init";
 export { adoptTables, loadSources, readMarkdownRows } from "./functions/sources";
 export { assignKeys } from "./functions/read-table";
+export { checkContrast, checkTextContrast } from "./functions/contrast";
 export {
 	AT_ONCE_CLASS,
 	type Config,
