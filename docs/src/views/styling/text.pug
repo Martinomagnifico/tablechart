@@ -104,42 +104,9 @@ block content
 		p For each number, Tablechart takes the one of these two colours that has more contrast with its bar, its part of a stack or its step of a waterfall. If that has less than 5:1, the number gets to be black or white instead, whichever reaches 5:1. On a middle colour, where neither does but both reach 4.5:1, it gets to be white, because white is easier to read there. If the colours of the page change, such as from light to dark mode, the numbers get their colour again.
 		p If you want other colours, such as those of your brand, set #[code --tablechart-value-on-dark] for the numbers on dark bars, and #[code --tablechart-value-on-light] for the numbers on light bars. They replace the two default colours. The contrast is checked in the same way: if your colour has less than 5:1 with a bar, the number on that bar gets to be black or white, to achieve better contrast. If you want another goal than 5:1, set #[code --tablechart-value-contrast], such as #[code 7] for 7:1. With APCA, the goal is Lc 60, and the setting is an Lc value, such as #[code 75]. See #[a(href=url('/accessibility.html#contrast')) Contrast].
 
-		style.
-			.demo:has(.inside-choice) {
-				color-scheme: light;
-			}
-			.inside-choice {
-				color: #003646;
-				--tablechart-color-1: #003646;
-				--tablechart-color-2: #047b74;
-				--tablechart-color-3: #3f8dbf;
-				--tablechart-color-4: #b07d1e;
-				--tablechart-color-5: #a87264;
-			}
+		p The contrast can be measured in two ways: as WCAG 2 does, with a ratio, or with APCA from the draft of WCAG 3, with an Lc value. WCAG 2 is the default. If you want APCA, set #[code --tablechart-contrast-wcag] to #[code 3]. The dropdown in this example switches between the two. See #[a(href=url('/accessibility.html#contrast')) Contrast].
 
-		.card
-			.demo
-				figure.inside-choice(data-chart="bar" data-chart-stack)
-					figcaption
-						b How do visitors rate each apple?
-						br
-						span % of votes
-					table
-						thead
-							tr
-								th Variety
-								th Love it
-								th Like it
-								th Fine
-								th Not keen
-								th Dislike it
-						tbody
-							each row in [['Elstar', '34', '22', '18', '14', '12'], ['Jonagold', '28', '25', '20', '15', '12'], ['Granny Johnson', '18', '20', '24', '20', '18']]
-								tr
-									th= row[0]
-									each value in row.slice(1)
-										td= value
-			p In this example, the text colour of the chart is navy, and nothing else is set. The numbers on dark bars have the measured background colour, the pink of the card, and the numbers on light bars have the navy of the text. The numbers on the navy parts are pink. On the teal parts, pink has less than 5:1, so the numbers there get to be white. On the blue, amber and brown parts, navy has less than 5:1, so the numbers there get to be black.
+		+wcagDemo('wcag-text')
 
 		p #[code --tablechart-value-align] sets where a number inside its bar goes: #[code start], where the bar starts, #[code center], or #[code end], where it ends. On a waterfall, a step down ends at the bottom. The number is as far from the start or end as the widest number is from the sides. Columns and bars use #[code end] by default, a waterfall #[code center].
 
@@ -170,10 +137,7 @@ block content
 
 		p The buttons change the width of the example.
 
-		.width-toggle.lang-toggle(role="group" aria-label="Width of the example")
-			button(type="button" data-width="" aria-pressed="true") Wide
-			button(type="button" data-width="min(360px, 60%)" aria-pressed="false") Narrow
-		+chart(null, '1')
+		+chart(null, '1', { class: 'width-toggle', label: 'Width of the example', buttons: [{ text: 'Wide', attrs: { 'data-width': '' } }, { text: 'Narrow', attrs: { 'data-width': 'min(360px, 60%)' } }] })
 			.text-box
 				figure(data-chart="column")
 					figcaption: b Visitors per month

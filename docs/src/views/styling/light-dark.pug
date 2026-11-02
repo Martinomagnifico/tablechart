@@ -27,7 +27,7 @@ block content
 
 		+codeblock('CSS').
 			.granny {
-				--tablechart-bar-color: light-dark(#7fb03f, #a5d46a);
+				--tablechart-bar-color: light-dark(#699822, #a5d46a);
 				--tablechart-value-color: light-dark(#5d8a2b, #c3e59a);
 			}
 
@@ -35,7 +35,7 @@ block content
 
 		+codeblock('CSS').
 			:root {
-				--brand-green: #7fb03f;
+				--brand-green: #699822;
 				--brand-green-light: #a5d46a;
 			}
 			.granny {
@@ -64,7 +64,7 @@ block content
 				--tablechart-surface: light-dark(#f7f2f5, #1d2b33);
 			}
 			.scheme-example .granny {
-				--tablechart-bar-color: light-dark(#7fb03f, #a5d46a);
+				--tablechart-bar-color: light-dark(#699822, #a5d46a);
 				--tablechart-value-color: light-dark(#5d8a2b, #c3e59a);
 			}
 			.scheme-example .tablechart-value.granny {
@@ -116,7 +116,7 @@ block content
 
 		+codeblock('CSS').
 			.granny {
-				--tablechart-bar-color: #7fb03f;
+				--tablechart-bar-color: #699822;
 			}
 			@media (prefers-color-scheme: dark) {
 				.granny {
@@ -128,4 +128,4 @@ block content
 		p A number inside a bar gets its colour again when the colour scheme changes, with at least 5:1 with its bar where possible. You do not need to set it for light and dark mode. See #[a(href=url('/styling/text.html#numbers-inside-bars-or-columns')) Numbers inside bars or columns].
 
 	+section("Background")
-		p Tablechart measures the background colour behind a chart, and measures it again when the colour scheme changes. Lighter lines and slices are mixed with it. See #[a(href=url('/styling/background.html')) Background].
+		p Tablechart measures the background colour behind a chart. It measures it again if the colour scheme changes, or if a class or attribute on #[code html] or #[code body] changes. Lighter lines and slices are mixed with it. See #[a(href=url('/styling/background.html')) Background].

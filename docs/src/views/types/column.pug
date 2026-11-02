@@ -270,10 +270,7 @@ block content
 
 		p The buttons change the width of the example.
 
-		.width-toggle.lang-toggle(role="group" aria-label="Width of the example")
-			button(type="button" data-width="" aria-pressed="true") Wide
-			button(type="button" data-width="min(360px, 60%)" aria-pressed="false") Narrow
-		+chart(null, '1')
+		+chart(null, '1', { class: 'width-toggle', label: 'Width of the example', buttons: [{ text: 'Wide', attrs: { 'data-width': '' } }, { text: 'Narrow', attrs: { 'data-width': 'min(360px, 60%)' } }] })
 			.type-box
 				figure(data-chart="column")
 					figcaption: b Visitors per month

@@ -73,6 +73,10 @@ export const column: ChartType = {
 			// All numbers shrink together to fit above their bars, or all are left out.
 			const shown = geo.own.flatMap((s) => geo.seriesValues[s]).filter((label) => label.dataset.missing === undefined);
 			const fit = fitTogether(geo.plot, shown, (label) => ({ size: sizeOf(label).width * unit, room: layout.size + layout.gap * 0.5 }), "--_fit");
+			// As on a single column: if any number is wider than its column, every number goes above.
+			const inGroup = labels === "inside" && !tooWide(shown, layout.size, unit);
+			const digits = shown[0] ? sizeOf(shown[0]).height * unit * 0.56 : 0;
+			const side = Math.min(...shown.map((label) => (layout.size - sizeOf(label).width * unit) / 2));
 			geo.rows.forEach((row, i) => {
 				geo.own.forEach((s, k) => {
 					const cell = row.cells[s] ?? row.cells[0];
@@ -100,9 +104,19 @@ export const column: ChartType = {
 								...seriesMark(geo, row, s),
 							})
 						);
-					label.dataset.place = below ? "below" : "outside";
+					const inside = inGroup && tallEnough(label, Math.abs(baseline - end), unit);
+					const toward = below ? -1 : 1;
+					const pad = Math.min(side, (Math.abs(baseline - end) - digits) / 2);
+					const along =
+						insideAlign === "center"
+							? (end + baseline) / 2
+							: insideAlign === "start"
+								? baseline - toward * (pad + digits / 2)
+								: end + toward * (pad + digits / 2);
+					label.dataset.place = inside ? "inside" : below ? "below" : "outside";
 					label.toggleAttribute("data-left-out", !fit);
-					placeAt(label, x + layout.size / 2, below ? end + 4 * unit : end - 4 * unit, VIEWBOX_WIDTH, height);
+					if (inside) inkOf(label, geo, s);
+					placeAt(label, x + layout.size / 2, inside ? along : below ? end + 4 * unit : end - 4 * unit, VIEWBOX_WIDTH, height);
 				});
 			});
 			svg.appendChild(

@@ -2,7 +2,7 @@ import "../style/tablechart.scss";
 
 import { type Config, defaultConfig, LIBRARY_NAME, PRINTING_CLASS } from "./config";
 import { animated, build, layout, putMasksOn, relabel, setShown, unbuild } from "./core";
-import { inkInside, measureSurface } from "./functions/colour";
+import { inkInside, inkNames, measureSurface } from "./functions/colour";
 import { checkContrast, checkOldColours, checkTextContrast } from "./functions/contrast";
 import { debug } from "./functions/debug";
 import { assignKeys } from "./functions/read-table";
@@ -300,15 +300,28 @@ const make = (figure: HTMLElement, config: Config): TablechartChart | null => {
 };
 
 // A switch between light and dark changes the colours, not the sizes: the background is measured again, and the numbers inside bars follow.
+// A site can also switch with a class or an attribute on `html` or `body`, so those are followed too, also when the colours fade to the new ones.
 let following = false;
+const textColours = new WeakMap<HTMLElement, string>();
 const followScheme = (): void => {
 	if (following || typeof matchMedia !== "function") return;
 	following = true;
-	matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+	const recolour = () => {
 		for (const figure of document.querySelectorAll<HTMLElement>(`[${MADE}]`)) {
-			measureSurface(figure);
-			inkInside(figure);
+			const text = getComputedStyle(figure).color;
+			const changed = measureSurface(figure) || textColours.get(figure) !== text;
+			textColours.set(figure, text);
+			if (changed) {
+				inkInside(figure);
+				inkNames(figure);
+			}
 		}
+	};
+	matchMedia("(prefers-color-scheme: dark)").addEventListener("change", recolour);
+	const watch = new MutationObserver(recolour);
+	for (const root of [document.documentElement, document.body]) watch.observe(root, { attributes: true });
+	document.addEventListener("transitionend", (event) => {
+		if (event.target === document.documentElement || event.target === document.body) recolour();
 	});
 };
 

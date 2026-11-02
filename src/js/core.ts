@@ -48,7 +48,7 @@ import { readSeries, readTable } from "./functions/read-table";
 import { clipAround, cutOut, htmlEl, placeAt, short, svgEl } from "./functions/svg";
 import { niceStep, readScale, type Scale, scaleOf, thin, ticksOf } from "./functions/axis";
 import type { Box } from "./functions/collision";
-import { inkInside, measureSurface } from "./functions/colour";
+import { inkInside, inkNames, measureSurface } from "./functions/colour";
 import { debug } from "./functions/debug";
 import { applySteps, makeControls, planSteps, stepTo } from "./steps";
 import { attachTooltip, releaseTooltip } from "./tooltip";
@@ -1301,6 +1301,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 
 	measureSurface(state.figure);
 	inkInside(state.figure);
+	inkNames(state.figure);
 	return true;
 };
 

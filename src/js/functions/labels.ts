@@ -33,12 +33,20 @@ export const fitTogether = (
 	return fit;
 };
 
+/** Pushes items apart where they are closer than `gap`. A group that had to move stays centred on where its items wanted to be. */
 export const spread = <T extends { y: number }>(items: T[], gap: number): T[] => {
 	items.sort((a, b) => a.y - b.y);
-	items.forEach((item, k) => {
-		const above = items[k - 1];
-		if (above && item.y < above.y + gap) item.y = above.y + gap;
-	});
+	const groups: { items: T[]; sum: number }[] = [];
+	const topOf = (group: { items: T[]; sum: number }) => group.sum / group.items.length - ((group.items.length - 1) * gap) / 2;
+	for (const item of items) {
+		let group = { items: [item], sum: item.y };
+		for (let above = groups.at(-1); above && topOf(above) + above.items.length * gap > topOf(group); above = groups.at(-1)) {
+			groups.pop();
+			group = { items: [...above.items, ...group.items], sum: above.sum + group.sum };
+		}
+		groups.push(group);
+	}
+	for (const group of groups) group.items.forEach((item, k) => (item.y = topOf(group) + k * gap));
 	return items;
 };
 

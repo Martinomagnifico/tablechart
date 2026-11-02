@@ -4,6 +4,25 @@ append variables
 	- pagetitle = "Accessibility"
 	- pagedescription = "Accessibility in Tablechart: every chart is also a real table, for screen readers, print and PDF, and a long table can have a summary."
 
+mixin visionChart
+	figure.a11y-colours(data-chart="line" data-chart-legend)
+		table
+			thead
+				tr
+					th Year
+					th North
+					th(data-line="dashed") South
+					th East
+					th(data-marker="diamond open") West
+			tbody
+				each row in [['2016', '41', '30', '22', '12'], ['2019', '58', '39', '35', '20'], ['2022', '77', '52', '41', '33'], ['2025', '105', '61', '70', '45']]
+					tr
+						th= row[0]
+						td= row[1]
+						td= row[2]
+						td= row[3]
+						td= row[4]
+
 block content
 	.lane
 		.container
@@ -21,7 +40,8 @@ block content
 			li The parts of a stack and the slices of a donut have a gap in the background colour between them. So two parts in similar colours do not need contrast with each other, only with the background.
 			li Without a palette, each next line, part or slice is lighter than the one before it, so it has less contrast with the background. With many lines or slices, the last ones can have less than 3:1. If so, a palette or a range of colours helps: if both ends of a range have at least 3:1 with the background, every step between them has too. See #[a(href=url('/styling/colours.html#a-range-of-colours')) A range of colours].
 			li If you set your own colours, they need the same contrast with the background: 3:1 for a bar or a line.
-		p The console warns about each line, bar, slice or number inside a bar with too little contrast, with its name and the contrast it has. The check runs for every chart once it is laid out, also without the #[code debug] option, because a printed page or a PDF has the same colours.
+			li A name next to a line has the colour of its line. A line only needs 3:1, but a name is text and needs 4.5:1. If the colour of the line has less, the name gets darker or lighter towards the text colour, just far enough to reach 4.5:1, so it still looks like its line.
+		p The console warns about each line, bar, slice or text with too little contrast, with its name and the contrast it has. That is also text on the background, such as the names next to the lines and the numbers along an axis. The check runs for every chart once it is laid out, also without the #[code debug] option, because a printed page or a PDF has the same colours.
 
 		h4 WCAG 2 or APCA
 		p By default, Tablechart measures contrast as WCAG 2 does, with a ratio such as 4.5:1. That is the standard that most accessibility rules ask for now. APCA, the method in the draft of WCAG 3, follows what people see more closely. On a middle colour, such as a teal or a brown, WCAG 2 often prefers black text where white is easier to read.
@@ -46,58 +66,71 @@ block content
 					td 5:1
 					td Lc 60
 		p With APCA, a page can have text that an audit tool for WCAG 2 reports, because those tools measure the WCAG 2 way.
+		p The dropdown in this example switches between the two.
 
-		h3(id="not-only-colour") Not only colour
-		p Lines are told apart by their points as well: filled and open circles, squares and diamonds. A line can also be dashed or dotted. The button shows the chart without colour, as some people see it.
+		+wcagDemo('wcag-accessibility')
 
-		.lang-toggle(role="group" aria-label="Colour of the example")
-			button.greyscale(type="button" aria-pressed="false") Without colour
+		h3(id="colour-vision") Colour vision
+		p About 8 in 100 men and 1 in 200 women have a colour vision deficiency. Most of them have trouble telling red and green apart: protanopia and deuteranopia are the strongest forms. Trouble with blue and yellow, tritanopia, is rare. So is seeing no colour at all, achromatopsia.
+		p So a line in Tablechart is not told apart by its colour alone. Each line also has its own points, in a fixed order: a filled circle, an open circle, a filled square, an open square, a filled diamond and an open diamond. If you want another point for a line, set #[code data-marker] on its column header. If you want a dashed or dotted line, set #[code data-line]. See #[a(href=url('/types/line.html#points')) Points] and #[a(href=url('/types/line.html#dashed-and-dotted-lines')) Dashed and dotted lines].
+		p The dropdown shows this chart about as someone with that colour vision sees it. It is a simulation, and people differ. If you turn off the markers and dashes, which only this demo can do, only the colours are left to tell the lines apart.
 
-		+style.
+		style.
 			.a11y-colours {
 				--tablechart-color-1: #c2410c;
-				--tablechart-color-2: #15803d;
-				--tablechart-color-3: #1d4ed8;
-				--tablechart-color-4: #a21caf;
-			}
-			.is-grey .demo {
-				filter: grayscale(1);
+				--tablechart-color-2: #547218;
+				--tablechart-color-3: #2f62e6;
+				--tablechart-color-4: #ad18ec;
 			}
 
-		.a11y-grey
-			+chart(null, '5')
-				figure.a11y-colours(data-chart="line" data-chart-legend)
-					table
-						thead
-							tr
-								th Year
-								th North
-								th(data-line="dashed") South
-								th East
-								th(data-marker="diamond open") West
-						tbody
-							each row in [['2016', '41', '30', '22', '12'], ['2019', '58', '39', '35', '20'], ['2022', '77', '52', '41', '33'], ['2025', '105', '61', '70', '45']]
-								tr
-									th= row[0]
-									td= row[1]
-									td= row[2]
-									td= row[3]
-									td= row[4]
+		//- The colour matrices of Machado, Oliveira and Fernandes (2009), at full strength. A filter works in linear RGB by default, as they do.
+		svg(width="0" height="0" aria-hidden="true" style="position: absolute")
+			filter#vision-protanopia
+				feColorMatrix(values="0.152286 1.052583 -0.204868 0 0  0.114503 0.786281 0.099216 0 0  -0.003882 -0.048116 1.051998 0 0  0 0 0 1 0")
+			filter#vision-deuteranopia
+				feColorMatrix(values="0.367322 0.860646 -0.227968 0 0  0.280085 0.672501 0.047413 0 0  -0.011820 0.042940 0.968881 0 0  0 0 0 1 0")
+			filter#vision-tritanopia
+				feColorMatrix(values="1.255528 -0.076749 -0.178779 0 0  -0.078411 0.930809 0.147602 0 0  0.004733 0.691367 0.303900 0 0  0 0 0 1 0")
+			filter#vision-achromatopsia
+				feColorMatrix(values="0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0")
+
+		.card.vision-demo(data-vision="deuteranopia")
+			.demo-choice
+				button.demo-switch.vision-marks(type="button" role="switch" aria-checked="true") Markers and dashes
+				.demo-choice
+					label(for="vision-choice") Colour vision
+					select#vision-choice.styled-select
+						button
+							selectedcontent
+							+chevron(18, 'down')
+						option.choice(value="deuteranopia") Deuteranopia (red and green)
+						option.choice(value="protanopia") Protanopia (red and green)
+						option.choice(value="tritanopia") Tritanopia (blue and yellow)
+						option.choice(value="achromatopsia") Achromatopsia (no colour)
+						option.choice(value="") Typical colour vision
+			.demo
+				+visionChart
+			+codeblock('HTML', null, '4')
+				+visionChart
 
 		script.
-			document.querySelector('.greyscale').addEventListener('click', function () {
-				var grey = this.getAttribute('aria-pressed') !== 'true';
-				document.querySelector('.a11y-grey').classList.toggle('is-grey', grey);
-				this.setAttribute('aria-pressed', String(grey));
-			});
+			(function () {
+				var demo = document.querySelector('.vision-demo');
+				demo.querySelector('select').addEventListener('change', function () {
+					demo.dataset.vision = this.value;
+				});
+				demo.querySelector('.vision-marks').addEventListener('click', function () {
+					var on = this.getAttribute('aria-checked') !== 'true';
+					demo.classList.toggle('no-marks', !on);
+					this.setAttribute('aria-checked', String(on));
+				});
+			})();
 
 		h3(id="what-a-screen-reader-gets") What a screen reader gets
 		p The table stays on the page. It is hidden from sight, but screen readers read it like any other table: the names of the rows and columns, and every value. The chart is hidden from screen readers, with #[code aria-hidden="true"], so they do not read everything twice.
-		p This button shows the table that a screen reader reads out loud:
+		p If you turn on this switch, the example shows the table that a screen reader reads out loud:
 
-		.lang-toggle(role="group" aria-label="The table of the example")
-			button.show-table(type="button" aria-pressed="false") Show the table
-		+chart(null, '1')
+		+chart(null, '1', { switch: 'Show the table', class: 'show-table' })
 			figure#a11y-table(data-chart="column" data-chart-table="print")
 				figcaption
 					b Apples picked
@@ -113,9 +146,9 @@ block content
 		script.
 			document.querySelector('.show-table').addEventListener('click', function () {
 				var figure = document.getElementById('a11y-table');
-				var shown = this.getAttribute('aria-pressed') !== 'true';
+				var shown = this.getAttribute('aria-checked') !== 'true';
 				figure.setAttribute('data-table', shown ? 'always' : 'print');
-				this.setAttribute('aria-pressed', String(shown));
+				this.setAttribute('aria-checked', String(shown));
 			});
 
 		p If the chart has a title in a #[code figcaption], Tablechart makes it the name of the figure and of the table, with #[code aria-labelledby]. So a screen reader that jumps to the table also reads the title and the unit. If the figure or the table already has a name, with #[code aria-label], #[code aria-labelledby] or a #[code caption], it keeps that name.

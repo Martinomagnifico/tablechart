@@ -56,13 +56,7 @@ block content
 		p The decimal and thousands separators follow the #[code lang] attribute of the #[code html] element. If the #[code lang] attribute changes, the numbers change with it, and the chart is laid out again.
 		p The buttons change the language of this page.
 
-		.lang-toggle(role="group" aria-label="Language of the page")
-			button(type="button" data-lang="en" aria-pressed="true") English
-			button(type="button" data-lang="nl" aria-pressed="false") Nederlands
-			button(type="button" data-lang="de-CH" aria-pressed="false") Deutsch (Schweiz)
-			button(type="button" data-lang="fr" aria-pressed="false") Français
-
-		+chart
+		+chart(null, null, { label: 'Language of the page', buttons: [{ text: 'English', attrs: { 'data-lang': 'en' } }, { text: 'Nederlands', attrs: { 'data-lang': 'nl' } }, { text: 'Deutsch (Schweiz)', attrs: { 'data-lang': 'de-CH' } }, { text: 'Français', attrs: { 'data-lang': 'fr' } }] })
 			figure(data-chart="column")
 				figcaption: b Apples picked
 				table

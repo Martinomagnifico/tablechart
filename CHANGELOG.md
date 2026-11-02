@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Columns and bars side by side follow `data-chart-labels="inside"`. Before, their numbers stayed outside.
+- A line with few points builds in at least the minimum time. Before, a line with 2 points took 0.1s.
+- A name next to a line has at least 4.5:1 with the background. It keeps the colour of its line if it can. Before, a name had the same colour as its line, which only needs 3:1.
+- The names at the ends of the lines start past the numbers of the last row, and names that are close together are centred around their points. Before, a number could touch a name, and the names were pushed down.
+- The contrast check also measures text on the background, such as those names and the numbers along an axis. Before, it only measured numbers inside bars.
+- A chart measures its background again if a class or attribute on `html` or `body` changes, such as a theme switch. Before, its colours stayed as they were.
+
 ## [1.2.3] - 2026-10-31
 
 ### Added

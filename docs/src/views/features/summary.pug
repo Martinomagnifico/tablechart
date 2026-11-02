@@ -278,11 +278,10 @@ block content
 			const kinds = Array.from({ length: 24 }, (_, i) => [...month(i + 36), (80 + i * 2.5 + (((i * 7) % 5) - 2) * 1.5 + (i === 9 ? 40 : 0)).toFixed(1)]);
 		p The button makes new data for the chart, of one kind at a time: a trend up, down, flat or unclear. The summary is filled again for each, and shows the sentence for that kind.
 
-		.lang-toggle.trend-toggle(role="group" aria-label="Data of the example")
-			button(type="button") Swap data
-			span.trend-kind(aria-live="polite") Up
-
 		.card
+			.lang-toggle.trend-toggle(role="group" aria-label="Data of the example")
+				button(type="button") Swap data
+				span.trend-kind(aria-live="polite") Up
 			.demo
 				figure#trend-kinds(data-chart="line" data-chart-summary="always")
 					figcaption
@@ -454,13 +453,10 @@ block content
 					td Shown
 					td Printed
 
-		p A screen reader always reads the summary, right after the title of the chart. The buttons change #[code data-chart-summary] on this chart, and then call #[code refresh()].
-
-		.lang-toggle.summary-toggle(role="group" aria-label="Who sees the summary")
-			button(type="button" data-summary-value="always" aria-pressed="true") always
-			button(type="button" data-summary-value="never" aria-pressed="false") never
+		p A screen reader always reads the summary, right after the title of the chart. The switch sets #[code data-chart-summary] on this chart to #[code always] or #[code never], and then calls #[code refresh()].
 
 		.card
+			+chartControls({ switch: 'Show the summary', class: 'summary-switch', on: true })
 			.demo
 				figure#apples-shown(data-chart="column" data-chart-summary="always")
 					figcaption
@@ -481,15 +477,12 @@ block content
 						p Most apples were sold in {highest.name}: {highest.value} tonnes. The fewest in {lowest.name}: {lowest.value} tonnes.
 
 		script.
-			document.querySelectorAll('.summary-toggle button').forEach(function (button) {
-				button.addEventListener('click', function () {
-					var figure = document.getElementById('apples-shown');
-					figure.setAttribute('data-chart-summary', button.dataset.summaryValue);
-					figure.tablechart?.refresh();
-					button.parentElement.querySelectorAll('button').forEach(function (other) {
-						other.setAttribute('aria-pressed', String(other === button));
-					});
-				});
+			document.querySelector('.summary-switch').addEventListener('click', function () {
+				var on = this.getAttribute('aria-checked') !== 'true';
+				var figure = document.getElementById('apples-shown');
+				figure.setAttribute('data-chart-summary', on ? 'always' : 'never');
+				figure.tablechart?.refresh();
+				this.setAttribute('aria-checked', String(on));
 			});
 
 	+section("On paper")
@@ -509,12 +502,11 @@ block content
 		p This page has no real translation engine. The buttons use a small script that only knows the words of this example, as a demo. On your site, use your own translation solution. 
 		//-p In a Reveal.js presentation, you can use #[a(href='https://github.com/martinomagnifico/reveal.js-internation') reveal.js-internation] by yours truly.
 
-		.lang-toggle.fruit-toggle(role="group" aria-label="Language of the example")
-			button(type="button" data-lang="en" aria-pressed="true") English
-			button(type="button" data-lang="nl" aria-pressed="false") Nederlands
-			button(type="button" data-lang="es" aria-pressed="false") Español
-
 		.card
+			.lang-toggle.fruit-toggle(role="group" aria-label="Language of the example")
+				button(type="button" data-lang="en" aria-pressed="true") English
+				button(type="button" data-lang="nl" aria-pressed="false") Nederlands
+				button(type="button" data-lang="es" aria-pressed="false") Español
 			.demo
 				figure#fruit(data-chart="column" data-chart-keys="fruit" data-chart-summary="always")
 					figcaption

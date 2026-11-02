@@ -95,15 +95,19 @@ export const bar: ChartType = {
 				: 0;
 		// A number goes after its bar, or with `labels: "inside"`, inside it if it fits, as on a column chart.
 		const fits = (label: HTMLElement, length: number) => geo.labels === "inside" && fitsLength(label, length, unit);
-		if (!several && !geo.stacked) {
+		// A group has room inside its bars only if a number is not higher than a bar.
+		const inGroup = several && !geo.stacked && geo.labels === "inside" && !!first && sizeOf(first).height * unit <= layout.size;
+		if (inGroup) room = before = 0;
+		if (inGroup || (!several && !geo.stacked)) {
+			const items = several
+				? grouped.filter(({ label }) => label.dataset.missing === undefined)
+				: segs.map((seg, i) => ({ label: values[i], value: seg.value }));
 			// A narrower span can push another number out of its bar, so this repeats until the room stays the same.
 			for (let tries = 0; tries < 3; tries++) {
 				const span = right - left - room - before;
-				const outside = segs
-					.map((seg, i) => ({ seg, label: values[i] }))
-					.filter(({ seg, label }) => !fits(label, lengthOf(seg.value, span)));
-				const after = roomFor(outside.filter(({ seg }) => seg.value >= 0).map(({ label }) => label));
-				const ahead = roomFor(outside.filter(({ seg }) => seg.value < 0).map(({ label }) => label));
+				const outside = items.filter(({ label, value }) => !fits(label, lengthOf(value, span)));
+				const after = roomFor(outside.filter(({ value }) => value >= 0).map(({ label }) => label));
+				const ahead = roomFor(outside.filter(({ value }) => value < 0).map(({ label }) => label));
 				if (after <= room && ahead <= before) break;
 				room = Math.max(room, after);
 				before = Math.max(before, ahead);
@@ -187,9 +191,25 @@ export const bar: ChartType = {
 								...seriesMark(geo, row, s),
 							})
 						);
-					label.dataset.place = back ? "before" : "after";
+					const inside = inGroup && fits(label, Math.abs(end - zero));
+					const pad = Math.max(Math.min(gap, Math.abs(end - zero) - widthOf(label) - 6 * unit), 6 * unit);
+					const toward = back ? 1 : -1;
+					label.dataset.place = inside ? "inside" : back ? "before" : "after";
 					label.toggleAttribute("data-left-out", !fit);
-					placeAt(label, back ? end - gap : end + gap, top + layout.size / 2, VIEWBOX_WIDTH, height);
+					if (inside) inkOf(label, geo, s);
+					placeAt(
+						label,
+						!inside
+							? back ? end - gap : end + gap
+							: geo.insideAlign === "center"
+								? (zero + end) / 2
+								: geo.insideAlign === "start"
+									? zero - toward * (pad + widthOf(label) / 2)
+									: end + toward * (pad + widthOf(label) / 2),
+						top + layout.size / 2,
+						VIEWBOX_WIDTH,
+						height
+					);
 				});
 				const name = categories[i];
 				if (name) placeAt(name, left - 8 * unit, cy(i), VIEWBOX_WIDTH, height);

@@ -102,10 +102,10 @@ block content
 		p A chart fills the width of its container. Its height is a share of its width, set with #[code data-chart-aspect], but never less than #[code --tablechart-min-height], 200px by default. If the width changes, the chart is laid out again.
 		p The buttons change the width of the example.
 
-		.width-toggle.lang-toggle(role="group" aria-label="Width of the example" data-free-height)
-			button(type="button" data-width="" aria-pressed="true") Wide
-			button(type="button" data-width="min(320px, 60%)" aria-pressed="false") Narrow
 		.card
+			.width-toggle.lang-toggle(role="group" aria-label="Width of the example" data-free-height)
+				button(type="button" data-width="" aria-pressed="true") Wide
+				button(type="button" data-width="min(320px, 60%)" aria-pressed="false") Narrow
 			.demo
 				.size-box
 					figure(data-chart="column")

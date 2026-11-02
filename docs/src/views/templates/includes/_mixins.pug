@@ -353,8 +353,20 @@ mixin installWizard(name, imports)
 
 //- A live chart in a demo card, with its markup below it as code, both from the
 //- same block. For code that shows only part of the markup, use codeblock on its own.
-mixin chart(label, lines)
+//- The controls of an example, in its card: a switch ({ switch, class }), or a group of buttons of which the first is on ({ buttons, class, label }).
+mixin chartControls(c)
+	if c.switch
+		.demo-choice
+			button.demo-switch(class=c.class type="button" role="switch" aria-checked=c.on ? "true" : "false")= c.switch
+	else
+		.lang-toggle(class=c.class role="group" aria-label=c.label)&attributes(c.attrs || {})
+			each one, i in c.buttons
+				button(type="button" aria-pressed=i === 0 ? "true" : "false")&attributes(one.attrs)= one.text
+
+mixin chart(label, lines, controls)
 	.card
+		if controls
+			+chartControls(controls)
 		.demo&attributes(attributes)
 			block
 		+codeblock('HTML', label, lines)
@@ -368,3 +380,41 @@ mixin style(label)
 		block
 	+codeblock('CSS', label)
 		block
+
+
+//- The apples demo of numbers inside bars, with a dropdown for how contrast is measured. Its styles are in _charts.scss, its script in main.js.
+mixin wcagDemo(id)
+	.card.wcag-demo(data-wcag="2")
+		.demo-choice
+			label(for=id) Contrast measured with
+			select.styled-select(id=id)
+				button
+					selectedcontent
+					+chevron(18, 'down')
+				option.choice(value="2") WCAG 2, the default
+				option.choice(value="3") WCAG 3 (APCA)
+		.demo
+			figure.inside-choice(data-chart="bar" data-chart-stack)
+				figcaption
+					b How do visitors rate each apple?
+					br
+					span % of votes
+				table
+					thead
+						tr
+							th Variety
+							th Love it
+							th Like it
+							th Fine
+							th Not keen
+							th Dislike it
+					tbody
+						each row in [['Elstar', '34', '22', '18', '14', '12'], ['Jonagold', '28', '25', '20', '15', '12'], ['Granny Johnson', '18', '20', '24', '20', '18']]
+							tr
+								th= row[0]
+								each value in row.slice(1)
+									td= value
+		p.wcag-note(data-method="2" data-mode="light") The text colour of this chart is changed to deep blue, so it is easy to tell apart from black. That is only for this demo. Nothing is set for the numbers. The card is light, so the numbers choose between the pink of the card and the deep blue text colour. On the red parts, they have the pink of the card. On the blue parts, they have the deep blue text colour. On the green and purple parts, neither has 5:1, so they get to be white. On the amber parts, they get to be black.
+		p.wcag-note(data-method="2" data-mode="dark") The text colour of this chart is changed to yellow, so it is easy to tell apart from white. That is only for this demo. Nothing is set for the numbers. The card is dark, so the numbers choose between the yellow text colour and the dark pink of the card. On the red parts, they have the yellow text colour. On the blue parts, they have the dark pink of the card. On the green and purple parts, neither has 5:1, so they get to be white. On the amber parts, they get to be black.
+		p.wcag-note(data-method="3" data-mode="light") The text colour of this chart is changed to deep blue. That is only for this demo. With #[code --tablechart-contrast-wcag: 3], the card is still light, so the numbers choose between the pink of the card and the deep blue text colour, but a number now needs Lc 60. On the red, green, amber and purple parts, they have the pink of the card. On the blue parts, neither has Lc 60, so they get to be white.
+		p.wcag-note(data-method="3" data-mode="dark") The text colour of this chart is changed to yellow. That is only for this demo. With #[code --tablechart-contrast-wcag: 3], the card is still dark, so the numbers choose between the yellow text colour and the dark pink of the card, but a number now needs Lc 60. On the red, green, amber and purple parts, they have the yellow text colour. On the blue parts, neither has Lc 60, so they get to be white.

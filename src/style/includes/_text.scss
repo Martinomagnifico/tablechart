@@ -75,7 +75,7 @@
 	transform: translate(0, -50%);
 	white-space: nowrap;
 	font-size: #{$namesize};
-	color: #{$seriesink};
+	color: var(--_ink, #{$seriesink});
 }
 
 .tablechart-legend {

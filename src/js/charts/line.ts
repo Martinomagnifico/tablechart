@@ -293,6 +293,24 @@ const trend = (area: boolean): ChartType => ({
 			return "below";
 		};
 
+		// A name starts past the numbers of the last row, which are centred on their points, so the two never touch.
+		const nameGap =
+			step || stacked ? 10 * unit : Math.max(10 * unit, ...own.map((s) => (sizeOf(seriesValues[s][last]).width * unit) / 2 + 6 * unit));
+		// The names at the ends of the lines, pushed apart as they will be.
+		const nameBoxes = (): Box[] => {
+			const tall = (names[0] ? sizeOf(names[0]).height : 0) * unit;
+			const room = 2 * unit;
+			const ends = own.flatMap((s) => {
+				const name = names[s];
+				if (!name) return [];
+				let i = last;
+				while (i > 0 && missing(s, i)) i--;
+				const [px, py] = pointAt(s, i);
+				return [{ name, x: px + nameGap, y: py }];
+			});
+			return spread(ends, tall).map((end): Box => [end.x - room, end.y - tall / 2 - room, sizeOf(end.name).width * unit + 2 * room, tall + 2 * room]);
+		};
+
 		// With more than two lines, each number goes above its point or below it, where it covers no point and no other number.
 		// Per row the highest value places first; below zero, below comes first. A number with no room at all is left out.
 		const crowded = mixed ? !step : several && !focused && series.length > 2 && !stacked && !step;
@@ -315,7 +333,7 @@ const trend = (area: boolean): ChartType => ({
 					return [[px - 4 * unit, py - 4 * unit, 8 * unit, 8 * unit]];
 				})
 			);
-			const chosen = avoidCollisions(candidates, [...points, ...columnsShown.map(({ box }) => box)], [0, 0, cx(last) + cx(0), height]);
+			const chosen = avoidCollisions(candidates, [...points, ...nameBoxes(), ...columnsShown.map(({ box }) => box)], [0, 0, cx(last) + cx(0), height]);
 			items.forEach(({ s, i, value }, k) => picks.set(seriesValues[s][i], chosen[k] === null ? null : places(value)[chosen[k] as number]));
 		}
 
@@ -414,16 +432,7 @@ const trend = (area: boolean): ChartType => ({
 			const along: Box[] = own.flatMap((s) =>
 				rows.flatMap((_row, i) => (i === last || missing(s, i) || missing(s, i + 1) ? [] : piecesOf(s, i, i + 1, clear)))
 			);
-			// The names at the ends of the lines, where they will be.
-			const nameHeight = (names[0] ? sizeOf(names[0]).height : 0) * unit;
-			const ends = own.flatMap((s): Box[] => {
-				const name = names[s];
-				if (!name) return [];
-				let i = last;
-				while (i > 0 && missing(s, i)) i--;
-				const [px, py] = pointAt(s, i);
-				return [[px + 10 * unit, py - nameHeight / 2, sizeOf(name).width * unit, nameHeight]];
-			});
+			const ends = nameBoxes();
 			// Above or below its point, or a line of text further, if the line or another value is in the way; or beside it.
 			type Spot = "outside" | "below" | "outside far" | "below far" | "after" | "before";
 			const items = own.flatMap((s) => [...(showing.get(s) ?? [])].map((i) => ({ s, i })));
@@ -504,7 +513,7 @@ const trend = (area: boolean): ChartType => ({
 			const i = lastOf(s);
 			const [px, py] = pointAt(s, i);
 			const end = step ? px + band / 2 : px;
-			return { name, x: end + 10 * unit, y: stacked ? (py + y(bottomValue(s, i))) / 2 : py };
+			return { name, x: end + nameGap, y: stacked ? (py + y(bottomValue(s, i))) / 2 : py };
 		});
 		const nameHeight = (names[0] ? sizeOf(names[0]).height : 0) * unit;
 		for (const end of spread(ends, nameHeight)) placeAt(end.name, end.x, end.y, VIEWBOX_WIDTH, height);

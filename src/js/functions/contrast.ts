@@ -80,16 +80,25 @@ export const checkContrast = (figure: HTMLElement): void => {
 	}
 };
 
-/** Warns about each number inside a bar whose colour does not stand out enough from that bar, once the chart is built. */
+// Text in a chart with the background behind it. A badge can have a background of its own, so it is left out.
+const TEXT_ON_SURFACE = ".tablechart-name, .tablechart-value:not([data-place='inside'], [data-place='middle']), .tablechart-categories span, .tablechart-centre, .tablechart-tick, .tablechart-quadrant-name, figcaption b, figcaption span";
+
+/** Warns about text that does not stand out enough: a number inside a bar from that bar, other text from the background, once the chart is built. */
 export const checkTextContrast = (figure: HTMLElement): void => {
 	let tries = 0;
 	const run = () => {
 		const values = Array.from(figure.querySelectorAll<HTMLElement>(".tablechart-value[data-place='inside'], .tablechart-value[data-place='middle']")).filter(
 			(value) => !value.hasAttribute("data-left-out") && !value.hidden
 		);
-		// A number that is still fading in, such as on a slide that is not in view, is measured again a bit later.
-		if (values.some((value) => rgbOf(getComputedStyle(value).color)[3] < 1)) {
-			if (++tries <= 20) setTimeout(later, 500);
+		// Other text in a chart is on the background, such as the name next to a line.
+		const onSurface = Array.from(figure.querySelectorAll<HTMLElement>(TEXT_ON_SURFACE)).filter(
+			// A faint name of a line that is out of focus is left out, as its line is.
+			(text) => !text.hasAttribute("data-left-out") && !text.hidden && text.style.getPropertyValue("--m") !== "1" && (text.textContent ?? "").trim() && getComputedStyle(text).visibility !== "hidden"
+		);
+		// Text that is still fading in, such as on a slide that is not in view, is measured again a bit later.
+		if ([...values, ...onSurface].some((text) => rgbOf(getComputedStyle(text).color)[3] === 0 && tries < 20)) {
+			tries++;
+			setTimeout(later, 500);
 			return;
 		}
 		const rows = Array.from(figure.querySelectorAll("tbody tr > :first-child")).map((cell) => (cell.textContent ?? "").trim());
@@ -111,6 +120,25 @@ export const checkTextContrast = (figure: HTMLElement): void => {
 			entry.names.push(`"${rows[Number(value.dataset.row) - 1] ?? ""}" ("${value.textContent?.trim()}")`);
 			found.set(key, entry);
 		}
+		const surface = surfaceOf(figure);
+		const faint = new Map<string, { names: string[]; contrast: number; needed: number }>();
+		for (const text of onSurface) {
+			const style = getComputedStyle(text);
+			const [r, g, b, a] = rgbOf(style.color);
+			const color = [r, g, b].map((value, k) => value * a + surface[k] * (1 - a));
+			const contrast = contrastOf(methodOf(figure), color, surface);
+			const size = Number.parseFloat(style.fontSize);
+			const needed = size >= 24 || (size >= 18.66 && Number(style.fontWeight) >= 700) ? method.large : method.text;
+			if (contrast >= needed) continue;
+			const entry = faint.get(style.color) ?? { names: [], contrast, needed };
+			entry.names.push(`"${text.textContent?.trim()}"`);
+			faint.set(style.color, entry);
+		}
+		for (const { names, contrast, needed } of faint.values())
+			console.warn(
+				`[${LIBRARY_NAME}] The text ${names.join(", ")} has a contrast of ${method.show(contrast)} with the background. Text needs at least ${method.need(needed)} (${method.textRule}).`,
+				figure
+			);
 		for (const { what, names, contrast, needed } of found.values()) {
 			const several = names.length > 1;
 			console.warn(

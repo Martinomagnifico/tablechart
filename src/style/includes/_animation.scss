@@ -10,6 +10,14 @@
 		--_ring: calc(#{$duration} + (var(--count, 1) - 1) * #{$stagger});
 	}
 
+	// A line only sweeps during its starts, without an element time after them, so its starts alone reach the minimum.
+	:where([data-animate]:is([data-chart="line"], [data-chart="area"]), [data-animate]:is([data-chart="line"], [data-chart="area"]) .tablechart-plot) {
+		--_stg: min(
+			max(calc(var(--_r) * var(--_dur)), calc(var(--_min) / max(var(--count, 1) - 1, 1))),
+			max(0s, calc((var(--_max) - var(--_dur)) / max(var(--count, 1) - 1, 1)))
+		);
+	}
+
 	// `is-shown` starts the build; `--after` is how many stagger steps the data takes, so commentary lands after it.
 	// What follows an element starts a fraction of the element time after it, so it never lands with it when the stagger shrinks.
 

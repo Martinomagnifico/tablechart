@@ -63,7 +63,7 @@ const resolve = (figure: HTMLElement, color: string): [number, number, number, n
  * any see-through ones in front of it mixed in. A slide in Reveal.js has its colour in `data-background-color`, or in
  * `data-background` if that is a colour rather than an image.
  */
-export const measureSurface = (figure: HTMLElement): void => {
+export const measureSurface = (figure: HTMLElement): boolean => {
 	const layers: number[][] = [];
 	let color: number[] | null = null;
 	for (let element: HTMLElement | null = figure; element && !color; element = element.parentElement) {
@@ -75,7 +75,10 @@ export const measureSurface = (figure: HTMLElement): void => {
 	}
 	color ??= resolve(figure, "Canvas");
 	for (const [r, g, b, a] of layers.reverse()) color = [r, g, b].map((value, k) => value * a + (color as number[])[k] * (1 - a));
-	figure.style.setProperty("--_surface", `rgb(${color.slice(0, 3).map(Math.round).join(" ")})`);
+	const measured = `rgb(${color.slice(0, 3).map(Math.round).join(" ")})`;
+	if (figure.style.getPropertyValue("--_surface") === measured) return false;
+	figure.style.setProperty("--_surface", measured);
+	return true;
 };
 
 /** The background of a chart: `--tablechart-surface` if it is set, or else the measured one. */
@@ -128,5 +131,30 @@ export const inkInside = (figure: HTMLElement): void => {
 		const best = contrastOf(method, onDark, fill) > contrastOf(method, onLight, fill) ? onDark : onLight;
 		const ink = contrastOf(method, best, fill) >= needed ? best : blackOrWhite(fill, needed, method);
 		value.style.setProperty("--_ink", `rgb(${ink.join(" ")})`);
+	}
+};
+
+/**
+ * A name next to a line is text on the background, in the colour of its line. If that has too little contrast, it moves towards the
+ * text colour only as far as needed, so it still looks like its line. Measured from the line, because the name may still be fading in.
+ */
+export const inkNames = (figure: HTMLElement): void => {
+	const names = figure.querySelectorAll<HTMLElement>(".tablechart-name:not([data-place='legend'])");
+	if (!names.length) return;
+	const method = methodOf(figure);
+	const needed = method === 3 ? 60 : 4.5;
+	const surface = surfaceOf(figure).slice(0, 3);
+	const text = rgbOf(getComputedStyle(figure).color).slice(0, 3);
+	for (const name of names) {
+		const line = figure.querySelector(`.tablechart-series[data-series="${name.dataset.series}"]:not([data-muted])`);
+		name.style.removeProperty("--_ink");
+		if (!line) continue;
+		const own = rgbOf(getComputedStyle(line).stroke).slice(0, 3);
+		for (let step = 0; step <= 20; step++) {
+			const color = own.map((value, k) => Math.round(value + ((text[k] - value) * step) / 20));
+			if (contrastOf(method, color, surface) < needed && step < 20) continue;
+			if (step) name.style.setProperty("--_ink", `rgb(${color.join(" ")})`);
+			break;
+		}
 	}
 };
