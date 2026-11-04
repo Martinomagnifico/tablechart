@@ -1,15 +1,31 @@
 # Changelog
 
-## [Unreleased]
+## [1.2.4] - Unreleased
+
+### Added
+
+- `lines` and `data-chart-lines`, the order of the points and dashes of lines.
+- `data-line="dash-dot"`, a third line style.
+- `marker: "none"` and `data-marker="none"`, a line without points.
+
+### Changed
+
+- 24 different lines before they repeat.
+- With a chosen set such as `data-chart-values="last"`, the last number of a line goes next to its name.
 
 ### Fixed
 
-- Columns and bars side by side follow `data-chart-labels="inside"`. Before, their numbers stayed outside.
-- A line with few points builds in at least the minimum time. Before, a line with 2 points took 0.1s.
-- A name next to a line has at least 4.5:1 with the background. It keeps the colour of its line if it can. Before, a name had the same colour as its line, which only needs 3:1.
-- The names at the ends of the lines start past the numbers of the last row, and names that are close together are centred around their points. Before, a number could touch a name, and the names were pushed down.
-- The contrast check also measures text on the background, such as those names and the numbers along an axis. Before, it only measured numbers inside bars.
-- A chart measures its background again if a class or attribute on `html` or `body` changes, such as a theme switch. Before, its colours stayed as they were.
+- Columns and bars side by side follow `data-chart-labels="inside"`.
+- Minimum build time for a line with few points.
+- Contrast of names next to lines.
+- Names at the ends of lines keep clear of the last numbers.
+- The contrast check also measures text on the background.
+- A chart measures its background again after a theme switch.
+- Filled and open points have the same outer size.
+- Points in the legend and the tooltip have the same size and shape as on the chart.
+- The legend and the tooltip show `--tablechart-point-color`.
+- A value of a chosen set that finds a place is shown.
+- A value moved away from its point gets no other line in between.
 
 ## [1.2.3] - 2026-10-31
 

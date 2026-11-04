@@ -1,3 +1,5 @@
+@use "tokens" as *;
+
 // One tooltip for the page, a child of body by default, so no parent clips it. Its variables are copied from the chart it is for.
 .tablechart-tooltip {
 	position: fixed;
@@ -64,9 +66,10 @@
 
 	// The legend's sample of a line, with its point; the shapes are set with the legend's.
 	&[data-sample="line"] {
-		width: 1.6em;
-		height: 0.8em;
+		width: 36px;
+		height: 12px;
 		border-radius: 0;
+		@include sample-point;
 		mask-image: var(--_line), var(--_mark, none);
 		mask-position: center;
 		mask-size: contain;

@@ -1,7 +1,7 @@
 import type { Series } from "../types";
 import { svgEl } from "./svg";
 
-export type Shape = "circle" | "square" | "diamond" | "triangle";
+export type Shape = "circle" | "square" | "diamond" | "triangle" | "none";
 const SHAPES: Shape[] = ["circle", "square", "diamond"];
 
 export interface Marker {
@@ -9,9 +9,10 @@ export interface Marker {
 	open: boolean;
 }
 
-/** Filled circle, open circle, filled square, and so on; `data-marker` on the column header sets another. */
+/** Filled circle, open circle, filled square, and so on; `data-marker` on the column header sets another, or `none` for no points. */
 export const markerOf = (series: Series[], s: number): Marker => {
 	const own = series[s]?.marker?.toLowerCase().split(/\s+/) ?? [];
+	if (own.includes("none")) return { shape: "none", open: false };
 	const asked = SHAPES.find((shape) => own.includes(shape));
 	return {
 		shape: asked ?? SHAPES[Math.floor(s / 2) % SHAPES.length],

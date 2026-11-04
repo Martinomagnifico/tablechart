@@ -1,15 +1,69 @@
 extends /views/templates/layouts/_base
 
 append variables
-	- pagetitle = "Styling | Lines and marks"
-	- pagedescription = "Styling the baseline, waterfall connectors, badges and bar width in Tablechart."
+	- pagetitle = "Styling | Parts of a chart"
+	- pagedescription = "Styling lines and points, the baseline, waterfall connectors, badges and bar width in Tablechart."
 
 block content
 	.lane
 		.container
 			.page-header
-				h1 Lines and marks
-				p.lead The baseline, connectors, the badge and the bar width.
+				h1 Parts of a chart
+				p.lead Lines and points, the baseline, connectors, the badge and the bar width.
+
+	+section("Lines and points")
+		p These variables set the lines of a line chart or an area chart, and their points. The colours of the lines are on #[a(href=url('/styling/colours.html')) Colours]. Which line has which point and pattern is on #[a(href=url('/types/line.html#points')) Line].
+
+		+style.
+			.bold-lines {
+				--tablechart-series-width: 3px;
+				--tablechart-series-dash: 10 6;
+				--tablechart-series-dash-dot: 10 6 0 6;
+				--tablechart-point-color: light-dark(#8a1c2c, #ffb4a8);
+			}
+
+		+chart(null, '1')
+			figure.bold-lines(data-chart="line" data-chart-legend)
+				figcaption: b Apples per tree
+				table
+					thead
+						tr
+							th Year
+							th North
+							th(data-line="dashed") South
+							th(data-line="dash-dot") East
+					tbody
+						each row in [['2016', '41', '30', '22'], ['2019', '58', '39', '35'], ['2022', '77', '52', '41'], ['2025', '105', '61', '70']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+								td= row[3]
+
+		table
+			thead
+				tr
+					th Variable
+					th Sets
+			tbody
+				tr
+					td: code --tablechart-series-width
+					td The width of a line: 2px by default
+				tr
+					td: code --tablechart-series-dash
+					td The pattern of a dashed line, in pixels: #[code 6 4] by default
+				tr
+					td: code --tablechart-series-dot
+					td The pattern of a dotted line, in pixels: #[code 0 4] by default
+				tr
+					td: code --tablechart-series-dash-dot
+					td The pattern of a dash-dot line, in pixels: #[code 6 4 0 4] by default
+				tr
+					td: code --tablechart-point-color
+					td The points on a line, also in the legend and the tooltip: the colour of the line by default
+				tr
+					td #[code --tablechart-area-color] / #[code -opacity]
+					td The fill under a line, in an area chart
 
 	+section("Baseline and connectors")
 		p The baseline and the connectors between waterfall steps each have a colour, width and opacity. #[code --tablechart-connector-dash] sets the dashes.

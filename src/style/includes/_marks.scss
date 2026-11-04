@@ -76,16 +76,20 @@
 .tablechart-series[data-line="dotted"] {
 	stroke-dasharray: var(--tablechart-series-dot, 0 4);
 }
+.tablechart-series[data-line="dash-dot"] {
+	stroke-dasharray: var(--tablechart-series-dash-dot, 6 4 0 4);
+}
 
 .tablechart-point {
 	fill: var(--tablechart-point-color, #{$seriesink});
+	// The same stroke on a filled and an open point, whatever the width of the line, so both have the same outer size.
+	stroke: var(--tablechart-point-color, #{$seriesink});
+	stroke-width: 2px;
+	vector-effect: non-scaling-stroke;
 
 	// Every second series has open points; the line under an open point is cut out.
 	&[data-open] {
 		fill: none;
-		stroke: var(--tablechart-point-color, #{$seriesink});
-		stroke-width: var(--tablechart-series-width, 2px);
-		vector-effect: non-scaling-stroke;
 	}
 }
 

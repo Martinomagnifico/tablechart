@@ -91,14 +91,16 @@
 	font-size: inherit;
 
 	// A sample of the line and its point, as two masks over the colour. A step line has no point.
+	// In pixels, as the points on the chart are, so a point has the same size in all three places.
 	&::before {
 		content: "";
 		display: inline-block;
-		width: 1.6em;
-		height: 0.8em;
+		width: 36px;
+		height: 12px;
 		margin-right: 0.4em;
 		vertical-align: -0.05em;
 		background: #{$seriesink};
+		@include sample-point;
 		mask-image: var(--_line), var(--_mark, none);
 		mask-position: center;
 		mask-size: contain;
@@ -117,57 +119,73 @@
 // The line and point of each sample, for the legend and the tooltip.
 .tablechart-name[data-place="legend"],
 .tablechart-tooltip-key[data-sample] {
-	--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H24'/%3E%3C/svg%3E");
+	--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H36'/%3E%3C/svg%3E");
 	&[data-line="dashed"] {
-		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H24' stroke-dasharray='4 2.5' stroke-linecap='butt'/%3E%3C/svg%3E");
+		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H36' stroke-dasharray='4 2.5' stroke-linecap='butt'/%3E%3C/svg%3E");
+	}
+	&[data-line="dash-dot"] {
+		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M36 6H0' stroke-dasharray='4 4 0 4' stroke-dashoffset='2'/%3E%3C/svg%3E");
 	}
 	&[data-line="dotted"] {
-		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H24' stroke-dasharray='0 3'/%3E%3C/svg%3E");
+		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H36' stroke-dasharray='0 3'/%3E%3C/svg%3E");
 	}
 	&[data-marker="circle"] {
-		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Ccircle cx='12' cy='6' r='3.4' fill='white'/%3E%3C/svg%3E");
+		--_band: 8px;
+		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Ccircle cx='12' cy='6' r='3' stroke-width='2' fill='white'/%3E%3C/svg%3E");
 	}
 	&[data-marker="circle"][data-open] {
-		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Ccircle cx='12' cy='6' r='3.4'/%3E%3C/svg%3E");
-		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H8.6 M15.4 6H24'/%3E%3C/svg%3E");
+		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Ccircle cx='12' cy='6' r='3' stroke-width='2'/%3E%3C/svg%3E");
+		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H14.2 M21.8 6H36'/%3E%3C/svg%3E");
 	}
 	&[data-marker="circle"][data-open][data-line="dashed"] {
-		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H8.6 M15.4 6H24' stroke-dasharray='4 2.5' stroke-linecap='butt'/%3E%3C/svg%3E");
+		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H14.2 M21.8 6H36' stroke-dasharray='4 2.5' stroke-linecap='butt'/%3E%3C/svg%3E");
+	}
+	&[data-marker="circle"][data-open][data-line="dash-dot"] {
+		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H14.2 M36 6H21.8' stroke-dasharray='4 4 0 4' stroke-dashoffset='2'/%3E%3C/svg%3E");
 	}
 	&[data-marker="circle"][data-open][data-line="dotted"] {
-		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H8.6 M15.4 6H24' stroke-dasharray='0 3'/%3E%3C/svg%3E");
+		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H14.2 M21.8 6H36' stroke-dasharray='0 3'/%3E%3C/svg%3E");
 	}
 	&[data-marker="square"] {
-		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Crect x='9' y='3' width='6' height='6' stroke-linecap='butt' fill='white'/%3E%3C/svg%3E");
+		--_band: 7.3px;
+		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Crect x='9.36' y='3.36' width='5.28' height='5.28' stroke-width='2' stroke-linecap='butt' fill='white'/%3E%3C/svg%3E");
 	}
 	&[data-marker="square"][data-open] {
-		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Crect x='9' y='3' width='6' height='6' stroke-linecap='butt'/%3E%3C/svg%3E");
-		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H9 M15 6H24'/%3E%3C/svg%3E");
+		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Crect x='9.36' y='3.36' width='5.28' height='5.28' stroke-width='2' stroke-linecap='butt'/%3E%3C/svg%3E");
+		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H14.56 M21.44 6H36'/%3E%3C/svg%3E");
 	}
 	&[data-marker="square"][data-open][data-line="dashed"] {
-		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H9 M15 6H24' stroke-dasharray='4 2.5' stroke-linecap='butt'/%3E%3C/svg%3E");
+		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H14.56 M21.44 6H36' stroke-dasharray='4 2.5' stroke-linecap='butt'/%3E%3C/svg%3E");
+	}
+	&[data-marker="square"][data-open][data-line="dash-dot"] {
+		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H14.56 M36 6H21.44' stroke-dasharray='4 4 0 4' stroke-dashoffset='2'/%3E%3C/svg%3E");
 	}
 	&[data-marker="square"][data-open][data-line="dotted"] {
-		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H9 M15 6H24' stroke-dasharray='0 3'/%3E%3C/svg%3E");
+		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H14.56 M21.44 6H36' stroke-dasharray='0 3'/%3E%3C/svg%3E");
 	}
 	&[data-marker="diamond"] {
-		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpolygon points='12,1.9 16.1,6 12,10.1 7.9,6' fill='white'/%3E%3C/svg%3E");
+		--_band: 10px;
+		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpolygon points='12,2.4 15.6,6 12,9.6 8.4,6' stroke-width='2' fill='white'/%3E%3C/svg%3E");
 	}
 	&[data-marker="diamond"][data-open] {
-		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpolygon points='12,1.9 16.1,6 12,10.1 7.9,6'/%3E%3C/svg%3E");
-		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H7.9 M16.1 6H24'/%3E%3C/svg%3E");
+		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpolygon points='12,2.4 15.6,6 12,9.6 8.4,6' stroke-width='2'/%3E%3C/svg%3E");
+		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H13.6 M22.4 6H36'/%3E%3C/svg%3E");
 	}
 	&[data-marker="diamond"][data-open][data-line="dashed"] {
-		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H7.9 M16.1 6H24' stroke-dasharray='4 2.5' stroke-linecap='butt'/%3E%3C/svg%3E");
+		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H13.6 M22.4 6H36' stroke-dasharray='4 2.5' stroke-linecap='butt'/%3E%3C/svg%3E");
+	}
+	&[data-marker="diamond"][data-open][data-line="dash-dot"] {
+		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H13.6 M36 6H22.4' stroke-dasharray='4 4 0 4' stroke-dashoffset='2'/%3E%3C/svg%3E");
 	}
 	&[data-marker="diamond"][data-open][data-line="dotted"] {
-		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H7.9 M16.1 6H24' stroke-dasharray='0 3'/%3E%3C/svg%3E");
+		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H13.6 M22.4 6H36' stroke-dasharray='0 3'/%3E%3C/svg%3E");
 	}
 }
 
 // A marker without a line, on a scatter chart; a small and a large circle for the size of a bubble.
 .tablechart-name[data-place="legend"][data-line="none"] {
 	--_line: none;
+	--_band: 100%;
 	&[data-marker="triangle"] {
 		--_mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 12'%3E%3Cpolygon points='12,1.6 16.4,9.6 7.6,9.6' fill='white'/%3E%3C/svg%3E");
 	}

@@ -51,6 +51,13 @@ export const VIEWBOX_WIDTH = 1000;
 // The empty space where a broken scale jumps, in viewBox units: 1.3% of the width. `--tablechart-break-gap` sets another.
 export const BREAK_GAP = 13;
 
+/** One item of the `lines` option. */
+export interface LineStyle {
+	marker?: "circle" | "square" | "diamond" | "none";
+	open?: boolean;
+	line?: "dashed" | "dotted" | "dash-dot" | "solid";
+}
+
 export interface Config {
 	/** Which elements Tablechart turns into charts. */
 	selector: string;
@@ -93,6 +100,8 @@ export interface Config {
 	table: "never" | "auto" | "print" | "always";
 	/** With `auto`, the table is printed only up to this many values, rows times value columns; a longer one prints the summary instead. */
 	tablelimit: number;
+	/** The look of each next line, instead of the 24 default looks; after the last one it starts again. `data-chart-lines` on a figure or a parent, and `data-marker` and `data-line` on a column header, still win. */
+	lines: LineStyle[] | null;
 	/** The summary of a chart, in a `.chart-summary`: `"always"`, only in `"print"`, in print when the table is not (`"auto"`), or `"never"`, for screen readers only. A figure overrides it with `data-chart-summary`. */
 	summary: "never" | "auto" | "print" | "always";
 	/** The name of the total that a donut without a total row works out, for screen readers. */
@@ -134,6 +143,7 @@ export const defaultConfig: Config = {
 	tooltipparent: null,
 	table: "never",
 	tablelimit: 15,
+	lines: null,
 	summary: "auto",
 	totallabel: "Total",
 	controls: true,

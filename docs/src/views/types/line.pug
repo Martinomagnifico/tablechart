@@ -105,7 +105,25 @@ block content
 			li Three lines or more: if there is room, the number is above its point. If not, it is below it. If there is no room there either, the number is left out, and if you point at a point, or tap it, a tooltip shows the numbers of that row. If one line is highlighted, only that line shows its numbers.
 
 	+section("Points")
-		p With several lines, each line has its own point, in this order: a filled circle, an open circle, a filled square, an open square, a filled diamond and an open diamond. A seventh line starts again with the filled circle. The legend shows the same points.
+		p With several lines, each line has its own point. There are six points, always in the same order. After six lines, the points start again with the next line style. So there are 24 different lines, and the 25th line looks like the first. The legend shows the same points.
+
+		- const looks = [['circle', 'Filled circle'], ['circle open', 'Open circle'], ['square', 'Filled square'], ['square open', 'Open square'], ['diamond', 'Filled diamond'], ['diamond open', 'Open diamond']]
+		- const rounds = [['', 'Solid'], ['dashed', 'Dashed'], ['dotted', 'Dotted'], ['dash-dot', 'Dash-dot']]
+		.line-looks
+			table
+				thead
+					tr
+						th Line
+						each look in looks
+							th= look[1]
+				tbody
+					each round, r in rounds
+						tr
+							th= round[1]
+							each look, k in looks
+								td
+									span.tablechart-name(data-place="legend" data-marker=look[0].split(' ')[0] data-open=look[0].includes('open') ? '' : false data-line=round[0] || false)
+									| #{r * 6 + k + 1}
 
 		+chart
 			figure(data-chart="line" data-chart-legend)
@@ -147,7 +165,7 @@ block content
 		p An open point is cut out of the line, so the background shows through it.
 
 	+section("Dashed and dotted lines")
-		p If the column header of a line has #[code data-line="dashed"] or #[code data-line="dotted"], the line is dashed or dotted. The legend shows the same line.
+		p If the column header of a line has #[code data-line="dashed"], #[code data-line="dotted"] or #[code data-line="dash-dot"], the line is dashed, dotted or has dashes and dots. The legend shows the same line.
 
 		+chart(null, '5')
 			figure(data-chart="line" data-chart-legend)
@@ -159,18 +177,73 @@ block content
 							th North
 							th(data-line="dashed") South
 							th(data-line="dotted") East
+							th(data-line="dash-dot") Central
 							th West
 					tbody
-						each row in [['2016', '41', '30', '22', '12'], ['2019', '58', '39', '35', '20'], ['2022', '77', '52', '41', '33'], ['2025', '105', '61', '70', '45']]
+						each row in [['2016', '41', '30', '22', '62', '12'], ['2019', '58', '39', '35', '81', '20'], ['2022', '77', '52', '41', '108', '33'], ['2025', '105', '61', '70', '132', '45']]
 							tr
 								th= row[0]
 								td= row[1]
 								td= row[2]
 								td= row[3]
 								td= row[4]
+								td= row[5]
 
-		p #[code --tablechart-series-dash] and #[code --tablechart-series-dot] set the pattern, in pixels: #[code 6 4] and #[code 0 4] by default.
+		p If you want another pattern or another line width, see #[a(href=url('/styling/parts.html#lines-and-points')) Lines and points].
 		p If you want to give each line its own colour, use a #[a(href=url('/styling/colours.html')) palette].
+
+	+section("Your own order")
+		p If you want another look for every line chart, also later ones, set the #[code lines] option. Each next line gets the next item, and after the last item the order starts again. An item can have #[code marker], #[code open] and #[code line]. The legend and the tooltip show the same look.
+
+		+codeblock('JS').
+			init({
+				lines: [
+					{ marker: "square" },
+					{ marker: "diamond", open: true, line: "dashed" },
+					{ marker: "circle", line: "dotted" },
+				],
+			});
+
+		p #[code data-marker] and #[code data-line] on a column header still set the look of that one line. On a column chart with a line over it, only the lines count.
+		p If you want this for one chart or one part of a page, add #[code data-chart-lines] to the figure or to an element around it, with the same list as JSON.
+
+		p Some lines do not need to be told apart, such as the lines of a forecast. If you want all lines to look the same, use a list with one item. With #[code marker: "none"], the lines have no points. On one line, #[code data-marker="none"] on its column header does the same.
+
+		.card
+			.demo
+				figure(data-chart="line" data-chart-lines='[{"marker":"none"}]' data-chart-values="last")
+					figcaption: b Possible harvests per tree
+					table
+						thead
+							tr
+								th Year
+								th Low
+								th Lower
+								th Middle
+								th Higher
+								th High
+						tbody
+							each row in [['2025', '30', '30', '30', '30', '30'], ['2026', '27', '31', '33', '35', '37'], ['2027', '29', '29', '31', '40', '35'], ['2028', '26', '33', '38', '37', '44'], ['2029', '28', '36', '42', '46', '52'], ['2030', '25', '34', '40', '51', '49'], ['2031', '23', '38', '47', '49', '60'], ['2032', '26', '35', '44', '58', '67'], ['2033', '22', '39', '51', '63', '74'], ['2034', '24', '41', '55', '66', '86']]
+								tr
+									th= row[0]
+									each value in row.slice(1)
+										td= value
+
+			+codeblock('HTML', null, '1').
+				<figure data-chart="line" data-chart-lines='[{"marker":"none"}]' data-chart-values="last">
+					<figcaption><b>Possible harvests per tree</b></figcaption>
+					<table>
+						<thead>
+							<tr><th>Year</th><th>Low</th><th>Lower</th><th>Middle</th><th>Higher</th><th>High</th></tr>
+						</thead>
+						<tbody>
+							<tr><th>2025</th><td>30</td><td>30</td><td>30</td><td>30</td><td>30</td></tr>
+							<!-- …one row per year, to 2034 -->
+						</tbody>
+					</table>
+				</figure>
+
+		p Your list replaces the 24 looks. If it has three items, the fourth line looks like the first, and only its colour tells them apart. So if your charts can have many lines, the list needs as many items as there are lines.
 
 	+section("Highlight a line")
 		p If the header of a line has #[code data-kind="focus"], that line keeps its colour and shows its numbers. The other lines are shown fainter.
@@ -305,6 +378,8 @@ block content
 					td All values if they fit, and else only the ones after #[code auto].
 
 		p A row with #[code data-value="show"] always shows its value, such as the month a new press came into use. A point is shown where a value is. Each value goes above, below or beside its point, where it is clear of the lines, the names and the other values; a value at a dip tries below first. If there is no such place, it may cross a line, which then stops under the value, but it never covers another value, a name or a point. If two values would still touch, the one that matters less is left out, with its point: first a row with #[code data-value="show"] is kept, then the last value, the first, the highest, the lowest and the outliers.
+
+		p If the lines have names at their ends and #[code data-chart-values] has a set with #[code last], without #[code auto], the last number of each line goes between the end of the line and its name. If lines end close together, their numbers move apart with their names.
 
 		.card
 			.demo

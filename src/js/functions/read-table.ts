@@ -59,8 +59,8 @@ export const readTable = (figure: HTMLElement, langattribute: string | false = "
 const seriesHeads = (figure: HTMLElement): Element[] =>
 	Array.from(figure.querySelector("thead tr:last-child")?.children ?? []).slice(1).filter((head) => !head.hasAttribute("data-note"));
 
-const lineOf = (value: string | null | undefined): "dashed" | "dotted" | null =>
-	value === "dashed" || value === "dotted" ? value : null;
+const lineOf = (value: string | null | undefined): "dashed" | "dotted" | "dash-dot" | null =>
+	value === "dashed" || value === "dotted" || value === "dash-dot" ? value : null;
 
 export const readSeries = (figure: HTMLElement, rows: Row[], langattribute: string | false = "data-i18n"): Series[] => {
 	const heads = seriesHeads(figure);

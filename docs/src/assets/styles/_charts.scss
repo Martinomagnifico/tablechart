@@ -408,3 +408,21 @@
 .card > .lang-toggle {
 	margin: 0;
 }
+
+// The order of the lines: the legend samples, in one colour, in a table.
+.line-looks {
+	overflow-x: auto;
+
+	th, td {
+		white-space: nowrap;
+	}
+	th {
+		text-align: left;
+	}
+	.tablechart-name[data-place="legend"] {
+		display: inline;
+		&::before {
+			background: currentColor;
+		}
+	}
+}

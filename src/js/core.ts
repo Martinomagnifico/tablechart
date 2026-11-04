@@ -52,7 +52,7 @@ import { inkInside, inkNames, measureSurface } from "./functions/colour";
 import { debug } from "./functions/debug";
 import { applySteps, makeControls, planSteps, stepTo } from "./steps";
 import { attachTooltip, releaseTooltip } from "./tooltip";
-import type { AnnotationType, ChartState, ChartType, Geometry, Motion, Row, Shape, ValuePick } from "./types";
+import type { AnnotationType, ChartState, ChartType, Geometry, Motion, Row, Shape, ValuePick, Series } from "./types";
 
 const CHARTS: Record<string, ChartType> = { area, bar, column, donut, line, waterfall };
 /** Adds a chart type for `data-chart="name"`, such as one from `@martinomagnifico/tablechart/additional-types`, before `init()`. */
@@ -193,6 +193,32 @@ const nameTable = (figure: HTMLElement): void => {
 	if (table && !named(table) && !table.querySelector(":scope > caption")) link(table);
 };
 
+/** Every six lines the points start again, with the next line style: 24 looks. */
+const LINE_ROUNDS = [null, "dashed", "dotted", "dash-dot"] as const;
+
+/** The look of each next line, unless its column header has its own: from `data-chart-lines`, the `lines` option, or else the 24 looks. Over columns, only the lines count. */
+const lineStyles = (figure: HTMLElement, series: Series[], kind: string, config: Config): void => {
+	const asked = figure.closest("[data-chart-lines]")?.getAttribute("data-chart-lines");
+	let order = config.lines;
+	if (asked) {
+		try {
+			order = JSON.parse(asked);
+		} catch {
+			console.warn(`[${LIBRARY_NAME}] data-chart-lines needs a JSON list, such as [{"marker":"none"}].`, figure);
+		}
+	}
+	const lines = kind === "line" || kind === "area" ? series : series.filter((one) => one.chart);
+	lines.forEach((one, k) => {
+		if (!order?.length) {
+			one.line ??= LINE_ROUNDS[Math.floor(k / 6) % LINE_ROUNDS.length];
+			return;
+		}
+		const style = order[k % order.length];
+		one.marker ??= style.marker || style.open !== undefined ? [style.marker, style.open ? "open" : "filled"].filter(Boolean).join(" ") : null;
+		if (one.line === null && style.line !== "solid") one.line = style.line ?? null;
+	});
+};
+
 /** Pass 2: everything a reader will read, before a translation script looks. */
 export const build = (
 	figure: HTMLElement,
@@ -243,6 +269,7 @@ export const build = (
 			series = series.map((one) => ({ ...one, chart: null }));
 		}
 	}
+	lineStyles(figure, series, kind, config);
 	const lined = series.some((one) => one.chart);
 	const several = series.length > 1;
 	// How many lines or bars share the colour steps, so the last is not too light.
@@ -942,8 +969,13 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	}
 
 	// The bands give up the room the widest series name needs.
+	const pick = pickOf(state.figure, config);
+	const shape = shapeOf(state.figure, config);
+	// With a chosen set, the last numbers go next to the names, so a line that ends close to another keeps its own number.
+	const numbersAtEnd = !!type.running && names.length > 0 && !state.stacked && shape !== "step" && pick.mode === "set" && pick.keys.includes("last");
+	const endNumbers = numbersAtEnd ? largest(seriesValues.flat().map((label) => sizeOf(label).width)) * unit : 0;
 	const gutter = names.length
-		? largest(names.map((name) => sizeOf(name).width)) * unit + 12 * unit
+		? largest(names.map((name) => sizeOf(name).width)) * unit + 12 * unit + endNumbers
 		: 0;
 	const under = state.categories[0]?.parentElement;
 	if (under) under.style.paddingRight = gutter ? `${(gutter / VIEWBOX_WIDTH) * 100}%` : "";
@@ -1014,8 +1046,9 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		breakGap,
 		domain: valueScale ? [valueScale.min, valueScale.max] : null,
 		stacked: state.stacked,
-		shape: shapeOf(state.figure, config),
-		pick: pickOf(state.figure, config),
+		shape,
+		pick,
+		numbersAtEnd,
 		totals: state.totals,
 		svg,
 		plot,

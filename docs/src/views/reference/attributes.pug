@@ -55,6 +55,9 @@ block content
 					td: code data-chart-legend
 					td Puts the names of the lines in a legend. #[code data-chart-legend="false"] turns it off.
 				tr
+					td: code data-chart-lines
+					td The look of each next line, as a JSON list, also on an element around the figure. See #[a(href=url('/types/line.html#your-own-order')) Your own order]
+				tr
 					td: code data-chart-labels
 					td Puts the numbers of a column or bar chart #[code inside] or #[code outside] the columns or bars
 				tr
@@ -123,10 +126,10 @@ block content
 					td Highlights the line or the bars of this column. The others are shown fainter.
 				tr
 					td: code data-marker
-					td Sets the point of the line: #[code circle], #[code square] or #[code diamond], with #[code open] for an open point
+					td Sets the point of the line: #[code circle], #[code square] or #[code diamond], with #[code open] for an open point, or #[code none] for no points. See #[a(href=url('/types/line.html#your-own-order')) Your own order]
 				tr
 					td: code data-line
-					td Makes the line #[code dashed] or #[code dotted]
+					td Makes the line #[code dashed], #[code dotted] or #[code dash-dot]. See #[a(href=url('/types/line.html#your-own-order')) Your own order]
 				tr
 					td: code data-chart="line"
 					td On a column chart: shows this column as a line over the columns, on the same scale. See #[a(href=url('/types/column.html#columns-and-a-line')) Columns and a line].

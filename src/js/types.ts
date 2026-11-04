@@ -44,7 +44,7 @@ export interface Series {
 	focus: boolean;
 	/** `data-marker` on the header, such as `square` or `diamond open`. */
 	marker: string | null;
-	line: "dashed" | "dotted" | null;
+	line: "dashed" | "dotted" | "dash-dot" | null;
 	/** `data-group` on the header: the cells name a group, such as "Predefined". */
 	group: boolean;
 	/** `data-chart="line"` on the header, in a chart that takes it: a line over the other marks. */
@@ -108,6 +108,8 @@ export interface Geometry {
 	shape: Shape;
 	/** Which values a line or an area shows. */
 	pick: ValuePick;
+	/** The last number of each line goes next to its name. */
+	numbersAtEnd: boolean;
 	/** Empty when the chart is not stacked or its kind shows no totals. */
 	totals: HTMLElement[];
 	svg: SVGSVGElement;
@@ -196,7 +198,7 @@ export interface TooltipLine {
 	/** A small key in the colour of the series. */
 	colour?: string;
 	/** The shape of that key, as in the legend: a line with its point, or a box. */
-	sample?: { marker: string | null; open: boolean; line: string | null; box: boolean };
+	sample?: { marker: string | null; open: boolean; line: string | null; box: boolean; point?: string };
 }
 
 export interface HeadroomInput {
