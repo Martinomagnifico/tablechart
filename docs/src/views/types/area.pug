@@ -119,7 +119,7 @@ block content
 								td= row[3]
 
 	+section("Change the fill")
-		p The fill has the colour of the line, at 25% opacity. If you want to change it, set these variables.
+		p The fill has the colour of the line. It is 40% opaque at the top of the chart and fades to 5% at the baseline. All areas fade over the same height, so a low area is fainter than a high one. Below zero, the fill fades towards the zero line. Stacked areas have one opacity and no fade. If you want to change it, set these variables. If both opacities are the same, the fill is flat.
 
 		table
 			thead
@@ -129,7 +129,10 @@ block content
 			tbody
 				tr
 					td: code --tablechart-area-opacity
-					td The opacity of the fill. The default is #[code 0.25].
+					td The opacity of the fill at the top of the chart. The default is #[code 0.4], and #[code 0.5] when stacked.
+				tr
+					td: code --tablechart-area-fade
+					td The opacity of the fill at the baseline. The default is #[code 0.05].
 				tr
 					td: code --tablechart-area-color
 					td The colour of the fill. By default, the colour of the line.

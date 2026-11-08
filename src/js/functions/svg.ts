@@ -1,3 +1,4 @@
+import { FADE_STOP_CLASS } from "../config";
 const SVGNS = "http://www.w3.org/2000/svg";
 
 /** Two decimals: a hundredth of a viewBox unit is far less than a pixel. */
@@ -40,6 +41,7 @@ export const placeAt = (
 
 let cuts = 0;
 let clips = 0;
+let fades = 0;
 
 const defsOf = (svg: SVGSVGElement): SVGDefsElement => {
 	let defs = svg.querySelector<SVGDefsElement>(":scope > defs");
@@ -48,6 +50,41 @@ const defsOf = (svg: SVGSVGElement): SVGDefsElement => {
 		svg.prepend(defs);
 	}
 	return defs;
+};
+
+/** Rounds the marked end of each bar: an SVG `rect` can only round all its corners, so it becomes a `path`. Last, as a break in the scale reads the rects. */
+export const roundEnds = (svg: SVGSVGElement, radius: number): void => {
+	for (const rect of svg.querySelectorAll<SVGRectElement>("rect[data-end]")) {
+		const [x, y, w, h] = ["x", "y", "width", "height"].map((name) => Number(rect.getAttribute(name)));
+		const end = rect.getAttribute("data-end");
+		const sideways = end === "left" || end === "right";
+		const r = short(Math.min(radius, sideways ? h / 2 : w / 2, sideways ? w : h));
+		const arc = (dx: number, dy: number) => `a${r},${r} 0 0 1 ${dx},${dy}`;
+		const d = {
+			top: `M${x},${short(y + h)}v${short(r - h)}${arc(r, -r)}h${short(w - 2 * r)}${arc(r, r)}v${short(h - r)}z`,
+			bottom: `M${short(x + w)},${y}v${short(h - r)}${arc(-r, r)}h${short(2 * r - w)}${arc(-r, -r)}v${short(r - h)}z`,
+			right: `M${x},${y}h${short(w - r)}${arc(r, r)}v${short(h - 2 * r)}${arc(-r, r)}h${short(r - w)}z`,
+			left: `M${short(x + w)},${short(y + h)}h${short(r - w)}${arc(-r, -r)}v${short(2 * r - h)}${arc(r, -r)}h${short(w - r)}z`,
+		}[end as "top"];
+		const path = svgEl("path", { d });
+		for (const { name, value } of Array.from(rect.attributes)) if (!["x", "y", "width", "height"].includes(name)) path.setAttribute(name, value);
+		rect.replaceWith(path);
+	}
+};
+
+/** A fill that fades towards `zero`, from `top` and from `bottom`; its colours are in the CSS. Returns its id. */
+export const fadeFill = (svg: SVGSVGElement, top: number, zero: number, bottom: number, attrs: Record<string, string>): string => {
+	const id = `tablechart-fade-${++fades}`;
+	const fill = svgEl("linearGradient", { id, gradientUnits: "userSpaceOnUse", x1: 0, x2: 0, y1: short(top), y2: short(bottom), ...attrs });
+	const stops = [
+		...(top < zero ? [{ offset: 0, faded: false }] : []),
+		{ offset: bottom > top ? (zero - top) / (bottom - top) : 0, faded: true },
+		...(bottom > zero ? [{ offset: 1, faded: false }] : []),
+	];
+	for (const { offset, faded } of stops)
+		fill.appendChild(svgEl("stop", { class: FADE_STOP_CLASS, offset: short(offset), ...(faded && { "data-faded": "" }) }));
+	defsOf(svg).appendChild(fill);
+	return id;
 };
 
 /** The outline of a hole `rect`, its rounded corners included, so a badge of 50% radius leaves an ellipse. */

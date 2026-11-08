@@ -45,7 +45,7 @@ import { fitTogether, keepInside, thinOut } from "./functions/labels";
 import { measureAll, sizeOf } from "./functions/measure";
 import type { Squeeze } from "./functions/scale";
 import { readSeries, readTable } from "./functions/read-table";
-import { clipAround, cutOut, htmlEl, placeAt, short, svgEl } from "./functions/svg";
+import { clipAround, cutOut, htmlEl, placeAt, roundEnds, short, svgEl } from "./functions/svg";
 import { niceStep, readScale, type Scale, scaleOf, thin, ticksOf } from "./functions/axis";
 import type { Box } from "./functions/collision";
 import { inkInside, inkNames, measureSurface } from "./functions/colour";
@@ -1033,6 +1033,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		length: (name, fallback) => cssLength(state.figure, unit, name, fallback),
 		barWidth: Math.min(band * config.barfill, barMax(state.figure, unit)),
 		barMax: barMax(state.figure, unit),
+		barRadius: cssLength(state.figure, unit, "--tablechart-bar-radius", "0px") ?? 0,
 		height,
 		unit,
 		labelHeight,
@@ -1332,6 +1333,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		(type.columns ? [state.categories] : [...seriesValues, state.totals]).some((all) => all.some((label) => !skip(label) && !seen(label) && !covered(label, all)))
 	);
 
+	if (geo.barRadius) roundEnds(svg, geo.barRadius);
 	measureSurface(state.figure);
 	inkInside(state.figure);
 	inkNames(state.figure);

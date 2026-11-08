@@ -5,7 +5,7 @@ import { markerEl, markerOf } from "../functions/markers";
 import { boxOf, spread, stepOf } from "../functions/labels";
 import { avoidCollisions, overlaps, type Box } from "../functions/collision";
 import { curveTo, fixed, tangentsWithGaps } from "../functions/smooth";
-import { cutOut, placeAt, svgEl } from "../functions/svg";
+import { cutOut, fadeFill, placeAt, svgEl } from "../functions/svg";
 import { trendOf } from "../functions/trend";
 import type { Cell, ChartType, Geometry, Row, Segment } from "../types";
 
@@ -120,12 +120,18 @@ const trend = (area: boolean): ChartType => ({
 		const leftOf = (a: number) => cx(a) - (step ? band / 2 : 0);
 		const rightOf = (b: number) => cx(b) + (step ? band / 2 : 0);
 
+		// Every area fades over the same height, so the same height has the same strength. A stack stays flat: its bands are the data.
+		const levels = stacked ? [] : own.flatMap((s) => rows.flatMap((_row, i) => (missing(s, i) ? [] : [y(topValue(s, i))])));
+		const [highest, lowest] = levels.reduce(([top, bottom], level) => [Math.min(top, level), Math.max(bottom, level)], [baseline, baseline]);
+		const fadeOf = (s: number) =>
+			`fill:url(#${fadeFill(svg, highest, baseline, lowest, { style: marks[s].ink, ...(focused && !series[s].focus && { "data-muted": "" }) })}); `;
+
 		const drawArea = (s: number) => {
 			const group = svgEl("g", {
 				class: AREA_CLASS,
 				...marks[s].attrs,
 				...(stacked && { "data-stacked": "" }),
-				style: marks[s].ink,
+				style: `${marks[s].ink}${stacked ? "" : fadeOf(s)}`,
 			});
 			const runs = runsOf(s);
 			const fill = svgEl("g", {
@@ -355,6 +361,16 @@ const trend = (area: boolean): ChartType => ({
 			if (width > rowsWide * band - 4 * unit) return true;
 			// A part below zero lies over the part under it, so its number would cover that one's.
 			if (stacked && s > 0 && topValue(s, i) < bottomValue(s, i)) return true;
+			// A number at an end is moved inwards, past the points of its row.
+			if (stacked && !step && i > 0 && i < last) {
+				const middle = (y(bottomValue(s, i)) + y(topValue(s, i))) / 2;
+				const box: Box = [cx(i) - width / 2, middle - labelHeight / 2, width, labelHeight];
+				const covered = own.some((o) => {
+					const [px, py] = pointAt(o, i);
+					return !missing(o, i) && overlaps([px - 4 * unit, py - 4 * unit, 8 * unit, 8 * unit], box);
+				});
+				if (covered) return true;
+			}
 			return stacked && Math.abs(y(bottomValue(s, i)) - y(topValue(s, i))) < labelHeight * 1.2;
 		};
 

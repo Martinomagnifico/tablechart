@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.3.0] - Unreleased
+
+### Added
+
+- `--tablechart-bar-radius`, rounded ends on columns and bars.
+- `--tablechart-area-fade`, the opacity of an area at the baseline.
+
+### Changed
+
+- Areas fade towards the baseline. Stacked areas stay flat.
+
+### Fixed
+
+- A number on a stacked area no longer covers a point.
+
 ## [1.2.4] - 2026-11-05
 
 ### Added

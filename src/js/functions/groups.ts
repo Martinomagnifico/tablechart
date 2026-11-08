@@ -87,6 +87,10 @@ export const inkOf = (label: HTMLElement, geo: Geometry, s: number): void => {
 	label.style.setProperty("--palette", `var(--tablechart-color-${s + 1})`);
 };
 
+/** Marks the end of a bar that shows its value, to be rounded when `--tablechart-bar-radius` is set. */
+export const endOf = (geo: Geometry, side: "top" | "bottom" | "left" | "right"): Record<string, string> =>
+	geo.barRadius ? { "data-end": side } : {};
+
 /** Whether another piece of the stack starts where this one ends, so this one leaves a gap at its far end. Not at zero, not at the end. */
 export const gapAfter = (pieces: StackPiece[], k: number): boolean =>
 	pieces.some((other, j) => j !== k && !other.cell.missing && other.to !== other.from && other.from === pieces[k].to);

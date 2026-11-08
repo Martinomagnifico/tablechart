@@ -3,7 +3,7 @@ import { largest } from "../functions/format";
 import { sizeOf } from "../functions/measure";
 import { BAR_CLASS, RULE_CLASS, VIEWBOX_WIDTH } from "../config";
 import { timing } from "../functions/timing";
-import { gapAfter, groupLayout, inkOf, seriesMark, stackMarks, stackOf, stackReach } from "../functions/groups";
+import { endOf, gapAfter, groupLayout, inkOf, seriesMark, stackMarks, stackOf, stackReach } from "../functions/groups";
 import { fitsLength, fitTogether } from "../functions/labels";
 import { placeAt, svgEl, withRow } from "../functions/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
@@ -136,7 +136,7 @@ export const bar: ChartType = {
 					// A gap in the background colour before the next piece, at the far end; the end at zero stays on the baseline.
 					const gap = gapAfter(pieces, s) ? Math.min(stackGap, (end - start) / 2) : 0;
 					const [shownStart, shownEnd] = x(to) > x(from) ? [start, end - gap] : [start + gap, end];
-					piece(s, { x: shownStart, y: top, width: Math.max(shownEnd - shownStart, 1), height: thickness, ...(to < from && { "data-grow": "left" }) });
+					piece(s, { x: shownStart, y: top, width: Math.max(shownEnd - shownStart, 1), height: thickness, ...(to < from && { "data-grow": "left" }), ...(!gapAfter(pieces, s) && endOf(geo, to < from ? "left" : "right")) });
 					// A number too big for its piece is left out until its row is pointed at.
 					label.dataset.place = "inside";
 					label.toggleAttribute(
@@ -188,6 +188,7 @@ export const bar: ChartType = {
 								y: top,
 								width: wide,
 								height: layout.size,
+								...endOf(geo, back ? "left" : "right"),
 								...seriesMark(geo, row, s),
 							})
 						);
@@ -243,6 +244,7 @@ export const bar: ChartType = {
 						y: middle - thickness / 2,
 						width: wide,
 						height: thickness,
+						...endOf(geo, back ? "left" : "right"),
 						style: timing("--i", seg.slot),
 					})
 				);

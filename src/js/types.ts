@@ -82,6 +82,8 @@ export interface Geometry {
 	length: (name: string, fallback: string) => number | null;
 	barWidth: number;
 	barMax: number;
+	/** How round the end of a bar is, in viewBox units; 0 for square. */
+	barRadius: number;
 	height: number;
 	/** viewBox units per screen pixel. */
 	unit: number;

@@ -55,18 +55,28 @@
 // The opacity is on the group, so the pieces of one area do not show where they meet.
 .tablechart-area {
 	fill: var(--tablechart-area-color, #{$seriesink});
-	opacity: var(--tablechart-area-opacity, 0.25);
 
-	&[data-muted] {
-		opacity: calc(var(--tablechart-area-opacity, 0.25) / 2);
-	}
-
-	// Stacked areas do not overlap, so they are less see-through.
+	// Stacked areas do not overlap, so they are less see-through, and flat.
 	&[data-stacked] {
 		opacity: var(--tablechart-area-opacity, 0.5);
 	}
 	&[data-stacked][data-muted] {
 		opacity: calc(var(--tablechart-area-opacity, 0.5) / 2);
+	}
+}
+
+.tablechart-area-stop {
+	stop-color: var(--tablechart-area-color, #{$seriesink});
+	stop-opacity: var(--tablechart-area-opacity, 0.4);
+
+	&[data-faded] {
+		stop-opacity: var(--tablechart-area-fade, 0.05);
+	}
+	[data-muted] > & {
+		stop-opacity: calc(var(--tablechart-area-opacity, 0.4) / 2);
+	}
+	[data-muted] > &[data-faded] {
+		stop-opacity: calc(var(--tablechart-area-fade, 0.05) / 2);
 	}
 }
 

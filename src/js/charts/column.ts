@@ -1,7 +1,7 @@
 import { sizeOf } from "../functions/measure";
 import { BAR_CLASS, RULE_CLASS, VIEWBOX_WIDTH } from "../config";
 import { timing } from "../functions/timing";
-import { gapAfter, groupLayout, inkOf, seriesMark, stackMarks, stackOf, stackReach } from "../functions/groups";
+import { endOf, gapAfter, groupLayout, inkOf, seriesMark, stackMarks, stackOf, stackReach } from "../functions/groups";
 import { fitTogether, tallEnough, tooWide } from "../functions/labels";
 import { placeAt, svgEl, withRow } from "../functions/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
@@ -43,7 +43,7 @@ export const column: ChartType = {
 					// A gap in the background colour before the next piece, at the far end; the end at zero stays on the baseline.
 					const gap = gapAfter(pieces, s) ? Math.min(stackGap, (bottom - top) / 2) : 0;
 					const [shownTop, shownBottom] = y(to) < y(from) ? [top + gap, bottom] : [top, bottom - gap];
-					piece(s, { x, y: shownTop, width: barWidth, height: Math.max(shownBottom - shownTop, 1), ...(to < from && { "data-grow": "down" }) });
+					piece(s, { x, y: shownTop, width: barWidth, height: Math.max(shownBottom - shownTop, 1), ...(to < from && { "data-grow": "down" }), ...(!gapAfter(pieces, s) && endOf(geo, to < from ? "bottom" : "top")) });
 					// A number too big for its piece is left out until its row is pointed at.
 					label.dataset.place = "inside";
 					label.toggleAttribute(
@@ -101,6 +101,7 @@ export const column: ChartType = {
 								y: below ? baseline : baseline - tall,
 								width: layout.size,
 								height: tall,
+								...endOf(geo, below ? "bottom" : "top"),
 								...seriesMark(geo, row, s),
 							})
 						);
@@ -162,6 +163,7 @@ export const column: ChartType = {
 						y: below ? baseline : baseline - tall,
 						width: barWidth,
 						height: tall,
+						...endOf(geo, below ? "bottom" : "top"),
 						style: timing("--i", seg.slot),
 						...(mixed && seriesMark(geo, seg, own)),
 					})

@@ -9,7 +9,7 @@ block content
 		.container
 			.page-header
 				h1 Parts of a chart
-				p.lead Lines and points, the baseline, connectors, the badge and the bar width.
+				p.lead Lines and points, the baseline, connectors, the badge, the bar width and rounded ends.
 
 	+section("Lines and points")
 		p These variables set the lines of a line chart or an area chart, and their points. The colours of the lines are on #[a(href=url('/styling/colours.html')) Colours]. Which line has which point and pattern is on #[a(href=url('/types/line.html#points')) Line].
@@ -62,7 +62,7 @@ block content
 					td: code --tablechart-point-color
 					td The points on a line, also in the legend and the tooltip: the colour of the line by default
 				tr
-					td #[code --tablechart-area-color] / #[code -opacity]
+					td #[code --tablechart-area-color] / #[code -opacity] / #[code -fade]
 					td The fill under a line, in an area chart
 
 	+section("Baseline and connectors")
@@ -122,6 +122,19 @@ block content
 								th= row[0]
 								td= row[1]
 
+	+section("Rounded ends")
+		p #[code --tablechart-bar-radius] rounds the end of a column or bar that shows its value, in #[code px] or #[code em]. The end at the baseline stays square. In a stack, only the outer end of the stack is rounded. A column shorter than the radius gets a smaller radius. A waterfall stays square.
+
+		+chart(null, '1')
+			figure(data-chart="column" style="--tablechart-bar-radius: 4px")
+				table
+					tbody
+						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '91']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+
+	+section("All variables")
 		table
 			thead
 				tr
@@ -152,3 +165,6 @@ block content
 				tr
 					td: code --tablechart-bar-max
 					td The widest a bar may be: 60px by default
+				tr
+					td: code --tablechart-bar-radius
+					td How round the end of a column or bar is: 0 by default

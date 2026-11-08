@@ -72,6 +72,7 @@ block content
 		+vars([
 			['--tablechart-bar-color', 'The text colour', 'All bars and a single line'],
 			['--tablechart-bar-max', '<code>60px</code>', 'The widest a bar may be'],
+			['--tablechart-bar-radius', '<code>0</code>', 'How round the end of a column or bar is, in <code>px</code> or <code>em</code>'],
 			['--tablechart-value-contrast', '<code>5</code>, or <code>60</code> with APCA', 'The contrast a number inside a bar needs, as in 5:1 or Lc 60. If its colour has less, the number gets to be black or white, to achieve better contrast'],
 			['--tablechart-value-on-dark', 'The measured background; the text colour on a dark background', 'The colour of a number on a dark bar'],
 			['--tablechart-value-on-light', 'The text colour; the measured background on a dark background', 'The colour of a number on a light bar'],
@@ -91,7 +92,8 @@ block content
 	+section("Lines and areas")
 		+vars([
 			['--tablechart-area-color', 'The colour of its line', 'The fill under a line, in an area chart'],
-			['--tablechart-area-opacity', '<code>0.25</code>, <code>0.5</code> when stacked', 'The opacity of that fill'],
+			['--tablechart-area-fade', '<code>0.05</code>', 'The opacity of that fill at the baseline. Stacked areas have no fade'],
+			['--tablechart-area-opacity', '<code>0.4</code>, <code>0.5</code> when stacked', 'The opacity of that fill at the top of the chart'],
 			['--tablechart-point-color', 'The colour of its line', 'The points on a line'],
 			['--tablechart-series-color', 'The bar colour', 'Lines without a palette. Each next line is lighter'],
 			['--tablechart-series-color-end', 'None', 'An end colour: the lines or parts then go from the first colour to this one, in even steps'],

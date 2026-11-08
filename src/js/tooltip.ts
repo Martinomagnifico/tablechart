@@ -112,7 +112,8 @@ const arrived = (state: ChartState, element: Element | undefined): element is HT
 
 // The colour of a series, from its first mark: its fill, or the stroke of a line.
 const colourOf = (state: ChartState, series: number): string | undefined => {
-	const mark = state.svg.querySelector(`[data-series="${series + 1}"]:not(.tablechart-hole)`);
+	// An area that fades has no one colour; its line does.
+	const mark = state.svg.querySelector(`[data-series="${series + 1}"]:not(.tablechart-hole, .tablechart-area:not([data-stacked]))`);
 	if (!mark) return undefined;
 	const style = getComputedStyle(mark);
 	return style.fill && style.fill !== "none" ? style.fill : style.stroke;

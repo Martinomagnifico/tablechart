@@ -22,6 +22,7 @@ export const DIVIDE_CLASS = "tablechart-divide";
 export const SERIES_CLASS = "tablechart-series";
 export const AREA_CLASS = "tablechart-area";
 export const AREA_FILL_CLASS = "tablechart-area-fill";
+export const FADE_STOP_CLASS = "tablechart-area-stop";
 export const NAME_CLASS = "tablechart-name";
 export const LEGEND_CLASS = "tablechart-legend";
 export const POINT_CLASS = "tablechart-point";
