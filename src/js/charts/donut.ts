@@ -36,7 +36,7 @@ export const donut: ChartType = {
 	segments: (rows: Row[]): Segment[] =>
 		rows.map((row) => ({ ...row, from: 0, to: row.value, kind: "bar" as const })),
 
-	draw({ rows, height, unit, labelHeight, svg, values, config, centre }: Geometry) {
+	draw({ rows, height, unit, labelHeight, svg, values, config, centre, sliceRadius }: Geometry) {
 		const middleX = VIEWBOX_WIDTH / 2;
 		const middleY = height / 2;
 
@@ -147,12 +147,10 @@ export const donut: ChartType = {
 					})
 				);
 			}
-			const style = getComputedStyle(svg);
-			const asked = Number.parseFloat(style.getPropertyValue("--tablechart-slice-radius")) || 0;
-			if (asked > 0) {
-				const gap = Number.parseFloat(style.getPropertyValue("--tablechart-slice-gap").trim() || "4");
+			if (sliceRadius > 0) {
+				const gap = Number.parseFloat(getComputedStyle(svg).getPropertyValue("--tablechart-slice-gap").trim() || "4");
 				const edges = [radius - thickness / 2, radius + thickness / 2];
-				const roundOf = (k: number) => Math.min(asked, thickness / 2, Math.max((sweeps[k] * edges[0] - gap) / 2, 0));
+				const roundOf = (k: number) => Math.min(sliceRadius, thickness / 2, Math.max((sweeps[k] * edges[0] - gap) / 2, 0));
 				partings.forEach((angle, k) => {
 					const before = roundOf((k - 1 + partings.length) % partings.length);
 					for (const [side, r] of [[1, roundOf(k)], [-1, before]] as const) {

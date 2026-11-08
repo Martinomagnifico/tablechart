@@ -84,6 +84,8 @@ export interface Geometry {
 	barMax: number;
 	/** How round the end of a bar is, in viewBox units; 0 for square. */
 	barRadius: number;
+	/** How round the corners of a donut's slices are, in viewBox units; 0 for square. */
+	sliceRadius: number;
 	height: number;
 	/** viewBox units per screen pixel. */
 	unit: number;

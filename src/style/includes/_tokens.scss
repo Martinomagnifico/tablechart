@@ -64,7 +64,9 @@ $seriesink: "var(--tablechart-series-own-color, color-mix(in oklab, #{$seriesown
 // A legend is as wide as its items and centred, and wraps when they do not fit.
 // In a sample of a line, the point gets its own colour: only the middle of the sample, as wide as the point in `--_band`.
 @mixin sample-point {
-	background-image: linear-gradient(var(--tablechart-point-color), var(--tablechart-point-color));
+	// Through `color`, as an image cannot fade with the build and the background colour can.
+	color: var(--tablechart-point-color, transparent);
+	background-image: linear-gradient(currentColor, currentColor);
 	background-size: var(--_band, 0) 100%;
 	background-position: center;
 	background-repeat: no-repeat;

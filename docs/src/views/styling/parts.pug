@@ -19,7 +19,7 @@ block content
 				--tablechart-series-width: 3px;
 				--tablechart-series-dash: 10 6;
 				--tablechart-series-dash-dot: 10 6 0 6;
-				--tablechart-point-color: light-dark(#8a1c2c, #ffb4a8);
+				--tablechart-point-color: light-dark(#c8500a, #ffb366);
 			}
 
 		+chart(null, '1')
@@ -90,7 +90,7 @@ block content
 								th= row[0]
 								td= row[1]
 
-	+section("The badge")
+	+section("Badges")
 		p The badge of an annotation, such as a bracket, a trend arrow or a note, is a box with rounded corners by default. These variables set its corners, padding and background. For an ellipse, set the corners to #[code 50%], with more padding at the sides, so the text stays clear of the curve:
 
 		+style.
@@ -123,10 +123,12 @@ block content
 								td= row[1]
 
 	+section("Rounded ends")
-		p #[code --tablechart-bar-radius] rounds the end of a column or bar that shows its value, in #[code px] or #[code em]. The end at the baseline stays square. In a stack, only the outer end of the stack is rounded. A column shorter than the radius gets a smaller radius. A waterfall stays square.
+		p #[code --tablechart-corner-radius] rounds the corners of columns, bars and donut slices, in #[code px] or #[code em]. If one of them needs another value, #[code --tablechart-bar-radius] sets it for columns and bars, and #[code --tablechart-slice-radius] for slices.
+
+		p On a column or bar, the end that shows the value gets rounded. The end at the baseline stays square. In a stack, only the outer end of the stack is rounded. A column shorter than the radius gets a smaller radius. A waterfall stays square.
 
 		+chart(null, '1')
-			figure(data-chart="column" style="--tablechart-bar-radius: 4px")
+			figure(data-chart="column" style="--tablechart-corner-radius: 6px")
 				table
 					tbody
 						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '91']]
@@ -135,10 +137,10 @@ block content
 								td= row[1]
 
 	+section("Rounded slices")
-		p #[code --tablechart-slice-radius] rounds the corners of the slices of a donut. It has the units of #[code --tablechart-slice-gap] and grows with the ring. A thin slice gets a smaller radius.
+		p #[code --tablechart-corner-radius] also rounds the corners of the slices of a donut. A thin slice gets a smaller radius.
 
 		+chart(null, '1')
-			figure(data-chart="donut" style="--tablechart-slice-radius: 8;")
+			figure(data-chart="donut" style="--tablechart-corner-radius: 6px")
 				table
 					tbody
 						each row in [['Elstar', '42'], ['Jonagold', '28'], ['Gala', '18'], ['Cox', '12']]
@@ -178,8 +180,11 @@ block content
 					td: code --tablechart-bar-max
 					td The widest a bar may be: 60px by default
 				tr
-					td: code --tablechart-slice-radius
-					td How round the corners of a slice are: 0 by default
+					td: code --tablechart-corner-radius
+					td How round the corners of columns, bars and slices are: 0 by default
 				tr
 					td: code --tablechart-bar-radius
-					td How round the end of a column or bar is: 0 by default
+					td The same, for columns and bars only
+				tr
+					td: code --tablechart-slice-radius
+					td The same, for slices only

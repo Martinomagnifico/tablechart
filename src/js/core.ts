@@ -594,6 +594,10 @@ const cssLength = (figure: HTMLElement, unit: number, name: string, fallback: st
 	return amount * size * unit;
 };
 
+/** A corner of a column, bar or slice: its own variable, or else the one for all of them. */
+const cornerOf = (figure: HTMLElement, unit: number, name: string): number =>
+	cssLength(figure, unit, getComputedStyle(figure).getPropertyValue(name).trim() ? name : "--tablechart-corner-radius", "0px") ?? 0;
+
 const barMax = (figure: HTMLElement, unit: number): number =>
 	cssLength(figure, unit, "--tablechart-bar-max", "60px") ?? Number.POSITIVE_INFINITY;
 
@@ -1033,7 +1037,8 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		length: (name, fallback) => cssLength(state.figure, unit, name, fallback),
 		barWidth: Math.min(band * config.barfill, barMax(state.figure, unit)),
 		barMax: barMax(state.figure, unit),
-		barRadius: cssLength(state.figure, unit, "--tablechart-bar-radius", "0px") ?? 0,
+		barRadius: cornerOf(state.figure, unit, "--tablechart-bar-radius"),
+		sliceRadius: cornerOf(state.figure, unit, "--tablechart-slice-radius"),
 		height,
 		unit,
 		labelHeight,

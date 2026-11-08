@@ -1,11 +1,15 @@
 # Changelog
 
+## [1.2.6] - 2026-11-08
+
+### Added
+- `--tablechart-corner-radius`, rounded corners on columns, bars and donut slices.
+
+
 ## [1.2.5] - 2026-11-08
 
 ### Added
-
-- `--tablechart-bar-radius`, rounded ends on columns and bars.
-- `--tablechart-slice-radius`, rounded corners on donut slices.
+- `--tablechart-bar-radius` and `--tablechart-slice-radius`, for one of them only.
 - `--tablechart-area-fade`, the opacity of an area at the baseline.
 
 ### Changed

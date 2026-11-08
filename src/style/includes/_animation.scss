@@ -352,7 +352,7 @@
 			transition-duration: 0s;
 		}
 		:where(.tablechart-name)::before {
-			transition: background-color #{$fade} ease;
+			transition: background-color #{$fade} ease, color #{$fade} ease;
 			transition-delay: calc(var(--i) * #{$stagger} + 0.096 * #{$duration});
 		}
 		:where(.tablechart-reference) {
@@ -401,6 +401,7 @@
 	}
 	[data-animate]:not([data-steps]):not(.is-shown) .tablechart-name::before {
 		background-color: transparent;
+		color: transparent;
 	}
 	[data-animate]:not([data-steps]):not(.is-shown) .tablechart-reference {
 		stroke-opacity: 0;
