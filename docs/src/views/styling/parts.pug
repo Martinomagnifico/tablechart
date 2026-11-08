@@ -2,14 +2,14 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Styling | Parts of a chart"
-	- pagedescription = "Styling lines and points, the baseline, waterfall connectors, badges and bar width in Tablechart."
+	- pagedescription = "Styling lines and points, the baseline, waterfall connectors, badges, bar width and rounded ends in Tablechart."
 
 block content
 	.lane
 		.container
 			.page-header
 				h1 Parts of a chart
-				p.lead Lines and points, the baseline, connectors, the badge, the bar width and rounded ends.
+				p.lead Lines and points, the baseline, connectors, the badge, the bar width and rounded ends and slices.
 
 	+section("Lines and points")
 		p These variables set the lines of a line chart or an area chart, and their points. The colours of the lines are on #[a(href=url('/styling/colours.html')) Colours]. Which line has which point and pattern is on #[a(href=url('/types/line.html#points')) Line].
@@ -134,6 +134,18 @@ block content
 								th= row[0]
 								td= row[1]
 
+	+section("Rounded slices")
+		p #[code --tablechart-slice-radius] rounds the corners of the slices of a donut. It has the units of #[code --tablechart-slice-gap] and grows with the ring. A thin slice gets a smaller radius.
+
+		+chart(null, '1')
+			figure(data-chart="donut" style="--tablechart-slice-radius: 8;")
+				table
+					tbody
+						each row in [['Elstar', '42'], ['Jonagold', '28'], ['Gala', '18'], ['Cox', '12']]
+							tr
+								th= row[0]
+								td= row[1]
+
 	+section("All variables")
 		table
 			thead
@@ -165,6 +177,9 @@ block content
 				tr
 					td: code --tablechart-bar-max
 					td The widest a bar may be: 60px by default
+				tr
+					td: code --tablechart-slice-radius
+					td How round the corners of a slice are: 0 by default
 				tr
 					td: code --tablechart-bar-radius
 					td How round the end of a column or bar is: 0 by default

@@ -5,6 +5,7 @@
 ### Added
 
 - `--tablechart-bar-radius`, rounded ends on columns and bars.
+- `--tablechart-slice-radius`, rounded corners on donut slices.
 - `--tablechart-area-fade`, the opacity of an area at the baseline.
 
 ### Changed

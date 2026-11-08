@@ -1,8 +1,25 @@
 import { sizeOf } from "../functions/measure";
 import { DIVIDE_CLASS, LEADER_CLASS, SLICE_CLASS, VIEWBOX_WIDTH } from "../config";
 import { sweepTiming, timing } from "../functions/timing";
-import { placeAt, svgEl, withRow } from "../functions/svg";
+import { placeAt, short, svgEl, withRow } from "../functions/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
+
+/** What the mask cuts from a corner of a slice: between its side, the edge of the ring and an arc that touches both. */
+const cornerCut = (cx: number, cy: number, angle: number, ring: number, side: number, half: number, r: number, outer: boolean): string => {
+	const at = (u: number, v: number) => [cx + u * Math.cos(angle) - side * v * Math.sin(angle), cy + u * Math.sin(angle) + side * v * Math.cos(angle)];
+	const centreRing = outer ? ring - r : ring + r;
+	const u = Math.sqrt(Math.max(centreRing ** 2 - (half + r) ** 2, 0));
+	const ringTouch = ring / centreRing;
+	const past = outer ? ring + 8 : ring - 3;
+	const beyond = past / centreRing;
+	const inGap = Math.max(half - 1, 0);
+	const [ax, ay] = at(u * ringTouch, (half + r) * ringTouch);
+	const [lx, ly] = at(u, half);
+	const [mx, my] = at(u, half + r);
+	const sweep = (ax - mx) * (ly - my) - (ay - my) * (lx - mx) > 0 ? 1 : 0;
+	const point = (p: number[]) => `${short(p[0])},${short(p[1])}`;
+	return `M${point([ax, ay])}A${short(r)},${short(r)} 0 0 ${sweep} ${point([lx, ly])}L${point(at(u, inGap))}L${point(at(past, inGap))}L${point(at(u * beyond, (half + r) * beyond))}Z`;
+};
 
 let masks = 0;
 
@@ -36,6 +53,7 @@ export const donut: ChartType = {
 
 		// Kept until every slice is drawn, because the partings go over them.
 		const partings: number[] = [];
+		const sweeps: number[] = [];
 
 		let run = 0;
 		let part = 0;
@@ -55,6 +73,7 @@ export const donut: ChartType = {
 			const arc = share * circumference;
 			const angle = (run / circumference) * 2 * Math.PI - Math.PI / 2;
 			partings.push(angle);
+			sweeps.push((arc / circumference) * 2 * Math.PI);
 
 			svg.appendChild(
 				svgEl("circle", {
@@ -127,6 +146,19 @@ export const donut: ChartType = {
 						y2: middleY + Math.sin(angle) * outer2,
 					})
 				);
+			}
+			const style = getComputedStyle(svg);
+			const asked = Number.parseFloat(style.getPropertyValue("--tablechart-slice-radius")) || 0;
+			if (asked > 0) {
+				const gap = Number.parseFloat(style.getPropertyValue("--tablechart-slice-gap").trim() || "4");
+				const edges = [radius - thickness / 2, radius + thickness / 2];
+				const roundOf = (k: number) => Math.min(asked, thickness / 2, Math.max((sweeps[k] * edges[0] - gap) / 2, 0));
+				partings.forEach((angle, k) => {
+					const before = roundOf((k - 1 + partings.length) % partings.length);
+					for (const [side, r] of [[1, roundOf(k)], [-1, before]] as const) {
+						if (r > 0) for (const edge of edges) mask.appendChild(svgEl("path", { d: cornerCut(middleX, middleY, angle, edge, side, gap / 2, r, edge === edges[1]), fill: "black" }));
+					}
+				});
 			}
 			const group = svgEl("g", { mask: `url(#${id})` });
 			for (const slice of Array.from(svg.querySelectorAll(`.${SLICE_CLASS}`))) group.appendChild(slice);
