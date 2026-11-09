@@ -1,7 +1,7 @@
 // Charts in a `data-chart-group` with `data-chart-group-scale`: they agree on one scale and, per line of the page, one height.
 import type { Config } from "../config";
 import type { ChartState } from "../types";
-import { largest } from "./format";
+import { largest } from "../shared/format";
 
 /** The charts of the group of this figure, and whether they share one scale. */
 const groupOf = (figure: HTMLElement) => {

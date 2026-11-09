@@ -1,15 +1,15 @@
-import "../style/tablechart.scss";
+import "../../style/tablechart.scss";
 
-import { type Config, defaultConfig, LIBRARY_NAME, PRINTING_CLASS } from "./config";
-import { animated, build, layout, putMasksOn, relabel, setShown, unbuild } from "./core";
-import { inkInside, inkNames, measureSurface } from "./functions/colour";
-import { checkContrast, checkOldColours, checkTextContrast } from "./functions/contrast";
-import { debug } from "./functions/debug";
-import { assignKeys } from "./functions/read-table";
-import { adoptTables, loadSources, readMarkdownRows } from "./functions/sources";
+import { type Config, defaultConfig, LIBRARY_NAME, PRINTING_CLASS } from "../config";
+import { animated, build, layout, putMasksOn, relabel, setShown, unbuild } from "../core";
+import { inkInside, inkNames, measureSurface } from "../colour/colour";
+import { checkContrast, checkOldColours, checkTextContrast } from "../colour/contrast";
+import { debug } from "../shared/debug";
+import { assignKeys } from "../build/read-table";
+import { adoptTables, loadSources, readMarkdownRows } from "../build/sources";
 import { stepTo } from "./steps";
 import { releaseTooltip } from "./tooltip";
-import type { ChartState } from "./types";
+import type { ChartState } from "../types";
 
 export interface TablechartChart {
 	figure: HTMLElement;

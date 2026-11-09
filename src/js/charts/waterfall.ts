@@ -1,8 +1,8 @@
-import { sizeOf } from "../functions/measure";
+import { sizeOf } from "../layout/measure";
 import { BAR_CLASS, CONNECTOR_CLASS, LIBRARY_NAME, RULE_CLASS, VIEWBOX_WIDTH } from "../config";
-import { STOP, timing } from "../functions/timing";
-import { tallEnough, tooWide } from "../functions/labels";
-import { placeAt, svgEl, withRow } from "../functions/svg";
+import { STOP, timing } from "../shared/timing";
+import { tallEnough, tooWide } from "../layout/labels";
+import { placeAt, svgEl, withRow } from "../draw/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
 
 // Each mismatch is reported once, not again at every layout.

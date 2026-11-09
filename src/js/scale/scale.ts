@@ -1,5 +1,5 @@
 import type { Segment } from "../types";
-import { largest } from "./format";
+import { largest } from "../shared/format";
 
 /** A break in the scale: values from `lo` to `hi` get `share` of the length, and the cut is at `gap`. */
 export interface Squeeze {

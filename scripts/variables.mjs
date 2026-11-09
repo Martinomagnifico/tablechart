@@ -2,7 +2,7 @@
 //
 //   npm run check:variables
 //
-// Old names (OLD in src/js/functions/contrast.ts, not documented until they go in 1.3.0) and the palette numbers after
+// Old names (OLD in src/js/colour/contrast.ts, not documented until they go in 1.3.0) and the palette numbers after
 // --tablechart-color-1 are left out.
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, extname } from 'node:path';

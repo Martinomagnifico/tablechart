@@ -1,7 +1,7 @@
-import { sizeOf } from "../functions/measure";
+import { sizeOf } from "../layout/measure";
 import { HEAD_CLASS, LINE_CLASS, VIEWBOX_WIDTH } from "../config";
-import { timing } from "../functions/timing";
-import { placeAt, svgEl } from "../functions/svg";
+import { timing } from "../shared/timing";
+import { placeAt, svgEl } from "../draw/svg";
 import type { AnnotationType, Geometry } from "../types";
 import { checkAgainst, createBadge } from "./badge";
 

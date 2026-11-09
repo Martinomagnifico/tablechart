@@ -2,10 +2,10 @@
 import { area, line } from "../charts/line";
 import { CATEGORIES_CLASS, type Config, RULE_CLASS } from "../config";
 import type { ChartState } from "../types";
-import { largest } from "./format";
+import { largest } from "../shared/format";
 import { fitTogether } from "./labels";
-import { turnedOn } from "./settings";
-import { short } from "./svg";
+import { turnedOn } from "../shared/settings";
+import { short } from "../draw/svg";
 
 /** In a `data-chart-group`, charts on one line of the page get rows of names of one height, so their baselines line up. */
 export const lineUpNames = (figure: HTMLElement): void => {

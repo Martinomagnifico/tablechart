@@ -1,9 +1,9 @@
 import { LIBRARY_NAME, POINT_CLASS, REFERENCE_CLASS, VIEWBOX_WIDTH } from "../config";
-import { avoidCollisions, overlaps, type Box } from "../functions/collision";
-import { boxOf } from "../functions/labels";
-import { sizeOf } from "../functions/measure";
-import { timing } from "../functions/timing";
-import { placeAt, svgEl } from "../functions/svg";
+import { avoidCollisions, overlaps, type Box } from "../layout/collision";
+import { boxOf } from "../layout/labels";
+import { sizeOf } from "../layout/measure";
+import { timing } from "../shared/timing";
+import { placeAt, svgEl } from "../draw/svg";
 import type { AnnotationType } from "../types";
 import { createBadge } from "./badge";
 

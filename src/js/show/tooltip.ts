@@ -1,8 +1,8 @@
-import { PLACED_CLASS, SHOWN_CLASS, VIEWBOX_WIDTH } from "./config";
-import type { Config } from "./config";
-import { place } from "./functions/place";
-import { noteCell } from "./functions/read-table";
-import type { ChartState, TooltipLine } from "./types";
+import { PLACED_CLASS, SHOWN_CLASS, VIEWBOX_WIDTH } from "../config";
+import type { Config } from "../config";
+import { place } from "../layout/place";
+import { noteCell } from "../build/read-table";
+import type { ChartState, TooltipLine } from "../types";
 
 const TIP_CLASS = "tablechart-tooltip";
 // A child of body does not inherit the chart's variables, so these are copied from the chart when it opens.

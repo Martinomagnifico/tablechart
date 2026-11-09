@@ -1,4 +1,4 @@
-import { debug } from "./debug";
+import { debug } from "../shared/debug";
 import { BADGE_CAPTION_CLASS, LIBRARY_NAME } from "../config";
 import { ANNOTATION_NAMES } from "../core";
 

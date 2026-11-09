@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { createServer } from "vite";
 
 const vite = await createServer({ configFile: false, logLevel: "error", server: { middlewareMode: true }, appType: "custom" });
-const { along, reachOf, squeezeOf } = await vite.ssrLoadModule("/src/js/functions/scale.ts");
+const { along, reachOf, squeezeOf } = await vite.ssrLoadModule("/src/js/scale/scale.ts");
 const bar = (value) => ({ kind: "bar", from: 0, to: value, value });
 const step = (from, to) => ({ kind: to > from ? "up" : "down", from, to, value: to - from });
 const ask = (more) => ({ from: null, to: null, size: null, ceiling: 100, extent: 98, depth: 0, breakable: true, segments: [], ...more });

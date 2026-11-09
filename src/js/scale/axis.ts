@@ -1,5 +1,5 @@
 // The numbers along an axis. Arithmetic only: the tick labels are measured with the rest of the text.
-import { largest } from "./format";
+import { largest } from "../shared/format";
 
 export interface Scale {
 	min: number;

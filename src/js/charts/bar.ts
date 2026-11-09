@@ -1,11 +1,11 @@
-import { along } from "../functions/scale";
-import { largest } from "../functions/format";
-import { sizeOf } from "../functions/measure";
+import { along } from "../scale/scale";
+import { largest } from "../shared/format";
+import { sizeOf } from "../layout/measure";
 import { BAR_CLASS, RULE_CLASS, VIEWBOX_WIDTH } from "../config";
-import { timing } from "../functions/timing";
-import { endOf, gapAfter, groupLayout, inkOf, seriesMark, stackMarks, stackOf, stackReach } from "../functions/groups";
-import { fitsLength, fitTogether } from "../functions/labels";
-import { placeAt, svgEl, withRow } from "../functions/svg";
+import { timing } from "../shared/timing";
+import { endOf, gapAfter, groupLayout, inkOf, seriesMark, stackMarks, stackOf, stackReach } from "../shared/stacks";
+import { fitsLength, fitTogether } from "../layout/labels";
+import { placeAt, svgEl, withRow } from "../draw/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
 
 const segments = (rows: Row[]): Segment[] =>

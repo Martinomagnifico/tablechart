@@ -1,7 +1,7 @@
-import { sizeOf } from "../functions/measure";
+import { sizeOf } from "../layout/measure";
 import { DIVIDE_CLASS, LEADER_CLASS, SLICE_CLASS, VIEWBOX_WIDTH } from "../config";
-import { sweepTiming, timing } from "../functions/timing";
-import { placeAt, short, svgEl, withRow } from "../functions/svg";
+import { sweepTiming, timing } from "../shared/timing";
+import { placeAt, short, svgEl, withRow } from "../draw/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
 
 /** What the mask cuts from a corner of a slice: between its side, the edge of the ring and an arc that touches both. */

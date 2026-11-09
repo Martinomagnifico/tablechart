@@ -1,6 +1,6 @@
 import { BAR_CLASS, PIECE_CLASS } from "../config";
 import { timing } from "./timing";
-import { svgEl, withRow } from "./svg";
+import { svgEl, withRow } from "../draw/svg";
 import type { Cell, Geometry, Row } from "../types";
 
 export interface GroupBar {

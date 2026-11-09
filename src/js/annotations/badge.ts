@@ -1,5 +1,5 @@
 import { BADGE_CLASS, LIBRARY_NAME } from "../config";
-import { decimalsIn, numberIn } from "../functions/format";
+import { decimalsIn, numberIn } from "../shared/format";
 import type { Check, Geometry } from "../types";
 
 /** HTML rather than SVG, so the badge grows around its text in any language. */

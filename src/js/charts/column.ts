@@ -1,9 +1,9 @@
-import { sizeOf } from "../functions/measure";
+import { sizeOf } from "../layout/measure";
 import { BAR_CLASS, RULE_CLASS, VIEWBOX_WIDTH } from "../config";
-import { timing } from "../functions/timing";
-import { endOf, gapAfter, groupLayout, inkOf, seriesMark, stackMarks, stackOf, stackReach } from "../functions/groups";
-import { fitTogether, tallEnough, tooWide } from "../functions/labels";
-import { placeAt, svgEl, withRow } from "../functions/svg";
+import { timing } from "../shared/timing";
+import { endOf, gapAfter, groupLayout, inkOf, seriesMark, stackMarks, stackOf, stackReach } from "../shared/stacks";
+import { fitTogether, tallEnough, tooWide } from "../layout/labels";
+import { placeAt, svgEl, withRow } from "../draw/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
 
 const segments = (rows: Row[]): Segment[] =>

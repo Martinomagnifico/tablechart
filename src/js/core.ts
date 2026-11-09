@@ -36,25 +36,25 @@ import {
 	VALUE_CLASS,
 	VIEWBOX_WIDTH,
 } from "./config";
-import { decimalsIn, largest } from "./functions/format";
-import { markerOf } from "./functions/markers";
-import { stackReach, stackTotal } from "./functions/groups";
-import { keepInside, thinOut } from "./functions/labels";
-import { measureAll, sizeOf } from "./functions/measure";
-import { along as alongScale, reachOf, squeezeOf } from "./functions/scale";
-import { readSeries, readTable } from "./functions/read-table";
-import { clipAround, cutOut, htmlEl, roundEnds, short, svgEl } from "./functions/svg";
-import type { Scale } from "./functions/axis";
-import type { Box } from "./functions/collision";
-import { inkInside, inkNames, measureSurface } from "./functions/colour";
-import { debug } from "./functions/debug";
-import { applySteps, makeControls, planSteps, stepTo } from "./steps";
-import { attachTooltip, releaseTooltip } from "./tooltip";
-import { drawFrame, frameScalesOf, placeFrame, placeValueAxis, valueAxisOf } from "./functions/chart-axes";
-import { agree, remember } from "./functions/chart-group";
-import { fitNames, lineUpNames } from "./functions/names";
-import { writeNumber } from "./functions/numbers";
-import { cornerOf, cssLength, heightRange, turnedOn } from "./functions/settings";
+import { decimalsIn, largest } from "./shared/format";
+import { markerOf } from "./draw/markers";
+import { stackReach, stackTotal } from "./shared/stacks";
+import { keepInside, thinOut } from "./layout/labels";
+import { measureAll, sizeOf } from "./layout/measure";
+import { along as alongScale, reachOf, squeezeOf } from "./scale/scale";
+import { readSeries, readTable } from "./build/read-table";
+import { clipAround, cutOut, htmlEl, roundEnds, short, svgEl } from "./draw/svg";
+import type { Scale } from "./scale/axis";
+import type { Box } from "./layout/collision";
+import { inkInside, inkNames, measureSurface } from "./colour/colour";
+import { debug } from "./shared/debug";
+import { applySteps, makeControls, planSteps, stepTo } from "./show/steps";
+import { attachTooltip, releaseTooltip } from "./show/tooltip";
+import { drawFrame, frameScalesOf, placeFrame, placeValueAxis, valueAxisOf } from "./layout/chart-axes";
+import { agree, remember } from "./layout/chart-group";
+import { fitNames, lineUpNames } from "./layout/names";
+import { writeNumber } from "./shared/numbers";
+import { cornerOf, cssLength, heightRange, turnedOn } from "./shared/settings";
 import type { AnnotationType, ChartState, ChartType, Geometry, Motion, Row, Shape, ValuePick, Series } from "./types";
 
 const CHARTS: Record<string, ChartType> = { area, bar, column, donut, line, waterfall };

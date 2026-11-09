@@ -1,6 +1,6 @@
 import { BAR_CLASS, BREAK_CLASS, VIEWBOX_WIDTH } from "../config";
-import { timing } from "../functions/timing";
-import { svgEl } from "../functions/svg";
+import { timing } from "../shared/timing";
+import { svgEl } from "../draw/svg";
 import type { AnnotationType, Geometry } from "../types";
 
 let masks = 0;

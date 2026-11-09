@@ -1,5 +1,5 @@
 /** Sentences that the author writes, filled with values from the table. Imported as `@martinomagnifico/tablechart/summary`. */
-import { scaleOf, TREND_FLAT, TREND_OUTLIERS, trendOf } from "./functions/trend";
+import { scaleOf, TREND_FLAT, TREND_OUTLIERS, trendOf } from "./scale/trend";
 import { decimalsIn, LIBRARY_NAME, readSeries, readTable, splitSign } from "./kit";
 import type { Cell, Row } from "./types";
 

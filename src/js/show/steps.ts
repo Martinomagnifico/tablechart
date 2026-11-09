@@ -1,7 +1,7 @@
-import { BAR_CLASS, CENTRE_CLASS, CONNECTOR_CLASS, CONTROLS_CLASS, PIECE_CLASS, SLICE_CLASS, SR_CLASS } from "./config";
-import { sweepTiming } from "./functions/timing";
-import { svgEl } from "./functions/svg";
-import type { ChartState } from "./types";
+import { BAR_CLASS, CENTRE_CLASS, CONNECTOR_CLASS, CONTROLS_CLASS, PIECE_CLASS, SLICE_CLASS, SR_CLASS } from "../config";
+import { sweepTiming } from "../shared/timing";
+import { svgEl } from "../draw/svg";
+import type { ChartState } from "../types";
 
 /** The steps of one chart: which step shows each row, column and annotation, and how many steps there are. */
 export interface StepPlan {

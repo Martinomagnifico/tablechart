@@ -1,12 +1,12 @@
-import { sizeOf } from "../functions/measure";
+import { sizeOf } from "../layout/measure";
 import { AREA_CLASS, AREA_FILL_CLASS, HOLE_CLASS, POINT_CLASS, RULE_CLASS, SERIES_CLASS, VIEWBOX_WIDTH } from "../config";
-import { stackOf } from "../functions/groups";
-import { markerEl, markerOf } from "../functions/markers";
-import { boxOf, spread, stepOf } from "../functions/labels";
-import { avoidCollisions, overlaps, type Box } from "../functions/collision";
-import { curveTo, fixed, tangentsWithGaps } from "../functions/smooth";
-import { cutOut, fadeFill, placeAt, svgEl } from "../functions/svg";
-import { trendOf } from "../functions/trend";
+import { stackOf } from "../shared/stacks";
+import { markerEl, markerOf } from "../draw/markers";
+import { boxOf, spread, stepOf } from "../layout/labels";
+import { avoidCollisions, overlaps, type Box } from "../layout/collision";
+import { curveTo, fixed, tangentsWithGaps } from "../draw/smooth";
+import { cutOut, fadeFill, placeAt, svgEl } from "../draw/svg";
+import { trendOf } from "../scale/trend";
 import type { Cell, ChartType, Geometry, Row, Segment } from "../types";
 
 type Point = [number, number];

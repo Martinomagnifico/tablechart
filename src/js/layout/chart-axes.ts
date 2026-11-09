@@ -1,14 +1,14 @@
 // The axes of a chart: their scales, numbers and gridlines. The arithmetic of a scale is in `axis.ts`.
 import { AXIS_CLASS, type Config, GRID_CLASS, TICK_CLASS, VIEWBOX_WIDTH } from "../config";
 import type { ChartState, Geometry } from "../types";
-import { niceStep, readScale, type Scale, scaleOf, thin, ticksOf } from "./axis";
-import { decimalsIn, largest } from "./format";
-import { stackReach } from "./groups";
+import { niceStep, readScale, type Scale, scaleOf, thin, ticksOf } from "../scale/axis";
+import { decimalsIn, largest } from "../shared/format";
+import { stackReach } from "../shared/stacks";
 import { measureAll, sizeOf } from "./measure";
-import { writeNumber } from "./numbers";
-import type { Squeeze } from "./scale";
-import { heightRange, turnedOn } from "./settings";
-import { htmlEl, placeAt, short, svgEl } from "./svg";
+import { writeNumber } from "../shared/numbers";
+import type { Squeeze } from "../scale/scale";
+import { heightRange, turnedOn } from "../shared/settings";
+import { htmlEl, placeAt, short, svgEl } from "../draw/svg";
 
 type ChartAxes = NonNullable<ChartState["axes"]>;
 

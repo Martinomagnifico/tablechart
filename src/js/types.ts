@@ -1,6 +1,6 @@
 import type { Config } from "./config";
-import type { Squeeze } from "./functions/scale";
-import type { StepPlan } from "./steps";
+import type { Squeeze } from "./scale/scale";
+import type { StepPlan } from "./show/steps";
 
 /** How a line or an area runs from one point to the next. */
 export type Shape = "straight" | "step" | "smooth";

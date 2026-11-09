@@ -1,5 +1,5 @@
-import { largest } from "./format";
-import { debug } from "./debug";
+import { largest } from "../shared/format";
+import { debug } from "../shared/debug";
 import { LIBRARY_NAME } from "../config";
 import type { Cell, Row, Series } from "../types";
 
