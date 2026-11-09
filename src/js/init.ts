@@ -288,6 +288,11 @@ export const prepare = async (found: HTMLElement[], config: Config): Promise<HTM
 	// A header with `data-chart="line"` is a series in a chart, not a chart.
 	const figures = adoptTables(found.filter((element) => !element.hasAttribute(MADE) && element.tagName !== "TH"));
 	warnNotFigure(figures);
+	// So the room it keeps until it is laid out is as high as it will be.
+	for (const figure of figures) {
+		const aspect = Number.parseFloat(figure.getAttribute("data-chart-aspect") ?? "");
+		if (aspect > 0) figure.style.setProperty("--_room", String(aspect));
+	}
 	await loadSources(figures);
 	readMarkdownRows(figures);
 	assignKeys(figures, config.langattribute);

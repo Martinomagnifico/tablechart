@@ -598,6 +598,12 @@ const cssLength = (figure: HTMLElement, unit: number, name: string, fallback: st
 const cornerOf = (figure: HTMLElement, unit: number, name: string): number =>
 	cssLength(figure, unit, getComputedStyle(figure).getPropertyValue(name).trim() ? name : "--tablechart-corner-radius", "0px") ?? 0;
 
+/** The least and the most a chart may be high; `--tablechart-height` is both. */
+const heightRange = (figure: HTMLElement, unit: number): [number, number] => {
+	const fixed = cssLength(figure, unit, "--tablechart-height", "none");
+	return [fixed ?? cssLength(figure, unit, "--tablechart-min-height", "200px") ?? 0, fixed ?? cssLength(figure, unit, "--tablechart-max-height", "none") ?? Number.POSITIVE_INFINITY];
+};
+
 const barMax = (figure: HTMLElement, unit: number): number =>
 	cssLength(figure, unit, "--tablechart-bar-max", "60px") ?? Number.POSITIVE_INFINITY;
 
@@ -699,7 +705,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		if (own && own.length > 2) valueScale = { min: own[0], max: own[own.length - 1], step: 0, ticks: own };
 		else {
 			const [from, to] = own ?? [min, max];
-			const step = niceStep(to - from, Math.max((sideways ? guess / 9 : (guess * aspect) / 3) / font, 2));
+			const step = niceStep(to - from, Math.max((sideways ? guess / 9 : Math.min(guess * aspect, heightRange(state.figure, 1)[1]) / 3) / font, 2));
 			const round = (value: number, up: boolean) => (own ? value : Number(((up ? Math.ceil : Math.floor)(value / step - 1e-9 * (up ? 1 : -1)) * step).toPrecision(12)));
 			const lo = round(from, false);
 			const hi = round(to, true);
@@ -733,7 +739,8 @@ export const layout = (state: ChartState, config: Config): boolean => {
 
 	// viewBox units per screen pixel.
 	const unit = VIEWBOX_WIDTH / widthPx;
-	const shaped = VIEWBOX_WIDTH * aspect;
+	const [least, most] = heightRange(state.figure, unit);
+	const shaped = Math.min(VIEWBOX_WIDTH * aspect, most);
 
 	plot.classList.add(PLACED_CLASS);
 	// Undo what the last layout did to the size of the text, then read every size at once, before anything is placed.
@@ -793,10 +800,10 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	const labelHeight = (values[0] ? sizeOf(values[0]).height : 0) * unit;
 	if (type.numbers === false && values[0]) values[0].dataset.place = "none";
 	const badgeHeight = annotations[0]?.badge ? sizeOf(annotations[0].badge).height * unit : 0;
-	// Never less than `--tablechart-min-height` (200px), or what the kind needs.
+	// Never less than `--tablechart-min-height` (200px), or what the kind needs: rows that need more than the maximum get it.
 	const height = Math.max(
 		shaped,
-		cssLength(state.figure, unit, "--tablechart-min-height", "200px") ?? 0,
+		least,
 		type.minHeight?.({
 			labelHeight,
 			nameHeight: Math.max(0, largest(state.categories.map((name) => sizeOf(name).height))) * unit,

@@ -76,7 +76,7 @@ block content
 
 	+section("Height")
 		p The height of a chart is a share of its width, set with #[code data-chart-aspect]. The default is #[code 0.38].
-		p On a narrow screen, a chart is never less high than #[code --tablechart-min-height]: #[code 200px] by default. Below that width, the height stays the same. It can be in #[code px], #[code em] or #[code rem], or #[code none] for no minimum.
+		p On a narrow screen, a chart is never less high than #[code --tablechart-min-height]: #[code 200px] by default. Below that width, the height stays the same. It can be in #[code px], #[code em] or #[code rem], or #[code none] for no minimum. On a wide screen, #[code --tablechart-max-height] does the same at the top. See #[a(href=url('/styling/parts.html#height')) Height].
 
 		+chart(null, '1')
 			figure(data-chart="column" data-chart-aspect="0.6")

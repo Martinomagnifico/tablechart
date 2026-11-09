@@ -4,10 +4,12 @@
 
 ### Added
 
+- `--tablechart-max-height` and `--tablechart-height`, so a chart stops getting higher on a wide screen.
 - `data-tablechart-ready` and `data-summary-ready` on `html`, with the events `tablechart:ready` and `tablechart:summary-ready`, for scripts that print the page to PDF.
 
 ### Fixed
 
+- A chart keeps the room of its `data-chart-aspect` until it is laid out.
 - In a tagged PDF, the summary and the table are outside the figure of the chart, so a screen reader reads them.
 
 

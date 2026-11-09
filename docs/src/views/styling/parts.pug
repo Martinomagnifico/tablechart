@@ -122,6 +122,31 @@ block content
 								th= row[0]
 								td= row[1]
 
+	+section("Height")
+		p A chart gets higher with its width. If you want it to stop at a certain height, set #[code --tablechart-max-height]. Above that height, the chart only gets wider. If you want one height at every width, such as in a dashboard tile, set #[code --tablechart-height]. Both can be in #[code px], #[code em] or #[code rem].
+
+		p If the rows of a bar chart need more room than the maximum, the chart gets that room.
+
+		p The height is the width times #[code data-chart-aspect], between the minimum and the maximum. So these three values set the shape of a chart at every width. In this example, a chart narrower than 320px is taller than it is wide. Between 320px and 480px it is square. Wider than 480px, it is wider than it is high, and it does not get higher.
+
+		+chart(null, '1')
+			figure(data-chart="column" data-chart-aspect="1" style="--tablechart-min-height: 320px; --tablechart-max-height: 480px")
+				table
+					tbody
+						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '91']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		+chart(null, '1')
+			figure(data-chart="column" style="--tablechart-max-height: 240px")
+				table
+					tbody
+						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '91']]
+							tr
+								th= row[0]
+								td= row[1]
+
 	+section("Rounded ends")
 		p #[code --tablechart-corner-radius] rounds the corners of columns, bars and donut slices, in #[code px] or #[code em]. If one of them needs another value, #[code --tablechart-bar-radius] sets it for columns and bars, and #[code --tablechart-slice-radius] for slices.
 
@@ -179,6 +204,12 @@ block content
 				tr
 					td: code --tablechart-bar-max
 					td The widest a bar may be: 60px by default
+				tr
+					td: code --tablechart-max-height
+					td The most height of a chart: none by default
+				tr
+					td: code --tablechart-height
+					td A fixed height, for the minimum and the maximum at once
 				tr
 					td: code --tablechart-corner-radius
 					td How round the corners of columns, bars and slices are: 0 by default
