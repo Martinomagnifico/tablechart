@@ -52,6 +52,7 @@
     "size": "node scripts/size.mjs",
     "test": "npm run build && node test/speed.test.mjs",
     "test:layout": "node test/layout.test.mjs",
+    "test:pdf": "node test/pdf.test.mjs",
     "lab": "node lab/pdf/lab.mjs",
     "lab:pdf": "node lab/pdf/lab.mjs --pdf",
     "prepack": "npm run build",
@@ -70,6 +71,7 @@
   "devDependencies": {
     "@vituum/vite-plugin-pug": "^2.0.1",
     "liquidjs": "^10.30.0",
+    "pdfjs-dist": "^6.5.438",
     "rolldown-plugin-dts": "^0.28.8",
     "sass": "^1.97.3",
     "terser": "^5.46.0",

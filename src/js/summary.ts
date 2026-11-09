@@ -40,6 +40,7 @@ export const summaryDefaults: SummaryConfig = {
 };
 
 const SUMMARY_CLASS = "chart-summary";
+const READY = "data-summary-ready";
 const TEMPLATE = "data-summary-template";
 const FILLED = "data-summary-text";
 // Line and area charts are in order; another chart is when it says so.
@@ -311,12 +312,21 @@ export const init = (options: Partial<SummaryConfig> = {}): void => {
 
 	// A change to a template or the table, such as by a translation script, fills its chart again, once per frame.
 	const queued = new Set<HTMLElement>();
+	const root = document.documentElement;
+	// For a script that prints the page, such as to a PDF: every summary is filled, for the language of the page.
+	const settle = () => {
+		if (queued.size || root.hasAttribute(READY) || !figures().every((figure) => figure.querySelector("tbody tr"))) return;
+		root.setAttribute(READY, "");
+		document.dispatchEvent(new CustomEvent("tablechart:summary-ready"));
+	};
 	const later = (figure: HTMLElement) => {
+		root.removeAttribute(READY);
 		// Emptied before filling, so a chart that fails to fill does not stop the next ones.
 		if (!queued.size) requestAnimationFrame(() => {
 			const figures = [...queued];
 			queued.clear();
 			for (const one of figures) fill(one, config);
+			settle();
 		});
 		queued.add(figure);
 	};
@@ -336,9 +346,13 @@ export const init = (options: Partial<SummaryConfig> = {}): void => {
 	};
 
 	for (const figure of figures()) start(figure);
+	settle();
 	document.addEventListener("tablechart:table", (event) => {
 		const figure = event.target;
-		if (figure instanceof HTMLElement && figure.matches(config.selector) && figure.querySelector(`:scope > .${SUMMARY_CLASS}`)) start(figure);
+		if (figure instanceof HTMLElement && figure.matches(config.selector) && figure.querySelector(`:scope > .${SUMMARY_CLASS}`)) {
+			start(figure);
+			settle();
+		}
 	});
 	// Numbers follow the language of the page.
 	if (!config.locale)

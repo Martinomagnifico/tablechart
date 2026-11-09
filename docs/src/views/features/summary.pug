@@ -580,7 +580,10 @@ block content
 			await page.emulateMediaType("print");
 			await page.setViewport({ width: 673, height: 1000 });
 			await page.goto(url);
+			await page.waitForSelector("html[data-tablechart-ready][data-summary-ready]");
+			await page.evaluate(() => document.fonts.ready);
 			await page.pdf({ format: "A4", tagged: true, outline: true });
 
-		p With #[code tagged: true], the headings and the tables are in the structure of the PDF, so a screen reader can go through a printed table as a table.
+		p When all charts are there, Tablechart sets #[code data-tablechart-ready] on #[code html] and sends the event #[code tablechart:ready]. When all summaries are filled, Summary sets #[code data-summary-ready] and sends #[code tablechart:summary-ready]. If a page has no summaries or does not load Summary, the script only needs to wait for #[code data-tablechart-ready]. If a data source fails, a summary stays empty and #[code data-summary-ready] does not come, so the script needs a timeout.
+		p With #[code tagged: true], the headings and the tables are in the structure of the PDF, so a screen reader can go through a printed table as a table. The drawing is a figure with the caption as its alt text. The summary and the table are outside that figure, so a screen reader reads them too.
 		p Template engines such as Twig, Liquid and Handlebars use double braces, such as #[code {{ client.name }}]. They leave #[code {highest.value}] alone, so the server fills its part, and the browser fills the summary.

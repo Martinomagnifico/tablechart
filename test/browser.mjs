@@ -47,10 +47,10 @@ const serve = (html, port) => {
 };
 
 /**
- * Opens `html` in headless Chrome, waits until `window.done` is set, and returns its value.
+ * Opens `html` in headless Chrome, waits until `window.done` is set, and returns its value; with `pdf`, also the page as a tagged PDF.
  * Errors on the page fail the run.
  */
-export async function run(html, { port = 4610, cdpPort = 9610, width = 1200, timeout = 120_000 } = {}) {
+export async function run(html, { port = 4610, cdpPort = 9610, width = 1200, timeout = 120_000, pdf = false } = {}) {
 	const server = await serve(html, port);
 	const chrome = CHROME_CANDIDATES[0];
 	const proc = spawn(
@@ -110,8 +110,9 @@ export async function run(html, { port = 4610, cdpPort = 9610, width = 1200, tim
 			const r = await send("Runtime.evaluate", { expression: "window.done", returnByValue: true });
 			const value = r.result?.result?.value;
 			if (value !== undefined) {
+				const printed = pdf && (await send("Page.printToPDF", { generateTaggedPDF: true, generateDocumentOutline: true, printBackground: true }));
 				ws.close();
-				return value;
+				return pdf ? { value, pdf: Buffer.from(printed.result.data, "base64") } : value;
 			}
 			await sleep(200);
 		}

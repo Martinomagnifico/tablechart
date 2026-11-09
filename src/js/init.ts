@@ -44,6 +44,7 @@ declare global {
 }
 
 const MADE = "data-chart-made";
+const READY = "data-tablechart-ready";
 
 const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -221,8 +222,12 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		setShown(state, true);
 		putMasksOn(state.svg);
 		void state.figure.offsetWidth;
+		paperRoles(state, true);
 	};
-	const printed = () => state.figure.classList.remove(PRINTING_CLASS);
+	const printed = () => {
+		state.figure.classList.remove(PRINTING_CLASS);
+		paperRoles(state, false);
+	};
 
 	const refresh = () => {
 		placed = null;
@@ -291,6 +296,23 @@ export const prepare = async (found: HTMLElement[], config: Config): Promise<HTM
 	return figures;
 };
 
+// In a tagged PDF, a named figure is one picture and its name replaces all in it, also a summary or table. On paper, only the drawing is the picture.
+const paperRoles = ({ figure, plot, svg }: ChartState, on: boolean): void => {
+	const name = ["aria-labelledby", "aria-label"].find((attribute) => figure.hasAttribute(attribute));
+	if (figure.tagName !== "FIGURE" || !name || (figure.hasAttribute("role") && figure.getAttribute("role") !== "group")) return;
+	if (on) {
+		figure.setAttribute("role", "group");
+		plot.removeAttribute("aria-hidden");
+		svg.setAttribute("role", "img");
+		svg.setAttribute(name, figure.getAttribute(name) ?? "");
+	} else {
+		figure.removeAttribute("role");
+		plot.setAttribute("aria-hidden", "true");
+		svg.setAttribute("role", "presentation");
+		svg.removeAttribute(name);
+	}
+};
+
 const make = (figure: HTMLElement, config: Config): TablechartChart | null => {
 	const state = debug.timed("Building", figure, () => build(figure, config));
 	if (!state) return null;
@@ -338,6 +360,8 @@ export const create = async (
 };
 
 /** Makes a chart of every figure in `root` that matches the selector, skipping existing charts. */
+let starting = 0;
+
 export const init = async (
 	options: Partial<Config> = {},
 	root: ParentNode = document
@@ -345,11 +369,19 @@ export const init = async (
 	const config: Config = { ...defaultConfig, ...options };
 	if (config.debug) debug.enabled = true;
 
+	starting += 1;
+	document.documentElement.removeAttribute(READY);
 	const figures = await prepare(Array.from(root.querySelectorAll<HTMLElement>(config.selector)), config);
 	const charts = figures
 		.map((figure) => make(figure, config))
 		.filter((chart): chart is TablechartChart => chart !== null);
 	debug.log(`Made ${charts.length} chart(s).`);
+	starting -= 1;
+	// For a script that prints the page, such as to a PDF: every chart of every `init` is there.
+	if (!starting) {
+		document.documentElement.setAttribute(READY, "");
+		document.dispatchEvent(new CustomEvent("tablechart:ready"));
+	}
 
 	return {
 		charts,
