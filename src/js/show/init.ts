@@ -1,7 +1,10 @@
 import "../../style/tablechart.scss";
 
 import { type Config, defaultConfig, LIBRARY_NAME, PRINTING_CLASS } from "../config";
-import { animated, build, layout, putMasksOn, relabel, setShown, unbuild } from "../core";
+import { build, relabel, unbuild } from "../build/build";
+import { layout } from "../layout/layout";
+import { animated } from "../shared/settings";
+import { putMasksOn, setShown } from "./shown";
 import { inkInside, inkNames, measureSurface } from "../colour/colour";
 import { checkContrast, checkOldColours, checkTextContrast } from "../colour/contrast";
 import { debug } from "../shared/debug";
@@ -25,6 +28,8 @@ export interface TablechartChart {
 	stepTo(step: number): void;
 	/** Builds the chart again, with its animation. A chart with steps goes back to its first step. */
 	replay(): void;
+	/** Takes the chart back to its start, to build when it scrolls into view. */
+	reset(): void;
 	/** How many steps are shown. */
 	readonly step: number;
 	/** How many steps the chart has; 0 for a chart that does not step. */
@@ -157,9 +162,17 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 	let waiting = false;
 	let forPaper = false;
 
+	// A chart that builds once has no more use for the scroll.
+	const done = (): void => {
+		if (!config.replay) scroll.unobserve(state.figure);
+	};
+
 	const show = async (): Promise<void> => {
 		// Without animation a chart is shown as soon as it is laid out, in view or not.
-		if (!animated(state.figure, config)) return setShown(state, true);
+		if (!animated(state.figure, config)) {
+			setShown(state, true);
+			return done();
+		}
 		const shown = state.figure.classList.contains("is-shown");
 		if (inView && placed !== null && !shown && !waiting) {
 			waiting = true;
@@ -168,6 +181,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 			await entrance(state.figure, entranceOf(state.figure, config));
 			waiting = false;
 			if (inView || !config.replay) setShown(state, true);
+			done();
 		} else if (!inView && config.replay && shown) {
 			setShown(state, false);
 		}
@@ -268,6 +282,12 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 			setShown(state, false, true);
 			// After the frame that ends the jump back, so the build runs with its transitions.
 			requestAnimationFrame(() => destroyed || setShown(state, true));
+		},
+		reset() {
+			if (state.plan || !animated(state.figure, config)) return;
+			inView = false;
+			setShown(state, false, true);
+			scroll.observe(state.figure);
 		},
 		get step() {
 			return state.step;

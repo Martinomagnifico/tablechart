@@ -5,10 +5,15 @@
 ### Added
 
 - `chart.replay()`, builds a chart again with its animation.
+- `chart.reset()`, takes a chart back to its start, to build when it scrolls into view.
 - `data-chart-group-scale`, one scale for the charts of a group, so the same value is the same height.
 - `data-chart-group`, so the baselines of charts side by side line up when their names take a different number of lines.
 - `--tablechart-max-height` and `--tablechart-height`, so a chart stops getting higher on a wide screen.
 - `data-tablechart-ready` and `data-summary-ready` on `html`, with the events `tablechart:ready` and `tablechart:summary-ready`, for scripts that print the page to PDF.
+
+### Changed
+
+- A chart that builds once stops watching the scroll.
 
 ### Fixed
 

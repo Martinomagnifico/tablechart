@@ -205,10 +205,6 @@
 .playground-settings dd {
 	margin: 0 0 0.8rem;
 }
-.playground-charts .no-motion,
-.playground-charts .no-motion * {
-	transition: none !important;
-}
 // On a phone: the name, the value and Reset on one line, the slider under them.
 @media (max-width: 600px) {
 	.playground-row {

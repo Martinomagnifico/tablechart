@@ -1,5 +1,7 @@
 // Settings read from a figure: its CSS lengths and its on or off attributes.
 import { VIEWBOX_WIDTH } from "../config";
+import type { Config } from "../config";
+import type { Shape } from "../types";
 
 export const cssLength = (figure: HTMLElement, unit: number, name: string, fallback: string) => {
 	const style = getComputedStyle(figure);
@@ -32,3 +34,16 @@ export const turnedOn = (figure: HTMLElement, name: string, option: boolean): bo
 	const own = figure.getAttribute(name);
 	return own === null ? option : own !== "false";
 };
+
+const SHAPES: readonly Shape[] = ["straight", "step", "smooth"];
+
+/** A figure's own `data-chart-shape`, or else the option. */
+export const shapeOf = (figure: HTMLElement, config: Config): Shape => {
+	const asked = figure.dataset.chartShape as Shape | undefined;
+	if (asked && SHAPES.includes(asked)) return asked;
+	return SHAPES.includes(config.shape) ? config.shape : "straight";
+};
+
+/** Whether a chart builds with animation: `data-chart-animate="false"` on the figure, or the `animate` option, turns it off. */
+export const animated = (figure: HTMLElement, config: Config): boolean =>
+	Boolean(config.animate) && figure.getAttribute("data-chart-animate") !== "false";

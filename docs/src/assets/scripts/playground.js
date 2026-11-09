@@ -150,9 +150,7 @@
 			return box.bottom > 0 && box.top < window.innerHeight;
 		});
 		var later = figures.filter(function (figure) { return !inView.includes(figure); });
-		later.forEach(function (figure) { figure.classList.add('no-motion'); figure.classList.remove('is-shown', 'is-built'); });
-		void charts.offsetWidth;
-		later.forEach(function (figure) { figure.classList.remove('no-motion'); });
+		later.forEach(function (figure) { figure.tablechart.reset(); });
 		inView.forEach(function (figure) { figure.tablechart.replay(); });
 	};
 

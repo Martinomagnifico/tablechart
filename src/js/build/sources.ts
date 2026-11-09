@@ -1,6 +1,6 @@
 import { debug } from "../shared/debug";
 import { BADGE_CAPTION_CLASS, LIBRARY_NAME } from "../config";
-import { ANNOTATION_NAMES } from "../core";
+import { ANNOTATION_NAMES } from "../charts/registry";
 
 /** Pass 0: Markdown, JSON and HTML all become the same table before anything is built. */
 

@@ -99,6 +99,16 @@ block content
 				input#clamp-width(type="range" min="130" max="640" step="5" value="640")
 				output#clamp-value(for="clamp-width")
 			.demo
+				.clamp-zones(aria-hidden="true")
+					svg(data-zone="min" viewBox="0 0 24 24")
+						rect(x="7" y="2" width="10" height="20" rx="2")
+						path(d="M10 17v-4M12 17v-8M14 17v-6M9.5 19.5h5")
+					svg(data-zone="aspect" viewBox="0 0 24 24")
+						rect(x="3.5" y="3.5" width="17" height="17" rx="2")
+						path(d="M8.5 15.5v-3M12 15.5v-7M15.5 15.5v-5M7.5 18h9")
+					svg(data-zone="max" viewBox="0 0 24 24")
+						rect(x="1.5" y="7" width="21" height="10" rx="2")
+						path(d="M7 12.5v-1M12 12.5v-2.5M17 12.5v-1.5M5.5 14.5h13")
 				.size-box
 					figure(data-chart="column" data-chart-aspect="1" style="--tablechart-min-height: 200px; --tablechart-max-height: 250px")
 						table
@@ -107,16 +117,6 @@ block content
 									tr
 										th= row[0]
 										td= row[1]
-			.clamp-zones
-				div(data-zone="min")
-					b Taller than wide
-					span Under #[span(data-clamp="min") 200px] wide: the height stays at the minimum.
-				div(data-zone="aspect")
-					b Square
-					span From #[span(data-clamp="min") 200px] to #[span(data-clamp="max") 250px] wide: the height follows the width.
-				div(data-zone="max")
-					b Wider than high
-					span Over #[span(data-clamp="max") 250px] wide: the height stays at the maximum.
 			p.clamp-note(aria-live="polite")
 
 
