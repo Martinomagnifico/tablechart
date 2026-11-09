@@ -53,6 +53,7 @@
     "test": "npm run build && node test/speed.test.mjs",
     "test:layout": "node test/layout.test.mjs",
     "test:pdf": "node test/pdf.test.mjs",
+    "test:group": "node test/group.test.mjs",
     "lab": "node lab/pdf/lab.mjs",
     "lab:pdf": "node lab/pdf/lab.mjs --pdf",
     "prepack": "npm run build",

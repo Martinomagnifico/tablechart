@@ -145,13 +145,13 @@ block content
 							th 2022
 							th 2026
 					tbody
-						each row in [['Elstar', '118', '131', false], ['Granny Johnson', '12', '45', 'granny'], ['Jonagold', '140', '135', false], ['Braeburn', '109', '121', false]]
+						each row in [['Elstar', '118', '131', false], ['Granny Smith', '12', '45', 'granny'], ['Jonagold', '140', '135', false], ['Braeburn', '109', '121', false]]
 							tr(class=row[3] || false)
 								th= row[0]
 								td= row[1]
 								td= row[2]
 
-		p Each column of a group is a bit lighter than the one before it. If you want to set a colour for each, use a #[a(href=url('/styling/colours.html')) palette]. A class on a row styles its whole group, as the Granny Johnson does here:
+		p Each column of a group is a bit lighter than the one before it. If you want to set a colour for each, use a #[a(href=url('/styling/colours.html')) palette]. A class on a row styles its whole group, as the Granny Smith does here:
 
 		+style.
 			.granny {

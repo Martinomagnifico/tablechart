@@ -147,6 +147,51 @@ block content
 								th= row[0]
 								td= row[1]
 
+	+section("Charts side by side")
+		p If the names under one chart take two lines and those under the chart next to it take one, the baselines of the charts do not line up. If you want them to line up, add #[code data-chart-group] to an element around the charts. Charts on one line of the page then get a row of names of the same height. Charts on another line have their own height, so this also works in a grid that wraps.
+
+		p If the charts are in different places, add #[code data-chart-group="sales"] to each, with the same name.
+
+		.card
+			.demo
+				div(data-chart-group style="display: grid; grid-template-columns: repeat(auto-fit, minmax(14em, 1fr)); gap: 1.5rem")
+					figure(data-chart="column")
+						table
+							tbody
+								each row in [['Elstar from the orchard', '58'], ['Jonagold from the hill', '72'], ['Cox from the old trees', '70']]
+									tr
+										th= row[0]
+										td= row[1]
+					figure(data-chart="column")
+						table
+							tbody
+								each row in [['2024', '41'], ['2025', '52']]
+									tr
+										th= row[0]
+										td= row[1]
+
+		p If the numbers of the charts can be compared, also add #[code data-chart-group-scale]. All charts of the group then use one scale, from the lowest to the highest value of them all. Charts on one line of the page also get the same plot height, so the same value is the same height. If the units of the charts differ, such as euros and percentages, leave it out. A waterfall chart and a chart with a break in its scale keep their own scale.
+
+		.card
+			.demo
+				div(data-chart-group data-chart-group-scale style="display: grid; grid-template-columns: repeat(auto-fit, minmax(14em, 1fr)); gap: 1.5rem")
+					figure(data-chart="column")
+						figcaption: b Elstar
+						table
+							tbody
+								each row in [['2023', '58'], ['2024', '72'], ['2025', '70']]
+									tr
+										th= row[0]
+										td= row[1]
+					figure(data-chart="column")
+						figcaption: b Cox
+						table
+							tbody
+								each row in [['2024', '41'], ['2025', '52']]
+									tr
+										th= row[0]
+										td= row[1]
+
 	+section("Rounded ends")
 		p #[code --tablechart-corner-radius] rounds the corners of columns, bars and donut slices, in #[code px] or #[code em]. If one of them needs another value, #[code --tablechart-bar-radius] sets it for columns and bars, and #[code --tablechart-slice-radius] for slices.
 

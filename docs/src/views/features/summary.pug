@@ -574,7 +574,7 @@ block content
 
 	+section("PDFs made on a server")
 		p A report is often a PDF that a server makes: a template is filled with the data of one client, and a headless browser, such as Puppeteer or Playwright, prints the page. JavaScript runs, so the charts and the summaries are there.
-		p A chart is laid out once, for the width it has, and the browser does not lay it out again to print. So lay the page out as on paper before it loads: with the print styles, at the width of the paper less its margins. For A4 with margins of 16 mm, that is 673 pixels.
+		p If the window is much wider than the paper, each chart is laid out again for a width of about 700px just before it prints. If you want it exact, lay the page out as on paper before it loads: with the print styles, at the width of the paper less its margins. For A4 with margins of 16 mm, that is 673 pixels.
 
 		+codeblock('JS').
 			await page.emulateMediaType("print");

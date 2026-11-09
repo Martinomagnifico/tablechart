@@ -153,6 +153,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 	let checked = false;
 	let inView = false;
 	let waiting = false;
+	let forPaper = false;
 
 	const show = async (): Promise<void> => {
 		// Without animation a chart is shown as soon as it is laid out, in view or not.
@@ -223,10 +224,19 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		putMasksOn(state.svg);
 		void state.figure.offsetWidth;
 		paperRoles(state, true);
+		// On paper the drawing shrinks and its text does not, so a chart from a wide window is laid out for the paper, about 700px wide.
+		const root = document.documentElement;
+		const width = root.style.width;
+		root.style.width = "700px";
+		forPaper = placed !== null && state.plot.clientWidth < placed * 0.9;
+		if (forPaper) layout(state, config);
+		root.style.width = width;
 	};
 	const printed = () => {
 		state.figure.classList.remove(PRINTING_CLASS);
 		paperRoles(state, false);
+		if (forPaper) layout(state, config);
+		forPaper = false;
 	};
 
 	const refresh = () => {

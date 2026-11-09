@@ -222,6 +222,10 @@ export interface AnnotationType {
 }
 
 export interface ChartState {
+	/** What the chart needs by itself, for a group that shares a scale; null for a chart that cannot share one. */
+	measured?: { height: number; room: number; floor: number; ceiling: number; bottom: number } | null;
+	/** What its group with `data-chart-group-scale` agreed on. */
+	agreed?: { height: number; room: number; floor: number; ceiling: number; bottom: number };
 	figure: HTMLElement;
 	plot: HTMLElement;
 	svg: SVGSVGElement;

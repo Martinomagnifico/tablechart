@@ -594,6 +594,29 @@ const cssLength = (figure: HTMLElement, unit: number, name: string, fallback: st
 	return amount * size * unit;
 };
 
+/** In a `data-chart-group`, charts on one line of the page get rows of names of one height, so their baselines line up. */
+const lineUpNames = (figure: HTMLElement): void => {
+	const holder = figure.closest<HTMLElement>("[data-chart-group]");
+	if (!holder) return;
+	const name = holder.getAttribute("data-chart-group");
+	const holders = name ? Array.from(document.querySelectorAll<HTMLElement>(`[data-chart-group="${CSS.escape(name)}"]`)) : [holder];
+	const rows = holders.flatMap((one) => Array.from(one.querySelectorAll<HTMLElement>(`.${CATEGORIES_CLASS}:not([data-place])`)));
+	for (const row of rows) row.style.minHeight = "";
+	const found = rows
+		.map((row) => ({ row, tall: row.offsetHeight, top: row.closest("figure")?.getBoundingClientRect().top ?? 0 }))
+		.filter(({ tall }) => tall > 0)
+		.sort((a, b) => a.top - b.top);
+	// Within a few pixels is the same line of the page; after a wrap, each line has its own height.
+	for (let i = 0; i < found.length; ) {
+		let end = i;
+		while (end + 1 < found.length && found[end + 1].top - found[i].top < 4) end++;
+		const line = found.slice(i, end + 1);
+		const tallest = largest(line.map(({ tall }) => tall));
+		if (line.length > 1) for (const { row, tall } of line) if (tall < tallest) row.style.minHeight = `${tallest}px`;
+		i = end + 1;
+	}
+};
+
 /** A corner of a column, bar or slice: its own variable, or else the one for all of them. */
 const cornerOf = (figure: HTMLElement, unit: number, name: string): number =>
 	cssLength(figure, unit, getComputedStyle(figure).getPropertyValue(name).trim() ? name : "--tablechart-corner-radius", "0px") ?? 0;
@@ -667,8 +690,61 @@ const showTable = ({ figure, rows, series }: ChartState, config: Config): void =
 	figure.toggleAttribute("data-long", rows.length * series.filter((one) => !one.group).length > config.tablelimit);
 };
 
+/** The charts of the group of this figure, and whether they share one scale. */
+const groupOf = (figure: HTMLElement) => {
+	const holder = figure.closest<HTMLElement>("[data-chart-group]");
+	if (!holder) return null;
+	const name = holder.getAttribute("data-chart-group");
+	const holders = name ? Array.from(document.querySelectorAll<HTMLElement>(`[data-chart-group="${CSS.escape(name)}"]`)) : [holder];
+	const figures = holders.flatMap((one) => (one.matches("figure") ? [one] : Array.from(one.querySelectorAll<HTMLElement>("figure"))));
+	return { figures, shared: holders.some((one) => one.hasAttribute("data-chart-group-scale")) };
+};
+
+const laidOut = new WeakMap<HTMLElement, { state: ChartState; config: Config }>();
+const agreedOn = new WeakMap<HTMLElement, string>();
+let agreeing = false;
+
+/** Charts of a group with `data-chart-group-scale` lay out once to measure, and then again with one scale, and per line of the page one height. */
+const agree = (figure: HTMLElement): void => {
+	const group = groupOf(figure);
+	if (!group?.shared || agreeing) return;
+	const members = group.figures.flatMap((one) => laidOut.get(one) ?? []).filter(({ state }) => state.plot.clientWidth);
+	const signature = members.map(({ state }) => `${state.plot.clientWidth}:${state.rows.map((row) => row.cells.map((cell) => cell.value)).join()}`).join("|");
+	const first = group.figures[0];
+	if (agreedOn.get(first) === signature) return;
+	agreedOn.set(first, signature);
+	agreeing = true;
+	for (const { state, config } of members) {
+		state.agreed = undefined;
+		layoutOne(state, config);
+	}
+	const measured = members.flatMap(({ state }) => (state.measured ? [{ state, ...state.measured, top: state.figure.getBoundingClientRect().top }] : []));
+	const ceiling = largest(measured.map((one) => one.ceiling));
+	const bottom = -largest(measured.map((one) => -one.bottom));
+	for (const one of measured) {
+		// Within a few pixels is the same line of the page.
+		const line = measured.filter((other) => Math.abs(other.top - one.top) < 4);
+		one.state.agreed = {
+			ceiling,
+			bottom,
+			height: largest(line.map((other) => other.height)),
+			room: largest(line.map((other) => other.room)),
+			floor: largest(line.map((other) => other.floor)),
+		};
+	}
+	for (const { state, config } of members) layoutOne(state, config);
+	agreeing = false;
+};
+
 /** Pass 3. Needs layout; makes no text, only places it. */
 export const layout = (state: ChartState, config: Config): boolean => {
+	laidOut.set(state.figure, { state, config });
+	const done = layoutOne(state, config);
+	if (done) agree(state.figure);
+	return done;
+};
+
+const layoutOne = (state: ChartState, config: Config): boolean => {
 	const { plot, svg, rows, type, values, series, seriesValues, names, annotations } = state;
 	showTable(state, config);
 	// With an end colour, lines and slices go from the first colour to the end colour, rather than lighter towards the background.
@@ -704,7 +780,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		const own = readScale(chartScaleY ?? chartScale);
 		if (own && own.length > 2) valueScale = { min: own[0], max: own[own.length - 1], step: 0, ticks: own };
 		else {
-			const [from, to] = own ?? [min, max];
+			const [from, to] = own ?? [Math.min(min, state.agreed?.bottom ?? min), Math.max(max, state.agreed?.ceiling ?? max)];
 			const step = niceStep(to - from, Math.max((sideways ? guess / 9 : Math.min(guess * aspect, heightRange(state.figure, 1)[1]) / 3) / font, 2));
 			const round = (value: number, up: boolean) => (own ? value : Number(((up ? Math.ceil : Math.floor)(value / step - 1e-9 * (up ? 1 : -1)) * step).toPrecision(12)));
 			const lo = round(from, false);
@@ -804,6 +880,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	const height = Math.max(
 		shaped,
 		least,
+		state.agreed?.height ?? 0,
 		type.minHeight?.({
 			labelHeight,
 			nameHeight: Math.max(0, largest(state.categories.map((name) => sizeOf(name).height))) * unit,
@@ -860,12 +937,13 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	const noteRoom = rows.some((row) => row.note) ? badgeHeight + 4 * unit : 0;
 	const headroom = Math.max(type.headroom?.(room) ?? labelHeight, lineSeries.length ? (line.headroom?.(room) ?? 0) : 0) + noteRoom;
 	const floor = 2 * unit + (type.footroom?.(room) ?? 0) + (depth < 0 ? labelHeight + 4 * unit : 0);
-	const top = headroom;
+	const top = Math.max(headroom, state.agreed?.room ?? 0);
+	const foot = Math.max(floor, state.agreed?.floor ?? 0);
 
-	const plotHeight = height - top - floor;
+	const plotHeight = height - top - foot;
 	// With an axis or gridlines, the scale of the axis; a value beyond it is still shown whole.
-	const ceiling = valueScale ? Math.max(valueScale.max, extent) : extent * 1.02;
-	const bottom = valueScale ? Math.min(valueScale.min, depth) : depth * 1.02;
+	const ceiling = Math.max(valueScale ? Math.max(valueScale.max, extent) : extent * 1.02, state.agreed?.ceiling ?? 0);
+	const bottom = Math.min(valueScale ? Math.min(valueScale.min, depth) : depth * 1.02, state.agreed?.bottom ?? 0);
 
 	// The break squeezes `data-from` to `data-to` into `data-size` of the plot; `data-at` is the old spelling of `data-from`.
 	const breakSpec = annotations.find(
@@ -922,11 +1000,12 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		}
 	}
 	const breakAt = compress ? compress.gap : null;
+	state.measured = [column, bar, line, area].includes(type) && !compress && !steps ? { height, room: top, floor: foot, ceiling, bottom } : null;
 
 	// The empty space where the scale jumps: `--tablechart-break-gap`, or 1.3% of the width if not set.
 	const breakGap = (compress && cssLength(state.figure, unit, "--tablechart-break-gap", "")) ?? BREAK_GAP;
 	// Full scale below and above the break, compressed through it.
-	const base = height - floor;
+	const base = height - foot;
 	const span = ceiling - bottom || 1;
 	let y: (value: number) => number = (value) => base - ((value - bottom) / span) * plotHeight;
 	if (compress) {
@@ -1057,7 +1136,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 		breakAt,
 		squeeze: compress,
 		breakGap,
-		domain: valueScale ? [valueScale.min, valueScale.max] : null,
+		domain: state.agreed ? [bottom, ceiling] : valueScale ? [valueScale.min, valueScale.max] : null,
 		stacked: state.stacked,
 		shape,
 		pick,
@@ -1349,6 +1428,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	measureSurface(state.figure);
 	inkInside(state.figure);
 	inkNames(state.figure);
+	lineUpNames(state.figure);
 	return true;
 };
 
