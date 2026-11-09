@@ -23,6 +23,8 @@ export interface TablechartChart {
 	previous(): void;
 	/** On a chart that steps: shows the chart up to `step`, from 0 to `steps`. */
 	stepTo(step: number): void;
+	/** Builds the chart again, with its animation. A chart with steps goes back to its first step. */
+	replay(): void;
 	/** How many steps are shown. */
 	readonly step: number;
 	/** How many steps the chart has; 0 for a chart that does not step. */
@@ -260,6 +262,13 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		next: () => stepTo(state, state.step + 1),
 		previous: () => stepTo(state, state.step - 1),
 		stepTo: (step) => stepTo(state, step),
+		replay() {
+			if (state.plan) return stepTo(state, 0);
+			if (!animated(state.figure, config)) return;
+			setShown(state, false, true);
+			// After the frame that ends the jump back, so the build runs with its transitions.
+			requestAnimationFrame(() => destroyed || setShown(state, true));
+		},
 		get step() {
 			return state.step;
 		},

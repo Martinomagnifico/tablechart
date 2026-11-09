@@ -106,7 +106,16 @@ figures.push(
 	figure('data-chart="waterfall" data-chart-axis', table(water)),
 	figure('data-chart="column" data-chart-axis data-chart-stack', table(three, ["X", "Y", "Z"])),
 	figure('data-chart="column" data-chart-axis data-chart-scale="0 25 50 75 100"', table(seasons)),
-	figure('data-chart="bar" data-chart-grid data-chart-scale="0 100"', table(seasons))
+	figure('data-chart="bar" data-chart-grid data-chart-scale="0 100"', table(seasons)),
+	figure('data-chart="column" style="--tablechart-corner-radius: 6px"', table(seasons)),
+	figure('data-chart="bar" style="--tablechart-corner-radius: 6px"', table([["a", "12"], ["b", "-4"]])),
+	figure('data-chart="column" data-chart-stack style="--tablechart-corner-radius: 6px"', table(three, ["X", "Y", "Z"])),
+	figure('data-chart="donut" style="--tablechart-corner-radius: 6px"', table(donut)),
+	figure('data-chart="column" style="--tablechart-max-height: 150px; --tablechart-min-height: 120px"', table(seasons)),
+	figure('data-chart="line" style="--tablechart-height: 180px"', table(seasons)),
+	figure('data-chart="line" data-chart-values="last"', table(three, ["X", "Y", "Z"])),
+	figure('data-chart="line" data-chart-values="first last"', table(gaps)),
+	figure(`data-chart="line" data-chart-lines='[{"marker":"none"},{"marker":"diamond","open":true,"line":"dash-dot"}]'`, table(two, ["N", "S"]))
 );
 
 const script = `

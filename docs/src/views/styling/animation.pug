@@ -89,15 +89,9 @@ block content
 											th= n + 1
 											td= 20 + ((n * 37) % 60)
 
-		style.
-			.no-motion, .no-motion * { transition: none !important; }
-
 		script.
 			document.querySelector('.build-both').addEventListener('click', function () {
-				var figures = document.querySelectorAll('.build-both-chart');
-				figures.forEach(function (figure) { figure.classList.add('no-motion'); figure.classList.remove('is-shown'); });
-				void document.body.offsetWidth;
-				figures.forEach(function (figure) { figure.classList.remove('no-motion'); figure.classList.add('is-shown'); });
+				document.querySelectorAll('.build-both-chart').forEach(function (figure) { figure.tablechart.replay(); });
 			});
 
 	+section("Waterfalls")

@@ -54,11 +54,8 @@ block content
 			  replay: false
 			});
 
-		p The button builds this chart again.
-
-		.demo-actions
-			button.btn.solid.build-again(type="button") Build again
 		.card
+
 			.demo
 				figure#build-demo(data-chart="column")
 					table
@@ -67,18 +64,12 @@ block content
 								tr
 									th= row[0]
 									td= row[1]
-
-		style.
-			.no-motion, .no-motion * { transition: none !important; }
+			.demo-actions(style="margin-bottom: 0")
+				button.btn.solid.build-again(type="button") Build again
 
 		script.
 			document.querySelector('.build-again').addEventListener('click', function () {
-				var figure = document.getElementById('build-demo');
-				figure.classList.add('no-motion');
-				figure.classList.remove('is-shown');
-				void figure.offsetWidth;
-				figure.classList.remove('no-motion');
-				figure.classList.add('is-shown');
+				document.getElementById('build-demo').tablechart.replay();
 			});
 
 		p If you want a chart on the page from the start, without animation, add #[code data-chart-animate="false"] to the figure. The chart is then shown as soon as the page is ready, also when it is not in view.

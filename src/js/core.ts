@@ -43,7 +43,7 @@ import { markerOf } from "./functions/markers";
 import { stackReach, stackTotal } from "./functions/groups";
 import { fitTogether, keepInside, thinOut } from "./functions/labels";
 import { measureAll, sizeOf } from "./functions/measure";
-import type { Squeeze } from "./functions/scale";
+import { along as alongScale, reachOf, squeezeOf } from "./functions/scale";
 import { readSeries, readTable } from "./functions/read-table";
 import { clipAround, cutOut, htmlEl, placeAt, roundEnds, short, svgEl } from "./functions/svg";
 import { niceStep, readScale, type Scale, scaleOf, thin, ticksOf } from "./functions/axis";
@@ -690,6 +690,76 @@ const showTable = ({ figure, rows, series }: ChartState, config: Config): void =
 	figure.toggleAttribute("data-long", rows.length * series.filter((one) => !one.group).length > config.tablelimit);
 };
 
+const fitNames = (state: ChartState, config: Config, height: number, unit: number): void => {
+	const { rows, svg, type } = state;
+	// Names under the plot shrink together, down to 70%, if one is wider than its column.
+	// If they still do not fit, every second, third or more is shown, at full size, centred under its column.
+	const nameRow = state.categories[0]?.parentElement;
+	if (nameRow && type.categories !== "beside" && !type.centre) {
+		// Held at its height while the names are measured at full size, so the page under it does not move for a moment.
+		nameRow.style.height = `${nameRow.offsetHeight}px`;
+		nameRow.removeAttribute("data-thinned");
+		for (const name of state.categories) {
+			name.removeAttribute("data-left-out");
+			name.removeAttribute("data-edge");
+		}
+		const names = state.categories.filter((name) => name.offsetParent !== null);
+		const fit = fitTogether(nameRow, names, (name) => ({ size: name.scrollWidth, room: name.clientWidth }), "--_name-fit");
+		if (!fit && names.length > 1) {
+			// The room of one column, without the padding of the row, which a name with its own padding may be wider than.
+			const rowStyle = getComputedStyle(nameRow);
+			const column = (nameRow.clientWidth - Number.parseFloat(rowStyle.paddingLeft) - Number.parseFloat(rowStyle.paddingRight)) / rows.length;
+			nameRow.style.setProperty("--_name-fit", "1");
+			nameRow.setAttribute("data-thinned", "");
+			const widest = largest(names.map((name) => name.offsetWidth));
+			const gap = 8;
+			// A name at an end is inside the chart rather than centred, so it reaches further: the step leaves room for that too,
+			// and the names stay evenly spaced.
+			const step = Math.max(Math.ceil((widest + gap) / column), Math.ceil((1.5 * widest + gap) / column - 0.5), 1);
+			names.forEach((name, i) => {
+				if (i % step) name.setAttribute("data-left-out", "");
+			});
+			const kept = names.filter((name) => !name.hasAttribute("data-left-out"));
+			const first = kept[0];
+			const last = kept.at(-1);
+			// Only a name that would stick out past the chart is moved in.
+			const box = nameRow.getBoundingClientRect();
+			const sticksOut = [first, last].map((name) => name?.getBoundingClientRect());
+			if (first && sticksOut[0] && sticksOut[0].left < box.left) first.setAttribute("data-edge", "start");
+			if (last && last !== first && sticksOut[1] && sticksOut[1].right > box.right - Number.parseFloat(rowStyle.paddingRight)) {
+				last.setAttribute("data-edge", "end");
+				// The last name is not always in the last column; if it now touches the one before it, it is left out.
+				const before = kept.at(-2);
+				if (before && before.getBoundingClientRect().right + gap > last.getBoundingClientRect().left) last.setAttribute("data-left-out", "");
+			}
+		}
+		// Under a line or an area, a tick above each name shown, at the place of its row: also where the name moved in at an edge.
+		const ticked = (type === line || type === area) && turnedOn(state.figure, "data-chart-ticks", config.ticks);
+		nameRow.toggleAttribute("data-ticks", ticked);
+		nameRow.style.removeProperty("--_tick-reach");
+		if (ticked) {
+			// Up to the baseline, a little above the foot of the plot; not to a zero line in the middle, with values below zero.
+			const rule = Number(svg.querySelector(`.${RULE_CLASS}`)?.getAttribute("y1") ?? height);
+			const reach = height - rule;
+			if (reach > 0 && reach < 10 * unit) nameRow.style.setProperty("--_tick-reach", `${short(reach / unit)}px`);
+			const box = nameRow.getBoundingClientRect();
+			// In the row's own pixels, also on a slide that is scaled.
+			const scale = box.width / (nameRow.offsetWidth || 1);
+			const rowStyle = getComputedStyle(nameRow);
+			const pad = Number.parseFloat(rowStyle.paddingLeft);
+			const column = (nameRow.clientWidth - pad - Number.parseFloat(rowStyle.paddingRight)) / rows.length;
+			state.categories.forEach((name, i) => {
+				if (name.hasAttribute("data-left-out")) name.style.removeProperty("--_tick");
+				else {
+					const left = (name.getBoundingClientRect().left - box.left) / scale - nameRow.clientLeft;
+					name.style.setProperty("--_tick", `${short(pad + (i + 0.5) * column - left)}px`);
+				}
+			});
+		}
+		nameRow.style.height = "";
+	}
+};
+
 /** The charts of the group of this figure, and whether they share one scale. */
 const groupOf = (figure: HTMLElement) => {
 	const holder = figure.closest<HTMLElement>("[data-chart-group]");
@@ -913,23 +983,11 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 		focused: series.some((one) => one.focus),
 		stacked: state.stacked,
 	};
-	const reach = (pick: (list: number[]) => number) =>
-		state.stacked
-			? pick(rows.map((row) => stackReach(row, series.length, type.running).top))
-			: pick([
-					...segments.flatMap((s) => [s.from, s.to, s.value]),
-					...rows.flatMap((row) => row.cells.slice(0, series.length).map((cell) => cell.value)),
-				]);
-	const extent = Math.max(reach(largest), 0);
-	// Below zero the scale goes as far down as the lowest value, with room under it for its number.
-	// A step of a waterfall is a size, not a place, so there only where the steps start and end counts.
-	const steps = segments.some((s) => s.kind === "up" || s.kind === "down");
-	const places = steps
-		? segments.flatMap((s) => [s.from, s.to])
-		: state.stacked
-			? rows.map((row) => stackReach(row, series.length, type.running).bottom)
-			: rows.flatMap((row) => row.cells.slice(0, series.length).map((cell) => cell.value));
-	const depth = Math.min(-largest(places.map((value) => -value)), 0);
+	const { extent, depth, steps } = reachOf(
+		segments,
+		rows.flatMap((row) => row.cells.slice(0, series.length).map((cell) => cell.value)),
+		state.stacked ? rows.map((row) => stackReach(row, series.length, type.running)) : null
+	);
 
 	const lineSeries = series.flatMap((one, s) => (one.chart ? [s] : []));
 	// A line over the columns has its numbers above its points, which needs more room.
@@ -953,52 +1011,17 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 		const value = Number.parseFloat(breakSpec?.getAttribute(name) ?? "");
 		return Number.isFinite(value) ? value : null;
 	};
-	const fromAsked = read("data-from") ?? read("data-at");
-	const toAsked = read("data-to");
-
-	let compress: Squeeze | null = null;
-	if (breakSpec && (fromAsked !== null || toAsked !== null)) {
-		const lo = fromAsked ?? 0;
-		const hi = toAsked ?? ceiling;
-		// The zigzag goes where the compressed part meets the part at full scale.
-		const gap = toAsked === null ? lo : fromAsked === null ? hi : (lo + hi) / 2;
-
-		const sizeAsked = breakSpec.getAttribute("data-size");
-		const sizeMatch = sizeAsked?.match(/^\s*(\d+(?:\.\d+)?)\s*%\s*$/);
-		if (sizeAsked !== null && !sizeMatch) {
-			console.warn(
-				`[${LIBRARY_NAME}] data-size="${sizeAsked}" is not a percentage, such as 30%. Using the default.`
-			);
-		}
-		const share = Math.min(
-			Math.max(sizeMatch ? Number(sizeMatch[1]) / 100 : toAsked === null ? 0.22 : 0.3, 0.05),
-			0.8
-		);
-
-		// Compressing any part of a floating step would make its height lie.
-		const floats = segments.filter(
-			(s) =>
-				(s.kind === "up" || s.kind === "down") &&
-				Math.max(s.from, s.to) > lo &&
-				Math.min(s.from, s.to) < hi
-		);
-
-		if (!type.breakable) {
-			console.warn(`[${LIBRARY_NAME}] This kind of chart cannot break its scale.`);
-		} else if (depth < 0) {
-			console.warn(`[${LIBRARY_NAME}] A chart with values below zero cannot break its scale.`);
-		} else if (lo < 0 || hi <= lo || hi > ceiling || (lo === 0 && hi === ceiling)) {
-			console.warn(
-				`[${LIBRARY_NAME}] A break from ${lo} to ${hi} does not fit a scale that runs from 0 to ${extent}.`
-			);
-		} else if (floats.length) {
-			console.warn(
-				`[${LIBRARY_NAME}] A break from ${lo} to ${hi} would cut a step that floats. Keep it below or above the steps.`
-			);
-		} else {
-			compress = { lo, hi, gap, share };
-		}
-	}
+	const { squeeze: compress, problems } = squeezeOf({
+		from: read("data-from") ?? read("data-at"),
+		to: read("data-to"),
+		size: breakSpec?.getAttribute("data-size") ?? null,
+		ceiling,
+		extent,
+		depth,
+		breakable: !!type.breakable,
+		segments,
+	});
+	for (const problem of problems) console.warn(`[${LIBRARY_NAME}] ${problem}`);
 	const breakAt = compress ? compress.gap : null;
 	state.measured = [column, bar, line, area].includes(type) && !compress && !steps ? { height, room: top, floor: foot, ceiling, bottom } : null;
 
@@ -1007,19 +1030,9 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 	// Full scale below and above the break, compressed through it.
 	const base = height - foot;
 	const span = ceiling - bottom || 1;
-	let y: (value: number) => number = (value) => base - ((value - bottom) / span) * plotHeight;
-	if (compress) {
-		const { lo, hi, gap, share } = compress;
-		const squeezed = plotHeight * share;
-		const density = (plotHeight - squeezed - breakGap) / (lo + (ceiling - hi));
-		const perValue = squeezed / (hi - lo);
-		y = (value) => {
-			if (value <= lo) return base - value * density;
-			if (value <= gap) return base - lo * density - (value - lo) * perValue;
-			if (value <= hi) return base - lo * density - (value - lo) * perValue - breakGap;
-			return base - lo * density - squeezed - breakGap - (value - hi) * density;
-		};
-	}
+	let y: (value: number) => number = compress
+		? (value) => base - alongScale(value, ceiling, plotHeight, compress, breakGap)
+		: (value) => base - ((value - bottom) / span) * plotHeight;
 	// The plot inside the axes: room for the titles and the numbers on the left and at the foot.
 	let x: Geometry["x"];
 	let frame: Geometry["frame"];
@@ -1258,72 +1271,7 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 		else legend.style.removeProperty("--step");
 	}
 
-	// Names under the plot shrink together, down to 70%, if one is wider than its column.
-	// If they still do not fit, every second, third or more is shown, at full size, centred under its column.
-	const nameRow = state.categories[0]?.parentElement;
-	if (nameRow && type.categories !== "beside" && !type.centre) {
-		// Held at its height while the names are measured at full size, so the page under it does not move for a moment.
-		nameRow.style.height = `${nameRow.offsetHeight}px`;
-		nameRow.removeAttribute("data-thinned");
-		for (const name of state.categories) {
-			name.removeAttribute("data-left-out");
-			name.removeAttribute("data-edge");
-		}
-		const names = state.categories.filter((name) => name.offsetParent !== null);
-		const fit = fitTogether(nameRow, names, (name) => ({ size: name.scrollWidth, room: name.clientWidth }), "--_name-fit");
-		if (!fit && names.length > 1) {
-			// The room of one column, without the padding of the row, which a name with its own padding may be wider than.
-			const rowStyle = getComputedStyle(nameRow);
-			const column = (nameRow.clientWidth - Number.parseFloat(rowStyle.paddingLeft) - Number.parseFloat(rowStyle.paddingRight)) / rows.length;
-			nameRow.style.setProperty("--_name-fit", "1");
-			nameRow.setAttribute("data-thinned", "");
-			const widest = largest(names.map((name) => name.offsetWidth));
-			const gap = 8;
-			// A name at an end is inside the chart rather than centred, so it reaches further: the step leaves room for that too,
-			// and the names stay evenly spaced.
-			const step = Math.max(Math.ceil((widest + gap) / column), Math.ceil((1.5 * widest + gap) / column - 0.5), 1);
-			names.forEach((name, i) => {
-				if (i % step) name.setAttribute("data-left-out", "");
-			});
-			const kept = names.filter((name) => !name.hasAttribute("data-left-out"));
-			const first = kept[0];
-			const last = kept.at(-1);
-			// Only a name that would stick out past the chart is moved in.
-			const box = nameRow.getBoundingClientRect();
-			const sticksOut = [first, last].map((name) => name?.getBoundingClientRect());
-			if (first && sticksOut[0] && sticksOut[0].left < box.left) first.setAttribute("data-edge", "start");
-			if (last && last !== first && sticksOut[1] && sticksOut[1].right > box.right - Number.parseFloat(rowStyle.paddingRight)) {
-				last.setAttribute("data-edge", "end");
-				// The last name is not always in the last column; if it now touches the one before it, it is left out.
-				const before = kept.at(-2);
-				if (before && before.getBoundingClientRect().right + gap > last.getBoundingClientRect().left) last.setAttribute("data-left-out", "");
-			}
-		}
-		// Under a line or an area, a tick above each name shown, at the place of its row: also where the name moved in at an edge.
-		const ticked = (type === line || type === area) && turnedOn(state.figure, "data-chart-ticks", config.ticks);
-		nameRow.toggleAttribute("data-ticks", ticked);
-		nameRow.style.removeProperty("--_tick-reach");
-		if (ticked) {
-			// Up to the baseline, a little above the foot of the plot; not to a zero line in the middle, with values below zero.
-			const rule = Number(svg.querySelector(`.${RULE_CLASS}`)?.getAttribute("y1") ?? height);
-			const reach = height - rule;
-			if (reach > 0 && reach < 10 * unit) nameRow.style.setProperty("--_tick-reach", `${short(reach / unit)}px`);
-			const box = nameRow.getBoundingClientRect();
-			// In the row's own pixels, also on a slide that is scaled.
-			const scale = box.width / (nameRow.offsetWidth || 1);
-			const rowStyle = getComputedStyle(nameRow);
-			const pad = Number.parseFloat(rowStyle.paddingLeft);
-			const column = (nameRow.clientWidth - pad - Number.parseFloat(rowStyle.paddingRight)) / rows.length;
-			state.categories.forEach((name, i) => {
-				if (name.hasAttribute("data-left-out")) name.style.removeProperty("--_tick");
-				else {
-					const left = (name.getBoundingClientRect().left - box.left) / scale - nameRow.clientLeft;
-					name.style.setProperty("--_tick", `${short(pad + (i + 0.5) * column - left)}px`);
-				}
-			});
-		}
-		nameRow.style.height = "";
-	}
+	fitNames(state, config, height, unit);
 
 	// A badge is a hole in the marks under it, so the background shows through.
 	const holes = annotations.flatMap(({ badge }) => {

@@ -149,10 +149,11 @@
 			var box = figure.getBoundingClientRect();
 			return box.bottom > 0 && box.top < window.innerHeight;
 		});
-		figures.forEach(function (figure) { figure.classList.add('no-motion'); figure.classList.remove('is-shown'); });
+		var later = figures.filter(function (figure) { return !inView.includes(figure); });
+		later.forEach(function (figure) { figure.classList.add('no-motion'); figure.classList.remove('is-shown', 'is-built'); });
 		void charts.offsetWidth;
-		figures.forEach(function (figure) { figure.classList.remove('no-motion'); });
-		inView.forEach(function (figure) { figure.classList.add('is-shown'); });
+		later.forEach(function (figure) { figure.classList.remove('no-motion'); });
+		inView.forEach(function (figure) { figure.tablechart.replay(); });
 	};
 
 	controls.forEach(function (control) {
