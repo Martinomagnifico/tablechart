@@ -29,29 +29,32 @@ import {
 	VALUES_CLASS,
 	QUADRANT_CLASS,
 	REFERENCE_CLASS,
-	RULE_CLASS,
 	SERIES_CLASS,
 	LIBRARY_NAME,
 	SR_CLASS,
-	MINUS_CLASS,
 	SHOWN_CLASS,
 	VALUE_CLASS,
 	VIEWBOX_WIDTH,
 } from "./config";
-import { decimalsIn, largest, splitSign } from "./functions/format";
+import { decimalsIn, largest } from "./functions/format";
 import { markerOf } from "./functions/markers";
 import { stackReach, stackTotal } from "./functions/groups";
-import { fitTogether, keepInside, thinOut } from "./functions/labels";
+import { keepInside, thinOut } from "./functions/labels";
 import { measureAll, sizeOf } from "./functions/measure";
 import { along as alongScale, reachOf, squeezeOf } from "./functions/scale";
 import { readSeries, readTable } from "./functions/read-table";
-import { clipAround, cutOut, htmlEl, placeAt, roundEnds, short, svgEl } from "./functions/svg";
-import { niceStep, readScale, type Scale, scaleOf, thin, ticksOf } from "./functions/axis";
+import { clipAround, cutOut, htmlEl, roundEnds, short, svgEl } from "./functions/svg";
+import type { Scale } from "./functions/axis";
 import type { Box } from "./functions/collision";
 import { inkInside, inkNames, measureSurface } from "./functions/colour";
 import { debug } from "./functions/debug";
 import { applySteps, makeControls, planSteps, stepTo } from "./steps";
 import { attachTooltip, releaseTooltip } from "./tooltip";
+import { drawFrame, frameScalesOf, placeFrame, placeValueAxis, valueAxisOf } from "./functions/chart-axes";
+import { agree, remember } from "./functions/chart-group";
+import { fitNames, lineUpNames } from "./functions/names";
+import { writeNumber } from "./functions/numbers";
+import { cornerOf, cssLength, heightRange, turnedOn } from "./functions/settings";
 import type { AnnotationType, ChartState, ChartType, Geometry, Motion, Row, Shape, ValuePick, Series } from "./types";
 
 const CHARTS: Record<string, ChartType> = { area, bar, column, donut, line, waterfall };
@@ -123,12 +126,6 @@ const piecesIn = (lines: [number, number, number, number][], [x, y, w, h]: Box):
 					: ""
 		)
 		.join("");
-
-/** A figure's own `data-chart-…`, on unless it says `false`, or else the option. */
-const turnedOn = (figure: HTMLElement, name: string, option: boolean): boolean => {
-	const own = figure.getAttribute(name);
-	return own === null ? option : own !== "false";
-};
 
 /** Whether a chart builds with animation: `data-chart-animate="false"` on the figure, or the `animate` option, turns it off. */
 export const animated = (figure: HTMLElement, config: Config): boolean =>
@@ -578,55 +575,6 @@ const labelsOf = (figure: HTMLElement, config: Config, withLine: boolean): Geome
 		? "inside"
 		: "outside";
 
-const cssLength = (figure: HTMLElement, unit: number, name: string, fallback: string) => {
-	const style = getComputedStyle(figure);
-	const raw = style.getPropertyValue(name).trim() || fallback;
-	const match = raw.match(/^(\d+(?:\.\d+)?)(px|%|em|rem)$/);
-	if (!match) return null;
-	const amount = Number(match[1]);
-	if (match[2] === "%") return (amount / 100) * VIEWBOX_WIDTH;
-	const size =
-		match[2] === "em"
-			? Number.parseFloat(style.fontSize)
-			: match[2] === "rem"
-				? Number.parseFloat(getComputedStyle(document.documentElement).fontSize)
-				: 1;
-	return amount * size * unit;
-};
-
-/** In a `data-chart-group`, charts on one line of the page get rows of names of one height, so their baselines line up. */
-const lineUpNames = (figure: HTMLElement): void => {
-	const holder = figure.closest<HTMLElement>("[data-chart-group]");
-	if (!holder) return;
-	const name = holder.getAttribute("data-chart-group");
-	const holders = name ? Array.from(document.querySelectorAll<HTMLElement>(`[data-chart-group="${CSS.escape(name)}"]`)) : [holder];
-	const rows = holders.flatMap((one) => Array.from(one.querySelectorAll<HTMLElement>(`.${CATEGORIES_CLASS}:not([data-place])`)));
-	for (const row of rows) row.style.minHeight = "";
-	const found = rows
-		.map((row) => ({ row, tall: row.offsetHeight, top: row.closest("figure")?.getBoundingClientRect().top ?? 0 }))
-		.filter(({ tall }) => tall > 0)
-		.sort((a, b) => a.top - b.top);
-	// Within a few pixels is the same line of the page; after a wrap, each line has its own height.
-	for (let i = 0; i < found.length; ) {
-		let end = i;
-		while (end + 1 < found.length && found[end + 1].top - found[i].top < 4) end++;
-		const line = found.slice(i, end + 1);
-		const tallest = largest(line.map(({ tall }) => tall));
-		if (line.length > 1) for (const { row, tall } of line) if (tall < tallest) row.style.minHeight = `${tallest}px`;
-		i = end + 1;
-	}
-};
-
-/** A corner of a column, bar or slice: its own variable, or else the one for all of them. */
-const cornerOf = (figure: HTMLElement, unit: number, name: string): number =>
-	cssLength(figure, unit, getComputedStyle(figure).getPropertyValue(name).trim() ? name : "--tablechart-corner-radius", "0px") ?? 0;
-
-/** The least and the most a chart may be high; `--tablechart-height` is both. */
-const heightRange = (figure: HTMLElement, unit: number): [number, number] => {
-	const fixed = cssLength(figure, unit, "--tablechart-height", "none");
-	return [fixed ?? cssLength(figure, unit, "--tablechart-min-height", "200px") ?? 0, fixed ?? cssLength(figure, unit, "--tablechart-max-height", "none") ?? Number.POSITIVE_INFINITY];
-};
-
 const barMax = (figure: HTMLElement, unit: number): number =>
 	cssLength(figure, unit, "--tablechart-bar-max", "60px") ?? Number.POSITIVE_INFINITY;
 
@@ -690,127 +638,11 @@ const showTable = ({ figure, rows, series }: ChartState, config: Config): void =
 	figure.toggleAttribute("data-long", rows.length * series.filter((one) => !one.group).length > config.tablelimit);
 };
 
-const fitNames = (state: ChartState, config: Config, height: number, unit: number): void => {
-	const { rows, svg, type } = state;
-	// Names under the plot shrink together, down to 70%, if one is wider than its column.
-	// If they still do not fit, every second, third or more is shown, at full size, centred under its column.
-	const nameRow = state.categories[0]?.parentElement;
-	if (nameRow && type.categories !== "beside" && !type.centre) {
-		// Held at its height while the names are measured at full size, so the page under it does not move for a moment.
-		nameRow.style.height = `${nameRow.offsetHeight}px`;
-		nameRow.removeAttribute("data-thinned");
-		for (const name of state.categories) {
-			name.removeAttribute("data-left-out");
-			name.removeAttribute("data-edge");
-		}
-		const names = state.categories.filter((name) => name.offsetParent !== null);
-		const fit = fitTogether(nameRow, names, (name) => ({ size: name.scrollWidth, room: name.clientWidth }), "--_name-fit");
-		if (!fit && names.length > 1) {
-			// The room of one column, without the padding of the row, which a name with its own padding may be wider than.
-			const rowStyle = getComputedStyle(nameRow);
-			const column = (nameRow.clientWidth - Number.parseFloat(rowStyle.paddingLeft) - Number.parseFloat(rowStyle.paddingRight)) / rows.length;
-			nameRow.style.setProperty("--_name-fit", "1");
-			nameRow.setAttribute("data-thinned", "");
-			const widest = largest(names.map((name) => name.offsetWidth));
-			const gap = 8;
-			// A name at an end is inside the chart rather than centred, so it reaches further: the step leaves room for that too,
-			// and the names stay evenly spaced.
-			const step = Math.max(Math.ceil((widest + gap) / column), Math.ceil((1.5 * widest + gap) / column - 0.5), 1);
-			names.forEach((name, i) => {
-				if (i % step) name.setAttribute("data-left-out", "");
-			});
-			const kept = names.filter((name) => !name.hasAttribute("data-left-out"));
-			const first = kept[0];
-			const last = kept.at(-1);
-			// Only a name that would stick out past the chart is moved in.
-			const box = nameRow.getBoundingClientRect();
-			const sticksOut = [first, last].map((name) => name?.getBoundingClientRect());
-			if (first && sticksOut[0] && sticksOut[0].left < box.left) first.setAttribute("data-edge", "start");
-			if (last && last !== first && sticksOut[1] && sticksOut[1].right > box.right - Number.parseFloat(rowStyle.paddingRight)) {
-				last.setAttribute("data-edge", "end");
-				// The last name is not always in the last column; if it now touches the one before it, it is left out.
-				const before = kept.at(-2);
-				if (before && before.getBoundingClientRect().right + gap > last.getBoundingClientRect().left) last.setAttribute("data-left-out", "");
-			}
-		}
-		// Under a line or an area, a tick above each name shown, at the place of its row: also where the name moved in at an edge.
-		const ticked = (type === line || type === area) && turnedOn(state.figure, "data-chart-ticks", config.ticks);
-		nameRow.toggleAttribute("data-ticks", ticked);
-		nameRow.style.removeProperty("--_tick-reach");
-		if (ticked) {
-			// Up to the baseline, a little above the foot of the plot; not to a zero line in the middle, with values below zero.
-			const rule = Number(svg.querySelector(`.${RULE_CLASS}`)?.getAttribute("y1") ?? height);
-			const reach = height - rule;
-			if (reach > 0 && reach < 10 * unit) nameRow.style.setProperty("--_tick-reach", `${short(reach / unit)}px`);
-			const box = nameRow.getBoundingClientRect();
-			// In the row's own pixels, also on a slide that is scaled.
-			const scale = box.width / (nameRow.offsetWidth || 1);
-			const rowStyle = getComputedStyle(nameRow);
-			const pad = Number.parseFloat(rowStyle.paddingLeft);
-			const column = (nameRow.clientWidth - pad - Number.parseFloat(rowStyle.paddingRight)) / rows.length;
-			state.categories.forEach((name, i) => {
-				if (name.hasAttribute("data-left-out")) name.style.removeProperty("--_tick");
-				else {
-					const left = (name.getBoundingClientRect().left - box.left) / scale - nameRow.clientLeft;
-					name.style.setProperty("--_tick", `${short(pad + (i + 0.5) * column - left)}px`);
-				}
-			});
-		}
-		nameRow.style.height = "";
-	}
-};
-
-/** The charts of the group of this figure, and whether they share one scale. */
-const groupOf = (figure: HTMLElement) => {
-	const holder = figure.closest<HTMLElement>("[data-chart-group]");
-	if (!holder) return null;
-	const name = holder.getAttribute("data-chart-group");
-	const holders = name ? Array.from(document.querySelectorAll<HTMLElement>(`[data-chart-group="${CSS.escape(name)}"]`)) : [holder];
-	const figures = holders.flatMap((one) => (one.matches("figure") ? [one] : Array.from(one.querySelectorAll<HTMLElement>("figure"))));
-	return { figures, shared: holders.some((one) => one.hasAttribute("data-chart-group-scale")) };
-};
-
-const laidOut = new WeakMap<HTMLElement, { state: ChartState; config: Config }>();
-const agreedOn = new WeakMap<HTMLElement, string>();
-let agreeing = false;
-
-/** Charts of a group with `data-chart-group-scale` lay out once to measure, and then again with one scale, and per line of the page one height. */
-const agree = (figure: HTMLElement): void => {
-	const group = groupOf(figure);
-	if (!group?.shared || agreeing) return;
-	const members = group.figures.flatMap((one) => laidOut.get(one) ?? []).filter(({ state }) => state.plot.clientWidth);
-	const signature = members.map(({ state }) => `${state.plot.clientWidth}:${state.rows.map((row) => row.cells.map((cell) => cell.value)).join()}`).join("|");
-	const first = group.figures[0];
-	if (agreedOn.get(first) === signature) return;
-	agreedOn.set(first, signature);
-	agreeing = true;
-	for (const { state, config } of members) {
-		state.agreed = undefined;
-		layoutOne(state, config);
-	}
-	const measured = members.flatMap(({ state }) => (state.measured ? [{ state, ...state.measured, top: state.figure.getBoundingClientRect().top }] : []));
-	const ceiling = largest(measured.map((one) => one.ceiling));
-	const bottom = -largest(measured.map((one) => -one.bottom));
-	for (const one of measured) {
-		// Within a few pixels is the same line of the page.
-		const line = measured.filter((other) => Math.abs(other.top - one.top) < 4);
-		one.state.agreed = {
-			ceiling,
-			bottom,
-			height: largest(line.map((other) => other.height)),
-			room: largest(line.map((other) => other.room)),
-			floor: largest(line.map((other) => other.floor)),
-		};
-	}
-	for (const { state, config } of members) layoutOne(state, config);
-	agreeing = false;
-};
-
 /** Pass 3. Needs layout; makes no text, only places it. */
 export const layout = (state: ChartState, config: Config): boolean => {
-	laidOut.set(state.figure, { state, config });
+	remember(state, config);
 	const done = layoutOne(state, config);
-	if (done) agree(state.figure);
+	if (done) agree(state.figure, layoutOne);
 	return done;
 };
 
@@ -828,56 +660,10 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 	// The value axis of a column, bar or line chart. Its numbers are measured first, as they take room beside the plot, or under a bar chart.
 	const sideways = type.categories === "beside";
 	const along = state.axes && !type.axes ? state.axes : null;
-	const namesUnder = sideways ? null : state.categories[0]?.parentElement;
 	let valueScale: Scale | null = null;
 	if (along) {
-		plot.style.margin = "";
-		if (namesUnder) namesUnder.style.marginLeft = "";
-		const guess = plot.clientWidth;
-		if (!guess) return false;
-		// As the scale does: a step of a waterfall is a size, so only where the steps start and end counts.
-		const segs = type.segments?.(rows) ?? [];
-		const all = state.stacked
-			? rows.flatMap((row) => Object.values(stackReach(row, series.length, type.running)))
-			: segs.some((s) => s.kind === "up" || s.kind === "down")
-				? segs.flatMap((s) => [s.from, s.to])
-				: rows.flatMap((row) => row.cells.slice(0, series.length).filter((cell) => !cell.missing).map((cell) => cell.value));
-		const min = Math.min(0, -largest(all.map((value) => -value)));
-		const max = Math.max(0, largest(all));
-		const font = Number.parseFloat(getComputedStyle(plot).fontSize) || 16;
-		// The scale ends on a number of the axis, or where `data-chart-scale` says; three numbers or more are the numbers themselves.
-		const { chartScaleY, chartScale } = state.figure.dataset;
-		const own = readScale(chartScaleY ?? chartScale);
-		if (own && own.length > 2) valueScale = { min: own[0], max: own[own.length - 1], step: 0, ticks: own };
-		else {
-			const [from, to] = own ?? [Math.min(min, state.agreed?.bottom ?? min), Math.max(max, state.agreed?.ceiling ?? max)];
-			const step = niceStep(to - from, Math.max((sideways ? guess / 9 : Math.min(guess * aspect, heightRange(state.figure, 1)[1]) / 3) / font, 2));
-			const round = (value: number, up: boolean) => (own ? value : Number(((up ? Math.ceil : Math.floor)(value / step - 1e-9 * (up ? 1 : -1)) * step).toPrecision(12)));
-			const lo = round(from, false);
-			const hi = round(to, true);
-			valueScale = { min: lo, max: hi, step, ticks: ticksOf(lo, hi, step) };
-		}
-		along.ticks.textContent = "";
-		const first = rows.find((row) => !row.missing);
-		const places = largest(valueScale.ticks.map((value) => decimalsIn(String(value))));
-		for (const value of valueScale.ticks) {
-			const tick = htmlEl(TICK_CLASS, along.ticks);
-			tick.dataset.value = String(value);
-			tick.dataset.place = "none";
-			if (first?.prefix) tick.dataset.prefix = first.prefix;
-			if (first?.suffix) tick.dataset.suffix = first.suffix;
-			writeNumber(tick, places, config.locale);
-		}
-		if (along.numbers) {
-			const ticks = Array.from(along.ticks.children) as HTMLElement[];
-			for (const tick of ticks) delete tick.dataset.place;
-			measureAll(ticks);
-			if (sideways) plot.style.marginBottom = `${(ticks[0] ? sizeOf(ticks[0]).height : 0) + 6}px`;
-			else {
-				plot.style.marginLeft = `${largest([0, ...ticks.map((tick) => sizeOf(tick).width)]) + 10}px`;
-				if (namesUnder) namesUnder.style.marginLeft = plot.style.marginLeft;
-			}
-		}
+		valueScale = valueAxisOf(state, config, along, aspect);
+		if (!valueScale) return false;
 	}
 
 	const widthPx = plot.clientWidth;
@@ -904,34 +690,7 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 
 	// The numbers along the axes, for a first guess at the room. Once they are measured, some may be left out.
 	const axes = type.axes ? state.axes : null;
-	let scales: Scale[] = [];
-	if (axes) {
-		const font = Number.parseFloat(getComputedStyle(plot).fontSize) || 16;
-		const fields = series.flatMap((one, s) => (one.group ? [] : [s])).slice(0, 2);
-		const drawn = rows.filter((row) => fields.every((s) => row.cells[s] && !row.cells[s].missing));
-		const { chartScaleX, chartScaleY, chartScale } = state.figure.dataset;
-		const asked = [readScale(chartScaleX), readScale(chartScaleY ?? chartScale)];
-		scales = fields.map((s, k) =>
-			scaleOf(
-				drawn.length ? drawn.map((row) => row.cells[s].value) : [0, 1],
-				Math.max(k ? shaped / unit / (font * 4) : widthPx / (font * 9), 4),
-				asked[k]
-			)
-		);
-		axes.ticks.textContent = "";
-		scales.forEach((scale, k) => {
-			const first = drawn[0]?.cells[fields[k]];
-			const places = largest(scale.ticks.map((value) => decimalsIn(String(value))));
-			for (const value of scale.ticks) {
-				const tick = htmlEl(TICK_CLASS, axes.ticks);
-				tick.dataset.axis = k ? "y" : "x";
-				tick.dataset.value = String(value);
-				if (first?.prefix) tick.dataset.prefix = first.prefix;
-				if (first?.suffix) tick.dataset.suffix = first.suffix;
-				writeNumber(tick, places, config.locale);
-			}
-		});
-	}
+	const scales = axes ? frameScalesOf(state, config, axes, shaped, unit, widthPx) : [];
 	const ticks = axes ? (Array.from(axes.ticks.children) as HTMLElement[]) : [];
 	measureAll([
 		...seriesValues.flat(),
@@ -1037,39 +796,7 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 	let x: Geometry["x"];
 	let frame: Geometry["frame"];
 	let shownTicks: number[][] = [];
-	if (axes) {
-		const gap = 6 * unit;
-		const [titleX, titleY] = axes.titles;
-		const width = (node?: HTMLElement) => (node ? sizeOf(node).width * unit : 0);
-		const tall = (node?: HTMLElement) => (node ? sizeOf(node).height * unit : 0);
-		const across = ticks.filter((tick) => tick.dataset.axis === "x");
-		const up = ticks.filter((tick) => tick.dataset.axis === "y");
-		const tickHeight = tall(ticks[0]);
-		const left = width(titleY) + largest([0, ...up.map(width)]) + 2 * gap;
-		const top = tickHeight / 2;
-		frame = [left, top, VIEWBOX_WIDTH - left - largest([0, ...across.map(width)]) / 2, height - top - tall(titleX) - tickHeight - 2 * gap];
-		const [fx, fy, fw, fh] = frame;
-		const [sx, sy] = scales;
-		const scaleX = (value: number) => fx + ((value - sx.min) / (sx.max - sx.min || 1)) * fw;
-		const scaleY = (value: number) => fy + fh - ((value - sy.min) / (sy.max - sy.min || 1)) * fh;
-		x = scaleX;
-		y = scaleY;
-		// Fewer numbers where two would touch.
-		const widthAt = (value: number) => width(across.find((tick) => Number(tick.dataset.value) === value));
-		shownTicks = [
-			thin(sx, (list) => list.every((v, k) => !k || scaleX(v) - scaleX(list[k - 1]) > (widthAt(v) + widthAt(list[k - 1])) / 2 + gap)).ticks,
-			thin(sy, (list) => list.every((v, k) => !k || scaleY(list[k - 1]) - scaleY(v) > tickHeight + gap / 2)).ticks,
-		];
-		for (const tick of ticks) {
-			const value = Number(tick.dataset.value);
-			const k = tick.dataset.axis === "x" ? 0 : 1;
-			const shown = shownTicks[k].includes(value);
-			tick.dataset.place = shown ? (k ? "before" : "below") : "none";
-			if (shown) placeAt(tick, k ? fx - gap : scaleX(value), k ? scaleY(value) : fy + fh + gap, VIEWBOX_WIDTH, height);
-		}
-		if (titleX) placeAt(titleX, fx + fw / 2, height - tall(titleX), VIEWBOX_WIDTH, height);
-		if (titleY) placeAt(titleY, 0, fy + fh / 2, VIEWBOX_WIDTH, height);
-	}
+	if (axes) ({ frame, x, y, shownTicks } = placeFrame(axes, ticks, scales, height, unit));
 
 	// The bands give up the room the widest series name needs.
 	const pick = pickOf(state.figure, config);
@@ -1102,28 +829,7 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 	svg.textContent = ""; // geometry only; no text lives in here
 
 	// The axes, with a short mark at each number, and gridlines if asked.
-	if (frame && x) {
-		const [fx, fy, fw, fh] = frame;
-		const [across, up] = shownTicks;
-		const scaleX = x;
-		if (turnedOn(state.figure, "data-chart-grid", config.grid))
-			svg.appendChild(
-				svgEl("path", {
-					class: GRID_CLASS,
-					d: [...across.map((v) => `M${short(scaleX(v))},${short(fy)}V${short(fy + fh)}`), ...up.map((v) => `M${short(fx)},${short(y(v))}H${short(fx + fw)}`)].join(""),
-				})
-			);
-		svg.appendChild(
-			svgEl("path", {
-				class: AXIS_CLASS,
-				d: [
-					`M${short(fx)},${short(fy)}V${short(fy + fh)}H${short(fx + fw)}`,
-					...across.map((v) => `M${short(scaleX(v))},${short(fy + fh)}v${short(4 * unit)}`),
-					...up.map((v) => `M${short(fx)},${short(y(v))}h${short(-4 * unit)}`),
-				].join(""),
-			})
-		);
-	}
+	if (frame && x) drawFrame(state, config, frame, x, y, shownTicks, unit);
 
 	state.checks = [];
 	const geo: Geometry = {
@@ -1204,42 +910,7 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 		}
 
 	// The numbers along the value axis, fewer where two would touch, and none in the cut of a broken scale.
-	if (along && valueScale) {
-		const gap = 6 * unit;
-		const at = sideways && geo.x ? geo.x : y;
-		const ticks = Array.from(along.ticks.children) as HTMLElement[];
-		const size = (value: number) => sizeOf(ticks.find((tick) => Number(tick.dataset.value) === value) ?? ticks[0]);
-		const shown = thin(valueScale, (list) =>
-			list.every((v, k) =>
-				!k || (sideways ? at(v) - at(list[k - 1]) > ((size(v).width + size(list[k - 1]).width) / 2) * unit + gap : at(list[k - 1]) - at(v) > size(v).height * unit + gap / 2)
-			)
-		).ticks.filter((v) => !compress || v <= compress.lo || v >= compress.hi);
-		for (const tick of ticks) {
-			const value = Number(tick.dataset.value);
-			const on = along.numbers && shown.includes(value);
-			tick.dataset.place = on ? (sideways ? "below" : "before") : "none";
-			if (on) placeAt(tick, sideways ? at(value) : -gap, sideways ? height + gap : at(value), VIEWBOX_WIDTH, height);
-		}
-		const end = VIEWBOX_WIDTH - gutter;
-		// Under the marks.
-		if (turnedOn(state.figure, "data-chart-grid", config.grid))
-			svg.prepend(
-				svgEl("path", {
-					class: GRID_CLASS,
-					d: shown.map((v) => (sideways ? `M${short(at(v))},0V${short(height)}` : `M0,${short(at(v))}H${short(end)}`)).join(""),
-				})
-			);
-		if (along.numbers)
-			svg.appendChild(
-				svgEl("path", {
-					class: AXIS_CLASS,
-					d: [
-						sideways ? `M${short(at(valueScale.min))},${short(height)}H${short(at(valueScale.max))}` : `M0,${short(at(valueScale.max))}V${short(at(valueScale.min))}`,
-						...shown.map((v) => (sideways ? `M${short(at(v))},${short(height)}v${short(4 * unit)}` : `M0,${short(at(v))}h${short(-4 * unit)}`)),
-					].join(""),
-				})
-			);
-	}
+	if (along && valueScale) placeValueAxis(state, config, along, valueScale, sideways && geo.x ? geo.x : y, compress, height, unit, gutter);
 
 	for (const [n, annotation] of annotations.entries()) {
 		annotation.badge?.setAttribute("data-note", String(n + 1));
@@ -1386,20 +1057,6 @@ export const relabel = (state: ChartState, config: Config): void => {
 	for (const node of state.centre ? [...values, state.centre] : values) {
 		if (node.dataset.missing !== undefined) node.textContent = node.dataset.missing;
 		else writeNumber(node, node.dataset.decimals ? Number(node.dataset.decimals) : state.decimals, config.locale);
-	}
-};
-
-/** The number in `data-value`, in the locale, with the text around it. */
-const writeNumber = (node: HTMLElement, places: number, locale?: string): void => {
-	const { prefix = "", suffix = "" } = node.dataset;
-	const [sign, rest] = splitSign(Number.parseFloat(node.dataset.value || "0"), places, locale);
-	node.textContent = prefix + (prefix ? sign : "") + rest + suffix;
-	// A leading minus is set apart, so it can hang outside a centred number.
-	if (sign && !prefix) {
-		const minus = document.createElement("span");
-		minus.className = MINUS_CLASS;
-		minus.textContent = sign;
-		node.prepend(minus);
 	}
 };
 
