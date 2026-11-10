@@ -69,11 +69,25 @@ const warn = (message: string) => {
 	console.warn(`[${LIBRARY_NAME}] ${message}`);
 };
 
-/** The values one series gives, by analysis. */
+/** The sum of the values of a row, as the top of its stack; written with the most decimals of its parts. */
+const sumOf = (cells: Cell[]): Cell | undefined => {
+	const known = cells.filter((cell) => !cell.missing);
+	const widest = known.reduce((most, cell) => (decimalsIn(cell.number) > decimalsIn(most.number) ? cell : most), known[0] ?? cells[0]);
+	if (!widest) return undefined;
+	const value = known.reduce((total, cell) => total + cell.value, 0);
+	return { ...widest, raw: "", number: value.toFixed(decimalsIn(widest.number)), missing: !known.length, value };
+};
+
+/** The values one series gives, by analysis. `s` is -1 for the totals of the rows, with `data-series="total"`. */
 const analyse = (figure: HTMLElement, s: number, config: SummaryConfig, locale: string | undefined): Results => {
-	const rows = readTable(figure, config.langattribute).filter((row) => !row.isTotal);
-	const series = readSeries(figure, rows, config.langattribute);
-	const one = series[s];
+	const table = readTable(figure, config.langattribute);
+	const series = readSeries(figure, table.filter((row) => !row.isTotal), config.langattribute);
+	const totals = s < 0;
+	const rows = table
+		.filter((row) => !row.isTotal)
+		.map((row) => (totals ? { ...row, cells: [sumOf(row.cells.slice(0, series.length))].filter((cell): cell is Cell => !!cell) } : row));
+	const col = totals ? 0 : s;
+	const one = totals ? undefined : series[s];
 	const keyed = (text: string, key: string | null): Value => {
 		if (!key || !config.langattribute) return text;
 		const span = document.createElement("span");
@@ -82,7 +96,7 @@ const analyse = (figure: HTMLElement, s: number, config: SummaryConfig, locale: 
 		return span;
 	};
 	// As the chart writes them: the decimals of the column, and the text around the number of the cell.
-	const places = Math.max(0, ...rows.map((row) => decimalsIn(row.cells[s]?.number ?? "")));
+	const places = Math.max(0, ...rows.map((row) => decimalsIn(row.cells[col]?.number ?? "")));
 	const number = (value: number, like: Cell, decimals = places): string => {
 		const [sign, rest] = splitSign(value, decimals, locale);
 		return like.prefix + sign + rest + like.suffix;
@@ -113,7 +127,7 @@ const analyse = (figure: HTMLElement, s: number, config: SummaryConfig, locale: 
 		: null;
 
 	const points = rows.flatMap((row, x) => {
-		const cell = row.cells[s];
+		const cell = row.cells[col];
 		return cell && !cell.missing ? [{ row, cell, x, y: cell.value }] : [];
 	});
 	if (!points.length) return { chart, notes, extremes: null, range: null, change: null, trend: null, outliers: null };
@@ -133,6 +147,14 @@ const analyse = (figure: HTMLElement, s: number, config: SummaryConfig, locale: 
 			"lowest.value": number(low.y, low.cell),
 		},
 	};
+	// A share of the whole: of the total row if the table has one, or of the sum. Only for values that are all zero or more.
+	const given = totals ? undefined : table.find((row) => row.isTotal)?.cells[col];
+	const whole = given && !given.missing ? given.value : points.reduce((sum, point) => sum + point.y, 0);
+	extremes.values.total = number(whole, high.cell);
+	if (whole > 0 && points.every((point) => point.y >= 0)) {
+		extremes.values["highest.share"] = percent((high.y / whole) * 100);
+		extremes.values["lowest.share"] = percent((low.y / whole) * 100);
+	}
 	const range: Result = {
 		values: {
 			"range.from": number(low.y, low.cell),
@@ -293,7 +315,7 @@ export const fill = (figure: HTMLElement, options: Partial<SummaryConfig> = {}):
 	for (const template of box.querySelectorAll<HTMLElement>(":scope > *")) {
 		template.setAttribute(TEMPLATE, "");
 		template.hidden = true;
-		const s = Math.max(1, Number.parseInt(template.dataset.series ?? "1", 10) || 1) - 1;
+		const s = template.dataset.series === "total" ? -1 : Math.max(1, Number.parseInt(template.dataset.series ?? "1", 10) || 1) - 1;
 		if (!bySeries.has(s)) bySeries.set(s, analyse(figure, s, config, locale));
 		const results = bySeries.get(s) as Results;
 		if (!shows(template, results)) continue;

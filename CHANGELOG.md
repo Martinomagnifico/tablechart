@@ -4,6 +4,8 @@
 
 ### Added
 
+- `data-series="total"` in a summary, for the totals of the rows, such as the stacks of a stacked chart.
+- `{highest.share}`, `{lowest.share}` and `{total}` in a summary.
 - `chart.replay()`, builds a chart again with its animation.
 - `chart.reset()`, takes a chart back to its start, to build when it scrolls into view.
 - `data-chart-group-scale`, one scale for the charts of a group, so the same value is the same height.

@@ -51,6 +51,17 @@ block content
 
 		p A summary says in a few sentences what matters, such as the highest and the lowest value. You write the sentences. Tablechart fills in the numbers from the table, formatted as on the chart.
 
+	+section("What a summary needs")
+		p A chart only gets a summary if two things are there:
+		ul
+			li The summary script, loaded and started before #[code init()]. A page without it loads nothing extra. See #[a(href='#start-the-summary') Start the summary].
+			li Sentences in the figure: a #[code div] with the class #[code chart-summary], with your sentences and their placeholders. Without sentences, there is nothing to fill, and the chart has no summary.
+		p So a chart without sentences stays as it is, also on a page that loads the summary script.
+
+	+section("Shown or hidden")
+		p By default, a summary is not on the page for everyone to see. Screen readers read it, right after the title of the chart. In print and in a PDF, it is printed if the chart leaves numbers out and its table is not printed.
+		p If you want everyone to see the summary on screen too, add #[code data-chart-summary="always"] to the figure. The examples on this page have it, so you can see them. For all values, see #[a(href='#who-sees-what') Who sees what].
+
 	+section("Example")
 		p The sentences are in a #[code div] with the class #[code chart-summary], in the figure. A placeholder in braces, such as #[code {highest.value}], is filled with a value from the table. This chart has #[code data-chart-summary="always"], so the summary is also shown on the page.
 
@@ -141,6 +152,12 @@ block content
 					td: code {lowest.value}
 					td The lowest value
 				tr
+					td: code {highest.share}, #[code {lowest.share}]
+					td The highest and the lowest value as a share of the total, such as #[code 51%]. Only if no value is below zero.
+				tr
+					td: code {total}
+					td The total: the row with #[code data-kind="total"] if the table has one, or else the sum of the values
+				tr
 					td: code {range.from}
 					td The lowest value
 				tr
@@ -219,6 +236,22 @@ block content
 			<p data-summary="trend" data-when="unclear">The price went up and down, without a clear trend.</p>
 
 		p #[code {trend}] and #[code {change}] are words too, for a single sentence. The #[code words] option sets them, such as #[code Summary.init({ words: { up: "rising", down: "falling", flat: "stable" } })].
+
+	+section("Totals and shares")
+		p With #[code data-series="total"], a sentence is about the total of each row: all its values added up, as at the top of a stack. In a stacked chart, the highest stack is then the highest value, not the highest part of one column.
+		p #[code {highest.share}] and #[code {lowest.share}] say how much of the whole a value is, as on a donut chart.
+
+		+chart(null, '6')
+			figure(data-chart="donut" data-chart-summary="always")
+				figcaption: b Where the apples went
+				table
+					tbody
+						each row in [['Picked', '74.5', 'total'], ['Juiced', '38.2'], ['Eaten fresh', '18.1'], ['Sold whole', '12.4'], ['Composted', '5.8']]
+							tr(data-kind=row[2])
+								th= row[0]
+								td= row[1]
+				div.chart-summary
+					p Of the {total} tonnes picked, {highest.share} was juiced: {highest.value} tonnes. {lowest.name} was the smallest part, with {lowest.share}.
 
 	+section("Trend and outliers")
 		p The trend is a straight line through all values. With fewer than 4 rows, there is no trend. The trend is:
