@@ -419,10 +419,12 @@ const trend = (area: boolean): ChartType => ({
 				if (keys.includes("outliers")) order.push(...(trendOf(known.map((i) => ({ x: i, y: value(i) })))?.outside.map((p) => p.x) ?? []));
 			}
 			const kept: number[] = [];
+			// A last value that goes next to the name is not near its point, so it takes no room from the values before it.
+			const beside = (i: number) => geo.numbersAtEnd && i === lastOf(s);
 			for (const i of order) {
 				const label = seriesValues[s][i];
 				if (kept.includes(i) || label.dataset.place === "none") continue;
-				if (kept.every((k) => stepOf([seriesValues[s][k], label], unit, VIEWBOX_WIDTH, height) === 1)) kept.push(i);
+				if (beside(i) || kept.filter((k) => !beside(k)).every((k) => stepOf([seriesValues[s][k], label], unit, VIEWBOX_WIDTH, height) === 1)) kept.push(i);
 			}
 			return new Set(kept);
 		};
@@ -448,12 +450,12 @@ const trend = (area: boolean): ChartType => ({
 		if (!stacked && !step && own.some((s) => showing.get(s))) {
 			const right = cx(last) + cx(0);
 			const clear = 2 * unit;
-			const alongOf = (s: number): Box[] =>
-				rows.flatMap((_row, i) => (i === last || missing(s, i) || missing(s, i + 1) ? [] : piecesOf(s, i, i + 1, clear)));
-			const along: Box[] = own.flatMap(alongOf);
+			const along: Box[] = own.flatMap((s) =>
+				rows.flatMap((_row, i) => (i === last || missing(s, i) || missing(s, i + 1) ? [] : piecesOf(s, i, i + 1, clear)))
+			);
 			const ends = nameBoxes();
-			// Above or below its point, or a line of text further, if the line or another value is in the way; or beside it.
-			type Spot = "outside" | "below" | "outside far" | "below far" | "after" | "before";
+			// Above or below its point, or beside it. A value that fits none of these is left out, not moved further away.
+			type Spot = "outside" | "below" | "after" | "before";
 			const everyValue = own.flatMap((s) => [...(showing.get(s) ?? [])].map((i) => ({ s, i })));
 			const atEnd = ({ s, i }: { s: number; i: number }) => geo.numbersAtEnd && i === lastOf(s);
 			const items = everyValue.filter((item) => !atEnd(item));
@@ -463,8 +465,8 @@ const trend = (area: boolean): ChartType => ({
 				const after = i < last && !missing(s, i + 1) ? cellAt(s, i + 1)?.value : undefined;
 				const dip = (before ?? after) !== undefined && (before === undefined || value <= before) && (after === undefined || value <= after);
 				return dip
-					? ["below", "outside", "below far", "outside far", "after", "before"]
-					: ["outside", "below", "outside far", "below far", "after", "before"];
+					? ["below", "outside", "after", "before"]
+					: ["outside", "below", "after", "before"];
 			};
 			const boxOf = ({ s, i }: { s: number; i: number }, spot: Spot): Box => {
 				const w = sizeOf(seriesValues[s][i]).width * unit;
@@ -474,8 +476,6 @@ const trend = (area: boolean): ChartType => ({
 				const middle = Math.min(Math.max(px - w / 2, 0), right - w);
 				if (spot === "outside") return [middle, py - 7 * unit - h, w, h];
 				if (spot === "below") return [middle, py + 7 * unit, w, h];
-				if (spot === "outside far") return [middle, py - 7 * unit - 2 * h, w, h];
-				if (spot === "below far") return [middle, py + 7 * unit + h, w, h];
 				if (spot === "after") return [px + 7 * unit, py - h / 2, w, h];
 				return [px - 7 * unit - w, py - h / 2, w, h];
 			};
@@ -493,13 +493,9 @@ const trend = (area: boolean): ChartType => ({
 			const chosen = items.map((item, k) => {
 				const boxes = spots[k].map((spot) => boxOf(item, spot));
 				const free = (box: Box) => inside(box) && ![...placed, ...ends, ...points].some((other) => overlaps(box, other));
-				// A value a line of text further may not have another line between it and its point.
-				const others = own.filter((s) => s !== item.s).flatMap(alongOf);
-				const ownSide = (b: number) =>
-					!spots[k][b].endsWith("far") || !others.some((piece) => overlaps(boxOf(item, spots[k][b].split(" ")[0] as Spot), piece));
-				let pick = boxes.findIndex((box, b) => free(box) && ownSide(b) && !along.some((piece) => overlaps(box, piece)));
+				let pick = boxes.findIndex((box) => free(box) && !along.some((piece) => overlaps(box, piece)));
 				if (pick < 0) {
-					pick = boxes.findIndex((box, b) => free(box) && ownSide(b));
+					pick = boxes.findIndex(free);
 					if (pick >= 0) crossing.add(k);
 				}
 				if (pick >= 0) placed.push(boxes[pick]);
@@ -513,7 +509,7 @@ const trend = (area: boolean): ChartType => ({
 				if (pick === null) return;
 				const spot = spots[k][pick];
 				const [bx, by, bw, bh] = boxOf(item, spot);
-				const place = spot.split(" ")[0];
+				const place = spot;
 				label.dataset.place = place;
 				// Where each place is anchored: the foot of a value above, the top of one below, the side of one beside.
 				const x = place === "after" ? bx : place === "before" ? bx + bw : bx + bw / 2;

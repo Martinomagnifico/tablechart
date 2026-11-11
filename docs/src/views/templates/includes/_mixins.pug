@@ -386,12 +386,12 @@ mixin style(label)
 mixin wcagDemo(id)
 	.card.wcag-demo(data-wcag="2")
 		.demo-choice
-			label(for=id) Contrast measured with
+			label(for=id) Contrast standard
 			select.styled-select(id=id)
 				button
 					selectedcontent
 					+chevron(18, 'down')
-				option.choice(value="2") WCAG 2, the default
+				option.choice(value="2") WCAG 2 (default)
 				option.choice(value="3") WCAG 3 (APCA)
 		.demo
 			figure.inside-choice(data-chart="bar" data-chart-stack)

@@ -1,5 +1,6 @@
 import { LIBRARY_NAME, SHOWN_CLASS } from "../config";
 import { contrastOf, markOf, methodOf, rgbOf, surfaceOf } from "./colour";
+import { tableOf } from "../shared/table";
 
 // What each method asks, and how it writes a contrast. A line, slice or bar needs 3:1 with the background (WCAG 1.4.11), or Lc 30
 // with APCA; text needs 4.5:1 (WCAG 1.4.3), or Lc 60, and less if it is large. Parts next to each other are kept apart by a gap
@@ -32,8 +33,8 @@ export const checkContrast = (figure: HTMLElement): void => {
 	const method = METHODS[methodOf(figure)];
 
 	// The names of the value columns, from the header row; a chart with one value column needs none.
-	const names = Array.from(figure.querySelectorAll("table thead tr:first-child > *")).map((cell) => (cell.textContent ?? "").trim());
-	const rows = Array.from(figure.querySelectorAll("tbody tr > :first-child")).map((cell) => (cell.textContent ?? "").trim());
+	const names = Array.from(tableOf(figure)?.querySelectorAll("thead tr:first-child > *") ?? []).map((cell) => (cell.textContent ?? "").trim());
+	const rows = Array.from(tableOf(figure)?.querySelectorAll("tbody tr > :first-child") ?? []).map((cell) => (cell.textContent ?? "").trim());
 	const parts: [string, string, (element: Element) => string][] = [
 		[".tablechart-series", "Line", (element) => getComputedStyle(element).stroke],
 		[".tablechart-slice", "Slice", (element) => getComputedStyle(element).stroke],
@@ -101,7 +102,7 @@ export const checkTextContrast = (figure: HTMLElement): void => {
 			setTimeout(later, 500);
 			return;
 		}
-		const rows = Array.from(figure.querySelectorAll("tbody tr > :first-child")).map((cell) => (cell.textContent ?? "").trim());
+		const rows = Array.from(tableOf(figure)?.querySelectorAll("tbody tr > :first-child") ?? []).map((cell) => (cell.textContent ?? "").trim());
 		const method = METHODS[methodOf(figure)];
 		const shape = figure.dataset.chart === "bar" ? "bar" : "column";
 		const found = new Map<string, { what: string; names: string[]; contrast: number; needed: number }>();

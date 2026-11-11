@@ -6,8 +6,10 @@
 
 // The charts on the start page, each in a box of its own, with the donut in the middle.
 .hero-charts {
+	// Square boxes, at most as wide as the row needs; if the row is wider, the boxes are in the middle.
 	display: grid;
-	grid-template-columns: repeat(5, minmax(0, 1fr));
+	grid-template-columns: repeat(5, minmax(0, 13rem));
+	justify-content: center;
 	gap: 1em;
 	margin: 2em 0;
 	font-size: 0.85em;
@@ -18,36 +20,33 @@
 
 	// Where five do not fit well, the three in the middle stay.
 	@media (max-width: 1100px) {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-template-columns: repeat(3, minmax(0, 15rem));
 
 		[data-chart].hero-extra {
 			display: none;
 		}
 	}
 
-	// One below the other, with the same space between the boxes as beside them.
+	// Two by two on a phone: the column chart comes back, so no box is alone on its row.
 	@media (max-width: 640px) {
-		--hero-space: clamp(1.5rem, 9vw, 3.5rem);
-		grid-template-columns: minmax(0, 1fr);
-		gap: var(--hero-space);
-		// The page and its container each have the standard padding already.
-		margin-inline: calc(var(--hero-space) - 2 * var(--standard-padding));
+		grid-template-columns: repeat(2, minmax(0, 13rem));
+
+		[data-chart="column"].hero-extra {
+			display: flex;
+		}
 	}
 
 	[data-chart] {
 		margin: 0;
-		padding: 0.75em;
-		// Lower than a chart on its own may be, so the row stays low.
-		--tablechart-min-height: 120px;
+		padding: 1em;
+		aspect-ratio: 1;
+		// The drawing as high as most of its width, so with the names under it the box is about square.
+		--tablechart-height: 84%;
 
 		@media (max-width: 1100px) {
-			padding: 0.5em;
+			padding: 1em;
 		}
 
-		// As tall as the donut, so the boxes are about the same height.
-		@media (max-width: 640px) {
-			--tablechart-min-height: 85%;
-		}
 		border: 1px solid color-mix(in oklab, currentColor 25%, transparent);
 		border-radius: 1rem;
 		// One after the other, border and all. Tablechart waits until a box is halfway in, then builds its chart.
@@ -79,10 +78,15 @@
 		animation: none;
 	}
 
-	// The boxes in a row are as tall as the tallest, so each chart sits in the middle of its box.
+	// The boxes in a row are as tall as the tallest. Each chart goes to the bottom of its box, so the names and the key of the donut are on one line.
 	[data-chart] {
 		display: flex;
 		flex-direction: column;
+		justify-content: flex-end;
+	}
+
+	// The bar chart has its names beside the bars, so it is a row of names shorter: it goes in the middle.
+	[data-chart="bar"] {
 		justify-content: center;
 	}
 
@@ -300,6 +304,15 @@
 	justify-content: space-between;
 }
 
+// On a phone, a dropdown ends where the demo under it ends, with its name at the start of the row.
+@media (max-width: 600px) {
+	.demo-choice:has(> .styled-select) {
+		flex: 1 1 100%;
+		flex-wrap: nowrap;
+		justify-content: space-between;
+	}
+}
+
 // An on/off switch, with its name as the text of the button. The track always has a check on the left and a circle on the right,
 // and the knob covers the one that does not apply, so nothing is swapped when it is clicked.
 .demo-switch {
@@ -382,7 +395,7 @@
 
 @each $vision in (protanopia, deuteranopia, tritanopia, achromatopsia) {
 	.vision-demo[data-vision="#{$vision}"] .demo {
-		filter: url("##{"vision-" + $vision}");
+		filter: url("#vision-#{$vision}");
 	}
 }
 
@@ -464,4 +477,18 @@
 }
 .clamp-note {
 	margin: 0;
+}
+
+// A chart next to its explanation: on a wide screen the chart stays as narrow as on a phone.
+.side-by-side {
+	display: grid;
+	gap: 1.5rem;
+
+	@media (min-width: 769px) {
+		grid-template-columns: 22rem minmax(0, 1fr);
+		align-items: start;
+	}
+	.side-text > :first-child {
+		margin-top: 0;
+	}
 }

@@ -21,7 +21,7 @@ import {
 } from "../config";
 import { largest } from "../shared/format";
 import { stackReach, stackTotal } from "../shared/stacks";
-import { keepInside, thinOut } from "./labels";
+import { keepClear, keepInside, thinOut } from "./labels";
 import { measureAll, sizeOf } from "./measure";
 import { along as alongScale, reachOf, squeezeOf } from "../scale/scale";
 import { clipAround, cutOut, roundEnds, short, svgEl } from "../draw/svg";
@@ -278,9 +278,13 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 	// The bands give up the room the widest series name needs.
 	const pick = pickOf(state.figure, config);
 	const shape = shapeOf(state.figure, config);
-	// With a chosen set, the last numbers go next to the names, so a line that ends close to another keeps its own number.
-	const numbersAtEnd = !!type.running && names.length > 0 && !state.stacked && shape !== "step" && pick.mode === "set" && pick.keys.includes("last");
-	const endNumbers = numbersAtEnd ? largest(seriesValues.flat().map((label) => sizeOf(label).width)) * unit : 0;
+	// The last numbers go next to the names, so a line that ends close to another keeps its own number: with a chosen set, or with
+	// `auto` when the values will not all fit, judged from the widest value against the room per row.
+	const widest = largest(seriesValues.flat().map((label) => sizeOf(label).width));
+	const crowded = rows.length * (widest + 4) > widthPx;
+	const numbersAtEnd =
+		!!type.running && names.length > 0 && !state.stacked && shape !== "step" && pick.keys.includes("last") && (pick.mode === "set" || (pick.mode === "auto" && crowded));
+	const endNumbers = numbersAtEnd ? widest * unit : 0;
 	const gutter = names.length
 		? largest(names.map((name) => sizeOf(name).width)) * unit + 12 * unit + endNumbers
 		: 0;
@@ -379,12 +383,21 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 	const staggered = Number(plot.style.getPropertyValue("--count")) || rows.length;
 	for (const name of state.figure.querySelectorAll<HTMLElement>(`.${NAME_CLASS}`))
 		name.style.setProperty("--i", String(Math.min(rows[rows.length - 1].slot, staggered - 1)));
-	// Numbers that overlap, such as on a long line, are thinned out. Grouped and stacked numbers have rules of their own.
-	if (!state.stacked && !plot.hasAttribute("data-grouped"))
+	// Numbers that overlap, such as on a long line, are thinned out; by columns or bars, the largest that are clear of the others stay.
+	// Grouped and stacked numbers have rules of their own.
+	if (!state.stacked && !plot.hasAttribute("data-grouped")) {
+		const marks = new Map<number, Box>(
+			Array.from(svg.querySelectorAll<SVGGraphicsElement>(".tablechart-bar")).map((mark) => {
+				const { x, y, width, height: tall } = mark.getBBox();
+				return [Number(mark.dataset.row), [x, y, width, tall]];
+			})
+		);
 		for (const labels of seriesValues) {
 			keepInside(labels, unit, VIEWBOX_WIDTH);
-			thinOut(labels, unit, VIEWBOX_WIDTH, height);
+			if (marks.size && !lineSeries.length) keepClear(labels, marks, sideways, unit, VIEWBOX_WIDTH, height);
+			else thinOut(labels, unit, VIEWBOX_WIDTH, height);
 		}
+	}
 
 	// The numbers along the value axis, fewer where two would touch, and none in the cut of a broken scale.
 	if (along && valueScale) placeValueAxis(state, config, along, valueScale, sideways && geo.x ? geo.x : y, compress, height, unit, gutter);

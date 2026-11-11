@@ -486,9 +486,9 @@ hr {
 		font-weight: 600;
 	}
 
-	// A name never breaks on a wide screen: the first column wraps between names, so it does not crowd the descriptions.
+	// A name never breaks on a wide screen. On a small one it wraps at its hyphens, and a word only breaks if it cannot fit at all.
 	td:first-child {
-		overflow-wrap: anywhere;
+		overflow-wrap: break-word;
 
 		@media (min-width: 769px) {
 			overflow-wrap: normal;

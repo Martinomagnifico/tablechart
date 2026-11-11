@@ -21,7 +21,7 @@
 	// Clipped rather than hidden, so screen readers can go through the cells and VoiceOver shows where it reads.
 	position: relative;
 
-	:where(table),
+	:where(table:not(.chart-summary *)),
 	:where(.chart-annotations),
 	:where(.chart-summary) {
 		position: absolute;
@@ -40,7 +40,8 @@
 
 	// `data-chart-table="always"`: the table under the chart, also on screen.
 	// A shown table gets room between its cells, names to the left and numbers to the right; a site's own table styles win.
-	&[data-table] > :where(table) {
+	&[data-table] > :where(table),
+	:where(.chart-summary table) {
 		margin-top: 0.75em;
 		border-collapse: collapse;
 

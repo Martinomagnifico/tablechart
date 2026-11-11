@@ -3,6 +3,7 @@ import type { Config } from "../config";
 import { place } from "../layout/place";
 import { noteCell } from "../build/read-table";
 import type { ChartState, TooltipLine } from "../types";
+import { tableOf } from "../shared/table";
 
 const TIP_CLASS = "tablechart-tooltip";
 // A child of body does not inherit the chart's variables, so these are copied from the chart when it opens.
@@ -224,7 +225,7 @@ const show = (state: ChartState, index: number, config: Config): void => {
 		return node;
 	};
 	// The full name in the table, also after a translation; the name under the chart may be a short one.
-	const head = state.figure.querySelectorAll("tbody tr")[index]?.querySelector("th");
+	const head = tableOf(state.figure)?.querySelectorAll("tbody tr")[index]?.querySelector("th");
 	const name = head?.textContent?.trim() || state.categories[index]?.textContent || state.rows[index].label;
 	// With one value and no series name, the name of the row and its value share a line.
 	const single = lines.length === 1 && !lines[0].name;

@@ -1,4 +1,5 @@
 import { LIBRARY_NAME } from "../config";
+import { tableOf } from "./table";
 
 /** Messages for whoever is working on a page, shown only with `debug: true`. */
 export const debug = {
@@ -12,7 +13,7 @@ export const debug = {
 		const start = performance.now();
 		const result = work();
 		const ms = performance.now() - start;
-		const rows = figure.querySelectorAll("tbody tr").length;
+		const rows = tableOf(figure)?.querySelectorAll("tbody tr").length ?? 0;
 		if (ms > 50) console.warn(`[${LIBRARY_NAME}] ${what} took ${ms.toFixed(1)} ms for ${rows} rows, more than 50 ms.`, figure);
 		else debug.log(`${what} took ${ms.toFixed(1)} ms for ${rows} rows.`, figure);
 		return result;

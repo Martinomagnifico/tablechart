@@ -57,8 +57,6 @@
     "test:scale": "node test/scale.test.mjs",
     "test:replay": "node test/replay.test.mjs",
     "test:summary": "node test/summary.test.mjs",
-    "lab": "node lab/pdf/lab.mjs",
-    "lab:pdf": "node lab/pdf/lab.mjs --pdf",
     "prepack": "npm run build",
     "clean": "rm -rf dist"
   },

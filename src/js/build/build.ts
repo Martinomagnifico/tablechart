@@ -27,6 +27,7 @@ import type { ChartState, Motion, Series } from "../types";
 import { ANNOTATIONS, CHARTS } from "../charts/registry";
 import { animated, shapeOf } from "../shared/settings";
 import { settleMasks } from "../show/shown";
+import { tableOf } from "../shared/table";
 
 /** Three passes: keys, then every text element, then geometry. Geometry makes no text, so a translation script that sweeps once finds it all. */
 
@@ -53,7 +54,7 @@ const pauseLines = (caption: HTMLElement): void => {
 
 /** A total row in a donut's table, so screen readers read the total with its name. */
 const addTotalRow = (figure: HTMLElement, centre: HTMLElement, config: Config): HTMLElement | null => {
-	const table = figure.querySelector("table");
+	const table = tableOf(figure);
 	if (!table) return null;
 	const made = table.querySelector<HTMLElement>("tfoot [data-chart-total]");
 	if (made) {
@@ -87,7 +88,7 @@ const nameTable = (figure: HTMLElement): void => {
 	};
 	// Not every browser names a figure after its figcaption; a div may not have a name.
 	if (figure.tagName === "FIGURE" && !named(figure)) link(figure);
-	const table = figure.querySelector("table");
+	const table = tableOf(figure);
 	if (table && !named(table) && !table.querySelector(":scope > caption")) link(table);
 };
 
@@ -137,7 +138,7 @@ export const build = (
 	const rows = readTable(figure, config.langattribute);
 	if (!rows.length) {
 		console.warn(
-			figure.querySelector("table")
+			tableOf(figure)
 				? `[${LIBRARY_NAME}] A chart has no rows in its table, so there is nothing to draw.`
 				: `[${LIBRARY_NAME}] A chart has no table, so there is nothing to draw.`,
 			figure
@@ -352,7 +353,7 @@ export const build = (
 	// A chart that steps (`data-fragment`) builds a step at a time, from left to right. Without animation it is shown whole.
 	// A scatter chart has one step: the whole chart arrives together, after its axes and a quadrant, with `data-fragment` on the figure.
 	const plan = animated(figure, config) ? planSteps(figure, Boolean(type.axes)) : null;
-	if (type.axes && figure.querySelector("tbody [data-fragment], thead [data-fragment]"))
+	if (type.axes && tableOf(figure)?.querySelector("tbody [data-fragment], thead [data-fragment]"))
 		debug.log(`A ${kind} chart has one step, with data-fragment on the figure; its rows and columns have no steps of their own.`, figure);
 	if (plan) figure.setAttribute("data-steps", "");
 	const keys = figure.getAttribute("data-chart-keys");

@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.3.1] - 2026-11-XX
+
+### Added
+
+- `groups` in a summary, a short table of the rows in groups, each with its lowest, average and highest value.
+- `{rank}` and `{rank.low}` for each outlier and note in a summary, and `{values}`, the number of values.
+- Summary settings per chart, with `data-summary-` and the name, or as JSON in `data-summary-options` on the figure or a parent.
+
+### Changed
+
+- `Summary.fill(figure)` uses the settings of `Summary.init()`.
+- A table inside a summary is not read as the data of the chart.
+- On a crowded column or bar chart, the numbers of the largest values stay, where they are clear of the other columns.
+- On a crowded line or area chart, the last number of each line goes next to its name.
+- A number that does not fit next to its point is left out, not placed a line further away.
+
+
 ## [1.3.0] - 2026-11-10
 
 ### Added

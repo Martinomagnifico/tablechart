@@ -239,7 +239,7 @@ block content
 				`${months[i % 12].slice(0, 3)} ’${24 + Math.floor(i / 12)}`,
 				String(Math.round(60 + i * 1.5 + 25 * Math.cos(((i % 12) - 6) / 6 * Math.PI))),
 			]);
-		p With many columns, only every second, third or more number is shown, so they do not touch, and the names under the chart get smaller or fewer. If a row has a short name in #[code data-short], that name goes under the chart, and the table keeps the full name for a screen reader. See #[a(href=url('/types/line.html#many-rows')) Many rows].
+		p With many columns, only the numbers of the largest values are shown, each where it is clear of the other columns and numbers, and the names under the chart get smaller or fewer. If a row has a short name in #[code data-short], that name goes under the chart, and the table keeps the full name for a screen reader. See #[a(href=url('/types/line.html#many-rows')) Many rows].
 
 		.card
 			.demo

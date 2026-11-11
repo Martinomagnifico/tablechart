@@ -77,7 +77,7 @@ block content
 							tr
 								th Month
 								th Apples
-								th Oranges
+								th(data-line="dashed") Oranges
 						tbody
 							each row in fruit
 								tr
@@ -94,7 +94,7 @@ block content
 					<figcaption><b>Comparing apples and oranges</b><br><span>tonnes sold per month</span></figcaption>
 					<table>
 						<thead>
-							<tr><th>Month</th><th>Apples</th><th>Oranges</th></tr>
+							<tr><th>Month</th><th>Apples</th><th data-line="dashed">Oranges</th></tr>
 						</thead>
 						<tbody>
 							<tr><th data-short="#{fruit[0][1]}">#{fruit[0][0]}</th><td>#{fruit[0][4]}</td><td>#{fruit[0][5]}</td></tr>
@@ -111,6 +111,37 @@ block content
 
 		p The summary is where you put it in the figure. Here it is under the table, so it is under the chart. A screen reader reads it right after the title of the chart.
 		p Each month has its full name in the table, which a screen reader and the summary read, and a short name under the chart, in #[code data-short]. See #[a(href='#short-names') Short names].
+
+	+section("Many values")
+		.card
+			+chartControls({ switch: 'Show the summary', class: 'october-switch', on: false })
+			.side-by-side
+				.demo
+					figure#october(data-chart="column")
+						figcaption
+							b Apples sold in October 2025
+							br
+							span kilos per day
+						table
+							tbody
+								each row in [['1', '790'], ['2', '570'], ['3', '1210'], ['4', '470'], ['5', '1060'], ['6', '840'], ['7', '450'], ['8', '1020'], ['9', '470'], ['10', '930'], ['11', '85'], ['12', '500'], ['13', '920'], ['14', '1430'], ['15', '540'], ['16', '660'], ['17', '1180'], ['18', '1580'], ['19', '1620'], ['20', '880'], ['21', '1110'], ['22', '440'], ['23', '1470'], ['24', '750'], ['25', '560'], ['26', '530'], ['27', '770'], ['28', '1420'], ['29', '610'], ['30', '1120'], ['31', '1190']]
+									tr
+										th(data-short=row[0])= 'October ' + row[0]
+										td= row[1]
+						div.chart-summary
+							p Most apples were sold on {highest.name}: {highest.value} kilos. The fewest on {lowest.name}: {lowest.value} kilos.
+							p In total, {total} kilos were sold in October.
+				.side-text
+					p This column chart has a value for every day of October. The columns are narrower than their numbers, so the chart only shows the numbers that are clear of the other columns, mostly those of the highest days. The summary says what matters. By default it is only for screen readers, which read it right after the title. The switch shows it on screen too.
+
+		script.
+			document.querySelector('.october-switch').addEventListener('click', function () {
+				var on = this.getAttribute('aria-checked') !== 'true';
+				var figure = document.getElementById('october');
+				figure.setAttribute('data-chart-summary', on ? 'always' : 'auto');
+				figure.tablechart?.refresh();
+				this.setAttribute('aria-checked', String(on));
+			});
 
 	+section("Start the summary")
 		p The summary is a separate import, so a page without summaries does not load it. It needs to start before #[code init()].
@@ -205,6 +236,9 @@ block content
 				tr
 					td: code {rows}
 					td The number of rows
+				tr
+					td: code {values}
+					td The number of values in the value column
 				tr
 					td: code {series}
 					td The name of the value column
@@ -302,6 +336,12 @@ block content
 		p An element with #[code data-each="outliers"] is repeated for each outlier, and the outliers are joined as a list in the language of the page: "A, B and C". In it, #[code {name}] and #[code {value}] are those of the outlier, #[code {expected}] is the value of the line there, #[code {deviation}] is how far the value is from it, and #[code {side}] is #[code above] or #[code below].
 		p #[code {outliers.count|one:One month is|other:# months are}] picks the words for the number, by the rules of the language of the page. #[code #] is the number. English has #[code one] and #[code other]; other languages also have #[code zero], #[code two], #[code few] and #[code many].
 		p Say what an outlier is, so the reader knows what "far" means: #[code {outliers.percent}] is the percentage from the #[code outliers] option.
+		p If a reader needs to know how the trend was found, a sentence can say so, with a part that is only there when outliers were left out, as in the first sentence about the trend above:
+
+		+codeblock('HTML').
+			<p data-summary="trend">Based on a straight line through all values<span data-summary="outliers">, without the outliers</span>,
+				the trend is {trend}.</p>
+
 		p Without a clear trend there is nothing to be far from, so there are no outliers either, and their sentences are not shown.
 		p A trend is a straight line, so it is for values without a season. Apples sold, as in the first example, go up and down every year, and many months would be far from a straight line.
 
@@ -445,6 +485,72 @@ block content
 			<p data-summary="notes">{notes.count|one:One month has|other:# months have} a note:
 				<span data-each="notes">{name} ({note})</span>.</p>
 
+	+section("Rank")
+		p In a long table, a listener cannot remember whether a value heard a minute ago was more or less. #[code {rank}] is the place of a value among all values of its column: 1 for the highest. #[code {rank.low}] counts from the lowest. Equal values share a place, and #[code {values}] is the number of values.
+		p #[code {rank}] and #[code {rank.low}] are there for each item of #[code data-each="outliers"] and #[code data-each="notes"]. An item of a note also has #[code {value}].
+
+		+codeblock('HTML').
+			<p data-summary="outliers">Far from the trend:
+				<span data-each="outliers">{name}, the {rank|one:#st|two:#nd|few:#rd|other:#th} highest of {values} values</span>.</p>
+
+		p The forms after a rank follow the rules of the language of the page for an order. English has #[code one] (1st, 21st), #[code two] (2nd, 22nd), #[code few] (3rd, 23rd) and #[code other] (4th, 11th). If a language has one form, such as Dutch, #[code {rank|other:#e}] is enough.
+
+	+section("Groups")
+		p Between a few sentences and a table of hundreds of rows, #[code groups] gives a short table: the rows in groups, each with its lowest, average and highest value. The groups are made by number of rows, in order, so the rows need to be in order, as in #[a(href="#rows-in-order") Rows in order]. 60 months in 5 groups are 5 years.
+
+		.card
+			.demo
+				figure(data-chart="line" data-chart-shape="smooth" data-chart-summary="always" data-summary-groups="5")
+					figcaption
+						b Apples sold
+						br
+						span tonnes per month
+					table
+						thead
+							tr
+								th Month
+								th Apples
+						tbody
+							each row in fruit
+								tr
+									th(data-short=row[1])= row[0]
+									td= row[4]
+					.chart-summary
+						p Apples sold per year, from {rows} months:
+						table(data-summary="groups")
+							thead
+								tr
+									th Year
+									th Lowest
+									th Average
+									th Highest
+							tbody
+								tr(data-each="groups")
+									th {from} to {to}
+									td {lowest}
+									td {average}
+									td {highest}
+
+			+codeblock('HTML').
+				<figure data-chart="line" data-chart-summary="always" data-summary-groups="5">
+					…
+					<div class="chart-summary">
+						<p>Apples sold per year, from {rows} months:</p>
+						<table data-summary="groups">
+							<thead>
+								<tr><th>Year</th><th>Lowest</th><th>Average</th><th>Highest</th></tr>
+							</thead>
+							<tbody>
+								<tr data-each="groups"><th>{from} to {to}</th><td>{lowest}</td><td>{average}</td><td>{highest}</td></tr>
+							</tbody>
+						</table>
+					</div>
+				</figure>
+
+		p A row with #[code data-each="groups"] is repeated for each group. In it, #[code {from}] and #[code {to}] are the names of the first and the last row of the group, and #[code {lowest}], #[code {average}] and #[code {highest}] are its values. Rows of a table and items of a list (#[code li]) are repeated as they are. In a sentence, the items are joined as a list.
+		p The headers are in the template, so they are translated like the sentences. A screen reader can go down a column and compare the groups.
+		p The #[code groups] setting is the number of groups: 10 by default. If there are fewer rows than groups, each row is a group of its own.
+
 	+section("Rows in order")
 		p A change and a trend only make sense if the rows are in order, such as months or years. The rows of a line or an area chart are. On another chart, add #[code data-chart-ordered] to the figure. Without it, the sentences of #[code change], #[code trend] and #[code outliers] are not shown, also not the ones with #[code data-none].
 
@@ -458,6 +564,20 @@ block content
 			<tr><th data-short="Nov ’21">November 2021</th><td>83.4</td></tr>
 
 		p The summary always uses the full name, so a listener hears "November 2021". For how names fit under a chart with many rows, see #[a(href=url('/types/line.html#many-rows')) Many rows].
+
+	+section("Settings per chart")
+		p The settings of #[code Summary.init()] are for all charts. One chart can have its own, as an attribute with #[code data-summary-] and the name of the setting:
+
+		+codeblock('HTML').
+			<figure data-chart="line" data-summary-flat="10" data-summary-outliers="20" data-summary-groups="5">
+
+		p If a CMS gives no access to the script, all settings can be one piece of JSON in #[code data-summary-options], on the figure or on a parent, such as a page template. On a parent, it is for every chart in it.
+
+		+codeblock('HTML').
+			<div data-summary-options='{"flat": 10, "outliers": 20, "words": {"up": "rising", "down": "falling"}}'>
+
+		p The settings are #[code flat], #[code outliers], #[code groups], #[code words], #[code locale] and #[code delimiters]. As an attribute, #[code data-summary-words] is JSON and #[code data-summary-delimiters] is two parts with a space, such as #[code "[[ ]]"]. The most specific one counts: an attribute on the figure, then #[code data-summary-options] on the figure, then on its parents from the nearest out, then #[code Summary.init()].
+		p A change to these attributes is used the next time the summary is filled, such as after #[code Summary.fill(figure)].
 
 	+section("Who sees what")
 		p #[code data-chart-summary] on the figure, or the #[code summary] option for all charts, says when the summary is shown. It takes the same values as #[code data-chart-table].

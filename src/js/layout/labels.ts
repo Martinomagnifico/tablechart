@@ -1,4 +1,4 @@
-import type { Box } from "./collision";
+import { type Box, overlaps } from "./collision";
 import { sizeOf } from "./measure";
 
 /** Sizes are in viewBox units: a size in pixels times `unit`. */
@@ -94,16 +94,53 @@ export const thinOut = (labels: HTMLElement[], unit: number, width: number, heig
 	});
 };
 
+// With a little room between two numbers, so they do not read as one.
+const apart = (a: number[], b: number[], gap: number) =>
+	a[0] + a[2] + gap <= b[0] || b[0] + b[2] + gap <= a[0] || a[1] + a[3] <= b[1] || b[1] + b[3] <= a[1];
+
 /** The smallest step, every first, second, third or more of these numbers, at which none overlap; 1 if they all fit. */
 export const stepOf = (shown: HTMLElement[], unit: number, width: number, height: number): number => {
 	if (shown.length < 2) return 1;
 	const boxes = shown.map((label) => boxOf(label, unit, width, height));
-	// A little room between two numbers, so they do not read as one.
 	const gap = 2 * unit;
-	const apart = (a: number[], b: number[]) =>
-		a[0] + a[2] + gap <= b[0] || b[0] + b[2] + gap <= a[0] || a[1] + a[3] <= b[1] || b[1] + b[3] <= a[1];
 	let step = 1;
-	while (step < shown.length && boxes.some((box, i) => i >= step && i % step === 0 && !apart(boxes[i - step], box))) step++;
+	while (step < shown.length && boxes.some((box, i) => i >= step && i % step === 0 && !apart(boxes[i - step], box, gap))) step++;
 	return step;
 };
 
+/**
+ * Numbers by their columns or bars: if any covers another column or another number, the largest values go first, and each one
+ * stays only where it is clear of the other columns and of the numbers kept so far. `marks` is the box of each row's mark.
+ */
+export const keepClear = (labels: HTMLElement[], marks: Map<number, Box>, sideways: boolean, unit: number, width: number, height: number): void => {
+	const shown = labels.filter((label) => label.dataset.place !== "none" && !label.hasAttribute("data-left-out"));
+	const boxes = shown.map((label) => boxOf(label, unit, width, height));
+	const gap = 2 * unit;
+	// The rows side by side, across or down; a number can only reach the marks next to its own, so the search stops where they end.
+	const rows = [...marks.keys()].sort((a, b) => a - b);
+	const across = !sideways;
+	// Whether a mark is wholly past the box, in the direction of the search.
+	const past = (box: Box, mark: Box, step: number) =>
+		across ? (step > 0 ? mark[0] >= box[0] + box[2] : mark[0] + mark[2] <= box[0]) : step > 0 ? mark[1] >= box[1] + box[3] : mark[1] + mark[3] <= box[1];
+	const at = new Map(rows.map((row, i) => [row, i]));
+	// A number inside its own bar covers no other.
+	const clash = (k: number) => {
+		if (shown[k].dataset.place === "inside") return false;
+		const box = boxes[k] as Box;
+		const own = at.get(Number(shown[k].dataset.row)) ?? -1;
+		for (const step of [-1, 1])
+			for (let i = own + step; i >= 0 && i < rows.length; i += step) {
+				const mark = marks.get(rows[i]) as Box;
+				if (past(box, mark, step)) break;
+				if (overlaps(mark, box)) return true;
+			}
+		return false;
+	};
+	if (stepOf(shown, unit, width, height) === 1 && !shown.some((_label, k) => clash(k))) return;
+	const size = (k: number) => Math.abs(Number(shown[k].dataset.value) || 0);
+	const kept: number[] = [];
+	for (const k of shown.map((_label, k) => k).sort((a, b) => size(b) - size(a) || a - b)) {
+		if (!clash(k) && kept.every((other) => apart(boxes[other], boxes[k], gap))) kept.push(k);
+		else shown[k].setAttribute("data-left-out", "");
+	}
+};

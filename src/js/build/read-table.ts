@@ -2,6 +2,7 @@ import { largest } from "../shared/format";
 import { debug } from "../shared/debug";
 import { LIBRARY_NAME } from "../config";
 import type { Cell, Row, Series } from "../types";
+import { tableOf } from "../shared/table";
 
 // "71.8%" is 71.8 with its unit; a cell with no number, such as "n/a", is missing rather than zero.
 const readCell = (td: Element | null): Cell => {
@@ -19,14 +20,14 @@ const readCell = (td: Element | null): Cell => {
 
 /** The columns, counted among the cells of a row, whose header has `data-note`: their cells are notes, not values. */
 export const noteColumns = (figure: HTMLElement): number[] =>
-	Array.from(figure.querySelector("thead tr:last-child")?.children ?? [])
+	Array.from(tableOf(figure)?.querySelector("thead tr:last-child")?.children ?? [])
 		.slice(1)
 		.flatMap((head, i) => (head.hasAttribute("data-note") ? [i] : []));
 
 /** The note of a row, as the table has it now, also after a translation: its cell, or null. */
 export const noteCell = (figure: HTMLElement, index: number): HTMLTableCellElement | null => {
 	const columns = noteColumns(figure);
-	const tds = figure.querySelectorAll("tbody tr")[index]?.querySelectorAll("td") ?? [];
+	const tds = tableOf(figure)?.querySelectorAll("tbody tr")[index]?.querySelectorAll("td") ?? [];
 	const cell = columns.map((c) => tds[c]).find((td) => td?.textContent?.trim());
 	return cell ?? null;
 };
@@ -34,7 +35,7 @@ export const noteCell = (figure: HTMLElement, index: number): HTMLTableCellEleme
 /** Every cell after the label is a value, one per series; the row's own value is its first. A note column is not. */
 export const readTable = (figure: HTMLElement, langattribute: string | false = "data-i18n"): Row[] => {
 	const notes = noteColumns(figure);
-	return Array.from(figure.querySelectorAll("tbody tr")).map((tr, i) => {
+	return Array.from(tableOf(figure)?.querySelectorAll("tbody tr") ?? []).map((tr, i) => {
 		const th = tr.querySelector("th");
 		const tds = Array.from(tr.querySelectorAll("td"));
 		const cells = tds.filter((_td, c) => !notes.includes(c)).map(readCell);
@@ -57,7 +58,7 @@ export const readTable = (figure: HTMLElement, langattribute: string | false = "
 };
 
 const seriesHeads = (figure: HTMLElement): Element[] =>
-	Array.from(figure.querySelector("thead tr:last-child")?.children ?? []).slice(1).filter((head) => !head.hasAttribute("data-note"));
+	Array.from(tableOf(figure)?.querySelector("thead tr:last-child")?.children ?? []).slice(1).filter((head) => !head.hasAttribute("data-note"));
 
 const lineOf = (value: string | null | undefined): "dashed" | "dotted" | "dash-dot" | null =>
 	value === "dashed" || value === "dotted" || value === "dash-dot" ? value : null;
@@ -99,7 +100,7 @@ export const assignKeys = (figures: HTMLElement[], langattribute: string | false
 			used.set(prefix, 1);
 		}
 
-		figure.querySelectorAll("tbody th").forEach((th, i) => {
+		tableOf(figure)?.querySelectorAll("tbody th").forEach((th, i) => {
 			if (!th.getAttribute(langattribute))
 				th.setAttribute(langattribute, `${prefix}-row${i + 1}`);
 		});
@@ -113,7 +114,7 @@ export const assignKeys = (figures: HTMLElement[], langattribute: string | false
 		heads.forEach((head, i) => {
 			if (!head.hasAttribute("data-group")) return;
 			const groups: string[] = [];
-			figure.querySelectorAll(`tbody tr > td:nth-of-type(${i + 1})`).forEach((td) => {
+			tableOf(figure)?.querySelectorAll(`tbody tr > td:nth-of-type(${i + 1})`).forEach((td) => {
 				const name = (td.textContent || "").trim();
 				if (!groups.includes(name)) groups.push(name);
 				if (!td.getAttribute(langattribute)) td.setAttribute(langattribute, `${prefix}-group${groups.indexOf(name) + 1}`);
@@ -121,7 +122,7 @@ export const assignKeys = (figures: HTMLElement[], langattribute: string | false
 		});
 		// A note has a key by its row, such as `harvest-note14`.
 		const notes = noteColumns(figure);
-		figure.querySelectorAll("tbody tr").forEach((tr, row) => {
+		tableOf(figure)?.querySelectorAll("tbody tr").forEach((tr, row) => {
 			const tds = tr.querySelectorAll("td");
 			for (const c of notes) {
 				const td = tds[c];
@@ -129,7 +130,7 @@ export const assignKeys = (figures: HTMLElement[], langattribute: string | false
 			}
 		});
 		debug?.log?.(
-			`Keys for "${prefix}" written onto ${figure.querySelectorAll("tbody th").length} rows`
+			`Keys for "${prefix}" written onto ${tableOf(figure)?.querySelectorAll("tbody th").length ?? 0} rows`
 		);
 	}
 };

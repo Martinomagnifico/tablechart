@@ -2,6 +2,7 @@ import { BAR_CLASS, CENTRE_CLASS, CONNECTOR_CLASS, CONTROLS_CLASS, PIECE_CLASS, 
 import { sweepTiming } from "../shared/timing";
 import { svgEl } from "../draw/svg";
 import type { ChartState } from "../types";
+import { tableOf } from "../shared/table";
 
 /** The steps of one chart: which step shows each row, column and annotation, and how many steps there are. */
 export interface StepPlan {
@@ -25,8 +26,8 @@ const ANNOTATIONS = ["axis-break", "trend", "bracket"];
  */
 export const planSteps = (figure: HTMLElement, together = false): StepPlan | null => {
 	const everyRow = figure.hasAttribute("data-fragment");
-	const trs = Array.from(figure.querySelectorAll("tbody tr"));
-	const heads = Array.from(figure.querySelector("thead tr:last-child")?.children ?? []).slice(1);
+	const trs = Array.from(tableOf(figure)?.querySelectorAll("tbody tr") ?? []);
+	const heads = Array.from(tableOf(figure)?.querySelector("thead tr:last-child")?.children ?? []).slice(1);
 	const specs = Array.from(figure.querySelectorAll<HTMLElement>("[data-annotation]")).filter((spec) =>
 		ANNOTATIONS.includes(spec.getAttribute("data-annotation") ?? "")
 	);

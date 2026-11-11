@@ -4,6 +4,7 @@ import { readFileSync } from "fs";
 import vituum from "vituum";
 import pug from '@vituum/vite-plugin-pug';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
+import sitemap from './plugins/sitemap.js';
 
 const SITE_URL = 'https://martinomagnifico.github.io/tablechart/';
 // The version of the library, for the docs as `version`.
@@ -46,6 +47,7 @@ export default defineConfig(({ mode }) => {
 	        },
 	    },
 		plugins: [
+			sitemap({ siteUrl: SITE_URL, viewsDir: resolve(import.meta.dirname, 'src/views') }),
 			{
 				name: 'og-url',
 				transformIndexHtml(html, ctx) {

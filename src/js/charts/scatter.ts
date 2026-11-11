@@ -15,6 +15,7 @@ import {
 } from "../kit";
 import { quadrant } from "../annotations/quadrant";
 import type { ChartType, Row, Series } from "../types";
+import { tableOf } from "../shared/table";
 
 const SHAPES: Shape[] = ["circle", "triangle", "square", "diamond"];
 // Where a name goes, in order of preference: right, left, above, below, then the corners.
@@ -70,7 +71,7 @@ export const scatter: ChartType = {
 		legend.className = LEGEND_CLASS;
 		legend.setAttribute("aria-hidden", "true");
 		legend.inert = true;
-		const cells = Array.from(figure.querySelectorAll(`tbody tr > td:nth-of-type(${group + 1})`));
+		const cells = Array.from(tableOf(figure)?.querySelectorAll(`tbody tr > td:nth-of-type(${group + 1})`) ?? []);
 		const entry = (text: string, key: string | null | undefined) => {
 			const node = htmlEl(NAME_CLASS, legend);
 			node.dataset.place = "legend";

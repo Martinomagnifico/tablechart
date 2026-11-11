@@ -115,7 +115,11 @@ figures.push(
 	figure('data-chart="line" style="--tablechart-height: 180px"', table(seasons)),
 	figure('data-chart="line" data-chart-values="last"', table(three, ["X", "Y", "Z"])),
 	figure('data-chart="line" data-chart-values="first last"', table(gaps)),
-	figure(`data-chart="line" data-chart-lines='[{"marker":"none"},{"marker":"diamond","open":true,"line":"dash-dot"}]'`, table(two, ["N", "S"]))
+	figure(`data-chart="line" data-chart-lines='[{"marker":"none"},{"marker":"diamond","open":true,"line":"dash-dot"}]'`, table(two, ["N", "S"])),
+	// Crowded, with names at the ends: the last numbers go next to the names, and nothing is placed a line away from its point.
+	figure('data-chart="line"', table(Array.from({ length: 48 }, (_, i) => [`m${i}`, (40 + 20 * Math.sin(i / 3) + i / 2).toFixed(1), (30 + 15 * Math.cos(i / 4)).toFixed(1)]), ["Apples", "Oranges"])),
+	// Crowded columns: only the numbers of the largest values that are clear of the other columns.
+	figure('data-chart="column"', table(Array.from({ length: 40 }, (_, i) => [`d${i + 1}`, String(400 + ((i * 7919) % 1250))])))
 );
 
 const script = `

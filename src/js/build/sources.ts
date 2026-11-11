@@ -1,6 +1,7 @@
 import { debug } from "../shared/debug";
 import { BADGE_CAPTION_CLASS, LIBRARY_NAME } from "../config";
 import { ANNOTATION_NAMES } from "../charts/registry";
+import { tableOf } from "../shared/table";
 
 /** Pass 0: Markdown, JSON and HTML all become the same table before anything is built. */
 
@@ -217,8 +218,9 @@ export const loadSources = async (figures: HTMLElement[]): Promise<void> => {
 			.filter((figure) => figure.hasAttribute("data-chart-src"))
 			.map(async (figure) => {
 				const src = figure.getAttribute("data-chart-src") as string;
-				const authored = Array.from(figure.querySelectorAll("table")).find((one) => one.tHead) ?? null;
-				for (const table of figure.querySelectorAll("table")) if (table !== authored) table.remove();
+				const tables = Array.from(figure.querySelectorAll("table")).filter((one) => !one.closest(".chart-summary"));
+				const authored = tables.find((one) => one.tHead) ?? null;
+				for (const table of tables) if (table !== authored) table.remove();
 				try {
 					const response = await fetch(src);
 					if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
@@ -281,7 +283,7 @@ export const readMarkdownRows = (figures: HTMLElement[]): void => {
 			}
 		}
 
-		const heads = Array.from(figure.querySelector("thead tr:last-child")?.children ?? []);
+		const heads = Array.from(tableOf(figure)?.querySelector("thead tr:last-child")?.children ?? []);
 		for (const th of heads.slice(1)) {
 			for (let mark = wrapperOf(th); mark?.matches(TOTAL_MARKS); mark = wrapperOf(th)) {
 				th.setAttribute("data-kind", "focus");
