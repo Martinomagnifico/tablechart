@@ -68,6 +68,11 @@
 	transform: translateX(-50%);
 }
 
+// The names under the chart that the name of the row covers.
+.tablechart-categories :where(span[data-crossed]) {
+	visibility: hidden;
+}
+
 @media print {
 	.tablechart-crosshair,
 	.tablechart-crosshair-labels {

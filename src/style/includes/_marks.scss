@@ -182,3 +182,27 @@
 :where([data-slice-range]) * {
 	--_slice-range: color-mix(in oklab, var(--tablechart-slice-color, var(--tablechart-slice-color-start, currentColor)) calc(100% - var(--n, 0) / max(var(--_slice-count, 2) - 1, 1) * 100%), var(--tablechart-slice-color-end));
 }
+
+// A candle has one colour for its wick and the outline of its body. A rising body is hollow, unless it gets a fill.
+.tablechart-candle {
+	--_candle: var(--tablechart-candle-down-color, var(--tablechart-down-color, var(--tablechart-bar-color, currentColor)));
+
+	&[data-move="up"] {
+		--_candle: var(--tablechart-candle-up-color, var(--tablechart-up-color, var(--tablechart-bar-color, currentColor)));
+	}
+}
+
+.tablechart-candle-wick,
+.tablechart-candle-body {
+	stroke: var(--_candle);
+	stroke-width: var(--tablechart-candle-line-width, 1px);
+	vector-effect: non-scaling-stroke;
+}
+
+.tablechart-candle-body {
+	fill: var(--_candle);
+
+	.tablechart-candle[data-move="up"] & {
+		fill: var(--tablechart-candle-up-fill, #{$surface});
+	}
+}

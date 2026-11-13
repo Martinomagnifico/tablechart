@@ -244,8 +244,8 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 	const ceiling = Math.max(valueScale ? Math.max(valueScale.max, extent) : extent * 1.02, state.agreed?.ceiling ?? 0);
 	// A line can start above zero where its scale does; columns and areas stand on zero.
 	const known = rows.flatMap((row) => row.cells.slice(0, series.length).flatMap((cell) => (cell.missing ? [] : [cell.value])));
-	const floats = !!valueScale && type === line && !state.stacked && valueScale.min > 0 && !state.agreed;
-	const bottom = floats && valueScale ? Math.min(valueScale.min, ...known) : Math.min(valueScale ? Math.min(valueScale.min, depth) : depth * 1.02, state.agreed?.bottom ?? 0);
+	const floats = !state.stacked && !state.agreed && (!!type.floats || (!!valueScale && type === line && valueScale.min > 0));
+	const bottom = floats ? Math.min(valueScale?.min ?? Number.POSITIVE_INFINITY, ...known) : Math.min(valueScale ? Math.min(valueScale.min, depth) : depth * 1.02, state.agreed?.bottom ?? 0);
 
 	// The break squeezes `data-from` to `data-to` into `data-size` of the plot; `data-at` is the old spelling of `data-from`.
 	const breakSpec = annotations.find(
@@ -536,10 +536,11 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 		const row = Number(label.dataset.row);
 		return all.some((one) => seen(one) && Number(one.dataset.row) <= row && row <= Number(one.dataset.rowEnd ?? one.dataset.row));
 	};
-	// A chart whose values are the fields of a mark, such as a scatter, shows names rather than numbers.
+	// A chart whose values are the fields of a mark, such as a scatter, shows names rather than numbers; a candlestick shows neither.
 	state.figure.toggleAttribute(
 		"data-left-out",
-		(type.columns ? [state.categories] : [...seriesValues, state.totals]).some((all) => all.some((label) => !skip(label) && !seen(label) && !covered(label, all)))
+		(type.numbers === false && !type.axes) ||
+			(type.columns ? [state.categories] : [...seriesValues, state.totals]).some((all) => all.some((label) => !skip(label) && !seen(label) && !covered(label, all)))
 	);
 
 	if (geo.barRadius) roundEnds(svg, geo.barRadius);

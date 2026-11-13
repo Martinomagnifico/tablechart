@@ -2,7 +2,7 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Chart types | All types"
-	- pagedescription = "All Tablechart chart types on one page: area, bar, column, donut, line, scatter and waterfall."
+	- pagedescription = "All Tablechart chart types on one page: area, bar, column, donut, line, waterfall, and the additional types scatter and candlestick."
 
 mixin type(name, href)
 	.card
@@ -92,3 +92,22 @@ block content
 									th= row[0]
 									td= row[1]
 									td= row[2]
+
+			+type("Candlestick", "/types/candlestick.html")
+				figure(data-chart="candlestick" aria-label="Open, high, low and close of an orchard share, per day")
+					table
+						thead
+							tr
+								th Day
+								th Open
+								th High
+								th Low
+								th Close
+						tbody
+							each row in [['2 Mar', '24.00', '24.55', '23.16', '23.34'], ['3 Mar', '23.40', '23.95', '23.05', '23.62'], ['4 Mar', '23.70', '24.42', '23.28', '24.08'], ['5 Mar', '24.12', '24.75', '23.90', '24.61'], ['6 Mar', '24.66', '25.02', '24.27', '24.98'], ['9 Mar', '25.00', '25.10', '24.40', '24.55'], ['10 Mar', '24.60', '25.70', '24.52', '25.62']]
+								tr
+									th= row[0]
+									td= row[1]
+									td= row[2]
+									td= row[3]
+									td= row[4]

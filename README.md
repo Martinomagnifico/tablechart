@@ -11,7 +11,7 @@
 
 Tablechart makes simple charts from a table: an HTML table, a Markdown table or a JSON file. You write the table, Tablechart shows it as a chart.
 
-* **Chart types:** column, bar, line, area, waterfall and donut, and scatter as an additional type
+* **Chart types:** column, bar, line, area, waterfall and donut, and scatter and candlestick as additional types
 * **The table:** the table is hidden from sight, but screen readers, search engines and translation scripts still read it.
 * **Real text:** names and numbers are HTML, so they use the font of the page. *No more Times New Roman labels.* Text does not scale, but just uses the font size of the page or a size you define.
 * **CSS styling:** colours, sizes and animation are CSS variables. Light and dark mode follow the page.
@@ -51,7 +51,7 @@ Or with a script tag:
 </script>
 ```
 
-The scatter chart is an additional type, in a script of its own. To use it, see [Additional types](#additional-types).
+The scatter and candlestick charts are additional types, in a script of their own. To use them, see [Additional types](#additional-types).
 
 ## A chart
 
@@ -74,13 +74,14 @@ Use `bar`, `line`, `area`, `waterfall` or `donut` for the other types. With more
 
 ### Additional types
 
-The scatter chart is an additional type, in a script of its own. To use it, add it before `init()`:
+The scatter and candlestick charts are additional types, in a script of their own. If you want to use one, add it before `init()`:
 
 ```js
 import { addType, init } from "@martinomagnifico/tablechart";
-import { scatter } from "@martinomagnifico/tablechart/additional-types";
+import { candlestick, scatter } from "@martinomagnifico/tablechart/additional-types";
 
 addType("scatter", scatter);
+addType("candlestick", candlestick);
 init();
 ```
 

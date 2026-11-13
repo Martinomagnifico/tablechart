@@ -73,6 +73,11 @@
                     "text": "Chart types | Scatter",
                     "label": "Scatter",
                     "href": "/types/scatter.html"
+                },
+                {
+                    "text": "Chart types | Candlestick",
+                    "label": "Candlestick",
+                    "href": "/types/candlestick.html"
                 }
             ]
         },

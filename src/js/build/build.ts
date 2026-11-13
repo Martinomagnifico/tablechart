@@ -332,7 +332,7 @@ export const build = (
 	// The headers of the first two value columns are the titles of the axes; layout makes the numbers along them.
 	const fields = series.filter((one) => !one.group);
 	// Off by default on the other types: `data-chart-axis` adds the numbers along the value axis, `data-chart-grid` the gridlines.
-	const valueAxis = !type.axes && !type.centre && turnedOn(figure, "data-chart-axis", config.axis);
+	const valueAxis = !type.axes && !type.centre && turnedOn(figure, "data-chart-axis", config.axis || !!type.valueAxis);
 	const axes = type.axes
 		? {
 				titles: fields.slice(0, 2).map((one, s) => {
@@ -447,8 +447,8 @@ export const build = (
 	stepTo(state, 0, true);
 	const own = figure.getAttribute("data-chart-tooltip");
 	const tooltip = own === "false" ? false : own === "auto" || own === "crosshair" ? own : own !== null ? true : config.tooltip;
-	// A crosshair is for a line or an area; another chart gets the tooltip.
-	if (tooltip === "crosshair" && (kind === "line" || kind === "area")) attachCrosshair(state);
+	// A crosshair is for a line, an area or a type that has one; another chart gets the tooltip.
+	if (tooltip === "crosshair" && (kind === "line" || kind === "area" || type.crosshair)) attachCrosshair(state);
 	else if (tooltip) attachTooltip(state, config, tooltip === "auto");
 	relabel(state, config);
 	return state;

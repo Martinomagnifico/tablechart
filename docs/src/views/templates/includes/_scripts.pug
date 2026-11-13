@@ -29,12 +29,13 @@ block scripts
 		script(type="module").
 			import { Panel, PanelSet, PanelControl } from 'panelset';
 			import { addType, create, init } from '@martinomagnifico/tablechart';
-			import { scatter } from '@martinomagnifico/tablechart/additional-types';
+			import { candlestick, scatter } from '@martinomagnifico/tablechart/additional-types';
 			import { Summary } from '@martinomagnifico/tablechart/summary';
 			Panel.init('.docs-sidebar [data-panel]', { returnFocus: false });
 			PanelSet.init();
 			PanelControl.init();
 			addType('scatter', scatter);
+			addType('candlestick', candlestick);
 			Summary.init();
 			init({ debug: true });
 			// As in the build, where tablechart.js gives it: for a page that makes a chart later, such as the summary demo.

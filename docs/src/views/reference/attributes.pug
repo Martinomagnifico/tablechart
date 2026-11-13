@@ -20,7 +20,7 @@ block content
 			tbody
 				tr
 					td: code data-chart
-					td Makes the figure a chart: #[code column], #[code bar], #[code line], #[code area], #[code waterfall] or #[code donut], or #[code scatter] from the #[a(href=url('/types/additional-types.html')) additional types]
+					td Makes the figure a chart: #[code column], #[code bar], #[code line], #[code area], #[code waterfall] or #[code donut], or #[code scatter] or #[code candlestick] from the #[a(href=url('/types/additional-types.html')) additional types]
 				tr
 					td: code data-chart-src
 					td Reads the data from a JSON file. See #[a(href=url('/data.html')) Data].
@@ -77,13 +77,13 @@ block content
 					td When the table is shown under the chart: #[code always], #[code print], #[code auto] (in print, when the chart does not show all its numbers and the table is not too long) or #[code never]
 				tr
 					td: code data-chart-ordered
-					td Says that the rows are in order, such as months, so a summary can have a change, a trend and outliers. Line and area charts are always in order.
+					td Says that the rows are in order, such as months, so a summary can have a change, a trend and outliers. Line, area and candlestick charts are always in order.
 				tr
 					td: code data-chart-summary="auto"
 					td When the summary is shown: #[code always], #[code print], #[code auto] (in print, when the chart does not show all its numbers and its table is not printed) or #[code never]. See #[a(href=url('/features/summary.html')) Summary].
 				tr
 					td: code data-chart-axis
-					td Adds numbers along the value axis of a column, bar, line, area or waterfall chart. #[code data-chart-axis="right"] puts them on the right of an upright chart, and #[code "left"] on the left. #[code data-chart-axis="false"] turns them off when the #[code axis] option is #[code true].
+					td Adds numbers along the value axis of a column, bar, line, area or waterfall chart; a candlestick chart has them by default. #[code data-chart-axis="right"] puts them on the right of an upright chart, and #[code "left"] on the left. #[code data-chart-axis="false"] turns them off when the #[code axis] option is #[code true].
 				tr
 					td: code data-chart-grid
 					td Adds a light line at each number of the value axis, or of both axes on a scatter chart. #[code data-chart-grid="false"] turns it off when the #[code grid] option is #[code true].

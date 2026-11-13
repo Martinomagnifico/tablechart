@@ -104,7 +104,7 @@ export const fitNames = (state: ChartState, config: Config, height: number, unit
 			}
 		}
 		// Under a line or an area, a tick above each name shown, at the place of its row: also where the name moved in at an edge.
-		const ticked = (type === line || type === area) && turnedOn(state.figure, "data-chart-ticks", config.ticks);
+		const ticked = (type === line || type === area || !!type.ticks) && turnedOn(state.figure, "data-chart-ticks", config.ticks);
 		nameRow.toggleAttribute("data-ticks", ticked);
 		nameRow.style.removeProperty("--_tick-reach");
 		if (ticked) {

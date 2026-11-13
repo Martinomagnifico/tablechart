@@ -251,7 +251,7 @@ block content
 			Summary.init({ delimiters: ["[[", "]]"] });
 
 	+section("Which sentences are shown")
-		p A sentence is about the first value column. With #[code data-series="2"], it is about the second.
+		p A sentence is about the first value column. With #[code data-series="2"], it is about the second. On a #[a(href=url('/types/candlestick.html#summary')) candlestick chart], it is about the close, the fourth column.
 		p A sentence with #[code data-summary] is shown only if that part of the summary has a result. #[code extremes] has the highest and the lowest value, and #[code range] has the range. With #[code data-none], a sentence is shown only if there is no result, such as when no row has a number yet.
 
 		+codeblock('HTML').
@@ -552,7 +552,7 @@ block content
 		p The #[code groups] setting is the number of groups: 10 by default. If there are fewer rows than groups, each row is a group of its own.
 
 	+section("Rows in order")
-		p A change and a trend only make sense if the rows are in order, such as months or years. The rows of a line or an area chart are. On another chart, add #[code data-chart-ordered] to the figure. Without it, the sentences of #[code change], #[code trend] and #[code outliers] are not shown, also not the ones with #[code data-none].
+		p A change and a trend only make sense if the rows are in order, such as months or years. The rows of a line, area or #[a(href=url('/types/candlestick.html#summary')) candlestick] chart are. On another chart, add #[code data-chart-ordered] to the figure. Without it, the sentences of #[code change], #[code trend] and #[code outliers] are not shown, also not the ones with #[code data-none].
 
 		+codeblock('HTML').
 			<figure data-chart="column" data-chart-ordered>

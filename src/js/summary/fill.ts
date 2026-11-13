@@ -1,5 +1,5 @@
 import { analyse } from "./analyse";
-import { ANALYSES, FILLED, type Result, type Results, started, SUMMARY_CLASS, summaryDefaults, type SummaryConfig, TEMPLATE, warn } from "./config";
+import { ANALYSES, FILLED, FIRST_SERIES, type Result, type Results, started, SUMMARY_CLASS, summaryDefaults, type SummaryConfig, TEMPLATE, warn } from "./config";
 import { replace } from "./replace";
 import { settingsOf } from "./settings";
 import { tableOf } from "../shared/table";
@@ -72,7 +72,8 @@ export const fill = (figure: HTMLElement, options: Partial<SummaryConfig> = star
 	for (const template of box.querySelectorAll<HTMLElement>(":scope > *")) {
 		template.setAttribute(TEMPLATE, "");
 		template.hidden = true;
-		const s = template.dataset.series === "total" ? -1 : Math.max(1, Number.parseInt(template.dataset.series ?? "1", 10) || 1) - 1;
+		const first = String(FIRST_SERIES[figure.getAttribute("data-chart") ?? ""] ?? 1);
+		const s = template.dataset.series === "total" ? -1 : Math.max(1, Number.parseInt(template.dataset.series ?? first, 10) || 1) - 1;
 		if (!bySeries.has(s)) bySeries.set(s, analyse(figure, s, config, locale));
 		const results = bySeries.get(s) as Results;
 		if (!shows(template, results)) continue;

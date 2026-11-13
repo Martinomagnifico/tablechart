@@ -135,10 +135,15 @@ mixin lane(title)
 		});
 		// A table row with only plain-text cells goes on one line, so a table of
 		// data is as many lines as it has rows.
-		return deindentedLines.join('\n').trim().replace(
+		const joined = deindentedLines.join('\n').trim().replace(
 			/^([ \t]*)<tr([^>]*)>\n((?:\1[ \t]+<t[hd][^>]*>[^<\n]*<\/t[hd]>\n)+)\1<\/tr>/gm,
 			(match, indent, attrs, cells) => indent + '<tr' + attrs + '>' + cells.split('\n').map((line) => line.trim()).join('') + '</tr>'
 		);
+		// A long run of one-line rows shows its first rows, a line with an ellipsis, and its last rows.
+		return joined.replace(/^([ \t]*)<tr[^\n]*<\/tr>(?:\n\1<tr[^\n]*<\/tr>)+/gm, (run, indent) => {
+			const rows = run.split('\n');
+			return rows.length > 12 ? [...rows.slice(0, 5), indent + '…', ...rows.slice(-2)].join('\n') : run;
+		});
 	};
 
 

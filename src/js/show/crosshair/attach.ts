@@ -23,9 +23,10 @@ export const attachCrosshair = (state: ChartState): void => {
 		if (index === null) return hide();
 		const drawing = state.svg.getBoundingClientRect();
 		const near = ((event.clientY - drawing.top) / drawing.height) * state.svg.viewBox.baseVal.height;
-		// Drawn again only for another row, or when another line is nearest.
-		const nearest = state.crossingOf?.(index)?.points.reduce((a, b) => (Math.abs(b.y - near) < Math.abs(a.y - near) ? b : a));
-		const key = `${index} ${nearest?.series}`;
+		// Drawn again only for another row, when another line is nearest, or when a line that follows the pointer moves.
+		const crossing = state.crossingOf?.(index);
+		const nearest = crossing?.points.reduce((a, b) => (Math.abs(b.y - near) < Math.abs(a.y - near) ? b : a));
+		const key = `${index} ${crossing?.textAt ? Math.round(near) : nearest?.series}`;
 		if (key === shown) return;
 		shown = drawCrosshair(state, index, near) === null ? null : key;
 	};

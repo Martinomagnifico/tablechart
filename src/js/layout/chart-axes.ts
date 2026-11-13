@@ -29,8 +29,10 @@ export const valueAxisOf = (state: ChartState, config: Config, along: ChartAxes,
 		: segs.some((s) => s.kind === "up" || s.kind === "down")
 			? segs.flatMap((s) => [s.from, s.to])
 			: rows.flatMap((row) => row.cells.slice(0, series.length).filter((cell) => !cell.missing).map((cell) => cell.value));
-	const min = Math.min(0, -largest(all.map((value) => -value)));
-	const max = Math.max(0, largest(all));
+	// A chart whose scale floats fits its values; the others reach zero.
+	const zero = type.floats ? [] : [0];
+	const min = Math.min(...zero, -largest(all.map((value) => -value)));
+	const max = Math.max(...zero, largest(all));
 	const font = Number.parseFloat(getComputedStyle(plot).fontSize) || 16;
 	// The scale ends on a number of the axis, or where `data-chart-scale` says; three numbers or more are the numbers themselves.
 	const { chartScaleY, chartScale } = state.figure.dataset;
@@ -46,7 +48,9 @@ export const valueAxisOf = (state: ChartState, config: Config, along: ChartAxes,
 	}
 	along.ticks.textContent = "";
 	const first = rows.find((row) => !row.missing);
-	const places = largest(valueScale.ticks.map((value) => decimalsIn(String(value))));
+	// A scale that floats, as for prices, writes its numbers as the table does, so a value at the pointer fits beside it.
+	const written = type.floats ? rows.flatMap((row) => row.cells.slice(0, series.length).map((cell) => decimalsIn(cell.number))) : [];
+	const places = largest([...valueScale.ticks.map((value) => decimalsIn(String(value))), ...written]);
 	for (const value of valueScale.ticks) {
 		const tick = htmlEl(TICK_CLASS, along.ticks);
 		tick.dataset.value = String(value);

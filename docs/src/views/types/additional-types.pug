@@ -2,7 +2,7 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Chart types | Additional types"
-	- pagedescription = "The additional chart types of Tablechart, such as the scatter chart, and how to load them."
+	- pagedescription = "The additional chart types of Tablechart, the scatter and candlestick charts, and how to load them."
 
 block content
 	.lane
@@ -13,7 +13,7 @@ block content
 	+section("The additional types")
 		p The main script has the column, bar, line, area, waterfall and donut charts. The additional types are in a separate script. Maybe you do not need it, then you do not need to load it. The stylesheet is the same for all.
 
-		p Right now, only the 'Scatter' chart is in the additional chart types. More types may be added in the future.
+		p Right now, the scatter and candlestick charts are the additional types. More types may be added in the future.
 
 		table
 			thead
@@ -24,15 +24,19 @@ block content
 				tr
 					td: a(href=url('/types/scatter.html')) Scatter
 					td: code scatter
+				tr
+					td: a(href=url('/types/candlestick.html')) Candlestick
+					td: code candlestick
 
 	+section("With a build tool")
 		p If you use a build tool, import the type from #[code @martinomagnifico/tablechart/additional-types], and add it with #[code addType()] before #[code init()] or #[code create()]. The first argument is the value of #[code data-chart].
 
 		+codeblock('JS').
 			import { addType, init } from "@martinomagnifico/tablechart";
-			import { scatter } from "@martinomagnifico/tablechart/additional-types";
+			import { candlestick, scatter } from "@martinomagnifico/tablechart/additional-types";
 
 			addType("scatter", scatter);
+			addType("candlestick", candlestick);
 			init();
 
 		p Only the types you import are in your bundle.

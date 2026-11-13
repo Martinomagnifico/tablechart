@@ -15,7 +15,7 @@ block content
 		+installWizard('Tablechart', 'init')
 
 	+section("Additional types")
-		p The column, bar, line, area, waterfall and donut charts are in the main script. If you use an additional type, such as the #[a(href=url('/types/scatter.html')) scatter chart], load it as well, before the charts are made.
+		p The column, bar, line, area, waterfall and donut charts are in the main script. If you use an additional type, such as the #[a(href=url('/types/scatter.html')) scatter] or the #[a(href=url('/types/candlestick.html')) candlestick chart], load it as well, before the charts are made.
 		p If you use a build tool, import the type and add it with #[code addType()]:
 
 		+codeblock('JS').
@@ -72,7 +72,7 @@ block content
 								th Autumn
 								td 70
 
-		p #[code data-chart] sets the chart type: #[code column], #[code bar], #[code line], #[code area], #[code waterfall] or #[code donut], or an #[a(href=url('/types/additional-types.html')) additional type] such as #[code scatter].
+		p #[code data-chart] sets the chart type: #[code column], #[code bar], #[code line], #[code area], #[code waterfall] or #[code donut], or an #[a(href=url('/types/additional-types.html')) additional type] such as #[code scatter] or #[code candlestick].
 
 	+section("Start it")
 		p #[code init()] needs to run once the page has loaded. It makes a chart of every figure with #[code data-chart].

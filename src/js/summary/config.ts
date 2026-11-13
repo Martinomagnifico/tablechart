@@ -50,8 +50,10 @@ export const SUMMARY_CLASS = "chart-summary";
 export const READY = "data-summary-ready";
 export const TEMPLATE = "data-summary-template";
 export const FILLED = "data-summary-text";
-// Line and area charts are in order; another chart is when it says so.
-export const ORDERED = ["line", "area"];
+// Line, area and candlestick charts are in order; another chart is when it says so.
+export const ORDERED = ["line", "area", "candlestick"];
+// The column a sentence is about without `data-series`, from 1: on a candlestick, the close.
+export const FIRST_SERIES: Record<string, number> = { candlestick: 4 };
 
 /** A value in a sentence: text, or a name with its translation key. */
 export type Value = string | Node;

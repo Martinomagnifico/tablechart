@@ -1,0 +1,183 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Chart types | Candlestick"
+	- pagedescription = "Candlestick charts in Tablechart: the open, high, low and close of each row, as a candle with a wick."
+	-
+		// Trading days of a made-up share, from Monday 2 March 2026, the same on every build.
+		const tradingDays = (count, from) => {
+			let seed = from;
+			const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+			const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+			const date = new Date(Date.UTC(2026, 2, 2));
+			let price = 24;
+			return Array.from({ length: count }, () => {
+				while ([0, 6].includes(date.getUTCDay())) date.setUTCDate(date.getUTCDate() + 1);
+				const open = price;
+				const close = open + (random() - 0.47) * 1.4;
+				const high = Math.max(open, close) + random() * 0.6;
+				const low = Math.min(open, close) - random() * 0.6;
+				price = close + (random() - 0.5) * 0.3;
+				const name = `${date.getUTCDate()} ${months[date.getUTCMonth()]}`;
+				const month = months[date.getUTCMonth()];
+				date.setUTCDate(date.getUTCDate() + 1);
+				return [name, month, ...[open, high, low, close].map((value) => value.toFixed(2))];
+			});
+		};
+		const days = tradingDays(24, 7);
+		const halfYear = tradingDays(126, 11);
+
+mixin prices(rows, short)
+	table
+		thead
+			tr
+				th Day
+				th Open
+				th High
+				th Low
+				th Close
+		tbody
+			each row in rows
+				tr
+					if short
+						th(data-short=row[1])= row[0]
+					else
+						th= row[0]
+					td= row[2]
+					td= row[3]
+					td= row[4]
+					td= row[5]
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Candlestick
+				p.lead The open, high, low and close of each row, as a candle with a wick.
+
+	+section("Candlestick chart")
+		p Each row is a candle. The body goes from the open to the close, and the wick from the low to the high. If the close is at or above the open, the price went up and the body is hollow. If the close is below the open, the body is filled.
+		p The candlestick chart is an additional type. If you want to use it, load it before the charts are made. See #[a(href="#load-it") Load it].
+
+		+chart(null, '1')
+			figure(data-chart="candlestick")
+				figcaption
+					b The price of an orchard share
+					br
+					span euro, per day
+				+prices(days)
+
+		p The scale fits the prices, from a little under the lowest low to a little over the highest high. It does not start at zero. If you want to set it yourself, add #[code data-chart-scale]. See #[a(href=url('/styling/axes.html#the-scale')) The scale].
+
+	+section("The table")
+		p The first four value columns are the open, the high, the low and the close, in that order. Their headers are the names in the tooltip, so they can be in any language.
+		p If a row has no number in one of the four columns, it has no candle. The row stays in the table.
+
+	+section("The axis")
+		p A candlestick chart has the numbers along its value axis by default, as a candle has no numbers on it. If you want them on the right, as in many trading charts, set #[code data-chart-axis="right"]. #[code data-chart-axis="false"] turns them off.
+
+	+section("Many rows")
+		p With many rows, the candles get thinner, down to only the wick. The names under the chart are thinned out. If rows next to each other have the same short name, such as the month, it is shown once.
+
+		+chart(null, '1')
+			figure(data-chart="candlestick" data-chart-axis="right" data-chart-grid)
+				figcaption
+					b Half a year of an orchard share
+					br
+					span euro, per day
+				+prices(halfYear, true)
+
+	+section("Tooltip and crosshair")
+		p If you point at a candle, the tooltip shows its open, high, low and close, and the change from the open to the close in percent.
+		p With #[code data-chart-tooltip="crosshair"], a line goes down through the candle, and a line across follows the pointer. Its label on the axis shows the value of the scale at that height. If the pointer is within 8 pixels of the open, high, low or close, the line goes to that value, with a dot on the candle, and the label shows the exact value from the table, in the colour of the candle. The label under the chart shows the name of the row. See #[a(href=url('/features/tooltips.html#crosshair')) Crosshair].
+
+		+chart(null, '1')
+			figure(data-chart="candlestick" data-chart-axis="right" data-chart-grid data-chart-tooltip="crosshair")
+				figcaption
+					b The price of an orchard share
+					br
+					span euro, per day
+				+prices(days)
+
+	+section("Summary")
+		p A #[a(href=url('/features/summary.html')) summary] of a candlestick chart is about the close: the fourth value column. Its rows are in order, so the summary has the change and the trend from the first close to the last. If you want a sentence about the high or the low, add #[code data-series="2"] or #[code data-series="3"].
+
+		+chart(null, '1,18-23')
+			figure(data-chart="candlestick" data-chart-summary="always")
+				figcaption
+					b The price of an orchard share
+					br
+					span euro, per day
+				+prices(days)
+				.chart-summary
+					p(data-summary="change" data-when="up") From {first.name} to {last.name}, the price went up by {change.percent}, from {first.value} to {last.value}.
+					p(data-summary="change" data-when="down") From {first.name} to {last.name}, the price went down by {change.percent}, from {first.value} to {last.value}.
+					p(data-series="2") The highest price was {highest.value}, on {highest.name}.
+					p(data-series="3") The lowest price was {lowest.value}, on {lowest.name}.
+
+		p #[code {total}] and #[code data-series="total"] add the values up, which means nothing for prices.
+
+	+section("Colours")
+		p By default, a rising and a falling candle have the same colour: the colour of the bars, #[code --tablechart-bar-color]. The hollow and filled bodies set them apart, also in print and for people who do not see colours well.
+		p If you want other colours, set these variables. Without them, the up and down colours of the #[a(href=url('/types/waterfall.html')) waterfall chart] are used.
+
+		table
+			thead
+				tr
+					th Variable
+					th Sets
+			tbody
+				tr
+					td: code --tablechart-candle-up-color
+					td The colour of a rising candle: #[code --tablechart-up-color] by default
+				tr
+					td: code --tablechart-candle-down-color
+					td The colour of a falling candle: #[code --tablechart-down-color] by default
+				tr
+					td: code --tablechart-candle-up-fill
+					td The inside of a rising body: the background by default, so it is hollow
+				tr
+					td: code --tablechart-candle-line-width
+					td How thick the wicks and the outlines of the bodies are: #[code 1px] by default
+
+		+style.
+			.green-red {
+				--tablechart-candle-up-color: #2e7d4f;
+				--tablechart-candle-down-color: #c0392b;
+				--tablechart-candle-up-fill: #2e7d4f;
+			}
+
+		+chart(null, '1')
+			figure.green-red(data-chart="candlestick")
+				figcaption
+					b The price of an orchard share
+					br
+					span euro, per day
+				+prices(days)
+
+		p Green and red alone are hard to tell apart for many people. If you use them, a hollow rising body still helps.
+
+	+section("Load it")
+		p The candlestick chart is not in the main script. It is an additional type, in a script of its own. See #[a(href=url('/types/additional-types.html')) Additional types].
+
+		+codeblock('JS').
+			import { addType, init } from "@martinomagnifico/tablechart";
+			import { candlestick } from "@martinomagnifico/tablechart/additional-types";
+
+			addType("candlestick", candlestick);
+			init();
+
+		p If you use a script tag, load #[code tablechart-additional-types.js] after #[code tablechart.js]. It adds the candlestick chart.
+
+		+codeblock('HTML').
+			<script src="tablechart.js"></script>
+			<script src="tablechart-additional-types.js"></script>
+			<script>
+				Tablechart.init();
+			</script>
+
+	+section("What it does not do")
+		p A candlestick chart has no numbers on its candles, no stacks, no break in the scale and no steps per row. It does not show the volume, so the table has only the four value columns: another column of numbers would change the scale.
+
+	+section("Next")
+		p If you want to style the axis and the gridlines, see #[a(href=url('/styling/axes.html')) Axes and gridlines]. For all the attributes, see #[a(href=url('/reference/attributes.html')) Attributes].
