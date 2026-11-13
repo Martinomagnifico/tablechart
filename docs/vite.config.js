@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
 	        outDir: "dist",
 	        emptyOutDir: false,
 			// Browsers that support light-dark(), so the build does not rewrite it.
-			cssTarget: ['chrome123', 'edge123', 'firefox120', 'safari17.5'],
+			cssTarget: ['chrome123', 'edge123', 'firefox120', 'safari17.5', 'ios17.5'],
 	        rollupOptions: {
 	            input: [
 					resolve(import.meta.dirname, "src/views/**/[!_]*.pug"),
