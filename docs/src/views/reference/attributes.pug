@@ -71,7 +71,7 @@ block content
 					td Sets the height of the chart as a share of its width, such as #[code 0.5]
 				tr
 					td: code data-chart-tooltip="auto"
-					td The tooltip of the chart: #[code auto] only when the chart does not show all its numbers, #[code false] never, #[code true] always.
+					td The tooltip of the chart: #[code auto] only when the chart does not show all its numbers, #[code false] never, #[code true] always, #[code crosshair] a line through the row with its values at the side, on a line or area chart.
 				tr
 					td: code data-chart-table="auto"
 					td When the table is shown under the chart: #[code always], #[code print], #[code auto] (in print, when the chart does not show all its numbers and the table is not too long) or #[code never]
@@ -83,7 +83,7 @@ block content
 					td When the summary is shown: #[code always], #[code print], #[code auto] (in print, when the chart does not show all its numbers and its table is not printed) or #[code never]. See #[a(href=url('/features/summary.html')) Summary].
 				tr
 					td: code data-chart-axis
-					td Adds numbers along the value axis of a column, bar, line, area or waterfall chart. #[code data-chart-axis="false"] turns them off when the #[code axis] option is #[code true].
+					td Adds numbers along the value axis of a column, bar, line, area or waterfall chart. #[code data-chart-axis="right"] puts them on the right of an upright chart, and #[code "left"] on the left. #[code data-chart-axis="false"] turns them off when the #[code axis] option is #[code true].
 				tr
 					td: code data-chart-grid
 					td Adds a light line at each number of the value axis, or of both axes on a scatter chart. #[code data-chart-grid="false"] turns it off when the #[code grid] option is #[code true].

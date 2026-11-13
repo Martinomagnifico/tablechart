@@ -57,10 +57,49 @@ block content
 								th= row[0]
 								td= row[1]
 
-		p #[code data-chart-tooltip="false"] turns it off. If you want to set it for every chart, use the #[code tooltip] option: #[code "auto"] by default, #[code true] or #[code false].
+		p #[code data-chart-tooltip="false"] turns it off. If you want to set it for every chart, use the #[code tooltip] option: #[code "auto"] by default, #[code true], #[code false] or #[code "crosshair"].
 
 		+codeblock('JS').
 			init({ tooltip: true });
+
+	+section("Crosshair")
+		-
+			const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+			// Three years of the price of a kilo of apples at two markets: a slow rise, with the seasons in it.
+			const markets = Array.from({ length: 36 }, (_, i) => {
+				const season = Math.cos(((i % 12) - 1) / 6 * Math.PI);
+				const north = 1.6 + i * 0.012 + season * 0.18 + (((i * 7) % 5) - 2) * 0.02;
+				const south = 1.45 + i * 0.015 + season * 0.12 + (((i * 3) % 4) - 1.5) * 0.025;
+				return [`${monthNames[i % 12]} ${2023 + Math.floor(i / 12)}`, String(2023 + Math.floor(i / 12)), north.toFixed(2), south.toFixed(2)];
+			});
+		p With #[code data-chart-tooltip="crosshair"], a line or area chart shows a crosshair instead of a tooltip: a thin line down through the row you point at, and one across through the point nearest to the pointer. Each line gets a dot, and its value at the side of the value axis, in the colour of its line. The name of the row is under the line down. Values that would touch are pushed apart.
+		p Together with #[code data-chart-values="none"] and #[code data-chart-axis], the chart shows clean lines, and exact values only where you point. This chart has #[code data-chart-axis="right"], so the values go over the numbers on the right. See #[a(href=url('/styling/axes.html')) Axes and gridlines].
+
+		+chart(null, '1')
+			figure(data-chart="line" data-chart-tooltip="crosshair" data-chart-values="none" data-chart-axis="right" data-chart-grid data-chart-legend data-chart-scale="1.2 2.2" data-chart-shape="smooth")
+				figcaption
+					b The price of apples
+					br
+					span euro per kilo
+				table
+					thead
+						tr
+							th Month
+							th North
+							th(data-line="dashed") South
+					tbody
+						each row in markets
+							tr
+								th(data-short=row[1])= row[0]
+								td= row[2]
+								td= row[3]
+
+		+codeblock('HTML').
+			<figure data-chart="line" data-chart-tooltip="crosshair" data-chart-values="none" data-chart-axis data-chart-grid data-chart-scale="1.2 2.2">
+
+		p On other chart types, #[code crosshair] gives the normal tooltip. If you want a crosshair on every line and area chart, set the #[code tooltip] option to #[code "crosshair"].
+		p As the tooltip, the crosshair works with a pointer or a tap. It is not printed, and screen readers read the table instead.
+		p The line of the crosshair is #[code --tablechart-crosshair-color] and #[code --tablechart-crosshair-width], and the size of its text is #[code --tablechart-crosshair-size].
 
 	+section("Style it")
 		p The background, text, border, corners and shadow of the tooltip are CSS variables. See #[a(href=url('/styling/tooltips.html')) Styling tooltips], with examples.

@@ -1,6 +1,9 @@
 
-:has(> [data-panel].is-restored),
-:has(> [data-panel].is-restored) * {
+// A panel that opens restored, with its button's chevron and its card, does not animate. Named, as `:has() *` slows every chart.
+[data-panel].is-restored,
+[data-panel].is-restored *,
+.card:has(> [data-panel].is-restored),
+:is(.card-trigger, .nav-section-toggle):has(+ [data-panel].is-restored) svg {
   transition: none !important;
 }
 

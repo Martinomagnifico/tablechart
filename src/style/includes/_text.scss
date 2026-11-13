@@ -209,6 +209,9 @@
 	&[data-place="before"] {
 		transform: translate(-100%, -50%);
 	}
+	&[data-place="after"] {
+		transform: translate(0, -50%);
+	}
 	&[data-place="none"] {
 		display: none;
 	}
@@ -302,6 +305,21 @@
 	}
 	:where(span[data-left-out]) {
 		visibility: hidden;
+	}
+
+	// A name that the next rows repeat, such as a year over its months, is shown once: from its own row, over the room of its run.
+	:where(span[data-repeat]) {
+		display: none;
+	}
+	& :where(span[data-run]),
+	&[data-thinned] :where(span[data-run]) {
+		grid-column: span var(--_run);
+		justify-self: start;
+		width: max-content;
+		margin-inline-start: calc(50% / var(--_run));
+		padding-inline-start: 0.3em;
+		text-align: start;
+		white-space: nowrap;
 	}
 
 	// Under a line or an area: a tick above each name shown, from the plot down to the name, at the place of its row.

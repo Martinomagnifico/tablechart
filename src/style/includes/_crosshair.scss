@@ -1,0 +1,76 @@
+@use "tokens" as *;
+
+// The crosshair of `tooltip: "crosshair"`: a thin line down through the row pointed at, a dot on each line, the values at the side.
+.tablechart-crosshair {
+	pointer-events: none;
+}
+
+.tablechart-crosshair-line {
+	stroke: var(--tablechart-crosshair-color, color-mix(in oklab, currentColor 55%, transparent));
+	stroke-width: var(--tablechart-crosshair-width, 1px);
+	vector-effect: non-scaling-stroke;
+}
+
+.tablechart-crosshair-point {
+	fill: var(--tablechart-point-color, #{$seriesink});
+	stroke: var(--tablechart-point-color, #{$seriesink});
+	stroke-width: 2px;
+	vector-effect: non-scaling-stroke;
+
+	// An open point is filled with the background, so the line does not show through it.
+	&[data-open] {
+		fill: var(--tablechart-surface, var(--_surface, Canvas));
+	}
+}
+
+.tablechart-crosshair-labels {
+	position: absolute;
+	inset: 0;
+	// Over the names under the chart.
+	z-index: 1;
+	pointer-events: none;
+}
+
+.tablechart-crosshair-value,
+.tablechart-crosshair-name {
+	position: absolute;
+	padding: var(--tablechart-crosshair-padding, 0.1em 0.25em);
+	border-radius: var(--tablechart-crosshair-radius, 0.25em);
+	// Apart from the lines and numbers under it.
+	border: var(--tablechart-crosshair-border, 1px solid var(--tablechart-surface, var(--_surface, Canvas)));
+	line-height: 1.25;
+	white-space: nowrap;
+}
+
+// In the colour of its line, with text that has enough contrast on it.
+.tablechart-crosshair-value {
+	background: var(--_line);
+	color: var(--_ink);
+	// As big as the numbers of the axis.
+	font-size: var(--tablechart-crosshair-size, var(--tablechart-axis-size, #{$namesize}));
+	transform: translateY(-50%);
+
+	// With an axis, over its numbers, from the edge of the plot.
+	&[data-axis="left"] {
+		transform: translate(calc(-100% - var(--_shift, 1px)), -50%);
+	}
+	&[data-axis="right"] {
+		transform: translate(var(--_shift, 1px), -50%);
+	}
+}
+
+// The name of the row, under the line, over the names of the chart.
+.tablechart-crosshair-name {
+	background: var(--tablechart-crosshair-name-surface, var(--_text));
+	color: var(--tablechart-crosshair-name-color, var(--tablechart-surface, var(--_surface, Canvas)));
+	// As big as the names under the chart.
+	font-size: var(--tablechart-crosshair-size, var(--_name-size, #{$namesize}));
+	transform: translateX(-50%);
+}
+
+@media print {
+	.tablechart-crosshair,
+	.tablechart-crosshair-labels {
+		display: none;
+	}
+}

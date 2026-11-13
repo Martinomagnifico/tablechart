@@ -2,14 +2,14 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Styling | Tooltips"
-	- pagedescription = "The background, text, border, corners and shadow of the tooltip in Tablechart."
+	- pagedescription = "The background, text, border, corners and shadow of the tooltip in Tablechart, and the lines and text of the crosshair."
 
 block content
 	.lane
 		.container
 			.page-header
 				h1 Tooltips
-				p.lead The background, text, border, corners and shadow of the tooltip.
+				p.lead The background, text, border, corners and shadow of the tooltip, and the lines and text of the crosshair.
 
 	+section("Where to set the variables")
 		p The tooltip is not inside the chart in the page: there is one tooltip for the whole page, at the end of the page. So it reads the variables of the chart when it opens. They can be set on the chart, on a class or on #[code :root], as other variables. The font, the text size and the colour scheme come from the chart too.
@@ -89,6 +89,67 @@ block content
 							th(data-line="dashed") South
 					tbody
 						each row in [['2016', '41', '30'], ['2019', '58', '39'], ['2022', '77', '52'], ['2025', '105', '61']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+	+section("Crosshair")
+		p A line or area chart with #[code data-chart-tooltip="crosshair"] has a crosshair instead of a tooltip. See #[a(href=url('/features/tooltips.html#crosshair')) Crosshair]. Its lines and its labels have variables. Unlike the tooltip, the crosshair is inside the chart, so the variables work as all other variables of the chart.
+
+		table
+			thead
+				tr
+					th Variable
+					th Sets
+			tbody
+				tr
+					td: code --tablechart-crosshair-color
+					td The colour of the lines: the text colour, half see-through, by default
+				tr
+					td: code --tablechart-crosshair-width
+					td How thick the lines are: 1px by default
+				tr
+					td: code --tablechart-crosshair-size
+					td The size of the values and the name of the row. By default, the values are as big as the numbers of the axis, and the name as the names under the chart, so their text covers those.
+				tr
+					td: code --tablechart-crosshair-radius
+					td The corners of the values and the name of the row: 0.25em by default
+				tr
+					td: code --tablechart-crosshair-padding
+					td The space inside the values and the name of the row: 0.1em 0.25em by default
+				tr
+					td: code --tablechart-crosshair-border
+					td The border of the values and the name of the row: 1px in the background colour by default, so they stand apart from the lines and numbers under them
+				tr
+					td: code --tablechart-crosshair-name-surface
+					td The background of the name of the row: the text colour of the chart by default
+				tr
+					td: code --tablechart-crosshair-name-color
+					td The text of the name of the row: the background colour by default
+
+		p Each value has the colour of its line, so #[code --tablechart-color-1] and the other colours of the lines set those. Its text gets to be black or white, whichever has more contrast.
+
+		+style.
+			.bold-crosshair {
+				--tablechart-crosshair-color: #b47a2a;
+				--tablechart-crosshair-width: 2px;
+				--tablechart-crosshair-size: 1em;
+				--tablechart-crosshair-radius: 0;
+				--tablechart-crosshair-name-surface: #b47a2a;
+				--tablechart-crosshair-name-color: #fff;
+			}
+
+		+chart(null, '1')
+			figure.bold-crosshair(data-chart="line" data-chart-tooltip="crosshair" data-chart-values="none" data-chart-axis data-chart-legend)
+				table
+					thead
+						tr
+							th Year
+							th North
+							th(data-line="dashed") South
+					tbody
+						each row in [['2016', '41', '30'], ['2017', '47', '33'], ['2018', '52', '36'], ['2019', '58', '39'], ['2020', '63', '44'], ['2021', '70', '47'], ['2022', '77', '52'], ['2023', '86', '55'], ['2024', '94', '58'], ['2025', '105', '61']]
 							tr
 								th= row[0]
 								td= row[1]

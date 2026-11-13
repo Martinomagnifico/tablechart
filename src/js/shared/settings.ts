@@ -30,9 +30,15 @@ export const cornerOf = (figure: HTMLElement, unit: number, name: string): numbe
 	cssLength(figure, unit, getComputedStyle(figure).getPropertyValue(name).trim() ? name : "--tablechart-corner-radius", "0px") ?? 0;
 
 /** A figure's own `data-chart-…`, on unless it says `false`, or else the option. */
-export const turnedOn = (figure: HTMLElement, name: string, option: boolean): boolean => {
+export const turnedOn = (figure: HTMLElement, name: string, option: boolean | string): boolean => {
 	const own = figure.getAttribute(name);
-	return own === null ? option : own !== "false";
+	return own === null ? !!option : own !== "false";
+};
+
+/** Whether the value axis is on the right: `data-chart-axis="right"`, or the `axis` option when the figure says no side. */
+export const axisRight = (figure: HTMLElement, config: Config): boolean => {
+	const own = figure.getAttribute("data-chart-axis");
+	return own === "right" || (own !== "left" && config.axis === "right");
 };
 
 const SHAPES: readonly Shape[] = ["straight", "step", "smooth"];

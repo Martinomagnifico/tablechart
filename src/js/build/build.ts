@@ -21,11 +21,11 @@ import { htmlEl, svgEl } from "../draw/svg";
 import { debug } from "../shared/debug";
 import { makeControls, planSteps, stepTo } from "../show/steps";
 import { attachTooltip, releaseTooltip } from "../show/tooltip";
+import { attachCrosshair } from "../show/crosshair/attach";
 import { writeNumber } from "../shared/numbers";
-import { turnedOn } from "../shared/settings";
 import type { ChartState, Motion, Series } from "../types";
 import { ANNOTATIONS, CHARTS } from "../charts/registry";
-import { animated, shapeOf } from "../shared/settings";
+import { animated, axisRight, shapeOf, turnedOn } from "../shared/settings";
 import { settleMasks } from "../show/shown";
 import { tableOf } from "../shared/table";
 
@@ -344,9 +344,10 @@ export const build = (
 				}),
 				ticks: htmlEl(`${TICK_CLASS}s`, plot),
 				numbers: true,
+				right: false,
 			}
 		: valueAxis || (!type.centre && turnedOn(figure, "data-chart-grid", config.grid))
-			? { titles: [], ticks: htmlEl(`${TICK_CLASS}s`, plot), numbers: valueAxis }
+			? { titles: [], ticks: htmlEl(`${TICK_CLASS}s`, plot), numbers: valueAxis, right: type.categories !== "beside" && axisRight(figure, config) }
 			: null;
 	type.text?.({ figure, plot, rows, series, config });
 
@@ -427,6 +428,8 @@ export const build = (
 		rowAt: null,
 		rowBox: null,
 		pointOf: null,
+		crossingOf: null,
+		crosshair: null,
 		annotations,
 		checks: [],
 		plan,
@@ -443,8 +446,10 @@ export const build = (
 	});
 	stepTo(state, 0, true);
 	const own = figure.getAttribute("data-chart-tooltip");
-	const tooltip = own === "false" ? false : own === "auto" ? "auto" : own !== null ? true : config.tooltip;
-	if (tooltip) attachTooltip(state, config, tooltip === "auto");
+	const tooltip = own === "false" ? false : own === "auto" || own === "crosshair" ? own : own !== null ? true : config.tooltip;
+	// A crosshair is for a line or an area; another chart gets the tooltip.
+	if (tooltip === "crosshair" && (kind === "line" || kind === "area")) attachCrosshair(state);
+	else if (tooltip) attachTooltip(state, config, tooltip === "auto");
 	relabel(state, config);
 	return state;
 };
@@ -475,6 +480,7 @@ export const relabel = (state: ChartState, config: Config): void => {
 /** Removes what `build` added, so the chart can be built again. */
 export const unbuild = (state: ChartState): void => {
 	releaseTooltip(state);
+	state.crosshair?.hide();
 	state.plot.remove();
 	state.categories[0]?.parentElement?.remove();
 	state.figure.querySelector(`:scope > .${LEGEND_CLASS}`)?.remove();

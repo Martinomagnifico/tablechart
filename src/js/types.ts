@@ -78,6 +78,10 @@ export interface Geometry {
 	rowAt?: (x: number, y: number) => number | null;
 	/** Where the tooltip of a row points, in viewBox units, for a row whose mark may not be drawn, such as a point of a long line. */
 	pointOf?: (index: number) => [number, number] | null;
+	/** The crosshair of a row, on a line or area chart. */
+	crossingOf?: (index: number) => Crossing | null;
+	/** The side of the numbers of the value axis; null without them. */
+	axisSide: "left" | "right" | null;
 	/** A CSS length set on the figure, such as `--tablechart-marker-size`, in viewBox units. */
 	length: (name: string, fallback: string) => number | null;
 	barWidth: number;
@@ -194,6 +198,21 @@ export interface ChartType {
 	annotations?: Record<string, AnnotationType>;
 }
 
+/** The crosshair of a row, in viewBox units: a line down at `x` from `from` to `to`, and a dot on each line where it crosses. */
+export interface Crossing {
+	x: number;
+	from: number;
+	to: number;
+	/** Where the value labels go: at the value axis, or the left edge of the plot without one. */
+	edge: number;
+	/** Where a line across the plot ends: at the row farthest from the axis. */
+	end: number;
+	/** The side of the axis numbers that the value labels go over. */
+	axis: "left" | "right" | null;
+	height: number;
+	points: { series: number; y: number; dot: SVGElement }[];
+}
+
 /** One line of a tooltip, under the name of the row. */
 export interface TooltipLine {
 	/** The name of the series; empty for a chart with one series. */
@@ -213,6 +232,8 @@ export interface HeadroomInput {
 	series: number;
 	focused: boolean;
 	stacked: boolean;
+	/** False with `data-chart-values="none"` and no row with `data-value="show"`: a line then needs no room for numbers. */
+	numbers: boolean;
 }
 
 /** `create` runs before layout, so a translation script finds its text; `draw` only places it. */
@@ -239,7 +260,7 @@ export interface ChartState {
 	categories: HTMLElement[];
 	centre: HTMLElement | null;
 	/** The axis titles and the place for the numbers along the axes. Without `numbers`, only for gridlines. */
-	axes: { titles: HTMLElement[]; ticks: HTMLElement; numbers: boolean } | null;
+	axes: { titles: HTMLElement[]; ticks: HTMLElement; numbers: boolean; right: boolean } | null;
 	stacked: boolean;
 	totals: HTMLElement[];
 	totalCell: HTMLElement | null;
@@ -249,6 +270,10 @@ export interface ChartState {
 	rowBox: ((index: number) => [number, number, number, number]) | null;
 	/** Where the tooltip of a row points, in viewBox units; set by a chart such as a line. */
 	pointOf: ((index: number) => [number, number] | null) | null;
+	/** The crosshair of a row, on a line or area chart. */
+	crossingOf: ((index: number) => Crossing | null) | null;
+	/** The crosshair, once it is attached, so a new layout can take it away. */
+	crosshair: { hide: () => void } | null;
 	annotations: {
 		spec: HTMLElement;
 		type: AnnotationType;

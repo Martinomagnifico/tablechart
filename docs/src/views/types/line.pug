@@ -343,6 +343,46 @@ block content
 		p A row with a translation key, such as #[code juice-row11], gets the key #[code juice-row11-short] for its short name under the chart. A translation script then needs a short name for that key too.
 		p For a long table, a summary can say in a few sentences what a listener needs, such as the highest value and the trend. See #[a(href=url('/features/summary.html')) Summary].
 
+	+section("Years and quarters")
+		-
+			const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+			// The same three years of apple juice, with the quarter of each month as its short name.
+			const quarters = Array.from({ length: 36 }, (_, i) => [
+				`${monthNames[i % 12]} ${2023 + Math.floor(i / 12)}`,
+				`Q${Math.floor((i % 12) / 3) + 1} ’${23 + Math.floor(i / 12)}`,
+				(20 + i * 0.35 + 4 * Math.cos(((i % 12) / 6) * Math.PI) + ((i * 7) % 5) * 0.4).toFixed(1),
+			]);
+		p If rows next to each other have the same short name, such as the year of each month, the chart shows that name once, from the first of those rows on, with its tick there. So a chart of months can show its years, or its quarters, under the chart. The tooltip, the crosshair and a screen reader still read the full name of each row.
+
+		.card
+			.demo
+				figure(data-chart="line")
+					figcaption
+						b Apple juice sold
+						br
+						span thousands of litres per month
+					table
+						tbody
+							each row in quarters
+								tr
+									th(data-short=row[1])= row[0]
+									td= row[2]
+
+			+codeblock('HTML', null, '4-7').
+				<figure data-chart="line">
+					<table>
+						<tbody>
+							<tr><th data-short="Q1 ’23">January 2023</th><td>#{quarters[0][2]}</td></tr>
+							<tr><th data-short="Q1 ’23">February 2023</th><td>#{quarters[1][2]}</td></tr>
+							<tr><th data-short="Q1 ’23">March 2023</th><td>#{quarters[2][2]}</td></tr>
+							<tr><th data-short="Q2 ’23">April 2023</th><td>#{quarters[3][2]}</td></tr>
+							<!-- …one row per month, 36 in all -->
+						</tbody>
+					</table>
+				</figure>
+
+		p If the names of the groups still do not fit, only every second, third or more group is shown.
+
 	+section("Which values are shown")
 		-
 			const names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];

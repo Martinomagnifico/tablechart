@@ -125,6 +125,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 
 const layoutOne = (state: ChartState, config: Config): boolean => {
 	const { plot, svg, rows, type, values, series, seriesValues, names, annotations } = state;
+	state.crosshair?.hide();
 	showTable(state, config);
 	// With an end colour, lines and slices go from the first colour to the end colour, rather than lighter towards the background.
 	const style = getComputedStyle(state.figure);
@@ -210,6 +211,7 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 		((r) => r.map((row) => ({ ...row, from: 0, to: row.value, kind: "bar" as const })))
 	)(state.stacked ? stackedRows.map((row) => ({ ...row, cells: [row.cells[0]] })) : rows);
 
+	const pick = pickOf(state.figure, config);
 	const room = {
 		labelHeight,
 		badgeHeight,
@@ -218,6 +220,7 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 		series: series.length,
 		focused: series.some((one) => one.focus),
 		stacked: state.stacked,
+		numbers: !(pick.mode === "set" && !pick.keys.length && !rows.some((row) => row.pinned)),
 	};
 	const { extent, depth, steps } = reachOf(
 		segments,
@@ -231,13 +234,18 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 	const noteRoom = rows.some((row) => row.note) ? badgeHeight + 4 * unit : 0;
 	const headroom = Math.max(type.headroom?.(room) ?? labelHeight, lineSeries.length ? (line.headroom?.(room) ?? 0) : 0) + noteRoom;
 	const floor = 2 * unit + (type.footroom?.(room) ?? 0) + (depth < 0 ? labelHeight + 4 * unit : 0);
-	const top = Math.max(headroom, state.agreed?.room ?? 0);
+	// The top number of a value axis is centred on its line, so half of it is above the plot.
+	const axisRoom = along?.numbers && !sideways ? labelHeight / 2 + 2 * unit : 0;
+	const top = Math.max(headroom, axisRoom, state.agreed?.room ?? 0);
 	const foot = Math.max(floor, state.agreed?.floor ?? 0);
 
 	const plotHeight = height - top - foot;
 	// With an axis or gridlines, the scale of the axis; a value beyond it is still shown whole.
 	const ceiling = Math.max(valueScale ? Math.max(valueScale.max, extent) : extent * 1.02, state.agreed?.ceiling ?? 0);
-	const bottom = Math.min(valueScale ? Math.min(valueScale.min, depth) : depth * 1.02, state.agreed?.bottom ?? 0);
+	// A line can start above zero where its scale does; columns and areas stand on zero.
+	const known = rows.flatMap((row) => row.cells.slice(0, series.length).flatMap((cell) => (cell.missing ? [] : [cell.value])));
+	const floats = !!valueScale && type === line && !state.stacked && valueScale.min > 0 && !state.agreed;
+	const bottom = floats && valueScale ? Math.min(valueScale.min, ...known) : Math.min(valueScale ? Math.min(valueScale.min, depth) : depth * 1.02, state.agreed?.bottom ?? 0);
 
 	// The break squeezes `data-from` to `data-to` into `data-size` of the plot; `data-at` is the old spelling of `data-from`.
 	const breakSpec = annotations.find(
@@ -276,7 +284,6 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 	if (axes) ({ frame, x, y, shownTicks } = placeFrame(axes, ticks, scales, height, unit));
 
 	// The bands give up the room the widest series name needs.
-	const pick = pickOf(state.figure, config);
 	const shape = shapeOf(state.figure, config);
 	// The last numbers go next to the names, so a line that ends close to another keeps its own number: with a chosen set, or with
 	// `auto` when the values will not all fit, judged from the widest value against the room per row.
@@ -286,7 +293,7 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 		!!type.running && names.length > 0 && !state.stacked && shape !== "step" && pick.keys.includes("last") && (pick.mode === "set" || (pick.mode === "auto" && crowded));
 	const endNumbers = numbersAtEnd ? widest * unit : 0;
 	const gutter = names.length
-		? largest(names.map((name) => sizeOf(name).width)) * unit + 12 * unit + endNumbers
+		? largest(names.map((name) => sizeOf(name).width)) * unit + 12 * unit + endNumbers + (along?.numbers && along.right && !sideways ? 6 * unit : 0)
 		: 0;
 	const under = state.categories[0]?.parentElement;
 	if (under) under.style.paddingRight = gutter ? `${(gutter / VIEWBOX_WIDTH) * 100}%` : "";
@@ -320,6 +327,7 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 		y,
 		x,
 		frame,
+		axisSide: frame ? "left" : along?.numbers && !sideways ? (along.right ? "right" : "left") : null,
 		length: (name, fallback) => cssLength(state.figure, unit, name, fallback),
 		barWidth: Math.min(band * config.barfill, barMax(state.figure, unit)),
 		barMax: barMax(state.figure, unit),
@@ -379,6 +387,7 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 	} else type.draw(geo);
 	if (geo.rowAt) state.rowAt = geo.rowAt;
 	state.pointOf = geo.pointOf ?? null;
+	state.crossingOf = geo.crossingOf ?? null;
 	// A name comes with the end of the marks: on a chart that builds in fewer stagger steps than it has rows, such as a line, sooner.
 	const staggered = Number(plot.style.getPropertyValue("--count")) || rows.length;
 	for (const name of state.figure.querySelectorAll<HTMLElement>(`.${NAME_CLASS}`))
@@ -422,10 +431,10 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 
 	// Before anything reads styles, so new marks start at their step and do not transition to it.
 	applySteps(state);
-	// A legend comes with its first name, so its box is never empty. With steps, a name in no step is there with the axes.
+	// A legend comes with the first marks, which it explains; with steps, a name in no step is there with the axes.
 	for (const legend of state.figure.querySelectorAll<HTMLElement>(`.${LEGEND_CLASS}`)) {
 		const names = Array.from(legend.children) as HTMLElement[];
-		if (state.plan) for (const name of names) if (!name.style.getPropertyValue("--step")) name.style.setProperty("--i", "0");
+		for (const name of names) if (!state.plan || !name.style.getPropertyValue("--step")) name.style.setProperty("--i", "0");
 		const steps = names.map((name) => Number.parseFloat(name.style.getPropertyValue("--step")));
 		legend.style.setProperty("--i", String(Math.min(...names.map((name) => Number(name.style.getPropertyValue("--i")) || 0))));
 		if (steps.length && steps.every(Number.isFinite)) legend.style.setProperty("--step", String(Math.min(...steps)));

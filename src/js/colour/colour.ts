@@ -112,6 +112,16 @@ const blackOrWhite = (fill: number[], needed: number, method: 2 | 3): number[] =
 export const inkInside = (figure: HTMLElement): void => {
 	const values = figure.querySelectorAll<HTMLElement>(".tablechart-value[data-place='inside']");
 	if (!values.length) return;
+	const ink = inkerOf(figure);
+	for (const value of values) {
+		const mark = markOf(figure, value);
+		if (!mark || value.hasAttribute("data-left-out")) continue;
+		value.style.setProperty("--_ink", ink(rgbOf(getComputedStyle(mark).fill)));
+	}
+};
+
+/** The colour of text on a fill, chosen as for a number inside a bar. */
+export const inkerOf = (figure: HTMLElement): ((fill: number[]) => string) => {
 	const surface = surfaceOf(figure).slice(0, 3);
 	// The point where black and white have the same contrast with a colour.
 	const lightSurface = luminance(surface) > 0.179;
@@ -124,14 +134,11 @@ export const inkInside = (figure: HTMLElement): void => {
 	const text = rgbOf(getComputedStyle(figure).color).slice(0, 3);
 	const onDark = own("--tablechart-value-on-dark", lightSurface ? surface : text);
 	const onLight = own("--tablechart-value-on-light", lightSurface ? text : surface);
-	for (const value of values) {
-		const mark = markOf(figure, value);
-		if (!mark || value.hasAttribute("data-left-out")) continue;
-		const fill = rgbOf(getComputedStyle(mark).fill);
+	return (fill) => {
 		const best = contrastOf(method, onDark, fill) > contrastOf(method, onLight, fill) ? onDark : onLight;
 		const ink = contrastOf(method, best, fill) >= needed ? best : blackOrWhite(fill, needed, method);
-		value.style.setProperty("--_ink", `rgb(${ink.join(" ")})`);
-	}
+		return `rgb(${ink.join(" ")})`;
+	};
 };
 
 /**

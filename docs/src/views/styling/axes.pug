@@ -43,7 +43,19 @@ block content
 								th= row[0]
 								td= row[1]
 
+	+section("The axis on the right")
+		p If you want the numbers of the value axis on the right, set #[code data-chart-axis="right"]. That works on a column, line, area or waterfall chart. On a line chart, the names at the ends of the lines go between the lines and the axis, and the gridlines reach the axis. With a #[a(href=url('/features/tooltips.html#crosshair')) crosshair], the values go over the numbers on the right.
+		p If you want it on the right for all charts, set the #[code axis] option to #[code "right"]. #[code data-chart-axis="left"] then puts it back on the left for one chart.
 
+		+chart(null, '1')
+			figure(data-chart="line" data-chart-axis="right" data-chart-grid)
+				figcaption: b Rainfall at the orchard
+				table
+					tbody
+						each row in [['Jan', '84'], ['Feb', '71'], ['Mar', '76'], ['Apr', '58'], ['May', '61'], ['Jun', '47'], ['Jul', '39'], ['Aug', '52']]
+							tr
+								th= row[0]
+								td= row[1]
 
 	+section("The scale")
 		p If a chart has an axis or gridlines, its scale ends on a number of the axis. For example, if the highest value is 84 and the numbers on the axis go up by 10, the scale ends at 90.

@@ -30,6 +30,31 @@ export const lineUpNames = (figure: HTMLElement): void => {
 	}
 };
 
+/**
+ * A name that the next rows repeat, such as a year over its months or Q1 over three months, is shown once, from its own row on.
+ * Gives the length of the shortest run, 1 if no name repeats.
+ */
+const markRuns = (names: HTMLElement[]): number => {
+	let shortest = Number.POSITIVE_INFINITY;
+	for (const name of names) {
+		name.removeAttribute("data-repeat");
+		name.removeAttribute("data-run");
+		name.style.removeProperty("--_run");
+	}
+	for (let i = 0; i < names.length; ) {
+		const text = names[i].textContent?.trim() ?? "";
+		let end = i + 1;
+		while (end < names.length && text && names[end].textContent?.trim() === text) names[end++].setAttribute("data-repeat", "");
+		if (end - i > 1) {
+			names[i].setAttribute("data-run", "");
+			names[i].style.setProperty("--_run", String(end - i));
+		}
+		shortest = Math.min(shortest, end - i);
+		i = end;
+	}
+	return names.some((name) => name.hasAttribute("data-run")) ? shortest : 1;
+};
+
 export const fitNames = (state: ChartState, config: Config, height: number, unit: number): void => {
 	const { rows, svg, type } = state;
 	// Names under the plot shrink together, down to 70%, if one is wider than its column.
@@ -43,12 +68,17 @@ export const fitNames = (state: ChartState, config: Config, height: number, unit
 			name.removeAttribute("data-left-out");
 			name.removeAttribute("data-edge");
 		}
+		const shortest = markRuns(state.categories);
 		const names = state.categories.filter((name) => name.offsetParent !== null);
-		const fit = fitTogether(nameRow, names, (name) => ({ size: name.scrollWidth, room: name.clientWidth }), "--_name-fit");
+		// A name over a run has the room of its run, from its own row to the next name.
+		const edges = getComputedStyle(nameRow);
+		const one = (nameRow.clientWidth - Number.parseFloat(edges.paddingLeft) - Number.parseFloat(edges.paddingRight)) / rows.length;
+		const roomOf = (name: HTMLElement) => (name.hasAttribute("data-run") ? one * Number(name.style.getPropertyValue("--_run")) : name.clientWidth);
+		const fit = fitTogether(nameRow, names, (name) => ({ size: name.scrollWidth, room: roomOf(name) }), "--_name-fit");
 		if (!fit && names.length > 1) {
 			// The room of one column, without the padding of the row, which a name with its own padding may be wider than.
 			const rowStyle = getComputedStyle(nameRow);
-			const column = (nameRow.clientWidth - Number.parseFloat(rowStyle.paddingLeft) - Number.parseFloat(rowStyle.paddingRight)) / rows.length;
+			const column = ((nameRow.clientWidth - Number.parseFloat(rowStyle.paddingLeft) - Number.parseFloat(rowStyle.paddingRight)) / rows.length) * shortest;
 			nameRow.style.setProperty("--_name-fit", "1");
 			nameRow.setAttribute("data-thinned", "");
 			const widest = largest(names.map((name) => name.offsetWidth));

@@ -1,5 +1,5 @@
 // The axes of a chart: their scales, numbers and gridlines. The arithmetic of a scale is in `axis.ts`.
-import { AXIS_CLASS, type Config, GRID_CLASS, TICK_CLASS, VIEWBOX_WIDTH } from "../config";
+import { AXIS_CLASS, AXIS_GAP, type Config, GRID_CLASS, TICK_CLASS, VIEWBOX_WIDTH } from "../config";
 import type { ChartState, Geometry } from "../types";
 import { niceStep, readScale, type Scale, scaleOf, thin, ticksOf } from "../scale/axis";
 import { decimalsIn, largest } from "../shared/format";
@@ -19,7 +19,7 @@ export const valueAxisOf = (state: ChartState, config: Config, along: ChartAxes,
 	const namesUnder = sideways ? null : state.categories[0]?.parentElement;
 	let valueScale: Scale;
 	plot.style.margin = "";
-	if (namesUnder) namesUnder.style.marginLeft = "";
+	if (namesUnder) namesUnder.style.margin = "";
 	const guess = plot.clientWidth;
 	if (!guess) return null;
 	// As the scale does: a step of a waterfall is a size, so only where the steps start and end counts.
@@ -61,8 +61,9 @@ export const valueAxisOf = (state: ChartState, config: Config, along: ChartAxes,
 		measureAll(ticks);
 		if (sideways) plot.style.marginBottom = `${(ticks[0] ? sizeOf(ticks[0]).height : 0) + 6}px`;
 		else {
-			plot.style.marginLeft = `${largest([0, ...ticks.map((tick) => sizeOf(tick).width)]) + 10}px`;
-			if (namesUnder) namesUnder.style.marginLeft = plot.style.marginLeft;
+			const side = along.right ? "marginRight" : "marginLeft";
+			plot.style[side] = `${largest([0, ...ticks.map((tick) => sizeOf(tick).width)]) + 10}px`;
+			if (namesUnder) namesUnder.style[side] = plot.style[side];
 		}
 	}
 	return valueScale;
@@ -101,7 +102,7 @@ export const frameScalesOf = (state: ChartState, config: Config, axes: ChartAxes
 
 /** The plot inside two axes: room for the titles and the numbers on the left and at the foot, and fewer numbers where two would touch. */
 export const placeFrame = (axes: ChartAxes, ticks: HTMLElement[], scales: Scale[], height: number, unit: number) => {
-	const gap = 6 * unit;
+	const gap = AXIS_GAP * unit;
 	const [titleX, titleY] = axes.titles;
 	const width = (node?: HTMLElement) => (node ? sizeOf(node).width * unit : 0);
 	const tall = (node?: HTMLElement) => (node ? sizeOf(node).height * unit : 0);
@@ -161,7 +162,7 @@ export const drawFrame = (state: ChartState, config: Config, frame: NonNullable<
 export const placeValueAxis = (state: ChartState, config: Config, along: ChartAxes, valueScale: Scale, at: (value: number) => number, compress: Squeeze | null, height: number, unit: number, gutter: number): void => {
 	const { svg, type } = state;
 	const sideways = type.categories === "beside";
-	const gap = 6 * unit;
+	const gap = AXIS_GAP * unit;
 	const ticks = Array.from(along.ticks.children) as HTMLElement[];
 	const size = (value: number) => sizeOf(ticks.find((tick) => Number(tick.dataset.value) === value) ?? ticks[0]);
 	const shown = thin(valueScale, (list) =>
@@ -169,13 +170,16 @@ export const placeValueAxis = (state: ChartState, config: Config, along: ChartAx
 			!k || (sideways ? at(v) - at(list[k - 1]) > ((size(v).width + size(list[k - 1]).width) / 2) * unit + gap : at(list[k - 1]) - at(v) > size(v).height * unit + gap / 2)
 		)
 	).ticks.filter((v) => !compress || v <= compress.lo || v >= compress.hi);
+	// On the right, the axis is past the names at the ends of the lines, and the gridlines reach it.
+	const right = along.right && !sideways;
+	const edge = right ? VIEWBOX_WIDTH : 0;
 	for (const tick of ticks) {
 		const value = Number(tick.dataset.value);
 		const on = along.numbers && shown.includes(value);
-		tick.dataset.place = on ? (sideways ? "below" : "before") : "none";
-		if (on) placeAt(tick, sideways ? at(value) : -gap, sideways ? height + gap : at(value), VIEWBOX_WIDTH, height);
+		tick.dataset.place = on ? (sideways ? "below" : right ? "after" : "before") : "none";
+		if (on) placeAt(tick, sideways ? at(value) : right ? edge + gap : -gap, sideways ? height + gap : at(value), VIEWBOX_WIDTH, height);
 	}
-	const end = VIEWBOX_WIDTH - gutter;
+	const end = right && along.numbers ? VIEWBOX_WIDTH : VIEWBOX_WIDTH - gutter;
 	// Under the marks.
 	if (turnedOn(state.figure, "data-chart-grid", config.grid))
 		svg.prepend(
@@ -184,13 +188,16 @@ export const placeValueAxis = (state: ChartState, config: Config, along: ChartAx
 				d: shown.map((v) => (sideways ? `M${short(at(v))},0V${short(height)}` : `M0,${short(at(v))}H${short(end)}`)).join(""),
 			})
 		);
+	// Down to the line under the chart, also where a line chart keeps room under its lowest numbers.
+	const rule = Number(svg.querySelector(".tablechart-rule")?.getAttribute("y1"));
+	const foot = Math.max(at(valueScale.min), Number.isFinite(rule) ? rule : 0);
 	if (along.numbers)
 		svg.appendChild(
 			svgEl("path", {
 				class: AXIS_CLASS,
 				d: [
-					sideways ? `M${short(at(valueScale.min))},${short(height)}H${short(at(valueScale.max))}` : `M0,${short(at(valueScale.max))}V${short(at(valueScale.min))}`,
-					...shown.map((v) => (sideways ? `M${short(at(v))},${short(height)}v${short(4 * unit)}` : `M0,${short(at(v))}h${short(-4 * unit)}`)),
+					sideways ? `M${short(at(valueScale.min))},${short(height)}H${short(at(valueScale.max))}` : `M${edge},${short(at(valueScale.max))}V${short(foot)}`,
+					...shown.map((v) => (sideways ? `M${short(at(v))},${short(height)}v${short(4 * unit)}` : `M${edge},${short(at(v))}h${short((right ? 4 : -4) * unit)}`)),
 				].join(""),
 			})
 		);

@@ -7,9 +7,17 @@
 - `groups` in a summary, a short table of the rows in groups, each with its lowest, average and highest value.
 - `{rank}` and `{rank.low}` for each outlier and note in a summary, and `{values}`, the number of values.
 - Summary settings per chart, with `data-summary-` and the name, or as JSON in `data-summary-options` on the figure or a parent.
+- `tooltip: "crosshair"` and `data-chart-tooltip="crosshair"`, lines through the row and the nearest point of a line or area chart, with its values at the side.
+- Rows next to each other with the same short name show it once under the chart, from the first of them, such as a year over its months.
+- `axis: "right"` and `data-chart-axis="right"`, the value axis on the right of a column, line, area or waterfall chart.
 
 ### Changed
 
+- A line chart with a scale that starts above zero starts at its scale.
+- The value axis of a line chart reaches the line under the chart.
+- A line chart without numbers keeps no room for them above and below its lines.
+- A chart keeps room for the top number of its value axis.
+- A legend comes in with the first marks.
 - `Summary.fill(figure)` uses the settings of `Summary.init()`.
 - A table inside a summary is not read as the data of the chart.
 - On a crowded column or bar chart, the numbers of the largest values stay, where they are clear of the other columns.

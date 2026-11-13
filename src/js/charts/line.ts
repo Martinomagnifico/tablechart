@@ -23,11 +23,12 @@ const trend = (area: boolean): ChartType => ({
 	running: true,
 	swatch: area ? "box" : undefined,
 
-	headroom: ({ labelHeight, unit }) => labelHeight * 1.6 + 6 * unit,
+	// Room for the numbers above the points; without numbers, for the points only.
+	headroom: ({ labelHeight, unit, numbers }) => (numbers ? labelHeight * 1.6 + 6 * unit : 6 * unit),
 
 	// Room under the baseline when the lower of two lines has its numbers under it; not for an area or a stack.
-	footroom: ({ labelHeight, unit, series, focused, stacked }) =>
-		!area && !stacked && series === 2 && !focused ? labelHeight + 7 * unit : 0,
+	footroom: ({ labelHeight, unit, series, focused, stacked, numbers }) =>
+		numbers && !area && !stacked && series === 2 && !focused ? labelHeight + 7 * unit : 0,
 
 	draw(geo: Geometry) {
 		const { rows, series, own, seriesValues, names, cx, y, height, unit, labelHeight, svg, stacked } = geo;
@@ -38,7 +39,8 @@ const trend = (area: boolean): ChartType => ({
 		const several = series.length > 1;
 		const focused = series.some((one) => one.focus);
 		const last = rows.length - 1;
-		const baseline = y(0);
+		// Zero, or the foot of a scale that starts above it.
+		const baseline = y(Math.max(0, geo.domain?.[0] ?? 0));
 		// The width of a row; a step is flat across it.
 		const band = rows.length > 1 ? cx(1) - cx(0) : cx(0) * 2;
 
@@ -178,12 +180,12 @@ const trend = (area: boolean): ChartType => ({
 		};
 
 		// `at` says which rows of a series get a point.
+		// Over columns, the first line has the first marker, as a line chart's first line does.
+		const ownSeries = own.map((s) => series[s]);
+		const markers = series.map((_one, s) =>
+			mixed ? markerOf(ownSeries, own.indexOf(s)) : several ? markerOf(series, s) : { shape: "circle" as const, open: false }
+		);
 		const drawPoints = (at: (s: number, i: number) => boolean) => {
-			// Over columns, the first line has the first marker, as a line chart's first line does.
-			const ownSeries = own.map((s) => series[s]);
-			const markers = series.map((_one, s) =>
-				mixed ? markerOf(ownSeries, own.indexOf(s)) : several ? markerOf(series, s) : { shape: "circle" as const, open: false }
-			);
 			const point = (s: number, i: number, attrs: Record<string, string | number>) => {
 				const [px, py] = pointAt(s, i);
 				// With its 2px stroke, a circle is 8px across; a square and a diamond are sized to look as large.
@@ -530,6 +532,27 @@ const trend = (area: boolean): ChartType => ({
 			return tops.length ? tops.reduce((a, b) => (b[1] < a[1] ? b : a)) : null;
 		};
 
+		// The crosshair of a row: a line down through it, and a dot in the shape of each line's points, a little larger.
+		geo.crossingOf = (i) => {
+			if (i < 0 || i > last) return null;
+			const [from, to] = geo.frame ? [geo.frame[1], geo.frame[1] + geo.frame[3]] : [geo.domain ? y(geo.domain[1]) : 0, rule];
+			const points = own
+				.filter((s) => !missing(s, i))
+				.map((s) => {
+					const [px, py] = pointAt(s, i);
+					const shape = markers[s].shape === "none" ? "circle" : markers[s].shape;
+					const dot = markerEl(shape, px, py, 4.5 * unit, {
+						class: "tablechart-crosshair-point",
+						...marks[s].attrs,
+						...(markers[s].open && { "data-open": "" }),
+						style: marks[s].ink,
+					});
+					return { series: s, y: py, dot };
+				});
+			const right = geo.axisSide === "right";
+			return { x: cx(i), from, to, edge: right ? VIEWBOX_WIDTH : (geo.frame?.[0] ?? 0), end: cx(right ? 0 : last), axis: geo.axisSide, height, points };
+		};
+
 		// Each name just past the last point of its line, pushed apart where two lines end close together.
 		const ends = (mixed ? [] : names).map((name, s) => {
 			const i = lastOf(s);
@@ -557,8 +580,8 @@ const trend = (area: boolean): ChartType => ({
 				svgEl("line", {
 					class: RULE_CLASS,
 					x1: 0,
-					// Past the last band is where the names are.
-					x2: cx(last) + cx(0),
+					// Past the last band is where the names are, unless the axis is past them.
+					x2: geo.axisSide === "right" ? VIEWBOX_WIDTH : cx(last) + cx(0),
 					y1: rule,
 					y2: rule,
 				})

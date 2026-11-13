@@ -43,6 +43,8 @@ export const BUILT_CLASS = "is-built";
 export const QUEUED_CLASS = "tablechart-queued";
 export const CONTROLS_CLASS = "tablechart-controls";
 export const AXIS_CLASS = "tablechart-axis";
+/** Between an axis and its numbers, in pixels. */
+export const AXIS_GAP = 6;
 export const TICK_CLASS = "tablechart-tick";
 export const GRID_CLASS = "tablechart-grid";
 
@@ -87,14 +89,14 @@ export interface Config {
 	shape: "straight" | "step" | "smooth";
 	/** Names of several lines in a legend instead of at the end of each line. A figure overrides it with `data-chart-legend`. */
 	legend: boolean;
-	/** Numbers along the value axis of a column, bar, line, area or waterfall chart. A figure overrides it with `data-chart-axis`. */
-	axis: boolean;
+	/** Numbers along the value axis of a column, bar, line, area or waterfall chart; `"right"` puts them on the right of an upright chart. A figure overrides it with `data-chart-axis`. */
+	axis: boolean | "right";
 	/** Gridlines across the plot at each number of the axis. A figure overrides it with `data-chart-grid`. */
 	grid: boolean;
 	/** The name of each marker beside it, on a scatter chart. A figure overrides it with `data-chart-names`. */
 	names: boolean;
-	/** A tooltip with the values of a row that is pointed at or tapped: `"auto"`, the default, only on a chart that does not show all its numbers; `true` always; `false` never. A figure overrides it with `data-chart-tooltip`. */
-	tooltip: boolean | "auto";
+	/** A tooltip with the values of a row that is pointed at or tapped: `"auto"`, the default, only on a chart that does not show all its numbers; `true` always; `false` never. `"crosshair"`, on a line or area chart, shows a line through the row with its values at the side. A figure overrides it with `data-chart-tooltip`. */
+	tooltip: boolean | "auto" | "crosshair";
 	/** Where the tooltip goes in the page: an element or a selector, `body` by default. In a scaled element, such as the slides of a presentation, the tooltip has their scale. */
 	tooltipparent: HTMLElement | string | null;
 	/** The table under the chart: `"always"`, only in `"print"`, in print when numbers are left out (`"auto"`), or `"never"`. A figure overrides it with `data-chart-table`. */
