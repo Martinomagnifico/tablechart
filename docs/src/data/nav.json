@@ -58,6 +58,11 @@
                     "href": "/types/line.html"
                 },
                 {
+                    "text": "Chart types | Pie",
+                    "label": "Pie",
+                    "href": "/types/pie.html"
+                },
+                {
                     "text": "Chart types | Waterfall",
                     "label": "Waterfall",
                     "href": "/types/waterfall.html"

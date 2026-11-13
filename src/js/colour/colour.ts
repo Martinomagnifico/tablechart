@@ -88,8 +88,14 @@ export const surfaceOf = (figure: HTMLElement): [number, number, number, number]
 /** The bar or part of a stack that a number inside it belongs to. */
 export const markOf = (figure: HTMLElement, value: HTMLElement): Element | null =>
 	figure.querySelector(
-		`:is(.tablechart-bar, .tablechart-piece)[data-row="${value.dataset.row}"]${value.dataset.series ? `[data-series="${value.dataset.series}"]` : ""}`
+		`:is(.tablechart-bar, .tablechart-piece, .tablechart-slice)[data-row="${value.dataset.row}"]${value.dataset.series ? `[data-series="${value.dataset.series}"]` : ""}`
 	);
+
+/** The colour of a mark: a slice is a stroke, a bar a fill. */
+export const paintOf = (mark: Element): string => {
+	const style = getComputedStyle(mark);
+	return mark.classList.contains("tablechart-slice") ? style.stroke : style.fill;
+};
 
 const WHITE = [255, 255, 255];
 const BLACK = [0, 0, 0];
@@ -115,13 +121,14 @@ export const inkInside = (figure: HTMLElement): void => {
 	const ink = inkerOf(figure);
 	for (const value of values) {
 		const mark = markOf(figure, value);
-		if (!mark || value.hasAttribute("data-left-out")) continue;
-		value.style.setProperty("--_ink", ink(rgbOf(getComputedStyle(mark).fill)));
+		// A pie gives the numbers on its slices one colour itself.
+		if (!mark || value.hasAttribute("data-left-out") || mark.classList.contains("tablechart-slice")) continue;
+		value.style.setProperty("--_ink", ink(rgbOf(paintOf(mark))));
 	}
 };
 
 /** The colour of text on a fill, chosen as for a number inside a bar. */
-export const inkerOf = (figure: HTMLElement): ((fill: number[]) => string) => {
+const inkSetup = (figure: HTMLElement) => {
 	const surface = surfaceOf(figure).slice(0, 3);
 	// The point where black and white have the same contrast with a colour.
 	const lightSurface = luminance(surface) > 0.179;
@@ -134,6 +141,11 @@ export const inkerOf = (figure: HTMLElement): ((fill: number[]) => string) => {
 	const text = rgbOf(getComputedStyle(figure).color).slice(0, 3);
 	const onDark = own("--tablechart-value-on-dark", lightSurface ? surface : text);
 	const onLight = own("--tablechart-value-on-light", lightSurface ? text : surface);
+	return { method, needed, onDark, onLight };
+};
+
+export const inkerOf = (figure: HTMLElement): ((fill: number[]) => string) => {
+	const { method, needed, onDark, onLight } = inkSetup(figure);
 	return (fill) => {
 		const best = contrastOf(method, onDark, fill) > contrastOf(method, onLight, fill) ? onDark : onLight;
 		const ink = contrastOf(method, best, fill) >= needed ? best : blackOrWhite(fill, needed, method);
@@ -164,4 +176,16 @@ export const inkNames = (figure: HTMLElement): void => {
 			break;
 		}
 	}
+};
+
+/** One colour for the numbers on several fills, such as the slices of a pie: the one with enough contrast on the most of them, and on which. */
+export const sharedInk = (figure: HTMLElement, fills: number[][]): { ink: string; fits: boolean[] } => {
+	const { method, needed, onDark, onLight } = inkSetup(figure);
+	let best = { ink: onDark, fits: fills.map(() => false), count: -1 };
+	for (const ink of [onDark, onLight, WHITE, BLACK]) {
+		const fits = fills.map((fill) => contrastOf(method, ink, fill) >= needed);
+		const count = fits.filter(Boolean).length;
+		if (count > best.count) best = { ink, fits, count };
+	}
+	return { ink: `rgb(${best.ink.join(" ")})`, fits: best.fits };
 };

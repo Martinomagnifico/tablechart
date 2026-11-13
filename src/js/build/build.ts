@@ -458,14 +458,14 @@ const MOTIONS: Record<string, Motion> = { grow: "grow", sweep: "sweep" };
 
 /**
  * How a chart builds: the figure's `data-chart-animate`, or else the option, or else the default of its kind.
- * A line or area sweeps by default; a donut and a waterfall grow, and can sweep; columns and bars only grow.
+ * A line or area sweeps by default; a donut, a pie and a waterfall grow, and can sweep; columns and bars only grow.
  * A line or area with steps sweeps.
  */
 const motionOf = (figure: HTMLElement, kind: string, config: Config, steps: boolean): Motion => {
 	const lines = kind === "line" || kind === "area";
 	const asked: Motion | undefined = MOTIONS[figure.getAttribute("data-chart-animate") ?? ""] ?? MOTIONS[String(config.animate)];
 	if (lines) return steps ? "sweep" : (asked ?? "sweep");
-	return kind === "donut" || kind === "waterfall" ? (asked ?? "grow") : "grow";
+	return ["donut", "pie", "waterfall"].includes(kind) ? (asked ?? "grow") : "grow";
 };
 
 /** Numbers are reformatted in place, so a language change costs no redraw. */

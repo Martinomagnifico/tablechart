@@ -1,5 +1,5 @@
 import { LIBRARY_NAME, SHOWN_CLASS } from "../config";
-import { contrastOf, markOf, methodOf, rgbOf, surfaceOf } from "./colour";
+import { contrastOf, markOf, methodOf, paintOf, rgbOf, surfaceOf } from "./colour";
 import { tableOf } from "../shared/table";
 
 // What each method asks, and how it writes a contrast. A line, slice or bar needs 3:1 with the background (WCAG 1.4.11), or Lc 30
@@ -110,12 +110,12 @@ export const checkTextContrast = (figure: HTMLElement): void => {
 			const mark = markOf(figure, value);
 			if (!mark) continue;
 			const style = getComputedStyle(value);
-			const fill = getComputedStyle(mark).fill;
+			const fill = paintOf(mark);
 			const contrast = contrastOf(methodOf(figure), rgbOf(style.color), rgbOf(fill));
 			const size = Number.parseFloat(style.fontSize);
 			const needed = size >= 24 || (size >= 18.66 && Number(style.fontWeight) >= 700) ? method.large : method.text;
 			if (contrast >= needed) continue;
-			const what = mark.classList.contains("tablechart-piece") ? `${shape} part` : shape;
+			const what = mark.classList.contains("tablechart-slice") ? "slice" : mark.classList.contains("tablechart-piece") ? `${shape} part` : shape;
 			const key = `${style.color}|${fill}`;
 			const entry = found.get(key) ?? { what, names: [], contrast, needed };
 			entry.names.push(`"${rows[Number(value.dataset.row) - 1] ?? ""}" ("${value.textContent?.trim()}")`);

@@ -124,7 +124,7 @@
 			transition-delay: calc(var(--i, 0) * #{$stagger} + 0.5 * #{$duration});
 		}
 
-		:where([data-chart="donut"] .tablechart-value) {
+		:where(:is([data-chart="donut"], [data-chart="pie"]) .tablechart-value) {
 			transition-delay: calc(var(--i, 0) * #{$stagger} + 0.5 * #{$duration});
 		}
 
@@ -310,11 +310,11 @@
 		}
 	}
 
-	// `sweep` on a donut: one motion round the ring at one speed, as long as the slices would take one after the other.
+	// `sweep` on a donut or pie: one motion round the ring at one speed, as long as the slices would take one after the other.
 	// Each slice has its piece of it (`--start`, `--span`, `--ease`); its leader and number come when it has arrived.
 	$ring: var(--_ring);
 
-	:where([data-animate="sweep"][data-chart="donut"]) {
+	:where([data-animate="sweep"]:is([data-chart="donut"], [data-chart="pie"])) {
 		:where(.tablechart-slice) {
 			transition: stroke-dasharray calc(var(--span, 1) * #{$ring}) var(--ease, linear);
 			transition-delay: calc(var(--start, 0) * #{$ring});

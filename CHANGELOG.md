@@ -9,6 +9,7 @@
 - Summary settings per chart, with `data-summary-` and the name, or as JSON in `data-summary-options` on the figure or a parent.
 - `tooltip: "crosshair"` and `data-chart-tooltip="crosshair"`, lines through the row and the nearest point of a line or area chart, with its values at the side.
 - Rows next to each other with the same short name show it once under the chart, from the first of them, such as a year over its months.
+- `pie`, a donut without a hole.
 - `candlestick`, an additional type with the open, high, low and close of each row.
 - `axis: "right"` and `data-chart-axis="right"`, the value axis on the right of a column, line, area or waterfall chart.
 

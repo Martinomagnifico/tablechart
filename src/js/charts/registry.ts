@@ -5,12 +5,12 @@ import { reference } from "../annotations/reference";
 import { trend } from "../annotations/trend";
 import { bar } from "./bar";
 import { column } from "./column";
-import { donut } from "./donut";
+import { donut, pie } from "./donut";
 import { area, line } from "./line";
 import { waterfall } from "./waterfall";
 import type { AnnotationType, ChartType } from "../types";
 
-export const CHARTS: Record<string, ChartType> = { area, bar, column, donut, line, waterfall };
+export const CHARTS: Record<string, ChartType> = { area, bar, column, donut, line, pie, waterfall };
 
 /** Adds a chart type for `data-chart="name"`, such as one from `@martinomagnifico/tablechart/additional-types`, before `init()`. */
 // A chart type can bring annotations of its own, such as the quadrant of a scatter chart.

@@ -2,7 +2,7 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Chart types | All types"
-	- pagedescription = "All Tablechart chart types on one page: area, bar, column, donut, line, waterfall, and the additional types scatter and candlestick."
+	- pagedescription = "All Tablechart chart types on one page: area, bar, column, donut, line, pie, waterfall, and the additional types scatter and candlestick."
 
 mixin type(name, href)
 	.card
@@ -61,6 +61,15 @@ block content
 					table
 						tbody
 							each row in [['Jan', '84'], ['Feb', '71'], ['Mar', '76'], ['Apr', '58'], ['May', '61'], ['Jun', '47'], ['Jul', '39'], ['Aug', '52']]
+								tr
+									th= row[0]
+									td= row[1]
+
+			+type("Pie", "/types/pie.html")
+				figure(data-chart="pie" aria-label="Apples sold per variety, in percent")
+					table
+						tbody
+							each row in [['Elstar', '42'], ['Jonagold', '28'], ['Braeburn', '18'], ['Gala', '12']]
 								tr
 									th= row[0]
 									td= row[1]

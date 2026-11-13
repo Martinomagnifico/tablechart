@@ -94,7 +94,7 @@
 	}
 }
 
-:where([data-chart="donut"]) {
+:where([data-chart="donut"], [data-chart="pie"]) {
 	--_room: 0.66;
 }
 

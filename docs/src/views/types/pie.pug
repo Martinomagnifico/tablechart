@@ -1,0 +1,69 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Chart types | Pie"
+	- pagedescription = "Pie charts in Tablechart: parts of a whole as slices of a circle."
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Pie
+				p.lead Parts of a whole, as slices of a circle.
+
+	+section("Pie chart")
+		p Each row is a slice. The slices start at the top and go clockwise, in the order of the table. The names are shown in a legend under the pie.
+		p A pie is a #[a(href=url('/types/donut.html')) donut] without a hole. It has the same colours, gaps and animation.
+
+		+chart
+			figure(data-chart="pie")
+				figcaption
+					b Where the crop went
+					br
+					span thousands of apples
+				table
+					tbody
+						each row in [['Juiced', '38.2'], ['Eaten fresh', '18.1'], ['Sold whole', '12.4'], ['Composted', '5.8']]
+							tr
+								th= row[0]
+								td= row[1]
+
+	+section("Numbers inside")
+		p If a number fits inside its slice, it is shown there. If it does not fit, such as on a small slice or a narrow screen, it is next to the slice, with a short line.
+		p The numbers inside all have one colour. It gets to be the one with enough contrast on the most slices, with the same settings as a number inside a bar. On a slice where that colour has too little contrast, the number is next to the slice. If you want all numbers next to their slices, add #[code data-chart-labels="outside"] to the figure.
+
+	+section("A total row")
+		p A pie has no middle, so it does not show a total. If a row has #[code data-kind="total"], it is not a slice. Screen readers read it in the table. If there is no total row, Tablechart adds a hidden row with the sum, as on a #[a(href=url('/types/donut.html#the-number-in-the-middle')) donut].
+
+	+section("Gaps and corners")
+		p The gaps between the slices go from the middle to the edge. If you want wider or no gaps, set #[code --tablechart-slice-gap]. With #[code --tablechart-slice-radius], the outer corners of the slices are round.
+
+		+style.
+			.round-pie {
+				--tablechart-slice-gap: 6;
+				--tablechart-slice-radius: 6px;
+			}
+
+		+chart
+			figure.round-pie(data-chart="pie")
+				table
+					tbody
+						each row in [['Elstar', '42'], ['Jonagold', '28'], ['Braeburn', '18'], ['Gala', '12']]
+							tr
+								th= row[0]
+								td= row[1]
+
+	+section("A sweep")
+		p With #[code data-chart-animate="sweep"], the slices go round in one motion, at one speed. See #[a(href=url('/styling/animation.html#grow-or-sweep')) Grow or sweep].
+
+		+chart(null, '1')
+			figure(data-chart="pie" data-chart-animate="sweep")
+				table
+					tbody
+						each row in [['Elstar', '42'], ['Jonagold', '28'], ['Braeburn', '18'], ['Gala', '12']]
+							tr
+								th= row[0]
+								td= row[1]
+
+	+section("Next")
+		p By default, all slices use one colour, each one a bit lighter. If you want to set a colour for each slice, see #[a(href=url('/styling/colours.html')) Colours].

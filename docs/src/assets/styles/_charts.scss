@@ -123,8 +123,8 @@
 	--tablechart-slice-min: 70%;
 }
 
-// A donut is as tall as it is wide, so on its own it gets a narrower box.
-.demo [data-chart="donut"] {
+// A donut or pie is as tall as it is wide, so on its own it gets a narrower box.
+.demo :is([data-chart="donut"], [data-chart="pie"]) {
 	max-width: 32rem;
 	margin-inline: auto;
 }

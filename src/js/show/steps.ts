@@ -52,8 +52,8 @@ export const planSteps = (figure: HTMLElement, together = false): StepPlan | nul
 
 	// A row's slot is its place among the rows that arrive with it, so they still arrive one after the other.
 	let unstepped = 0;
-	// A donut's total is the number in the middle, not a slice: it has no step of its own and comes with the last slice.
-	const donut = figure.getAttribute("data-chart") === "donut";
+	// A donut's total is the number in the middle, not a slice: it has no step of its own and comes with the last slice. A pie's is hidden.
+	const donut = ["donut", "pie"].includes(figure.getAttribute("data-chart") ?? "");
 	const middle = (tr: Element) => donut && tr.getAttribute("data-kind") === "total";
 	// A scatter chart: one step for all its rows.
 	const one = together ? stepFor(figure.getAttribute("data-fragment-index")) : -1;
