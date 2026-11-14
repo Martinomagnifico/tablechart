@@ -203,7 +203,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		switchKind();
 		const width = state.plot.clientWidth;
 		if (!width || width === placed) return;
-		if (!debug.timed("Layout", state.figure, () => layout(state, config))) return;
+		if (!debug.timed("Drawing", state.figure, () => layout(state, config))) return;
 		if (!checked) {
 			checked = true;
 			checkContrast(state.figure);

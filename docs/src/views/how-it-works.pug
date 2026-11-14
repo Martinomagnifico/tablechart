@@ -90,7 +90,7 @@ block content
 		p If you zoom in on this page, you can see it. The numbers and names stay sharp, and keep the size of the text around them.
 
 	+section("Size")
-		p A chart fills the width of its container. Its height is a share of its width, set with #[code data-chart-aspect], but never less than #[code --tablechart-min-height], 200px by default, and never more than #[code --tablechart-max-height], if that is set. If the width changes, the chart is laid out again.
+		p A chart fills the width of its container. Its height is a share of its width, set with #[code data-chart-aspect], but never less than #[code --tablechart-min-height], 200px by default, and never more than #[code --tablechart-max-height], if that is set. If the width changes, the chart is redrawn.
 		p In this example the aspect is #[code 1], the minimum is #[code(data-clamp="min") 200px] and the maximum is #[code(data-clamp="max") 250px]. If you move the slider, the width of the chart changes, and the text under it says what happens to the height.
 
 		.card.clamp-demo

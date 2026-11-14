@@ -107,7 +107,7 @@ Most options can also be set on one chart with a `data-chart-*` attribute. All o
 
 ## API
 
-`init()` returns `{ charts, refresh, destroy }`. `refresh()` lays out every chart again. `destroy()` stops watching scroll, size and language changes.
+`init()` returns `{ charts, refresh, destroy }`. `refresh()` redraws every chart. `destroy()` stops watching scroll, size and language changes.
 
 To make a chart of one figure, use `create()`. Each chart is also on its figure, as `figure.tablechart`.
 

@@ -727,15 +727,15 @@ block content
 
 	+section("PDFs made on a server")
 		p A report is often a PDF that a server makes: a template is filled with the data of one client, and a headless browser, such as Puppeteer or Playwright, prints the page. JavaScript runs, so the charts and the summaries are there.
-		p If the window is much wider than the paper, each chart is laid out again for a width of about 700px just before it prints. If you want it exact, lay the page out as on paper before it loads: with the print styles, at the width of the paper less its margins. For A4 with margins of 16 mm, that is 673 pixels.
+		p If the window is much wider than the paper, each chart is redrawn for a width of about 700px just before it prints. If you want it exact, the page needs the layout it has on paper before it loads: with the print styles, at the width of the paper less its margins. For A4 with margins of 12.7 mm, that is 698 pixels.
 
 		+codeblock('JS').
 			await page.emulateMediaType("print");
-			await page.setViewport({ width: 673, height: 1000 });
+			await page.setViewport({ width: 698, height: 1000 });
 			await page.goto(url);
 			await page.waitForSelector("html[data-tablechart-ready][data-summary-ready]");
 			await page.evaluate(() => document.fonts.ready);
-			await page.pdf({ format: "A4", tagged: true, outline: true });
+			await page.pdf({ format: "A4", margin: { top: "12.7mm", right: "12.7mm", bottom: "12.7mm", left: "12.7mm" }, tagged: true, outline: true });
 
 		p When all charts are there, Tablechart sets #[code data-tablechart-ready] on #[code html] and sends the event #[code tablechart:ready]. When all summaries are filled, Summary sets #[code data-summary-ready] and sends #[code tablechart:summary-ready]. If a page has no summaries or does not load Summary, the script only needs to wait for #[code data-tablechart-ready]. If a data source fails, a summary stays empty and #[code data-summary-ready] does not come, so the script needs a timeout.
 		p With #[code tagged: true], the headings and the tables are in the structure of the PDF, so a screen reader can go through a printed table as a table. The drawing is a figure with the caption as its alt text. The summary and the table are outside that figure, so a screen reader reads them too.

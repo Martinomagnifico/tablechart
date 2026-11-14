@@ -52,9 +52,9 @@ block content
 								th= row[0]
 								td= row[1]
 
-	+section("Language")
-		p The decimal and thousands separators follow the #[code lang] attribute of the #[code html] element. If the #[code lang] attribute changes, the numbers change with it, and the chart is laid out again.
-		p The buttons change the language of this page.
+	+section("Number formatting per language")
+		p How numbers are written follows the #[code lang] attribute of the #[code html] element: the decimal separator and the thousands separator. If the #[code lang] attribute changes, the numbers change with it, and the chart is redrawn. This is only the formatting of the numbers, not a translation. The title and the names stay as they are. If you want to translate them too, see #[a(href=url('/features/translation.html')) Translation].
+		p The buttons change the language of this page. The numbers on the columns change from 10,250.5 in English to 10.250,5 in Dutch, 10'250.5 in Swiss German and 10 250,5 in French.
 
 		+chart(null, null, { label: 'Language of the page', buttons: [{ text: 'English', attrs: { 'data-lang': 'en' } }, { text: 'Nederlands', attrs: { 'data-lang': 'nl' } }, { text: 'Deutsch (Schweiz)', attrs: { 'data-lang': 'de-CH' } }, { text: 'Français', attrs: { 'data-lang': 'fr' } }] })
 			figure(data-chart="column")

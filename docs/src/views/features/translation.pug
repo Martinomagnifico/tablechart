@@ -56,7 +56,7 @@ block content
 				"harvest-row3": "Automne"
 			}
 
-		p The buttons do what a translation script does: they replace the text of each element with a key, and then set the #[code lang] attribute of the page. The numbers change with the language, and the chart is laid out again for the new names.
+		p The buttons do what a translation script does: they replace the text of each element with a key, and then set the #[code lang] attribute of the page. The formatting of the numbers changes with the language, and the chart is redrawn for the new names.
 		p This page has no real translation engine. The buttons use a small script that only knows the words of this example, as a demo. On your site, use your own translation solution. In a Reveal.js presentation, you can use #[a(href='https://github.com/martinomagnifico/reveal.js-internation') reveal.js-internation].
 
 		+chart(null, '1-2', { class: 'translate-toggle', label: 'Language of the example', buttons: [{ text: 'English', attrs: { 'data-lang': 'en' } }, { text: 'Español', attrs: { 'data-lang': 'es' } }, { text: 'Français', attrs: { 'data-lang': 'fr' } }] })
@@ -98,7 +98,7 @@ block content
 			translatePage();
 
 	+section("Changing the language")
-		p If the #[code lang] attribute of the #[code html] element changes, the numbers change with it. Then the charts are laid out again, a moment later, so a translation script has time to change the names first.
+		p If the #[code lang] attribute of the #[code html] element changes, the formatting of the numbers changes with it. Then the charts are redrawn, a moment later, so a translation script has time to change the names first.
 		p If a script changes the text of a chart without changing #[code lang], lay the charts out again with #[code refresh()].
 
 		+codeblock('JS').
