@@ -170,8 +170,8 @@ block content
 		p A chart with more than about 15 values needs a summary. See #[a(href=url('/features/summary.html')) Summary].
 
 		h3(id="numbers-that-do-not-fit") Numbers that do not fit
-		p Some charts do not show all their numbers: a stack with small parts, a narrow chart, a chart with many rows, or a line chart with lines close together. The numbers are still in the table, so screen readers read them. Pointing at a row, or tapping it, shows them in a tooltip.
-		p If you want to show the table under the chart as well, add #[code data-chart-table="always"] to the figure. This chart has three lines close together, so it leaves numbers out. The table under it has them all.
+		p Some charts do not show all their numbers: a stack with small parts, a narrow chart, a chart with many rows, or a line chart with lines close together. The numbers are still in the table, so screen readers read them. If you hover over a column, bar or point (or tap it on a touch device), a tooltip shows them.
+		p If you want to show the table under the chart as well, add #[code data-chart-table="always"] to the figure. This chart has three lines close together, so it has to omit numbers. The table under it has them all.
 
 		+chart(null, '1')
 			figure(data-chart="line" data-chart-table="always")
@@ -198,7 +198,7 @@ block content
 		p The text of an annotation, such as #[code +24%] on a bracket, stays in the page under the table, hidden from sight. Screen readers read it there. The badge in the drawing is hidden from them.
 
 		h3(id="in-print-and-pdf") In print and PDF
-		p On screen, the tooltip shows numbers that are left out. On paper there is no tooltip, so a chart that leaves numbers out also needs its table. #[code data-chart-table], or the #[code table] option for all charts, says when the table is shown under the chart:
+		p If a chart has to omit numbers, the tooltip shows them on screen. On paper there is no tooltip, so such a chart also needs its table. #[code data-chart-table], or the #[code table] option for all charts, says when the table is shown under the chart:
 
 		table
 			thead
@@ -230,7 +230,7 @@ block content
 		+codeblock('JS').
 			init({ table: "auto" });
 
-		p Whether numbers are left out depends on the width of the chart. #[code auto] uses the width the chart has on the page.
+		p Whether a chart has to omit numbers depends on its width. #[code auto] uses the width the chart has on the page.
 
 		h3(id="zoom-and-text-size") Zoom and text size
 		p All text is HTML, sized in #[code em]. It follows the text size and the zoom of the browser, and stays sharp. Long names beside the bars of a bar chart wrap onto more lines.

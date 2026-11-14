@@ -158,7 +158,7 @@ block content
 				--tablechart-bar-color: light-dark(#3a6413, #7fb03f);
 			}
 
-		p If the numbers are wider than their columns, they all get smaller together, down to 70% of their size. If they still do not fit, none of them are shown. If you point at the row, or tap it, a tooltip shows the numbers of that row.
+		p If the numbers are wider than their columns, they all get smaller together, down to 70% of their size. If they still do not fit, the chart has to omit all of them. If you hover over a group of columns (or tap it on a touch device), a tooltip shows all its numbers.
 
 	+section("Stacked columns")
 		p If the figure has #[code data-chart-stack], the values of a row are shown on top of each other, the first value column at the bottom. Values below zero are stacked down from the baseline. The total of the row is above the column.
@@ -182,7 +182,7 @@ block content
 								td= row[1]
 								td= row[2]
 
-		p A number is shown inside its part of the column if it fits. If not, it is left out. If you point at the row, or tap it, a tooltip shows the numbers of that row.
+		p A number is shown inside its part of the column if it fits. If it does not fit, the chart has to omit it. If you hover over the column (or tap it on a touch device), a tooltip shows all its numbers.
 		p Below zero, the parts of a stack go down from the baseline. The total is the sum of all parts, above the column, or under it if the whole stack is below zero.
 
 		+chart
@@ -227,7 +227,7 @@ block content
 								td= row[2]
 
 		p A line suits values that have an order, such as months or years. The legend shows a box for the columns and a line for the line.
-		p If a number of the line is on a column, the column is cut away under the number, so the number can be read. The numbers of the columns are inside the columns if they fit. If a point of the line covers a number, or a number has no room, the number is left out. If you point at the row, or tap it, a tooltip shows the numbers of that row.
+		p If a number of the line is on a column, the column is cut away under the number, so the number can be read. The numbers of the columns are inside the columns if they fit. If a point of the line would cover a number, or a number has no room, the chart has to omit it. If you hover over a column (or tap it on a touch device), a tooltip shows all numbers at that place.
 		p A chart with a line cannot be stacked.
 
 	+section("Many columns")

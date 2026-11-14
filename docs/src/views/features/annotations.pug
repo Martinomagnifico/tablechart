@@ -152,7 +152,7 @@ block content
 						span(data-corner="bottom left") Fading
 						span(data-corner="bottom right") Steady
 
-		p The quadrant is there from the start, before the dots. Its lines are whole until the name of a dot arrives over them; then the line makes room for the name. A dot name that would cover a corner name is left out, and the tooltip of its dot still has it. Screen readers read the names of the corners with the annotations, under the table.
+		p The quadrant is there from the start, before the dots. Its lines are whole until the name of a dot arrives over them; then the line makes room for the name. If the name of a dot would cover a corner name, the chart has to omit the name of the dot. The tooltip of the dot still shows it. Screen readers read the names of the corners with the annotations, under the table.
 		p With #[code data-fragment] on the figure, the axes and the quadrant are shown first, and all dots arrive on the next step. Then you can explain the quadrants before the data comes in. See #[a(href=url('/features/steps.html')) Step by step].
 		p The lines are dashed by default. If you want to change them, set the #[code --tablechart-quadrant-] variables: see #[a(href=url('/reference/variables.html#annotations')) CSS variables].
 
@@ -178,7 +178,7 @@ block content
 								td= row[1]
 								td= row[2]
 
-		p The note is in the table, so a screen reader reads it with its row, a printed table has it, and a translation script translates it like any other cell. If you point at the row, or tap it, the tooltip shows the note too. A row without a note has an empty cell.
+		p The note is in the table, so a screen reader reads it with its row, a printed table has it, and a translation script translates it like any other cell. If you hover over the line of the note (or tap it on a touch device), the tooltip shows the note too. A row without a note has an empty cell.
 		p A note works on a chart with its rows across: a column, line, area or waterfall chart. In a summary, #[code data-each="notes"] lists them: see #[a(href=url('/features/summary.html#notes')) Summary]. From a JSON file, a row has its note in #[code note]: see #[a(href=url('/data.html#json-structure')) Data].
 
 	+section("Break the scale")

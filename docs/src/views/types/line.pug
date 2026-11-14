@@ -102,7 +102,7 @@ block content
 		ul
 			li One line: the number is above each point.
 			li Two lines: the number of the higher point is above it, the number of the lower point below it.
-			li Three lines or more: if there is room, the number is above its point. If not, it is below it. If there is no room there either, the number is left out, and if you point at a point, or tap it, a tooltip shows the numbers of that row. If one line is highlighted, only that line shows its numbers.
+			li Three lines or more: if there is room, the number is above its point. If not, it is below it. If there is no room there either, the chart has to omit it. If you hover over the chart above a name (or tap it on a touch device), a tooltip shows all numbers at that place. If one line is highlighted, only that line shows its numbers.
 
 	+section("Points")
 		p With several lines, each line has its own point. There are six points, always in the same order. After six lines, the points start again with the next line style. So there are 24 different lines, and the 25th line looks like the first. The legend shows the same points.
@@ -308,7 +308,7 @@ block content
 		p A chart with many rows has little room for each number and name. Tablechart then shows fewer of them:
 
 		ul
-			li If the values of a line would touch, only a few are shown: the first, the last, the highest, the lowest and the values far from the trend. If you point at a row, or tap it, a tooltip shows its value. See #[a(href='#which-values-are-shown') Which values are shown].
+			li If the values of a line would touch, only a few are shown: the first, the last, the highest, the lowest and the values far from the trend. If you hover over the chart above a name (or tap it on a touch device), a tooltip shows its value. See #[a(href='#which-values-are-shown') Which values are shown].
 			li If the names under the chart do not fit, they get smaller, down to 70%. If they still do not fit, only every second, third or more is shown, evenly spaced, at full size. A name at an end moves in, so it stays inside the chart.
 			li Each name has a tick above it, at the place of its row, so you can see which point it belongs to, also when it moved in. They have the colour and width of the gridlines, a little stronger. #[code --tablechart-tick-color], #[code --tablechart-tick-opacity] and #[code --tablechart-tick-width] change them. #[code data-chart-ticks="false"], or the #[code ticks] option, turns the ticks off.
 			li A point is shown where a value is. If all values are shown and the points would touch each other, the line has no points.
@@ -417,7 +417,7 @@ block content
 					td: code auto last
 					td All values if they fit, and else only the ones after #[code auto].
 
-		p A row with #[code data-value="show"] always shows its value, such as the month a new press came into use. A point is shown where a value is. Each value goes above, below or beside its point, where it is clear of the lines, the names and the other values; a value at a dip tries below first. If there is no such place, it may cross a line, which then stops under the value, but it never covers another value, a name or a point. If two values would still touch, the one that matters less is left out, with its point: first a row with #[code data-value="show"] is kept, then the last value, the first, the highest, the lowest and the outliers.
+		p A row with #[code data-value="show"] always shows its value, such as the month a new press came into use. A point is shown where a value is. Each value goes above, below or beside its point, where it is clear of the lines, the names and the other values; a value at a dip tries below first. If there is no such place, it may cross a line, which then stops under the value, but it never covers another value, a name or a point. If two values would still touch, the chart has to omit one of them, with its point. Which one stays goes in this order: a row with #[code data-value="show"], then the last value, the first, the highest, the lowest and the outliers.
 
 		p If the lines have names at their ends and #[code data-chart-values] has a set with #[code last], the last number of each line goes between the end of the line and its name. With #[code auto], that happens when the values do not all fit. If lines end close together, their numbers move apart with their names.
 

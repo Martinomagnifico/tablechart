@@ -59,7 +59,7 @@ block content
 		p So a chart without sentences stays as it is, also on a page that loads the summary script.
 
 	+section("Shown or hidden")
-		p By default, a summary is not on the page for everyone to see. Screen readers read it, right after the title of the chart. In print and in a PDF, it is printed if the chart leaves numbers out and its table is not printed.
+		p By default, a summary is not on the page for everyone to see. Screen readers read it, right after the title of the chart. In print and in a PDF, it is printed if the chart has to omit numbers and its table is not printed.
 		p If you want everyone to see the summary on screen too, add #[code data-chart-summary="always"] to the figure. The examples on this page have it, so you can see them. For all values, see #[a(href='#who-sees-what') Who sees what].
 
 	+section("Example")
@@ -596,7 +596,7 @@ block content
 				tr
 					td: code auto
 					td For screen readers only
-					td Printed, if the chart leaves numbers out and its table is not printed. The default.
+					td Printed, if the chart has to omit numbers and its table is not printed. The default.
 				tr
 					td: code print
 					td For screen readers only
@@ -639,13 +639,13 @@ block content
 			});
 
 	+section("On paper")
-		p On paper there is nothing only for screen readers: text that is hidden on the page does not reach a PDF. So in print, a chart that leaves numbers out needs its table or its summary.
+		p On paper there is nothing only for screen readers: text that is hidden on the page does not reach a PDF. So in print, a chart that has to omit numbers needs its table or its summary.
 		p With #[code data-chart-table="auto"], the table is printed if it has no more than 15 values, rows times value columns. A listener who hears more numbers than that loses track, so a longer table is not printed, and the summary is printed instead. The #[code tablelimit] option sets the number.
 
 		+codeblock('JS').
 			init({ table: "auto", tablelimit: 24 });
 
-		p If a chart prints neither its table nor a summary, the numbers it leaves out are not on paper at all.
+		p If a chart has to omit numbers, and it prints neither its table nor a summary, those numbers are not on paper at all.
 		p In the print preview of this page, the charts above print their summaries, because they have #[code data-chart-summary="always"].
 
 	+section("Translation")

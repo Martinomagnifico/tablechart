@@ -16,7 +16,7 @@ Tablechart makes simple charts from a table: an HTML table, a Markdown table or 
 * **Real text:** names and numbers are HTML, so they use the font of the page. *No more Times New Roman labels.* Text does not scale, but just uses the font size of the page or a size you define.
 * **CSS styling:** colours, sizes and animation are CSS variables. Light and dark mode follow the page.
 * **Annotations:** badges, brackets, trend arrows, reference lines and a break in the scale
-* **Tooltips:** when a chart leaves numbers out, point at a row, or tap it, to see all its values
+* **Tooltips:** if a chart has to omit numbers, a tooltip shows all values of a row when you hover over its place in the chart (or tap it on a touch device)
 * **Summary:** sometimes a table is just too large, for example when a screen reader talks through it, You try to remember the number that was said 4 sentences ago. In print too. A summary deals with that. See [Summary](https://martinomagnifico.github.io/tablechart/features/summary.html).
 * **Print and PDF:** tablechart in a PDF flow builds the charts immediately
 * **Step by step:** show the rows one at a time, with Previous and Next buttons
@@ -95,8 +95,8 @@ init({
 	threshold: 0.5,     // How much of a chart must be in view before it builds
 	replay: false,      // Build again each time a chart scrolls back into view
 	controls: true,     // Previous and Next buttons on a chart that steps
-	tooltip: "auto",    // Tooltips: "auto" only when a chart leaves numbers out, true or false
-	table: "never",     // The table under the chart: "never", "auto" (in print, if numbers are left out), "print" or "always"
+	tooltip: "auto",    // Tooltips: "auto" only when a chart has to omit numbers, true or false
+	table: "never",     // The table under the chart: "never", "auto" (in print, if the chart has to omit numbers), "print" or "always"
 	axis: false,        // Numbers along the value axis
 	grid: false,        // Gridlines at the numbers of the axis
 	locale: undefined,  // Locale for numbers; the language of the page if not set

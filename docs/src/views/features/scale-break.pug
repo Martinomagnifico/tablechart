@@ -24,7 +24,7 @@ block content
 
 	+section("Which charts")
 		p If one value is much larger than the others, the other bars are very short. With a break, part of the scale is shown smaller, and the small values get more room. The bars that run through the break are cut, so you can see they are not to scale there. Every bar shows its number.
-		p A break works on column, bar and waterfall charts. With several bars per row, each bar is cut, and a stack is cut as a whole. On a line or area chart a break would cut through nothing, so there, and on a donut, it is left out, and the console says so. A chart with values below zero cannot have a break either.
+		p A break works on column, bar and waterfall charts. With several bars per row, each bar is cut, and a stack is cut as a whole. On a line, area, donut or pie chart, a break would cut through nothing. So there the chart has to ignore the break, and the console says so. A chart with values below zero cannot have a break either.
 
 	+section("Column")
 		p The break is a #[code span] with #[code data-annotation="axis-break"], in a #[code div] with the class #[code chart-annotations] inside the chart. #[code data-from="20"] shows the scale above 20 smaller.
@@ -39,7 +39,7 @@ block content
 			+regions("bar")
 
 	+section("Waterfall")
-		p On a waterfall, the totals stand on the baseline and can be cut. A break may not cut a step that floats, because its height would then be wrong. So put the break below the steps, such as between the baseline and the lowest step. Otherwise it is left out, and the console says why.
+		p On a waterfall, the totals stand on the baseline and can be cut. A break may not cut a step that floats, because its height would then be wrong. So a break needs to be below the steps, such as between the baseline and the lowest step. If it is not, the chart has to ignore the break, and the console says why.
 
 		+chart(null, '11')
 			figure(data-chart="waterfall")

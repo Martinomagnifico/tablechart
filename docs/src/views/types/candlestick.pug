@@ -88,7 +88,7 @@ block content
 				+prices(halfYear, true)
 
 	+section("Tooltip and crosshair")
-		p If you point at a candle, the tooltip shows its open, high, low and close, and the change from the open to the close in percent.
+		p If you hover over a candle (or tap it on a touch device), the tooltip shows its open, high, low and close, and the change from the open to the close in percent.
 		p With #[code data-chart-tooltip="crosshair"], a line goes down through the candle, and a line across follows the pointer. Its label on the axis shows the value of the scale at that height. If the pointer is within 8 pixels of the open, high, low or close, the line goes to that value, with a dot on the candle, and the label shows the exact value from the table, in the colour of the candle. The label under the chart shows the name of the row. See #[a(href=url('/features/tooltips.html#crosshair')) Crosshair].
 
 		+chart(null, '1')

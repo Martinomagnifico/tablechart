@@ -91,14 +91,14 @@ block content
 
 	+section("Names")
 		p If there is room, a name is shown to the right of its marker. If not, it goes to the left, above, below, or to one of the corners. A name does not cover a marker or another name, and stays inside the axes. Larger markers get their place first.
-		p If a name has no room at all, it is left out. The chart then has a tooltip: if you point at a marker, its name is shown. See #[a(href=url('/features/tooltips.html')) Tooltips].
+		p If a name has no room at all, the chart has to omit it. The chart then has a tooltip: if you hover over a marker (or tap it on a touch device), its name is shown. See #[a(href=url('/features/tooltips.html')) Tooltips].
 		p If rows have the same two numbers, their markers are in the same place. They then share one name, with the number of the other rows, such as #[strong Boskoop +1] above. The tooltip of that marker shows all their names.
-		p If you want to turn the names off, add #[code data-chart-names="false"]. The tooltip then shows the name of the marker you point at. If you want to turn them off on every scatter chart, set the #[code names] option to #[code false].
+		p If you want to turn the names off, add #[code data-chart-names="false"]. The tooltip then shows the name of the marker you hover over or tap. If you want to turn them off on every scatter chart, set the #[code names] option to #[code false].
 
 		+codeblock('HTML').
 			<figure data-chart="scatter" data-chart-names="false">
 
-		p If a chart has more than 400 markers, no names are placed. They are all left out, and the tooltip shows them.
+		p If a chart has more than 400 markers, the chart has to omit all names, because finding room for each of them would take too long. If you hover over a marker (or tap it on a touch device), the tooltip shows its name.
 
 	+section("Axes")
 		p If you want to set the axis up yourself, add #[code data-chart-scale]. If you give two numbers, they are where the axis starts and ends. If you give three or more, they are the numbers along the axis. #[code data-chart-scale-x] does the same for the axis across. #[code data-chart-scale-y] is another name for #[code data-chart-scale].

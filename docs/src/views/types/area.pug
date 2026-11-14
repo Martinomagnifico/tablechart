@@ -147,7 +147,7 @@ block content
 								td= row[1]
 
 	+section("Stacked areas")
-		p If the figure has #[code data-chart-stack], each area starts on top of the one before it, the first value column at the bottom. A value below zero takes its area down from the one before it. Each number is shown in the middle of its area, if there is room for it. If you point at the row, or tap it, a tooltip shows the numbers of that row.
+		p If the figure has #[code data-chart-stack], each area starts on top of the one before it, the first value column at the bottom. A value below zero takes its area down from the one before it. Each number is shown in the middle of its area, if there is room for it. If you hover over the chart above a name (or tap it on a touch device), a tooltip shows all numbers at that place.
 
 		+chart(null, '1')
 			figure(data-chart="area" data-chart-stack)
@@ -191,7 +191,7 @@ block content
 								td= row[2]
 
 	+section("Steps")
-		p If the figure has #[code data-chart-shape="step"], each value is flat across the width of its row, and the line goes straight up or down to the next row. A number is shown only where the value changes, in the middle of the rows that have that value. If a number is wider than those rows, it is left out. If you point at the row, or tap it, a tooltip shows the numbers of that row.
+		p If the figure has #[code data-chart-shape="step"], each value is flat across the width of its row, and the line goes straight up or down to the next row. A number is shown only where the value changes, in the middle of the rows that have that value. If a number is wider than those rows, the chart has to omit it. If you hover over the chart above a name (or tap it on a touch device), a tooltip shows all numbers at that place.
 
 		+chart(null, '1')
 			figure(data-chart="area" data-chart-stack data-chart-shape="step" data-chart-legend)
