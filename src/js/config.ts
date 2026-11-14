@@ -43,6 +43,8 @@ export const BUILT_CLASS = "is-built";
 export const QUEUED_CLASS = "tablechart-queued";
 export const CONTROLS_CLASS = "tablechart-controls";
 export const AXIS_CLASS = "tablechart-axis";
+export const CROP_CLASS = "tablechart-crop";
+export const CROPTEXT = "Showing the last {shown} of {rows} rows. The table still contains all rows.";
 /** Between an axis and its numbers, in pixels. */
 export const AXIS_GAP = 6;
 export const TICK_CLASS = "tablechart-tick";
@@ -109,6 +111,8 @@ export interface Config {
 	summary: "never" | "auto" | "print" | "always";
 	/** The name of the total that a donut without a total row works out, for screen readers. */
 	totallabel: string;
+	/** The line under a chart whose first rows are cropped, with `{shown}` and `{rows}`: one text, or a text per chart type and `default` for the others. */
+	croptext: string | Record<string, string>;
 	/** Previous and Next buttons under a chart that steps (`data-fragment`). `false` leaves them out, for buttons of your own. */
 	controls: boolean;
 	/** The text of the Previous button. */
@@ -149,6 +153,7 @@ export const defaultConfig: Config = {
 	lines: null,
 	summary: "auto",
 	totallabel: "Total",
+	croptext: CROPTEXT,
 	controls: true,
 	previouslabel: "Previous",
 	nextlabel: "Next",

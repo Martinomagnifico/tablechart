@@ -323,7 +323,8 @@
 	}
 
 	// Under a line or an area: a tick above each name shown, from the plot down to the name, at the place of its row.
-	&[data-ticks] :where(span:not([data-left-out])) {
+	// Not over a run whose start is cropped, as its first row shown is not where it starts.
+	&[data-ticks] :where(span:not([data-left-out], [data-cut])) {
 		position: relative;
 
 		&::before {
@@ -361,4 +362,17 @@
 	&[data-more]::after {
 		content: " +" attr(data-more);
 	}
+}
+
+// The names and numbers of rows that are cropped from the start of a chart.
+.tablechart-categories :where(span[data-cropped]),
+.tablechart-value[data-cropped] {
+	display: none;
+}
+
+// The line under a chart whose first rows are cropped.
+.tablechart-crop {
+	margin: 0.5em 0 0;
+	font-size: var(--tablechart-crop-size, 0.85em);
+	color: var(--tablechart-crop-color, inherit);
 }

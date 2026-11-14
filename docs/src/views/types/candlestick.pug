@@ -72,13 +72,14 @@ block content
 	+section("The table")
 		p The first four value columns are the open, the high, the low and the close, in that order. Their headers are the names in the tooltip, so they can be in any language.
 		p If a row has no number in one of the four columns, it has no candle. The row stays in the table.
+		p If rows next to each other have the same short name in #[code data-short], such as the month, the name is shown once under the chart. See #[a(href=url('/types/line.html#many-rows')) Many rows].
 
 	+section("The axis")
 		p A candlestick chart has the numbers along its value axis by default, as a candle has no numbers on it. If you want them on the right, as in many trading charts, set #[code data-chart-axis="right"]. #[code data-chart-axis="false"] turns them off.
 
-	+section("Many rows")
-		p With many rows, the candles get thinner, down to only the wick. The names under the chart are thinned out. If rows next to each other have the same short name, such as the month, it is shown once.
-
+	+section("What if the candles do not fit?")
+		p A candle needs at least 4 pixels: a free pixel, then its body with an outline of a pixel on each side. If the rows do not all fit, the chart will be cropped.
+		p On a phone, the following candlestick chart shows the last part of the half year. On a wide screen, it shows all of it.
 		+chart(null, '1')
 			figure(data-chart="candlestick" data-chart-axis="right" data-chart-grid)
 				figcaption
@@ -86,6 +87,48 @@ block content
 					br
 					span euro, per day
 				+prices(halfYear, true)
+
+		h3(id="the-chart-will-be-cropped") The chart will be cropped, and the user informed
+		p If the full range of the data does not fit in the chart, the chart will start to hide the first rows, and more if the screen gets smaller or the data larger. The table and a summary still keep all rows.
+
+		p If that cropping happens, then a line (the #[code croptext] in the global options) under the chart informs the user about it: #[code "Showing the last {shown} of {rows} rows. The table still contains all rows."]. 
+		p You can change that informative line with the #[code croptext] option in the global options, or do it per chart with #[code data-chart-croptext]. You can use some placeholders in it: #[code {shown}] is the number of candles that are shown, and #[code {rows}] the number of rows. Both get the number formatting of the page. 
+		
+		p Set it globally:
+
+		+codeblock('JS').
+			init({ croptext: "Showing the last {shown} of {rows} days. The table still contains all rows." });
+
+		p Or per chart type. Only candlestick charts are cropped now, but other types may be later, and words such as "trading days" only fit candlesticks. #[code default] is the text for all other types. Without it, they get the text of Tablechart:
+
+		+codeblock('JS').
+			init({
+				croptext: {
+					candlestick: "The last {shown} of {rows} trading days. The table still contains all rows.",
+					default: "The chart shows {shown} of {rows} rows. The others are in the table.",
+				},
+			});
+
+		p Or per instance:
+
+		+codeblock('HTML').
+			<figure data-chart="candlestick" data-chart-croptext="The last {shown} of {rows} trading days.">
+
+		p With #[code data-chart-keys], the line gets a translation key that ends in #[code -crop]. The text with #[code {shown}] and #[code {rows}] is in a hidden template, and a translation script translates that template by its key. If the #[code lang] attribute changes, the chart is redrawn, and the line is filled again from the template. The chart adds the line and its template itself. In the page, they look like this:
+
+		+codeblock('HTML').
+			<figure data-chart="candlestick" data-chart-keys="share">
+				…
+				<p class="tablechart-crop" aria-hidden="true">
+					<span data-template hidden data-i18n="share-crop">Showing the last {shown} of {rows} rows. The table still contains all rows.</span>
+					<span>Showing the last 67 of 126 rows. The table still contains all rows.</span>
+				</p>
+			</figure>
+
+		p The text for that key, in a file of the translation script:
+
+		+codeblock('JSON').
+			{ "share-crop": "De laatste {shown} van {rows} rijen worden getoond. De tabel bevat nog steeds alle rijen." }
 
 	+section("Tooltip and crosshair")
 		p If you hover over a candle (or tap it on a touch device), the tooltip shows its open, high, low and close, and the change from the open to the close in percent.

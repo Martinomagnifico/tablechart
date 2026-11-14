@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.4.1] - 2026-11-14
+
+### Added
+- `croptext` and `data-chart-croptext`, the line under a candlestick chart that has to crop its first rows to keep each candle 4 pixels wide.
+
+### Changed
+- A short name over rows that is cut off at the start or end of a chart is not shown if it has less than half the rows of the longest one.
+
+
 ## [1.4.0] - 2026-11-13
 
 ### Added

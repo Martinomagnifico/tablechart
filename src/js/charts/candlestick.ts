@@ -20,6 +20,8 @@ export const candlestick: ChartType = {
 	valueAxis: true,
 	ticks: true,
 	crosshair: true,
+	// A free pixel, the outline, the inside and the outline again.
+	minBand: 4,
 
 	headroom: ({ unit }) => 4 * unit,
 
@@ -28,7 +30,9 @@ export const candlestick: ChartType = {
 		const fields = fieldsOf(geo.series);
 		const all = rows.map((row) => pricesOf(row, fields));
 		const lows = all.flatMap((prices) => (prices ? [prices[2]] : []));
-		const width = Math.max(barWidth, unit);
+		// With its outline of a pixel, a body keeps a free pixel to the next candle.
+		const band = rows.length > 1 ? cx(1) - cx(0) : VIEWBOX_WIDTH;
+		const width = Math.max(Math.min(barWidth, band - 2 * unit), unit);
 
 		all.forEach((prices, i) => {
 			if (!prices) return;

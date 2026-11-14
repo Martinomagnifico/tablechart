@@ -181,6 +181,8 @@ export interface ChartType {
 	ticks?: boolean;
 	/** A crosshair with `tooltip: "crosshair"`; the drawing sets `crossingOf`. */
 	crosshair?: boolean;
+	/** The least width of a row, in pixels: rows that do not fit are cropped from the start, with a line under the chart that says so. */
+	minBand?: number;
 	/** Text of its own, made with the rest of the text so a translation script finds it, such as a legend. */
 	text?: (input: { figure: HTMLElement; plot: HTMLElement; rows: Row[]; series: Series[]; config: Config }) => void;
 	/** With several series, always a legend, with a sample of this shape. */

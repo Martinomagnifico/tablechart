@@ -3,6 +3,8 @@ import {
 	AXIS_CLASS,
 	TICK_CLASS,
 	CATEGORIES_CLASS,
+	CROP_CLASS,
+	CROPTEXT,
 	CENTRE_CLASS,
 	type Config,
 	LEGEND_CLASS,
@@ -50,6 +52,24 @@ const pauseLines = (caption: HTMLElement): void => {
 		stop.textContent = ". ";
 		br.before(stop);
 	}
+};
+
+/** The line under a chart whose first rows are cropped: a template a translation script can change, and the text filled from it. */
+const cropNote = (figure: HTMLElement, config: Config): HTMLElement => {
+	const line = document.createElement("p");
+	line.className = CROP_CLASS;
+	line.hidden = true;
+	line.setAttribute("aria-hidden", "true");
+	const template = document.createElement("span");
+	template.dataset.template = "";
+	template.hidden = true;
+	const asked = config.croptext;
+	const kind = figure.getAttribute("data-chart") ?? "";
+	template.textContent = figure.dataset.chartCroptext ?? (typeof asked === "string" ? asked : (asked[kind] ?? asked.default ?? CROPTEXT));
+	const keys = figure.getAttribute("data-chart-keys");
+	if (keys && config.langattribute) template.setAttribute(config.langattribute, `${keys}-crop`);
+	line.append(template, document.createElement("span"));
+	return line;
 };
 
 /** A total row in a donut's table, so screen readers read the total with its name. */
@@ -328,6 +348,7 @@ export const build = (
 	if (beside) plot.appendChild(categories);
 	else put(categories);
 	if (legend) put(legend);
+	if (type.minBand) put(cropNote(figure, config));
 
 	// The headers of the first two value columns are the titles of the axes; layout makes the numbers along them.
 	const fields = series.filter((one) => !one.group);

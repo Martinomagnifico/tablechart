@@ -68,12 +68,22 @@ export const fitNames = (state: ChartState, config: Config, height: number, unit
 			name.removeAttribute("data-left-out");
 			name.removeAttribute("data-edge");
 		}
-		const shortest = markRuns(state.categories);
+		markRuns(state.categories);
 		const names = state.categories.filter((name) => name.offsetParent !== null);
 		// A name over a run has the room of its run, from its own row to the next name.
 		const edges = getComputedStyle(nameRow);
 		const one = (nameRow.clientWidth - Number.parseFloat(edges.paddingLeft) - Number.parseFloat(edges.paddingRight)) / rows.length;
-		const roomOf = (name: HTMLElement) => (name.hasAttribute("data-run") ? one * Number(name.style.getPropertyValue("--_run")) : name.clientWidth);
+		const runOf = (name: HTMLElement) => Number(name.style.getPropertyValue("--_run")) || 1;
+		const roomOf = (name: HTMLElement) => (name.hasAttribute("data-run") ? one * runOf(name) : name.clientWidth);
+		// A run cut short at an end, such as the last days of a month, has no name if it is less than half a whole run, so it does not thin the whole runs.
+		const longest = largest(names.map(runOf));
+		for (const end of names.length > 2 ? [names.at(-1), names[0]] : []) {
+			if (end && runOf(end) < longest / 2) {
+				end.setAttribute("data-left-out", "");
+				names.splice(names.indexOf(end), 1);
+			}
+		}
+		const shortest = Math.min(...names.map(runOf));
 		const fit = fitTogether(nameRow, names, (name) => ({ size: name.scrollWidth, room: roomOf(name) }), "--_name-fit");
 		if (!fit && names.length > 1) {
 			// The room of one column, without the padding of the row, which a name with its own padding may be wider than.

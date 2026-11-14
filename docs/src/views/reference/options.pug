@@ -113,6 +113,10 @@ block content
 					td: code "Total"
 					td The name of the total of a donut without a total row, for screen readers
 				tr
+					td: code croptext
+					td: code "Showing the last {shown} of {rows} rows. The table still contains all rows."
+					td The line under a chart whose first rows are cropped, with #[code {shown}] and #[code {rows}]: a text for all charts, or an object with a text per chart type and #[code default] for the others, such as #[code { candlestick: "…", default: "…" }]. #[code data-chart-croptext] on a figure sets it for one chart. See #[a(href=url('/types/candlestick.html#the-chart-will-be-cropped')) The chart will be cropped].
+				tr
 					td: code controls
 					td: code true
 					td Previous and Next buttons under a chart that steps. #[code false] leaves them out. See #[a(href=url('/features/steps.html')) Step by step].

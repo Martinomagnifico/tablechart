@@ -26,6 +26,7 @@ import { measureAll, sizeOf } from "./measure";
 import { along as alongScale, reachOf, squeezeOf } from "../scale/scale";
 import { clipAround, cutOut, roundEnds, short, svgEl } from "../draw/svg";
 import type { Scale } from "../scale/axis";
+import { withCrop } from "./crop";
 import type { Box } from "./collision";
 import { inkInside, inkNames, measureSurface } from "../colour/colour";
 import { applySteps } from "../show/steps";
@@ -123,7 +124,7 @@ export const layout = (state: ChartState, config: Config): boolean => {
 	return done;
 };
 
-const layoutOne = (state: ChartState, config: Config): boolean => {
+const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 	const { plot, svg, rows, type, values, series, seriesValues, names, annotations } = state;
 	state.crosshair?.hide();
 	showTable(state, config);
@@ -549,4 +550,4 @@ const layoutOne = (state: ChartState, config: Config): boolean => {
 	inkNames(state.figure);
 	lineUpNames(state.figure);
 	return true;
-};
+});

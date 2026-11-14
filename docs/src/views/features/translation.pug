@@ -16,7 +16,7 @@ block content
 		p Numbers are not translated. They are formatted for the language of the page. See #[a(href=url('/features/numbers.html')) Numbers].
 
 	+section("Translation keys")
-		p Many translation scripts find text by a translation key in an attribute, such as #[code data-i18n]. If the figure has #[code data-chart-keys], Tablechart adds translation keys to the names in the table. The value of #[code data-chart-keys] is the start of each key: #[code -row1], #[code -row2] and so on for the names of the rows, and #[code -col1], #[code -col2] and so on for the column headers. The names in the chart get the same keys.
+		p Many translation scripts find text by a translation key in an attribute, such as #[code data-i18n]. If the figure has #[code data-chart-keys], Tablechart adds translation keys to the names in the table. The value of #[code data-chart-keys] is the start of each key: #[code -row1], #[code -row2] and so on for the names of the rows, and #[code -col1], #[code -col2] and so on for the column headers. The names in the chart get the same keys. The line under a candlestick chart whose first rows are cropped gets #[code -crop].
 
 		+codeblock('HTML').
 			<figure data-chart="column" data-chart-keys="apples">

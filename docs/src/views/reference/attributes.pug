@@ -71,7 +71,10 @@ block content
 					td Sets the height of the chart as a share of its width, such as #[code 0.5]
 				tr
 					td: code data-chart-tooltip="auto"
-					td The tooltip of the chart: #[code auto] only when the chart does not show all its numbers, #[code false] never, #[code true] always, #[code crosshair] a line through the row with its values at the side, on a line or area chart.
+					td The tooltip of the chart: #[code auto] only when the chart does not show all its numbers, #[code false] never, #[code true] always, #[code crosshair] a line through the place you hover over, with its values at the side, on a line, area or candlestick chart.
+				tr
+					td: code data-chart-croptext
+					td The line under a candlestick chart whose first rows are cropped, with #[code {shown}] and #[code {rows}]. It overrides the #[code croptext] option. See #[a(href=url('/types/candlestick.html#the-chart-will-be-cropped')) The chart will be cropped].
 				tr
 					td: code data-chart-table="auto"
 					td When the table is shown under the chart: #[code always], #[code print], #[code auto] (in print, when the chart does not show all its numbers and the table is not too long) or #[code never]
