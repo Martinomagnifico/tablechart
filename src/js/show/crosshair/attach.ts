@@ -27,7 +27,8 @@ export const attachCrosshair = (state: ChartState): void => {
 		const crossing = state.crossingOf?.(index);
 		const nearest = crossing?.points.reduce((a, b) => (Math.abs(b.y - near) < Math.abs(a.y - near) ? b : a));
 		const key = `${index} ${crossing?.textAt ? Math.round(near) : nearest?.series}`;
-		if (key === shown) return;
+		// A second tap on the same place closes it.
+		if (key === shown) return event.type === "pointerdown" && event.pointerType !== "mouse" ? hide() : undefined;
 		shown = drawCrosshair(state, index, near) === null ? null : key;
 	};
 	plot.addEventListener("pointermove", point);

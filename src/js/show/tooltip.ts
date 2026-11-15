@@ -306,6 +306,8 @@ export const attachTooltip = (state: ChartState, config: Config, auto = false): 
 		pointed = index;
 		// Off every row but still on the plot, such as between the markers of a scatter chart: closed at once.
 		if (index === null || busy(index)) return owner === state ? hide() : undefined;
+		// A second tap on the row whose tooltip is open closes it.
+		if (event.type === "pointerdown" && event.pointerType !== "mouse" && owner === state && shownRow === index) return hide();
 		show(state, index, config);
 	};
 	const mark = (event: Event) => {

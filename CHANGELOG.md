@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.4.2] - 2026-11-15
+
+### Changed
+- A second tap on the same place closes the tooltip or the crosshair.
+
+
 ## [1.4.1] - 2026-11-14
 
 ### Added
