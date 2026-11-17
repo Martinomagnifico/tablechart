@@ -105,6 +105,11 @@
                     "href": "/features/legends.html"
                 },
                 {
+                    "text": "Features | Many rows",
+                    "label": "Many rows",
+                    "href": "/features/many-rows.html"
+                },
+                {
                     "text": "Features | Numbers",
                     "label": "Numbers",
                     "href": "/features/numbers.html"

@@ -1,0 +1,164 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Features | Many rows"
+	- pagedescription = "What Tablechart does with a large table: fewer names and numbers, short names, a bar chart on a narrow screen, and pies with many slices."
+
+block content
+	-
+		const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		// Three years of apple juice sold: more each year, most in winter.
+		const juice = Array.from({ length: 36 }, (_, i) => [
+			`${months[i % 12]} ${2023 + Math.floor(i / 12)}`,
+			`${months[i % 12].slice(0, 3)} ’${23 + Math.floor(i / 12)}`,
+			(20 + i * 0.35 + 4 * Math.cos(((i % 12) / 6) * Math.PI) + ((i * 7) % 5) * 0.4).toFixed(1),
+		]);
+		// Two years of visitors to the farm shop.
+		const visits = Array.from({ length: 24 }, (_, i) => [
+			`${months[i % 12]} ${2024 + Math.floor(i / 12)}`,
+			`${months[i % 12].slice(0, 3)} ’${24 + Math.floor(i / 12)}`,
+			String(Math.round(60 + i * 1.5 + 25 * Math.cos(((i % 12) - 6) / 6 * Math.PI))),
+		]);
+		const varieties = ['Elstar', 'Jonagold', 'Braeburn', 'Gala', 'Boskoop', 'Cox', 'Granny Smith', 'Fuji', 'Pinova', 'Santana', 'Topaz', 'Kanzi', 'Rubens', 'Wellant', 'Junami', 'Red Prince'];
+
+	.lane
+		.container
+			.page-header
+				h1 Many rows
+				p.lead What a chart does when the table has more rows than fit.
+
+	+section("Fewer names and numbers")
+		p A chart with many rows has little room for each number and name. Tablechart then shows fewer of them, on every chart type. The table keeps all of them, so a screen reader reads every value. If you hover over a row of the chart (or tap it on a touch device), a tooltip shows all its numbers.
+
+	+section("Names under the chart")
+		ul
+			li If the names under the chart do not fit, they get smaller, down to 70%. If they still do not fit, only every second, third or more is shown, evenly spaced, at full size. A name at an end moves in, so it stays inside the chart.
+			li Each name has a tick above it, at the place of its row, so you can see which point it belongs to, also when it moved in. They have the colour and width of the gridlines, a little stronger. #[code --tablechart-tick-color], #[code --tablechart-tick-opacity] and #[code --tablechart-tick-width] change them. #[code data-chart-ticks="false"], or the #[code ticks] option, turns the ticks off.
+
+		p A short name under the chart needs less room. A row can have its full name in the table, which a screen reader and the tooltip read, and a short name for under the chart in #[code data-short].
+
+		.card
+			.demo
+				figure(data-chart="line")
+					figcaption
+						b Apple juice sold
+						br
+						span thousands of litres per month
+					table
+						tbody
+							each row in juice
+								tr
+									th(data-short=row[1])= row[0]
+									td= row[2]
+
+			+codeblock('HTML', null, '4-5').
+				<figure data-chart="line">
+					<table>
+						<tbody>
+							<tr><th data-short="#{juice[0][1]}">#{juice[0][0]}</th><td>#{juice[0][2]}</td></tr>
+							<tr><th data-short="#{juice[1][1]}">#{juice[1][0]}</th><td>#{juice[1][2]}</td></tr>
+							<!-- …one row per month, 36 in all -->
+						</tbody>
+					</table>
+				</figure>
+
+		p A row with a translation key, such as #[code juice-row11], gets the key #[code juice-row11-short] for its short name under the chart. A translation script then needs a short name for that key too.
+
+	+section("Numbers on a line or an area")
+		p If the values of a line would touch, only a few are shown: the first, the last, the highest, the lowest and the values far from the trend. See #[a(href=url('/types/line.html#which-values-are-shown')) Which values are shown].
+		p A point is shown where a value is. If all values are shown and the points would touch each other, the line has no points.
+
+	+section("Numbers on columns and bars")
+		p With many columns, only the numbers of the largest values are shown, each where it is clear of the other columns and numbers.
+
+		.card
+			.demo
+				figure(data-chart="column")
+					figcaption: b Visitors to the farm shop
+					table
+						tbody
+							each row in visits
+								tr
+									th(data-short=row[1])= row[0]
+									td= row[2]
+
+			+codeblock('HTML').
+				<tr><th data-short="#{visits[0][1]}">#{visits[0][0]}</th><td>#{visits[0][2]}</td></tr>
+
+		p On grouped columns, the numbers all get smaller together, down to 70% of their size. If they still do not fit, the chart has to omit all of them.
+		p On stacked columns, a number inside a part of a column is shown only if it fits there. The totals above the columns follow the same rule as single columns: the largest totals that are clear of the others are shown.
+
+		+chart(null, '1')
+			figure(data-chart="column" data-chart-stack)
+				figcaption
+					b Apples sold
+					br
+					span thousands per month
+				table
+					thead
+						tr
+							th Month
+							th Farm shop
+							th Market
+					tbody
+						each row, i in visits
+							tr
+								th(data-short=row[1])= row[0]
+								td= Math.round(Number(row[2]) * 0.6)
+								td= 20 + ((i * 7) % 11) * 3
+
+	+section("Bar charts")
+		p A bar chart gets taller with each row, so every bar keeps the same thickness, and every name and number fits. A long name wraps onto more lines. If you want short names next to the bars, use #[code data-short], as above. See #[a(href=url('/types/bar.html#long-names')) Long names].
+
+	+section("A bar chart on narrow screens")
+		p A column chart with many rows can be shown as a bar chart when it is narrow. If the figure has #[code --tablechart-type: bar] in a container query or a media query, the chart is built again as a bar chart when the query applies, and as a column chart when it does not.
+
+		+style.
+			.type-box {
+				container-type: inline-size;
+			}
+			@container (max-width: 500px) {
+				.type-box > [data-chart] {
+					--tablechart-type: bar;
+				}
+			}
+
+		p The buttons change the width of the example.
+
+		+chart(null, '1', { class: 'width-toggle', label: 'Width of the example', buttons: [{ text: 'Wide', attrs: { 'data-width': '' } }, { text: 'Narrow', attrs: { 'data-width': 'min(360px, 60%)' } }] })
+			.type-box
+				figure(data-chart="column")
+					figcaption: b Visitors per month
+					table
+						tbody
+							each row in [['Jan', '41'], ['Feb', '38'], ['Mar', '52'], ['Apr', '61'], ['May', '74'], ['Jun', '88'], ['Jul', '93'], ['Aug', '90'], ['Sep', '77'], ['Oct', '63'], ['Nov', '49'], ['Dec', '45']]
+								tr
+									th= row[0]
+									td= row[1]
+
+		p #[code --tablechart-type] works for column and bar charts. It can also turn a bar chart into a column chart, with #[code --tablechart-type: column].
+
+	+section("Pies and donuts with many slices")
+		p Each slice is 15% lighter than the one before, down to 20% of the colour. From about the sixth slice on, the slices have the same colour. Then the console warns that those slices have too little contrast with the background. If you want a colour for each slice, set a #[a(href=url('/styling/colours.html')) palette].
+		p A number that does not fit in its slice is next to it, with a short line. If those numbers would touch, only the numbers of the largest slices are shown. The legend lists every slice.
+
+		+chart
+			figure(data-chart="donut")
+				figcaption
+					b Trees in the orchard
+					br
+					span per variety
+				table
+					tbody
+						each name, i in varieties
+							tr
+								th= name
+								td= Math.round(480 / (i + 1.5))
+
+		p If you want the small slices to be clear, add them up in one row, such as "Other". Or, if each value matters, a #[a(href=url('/types/bar.html')) bar chart] shows every name next to its number.
+
+	+section("Many lines")
+		p With several lines, the name of each line is at its end. If lines end close together, their names move apart, so each one has room. If the names and numbers still crowd each other, the names can go in a legend: see #[a(href=url('/features/legends.html')) Legends].
+
+	+section("Summary")
+		p For a long table, a summary can say in a few sentences what a listener needs, such as the highest value and the trend. See #[a(href=url('/features/summary.html')) Summary].

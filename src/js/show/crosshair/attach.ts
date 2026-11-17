@@ -6,6 +6,8 @@ import { clearCrosshair, drawCrosshair } from "./draw";
 export const attachCrosshair = (state: ChartState): void => {
 	const { plot, figure } = state;
 	plot.setAttribute("data-hover", "");
+	// A drag over the chart for its values starts no selection of the text around it.
+	plot.addEventListener("selectstart", (event) => event.preventDefault());
 	// The row and the series of the line across.
 	let shown: string | null = null;
 	const hide = () => {

@@ -67,6 +67,8 @@ const ring = (fill?: number): ChartType => ({
 		const thickness = fill === 1 ? outer - unit / 100 : outer * (fill ?? config.ringfill);
 		const radius = outer - thickness / 2;
 		const circumference = 2 * Math.PI * radius;
+		// A dash pattern a unit longer than the ring: with rounding, a shorter one starts again and paints a wedge at the top.
+		const period = circumference + 1;
 
 		// Kept until every slice is drawn, because the partings go over them.
 		const partings: number[] = [];
@@ -103,9 +105,9 @@ const ring = (fill?: number): ChartType => ({
 					r: radius,
 					"stroke-width": thickness,
 					transform: `rotate(-90 ${middleX} ${middleY})`,
-					"stroke-dasharray": `${arc.toFixed(1)} ${(circumference - arc).toFixed(1)}`,
+					"stroke-dasharray": `${arc.toFixed(1)} ${(period - arc).toFixed(1)}`,
 					"stroke-dashoffset": (-run).toFixed(1),
-					style: `--n:${part}; --palette:var(--tablechart-color-${part + 1}); --arc:${arc.toFixed(1)}; --circ:${circumference.toFixed(1)}; ${timed} --ease:${own.easing}; ${timing("--i", row.slot)}`,
+					style: `--n:${part}; --palette:var(--tablechart-color-${part + 1}); --arc:${arc.toFixed(1)}; --circ:${period.toFixed(1)};${timed} --ease:${own.easing}; ${timing("--i", row.slot)}`,
 				});
 			svg.appendChild(slice);
 

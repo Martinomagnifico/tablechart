@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.3] - 2026-11-17
+
+### Fixed
+- The names under a line chart with a value axis line up with the points again when the names of the lines are at their ends.
+- A pie with many slices no longer shows part of its last slice as a wedge at the top.
+- A drag over a chart on a phone, for the tooltip or the crosshair, no longer selects the table and the text around the chart.
+- The totals of a stacked chart with many rows no longer overlap: only the largest totals that are clear of the others are shown.
+
 ## [1.4.2] - 2026-11-15
 
 ### Changed
@@ -62,7 +70,7 @@
 ### Fixed
 
 - Brackets and numbers keep clear of each other in print to PDF flows..
-- A chart keeps the room of its `data-chart-aspect` until it is laid out.
+- A chart keeps the room of its `data-chart-aspect` until it is rendered.
 - In a tagged PDF, the summary and the table are outside the figure of the chart, so a screen reader reads them.
 
 
@@ -135,9 +143,9 @@
 
 ### Fixed
 
-- A chart whose width changes is laid out before the next frame is shown. Before, it was shown scaled for a frame or two, so the page jumped.
+- A chart whose width changes is rendered before the next frame is shown. Before, it was shown scaled for a frame or two, so the page jumped.
 - After a chart is built, a change of colour, such as to dark mode, changes its text at once. Before, the text took the time of the whole build again.
-- A scatter chart keeps the room it needs before it is laid out. Before, the page moved down by about a third of its width when it appeared.
+- A scatter chart keeps the room it needs before it is rendered. Before, the page moved down by about a third of its width when it appeared.
 - On a scatter chart with steps, a marker grows at its step. Before, it only faded in, because it had grown while still hidden.
 - A chart with steps and gridlines or a quadrant builds smoothly in Safari. Its lines now stop around the text as they do without steps; the mask they had made Safari draw the chart again on every frame.
 
@@ -443,14 +451,14 @@ Now at version 1!
 - The `shape` option: `"straight"` (the default), `"step"` or `"smooth"`. `data-chart-shape` on a figure overrides it, so `data-chart-shape="straight"` turns a chart back.
 - Lines and areas that grow up from zero: `data-chart-animate="up"`, or `animate: "up"` for every chart. `data-chart-animate="across"` is the opposite. Other chart types are not affected.
 - The moment a chart builds inside an element that animates in can be set: `data-chart-entrance` on a figure, or the `entrance` option, from `0` (when the element starts to move) to `1` (when it is in). It is `0.5`, halfway, by default, as before.
-- With `debug: true`, the console says how long each chart takes to build and to lay out, with a warning above 50 ms.
+- With `debug: true`, the console says how long each chart takes to build and to render, with a warning above 50 ms.
 
 ### Fixed
 
 - A step line (`data-chart-shape="step"`) now takes as long to build as other lines. Its rises and drops are drawn quickly, so the line no longer stops moving to the right while it goes up or down.
 - A line or area with more than seven points takes no longer to build than one with seven: six stagger steps in all. It was one step per point, so a long line was much slower than a short one.
 - The fill of an area fades in at an even speed while its line builds, so it is no longer there before the line.
-- A line or bar chart with many rows lays out much faster. A layout now reads the size of every number and name at once, before it places anything: 10,000 rows took 23 to 65 seconds and now take well under a second.
+- A line or bar chart with many rows renders much faster. A layout now reads the size of every number and name at once, before it places anything: 10,000 rows took 23 to 65 seconds and now take well under a second.
 - A chart with about 100,000 rows or more no longer stops with an error.
 - After a resize, a line chart whose first number is hidden, such as on a line out of focus, keeps the room for the numbers above it.
 
@@ -499,8 +507,8 @@ Now at version 1!
 - The build makes four files: `tablechart.mjs` (one ES module), `tablechart.js` (for a script tag), `tablechart.css` and `tablechart.d.ts` (all types in one file).
 - `@martinomagnifico/tablechart/core` has the building blocks under `init()` and `create()`: `prepare`, `build`, `layout`, `setShown`, `relabel` and `unbuild`, for a script or plugin that decides itself when a chart is built and shown.
 - `create(element, options)` makes a chart of one element, and returns it. Each chart is also on its element as `element.tablechart`, with `refresh()` and `destroy()`. `init()` returns these charts in `charts`.
-- `init()` returns `refresh()`, which lays out every chart again, for example after a script has changed the text of a chart.
-- If the `lang` attribute of the page changes, the charts are laid out again a moment later, so new text that is longer or shorter fits.
+- `init()` returns `refresh()`, which renders every chart again, for example after a script has changed the text of a chart.
+- If the `lang` attribute of the page changes, the charts are rendered again a moment later, so new text that is longer or shorter fits.
 - The `langattribute` option is used everywhere: to read keys from the table and to put them on the names in the chart, not only to write them on the table. `false` turns translation keys off.
 - `data-chart-keys` on a figure adds translation keys to its names, starting with its value: `harvest-row1` for a row, `harvest-col1` for a column header. It replaces `data-chart-prefix`. An `id` on a figure no longer adds keys.
 - With more than three lines, the colour steps between lines are smaller, so the last line is still `--tablechart-series-min` of its colour, now 40% by default.

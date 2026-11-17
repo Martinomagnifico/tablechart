@@ -96,7 +96,7 @@
 	}
 
 	// The front page: the three boxes in the middle, in one row and as tall as each other, as on a narrow screen.
-	// The other two may not be laid out, if the screen was narrow.
+	// The other two may not be rendered, if the screen was narrow.
 	.hero-charts {
 		display: flex;
 		gap: 1em;

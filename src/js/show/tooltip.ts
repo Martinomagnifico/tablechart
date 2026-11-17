@@ -272,6 +272,8 @@ const show = (state: ChartState, index: number, config: Config): void => {
 export const attachTooltip = (state: ChartState, config: Config, auto = false): void => {
 	const { plot } = state;
 	plot.setAttribute("data-hover", "");
+	// A drag over the chart for its values starts no selection of the text around it.
+	plot.addEventListener("selectstart", (event) => event.preventDefault());
 	watch();
 
 	const rowOf = (event: PointerEvent): number | null => {

@@ -297,7 +297,8 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 		? largest(names.map((name) => sizeOf(name).width)) * unit + 12 * unit + endNumbers + (along?.numbers && along.right && !sideways ? 6 * unit : 0)
 		: 0;
 	const under = state.categories[0]?.parentElement;
-	if (under) under.style.paddingRight = gutter ? `${(gutter / VIEWBOX_WIDTH) * 100}%` : "";
+	// In pixels: a percentage would count from the figure, which is wider than the plot when an axis has a margin.
+	if (under) under.style.paddingRight = gutter ? `${gutter / unit}px` : "";
 	const band = (VIEWBOX_WIDTH - gutter) / rows.length;
 	const cx = (i: number) => (i + 0.5) * band;
 
@@ -394,15 +395,15 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 	for (const name of state.figure.querySelectorAll<HTMLElement>(`.${NAME_CLASS}`))
 		name.style.setProperty("--i", String(Math.min(rows[rows.length - 1].slot, staggered - 1)));
 	// Numbers that overlap, such as on a long line, are thinned out; by columns or bars, the largest that are clear of the others stay.
-	// Grouped and stacked numbers have rules of their own.
-	if (!state.stacked && !plot.hasAttribute("data-grouped")) {
+	// Grouped numbers and the numbers inside a stack have rules of their own; the totals of the stacks follow the same rule.
+	if (!plot.hasAttribute("data-grouped")) {
 		const marks = new Map<number, Box>(
 			Array.from(svg.querySelectorAll<SVGGraphicsElement>(".tablechart-bar")).map((mark) => {
 				const { x, y, width, height: tall } = mark.getBBox();
 				return [Number(mark.dataset.row), [x, y, width, tall]];
 			})
 		);
-		for (const labels of seriesValues) {
+		for (const labels of state.stacked ? [state.totals] : seriesValues) {
 			keepInside(labels, unit, VIEWBOX_WIDTH);
 			if (marks.size && !lineSeries.length) keepClear(labels, marks, sideways, unit, VIEWBOX_WIDTH, height);
 			else thinOut(labels, unit, VIEWBOX_WIDTH, height);

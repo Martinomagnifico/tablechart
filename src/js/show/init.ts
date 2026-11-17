@@ -38,7 +38,7 @@ export interface TablechartChart {
 
 export interface TablechartInstance {
 	charts: TablechartChart[];
-	/** Lays out every chart again, for example after a script has changed its text. */
+	/** Renders every chart again, for example after a script has changed its text. */
 	refresh(): void;
 	/** Stops watching scroll, size and language. The charts stay as they are. */
 	destroy(): void;
@@ -122,7 +122,7 @@ let language: MutationObserver | null = null;
 const listen = (chart: { relabel(): void; refresh(): void }): void => {
 	speakers.add(chart);
 	if (language) return;
-	// A language change reformats the numbers, then lays out again after a translation script has run.
+	// A language change reformats the numbers, then renders the charts again after a translation script has run.
 	language = new MutationObserver(() => {
 		for (const one of speakers) one.relabel();
 		requestAnimationFrame(() =>
@@ -154,9 +154,9 @@ const kindFor = (figure: HTMLElement): string | null => {
 const watch = (first: ChartState, config: Config): TablechartChart => {
 	let state = first;
 	let kind = kindFor(state.figure);
-	// The width it was last laid out at; null until it is laid out.
+	// The width it was last rendered at; null until it is rendered.
 	let placed: number | null = null;
-	// The contrast is checked once per chart, also when it is laid out again from scratch.
+	// The contrast is checked once per chart, also when it is rendered again from scratch.
 	let checked = false;
 	let inView = false;
 	let waiting = false;
@@ -168,7 +168,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 	};
 
 	const show = async (): Promise<void> => {
-		// Without animation a chart is shown as soon as it is laid out, in view or not.
+		// Without animation a chart is shown as soon as it is rendered, in view or not.
 		if (!animated(state.figure, config)) {
 			setShown(state, true);
 			return done();
@@ -214,7 +214,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		void show();
 	};
 
-	// Laid out before the frame is painted, so a chart at a new width is never shown scaled. The layout changes the height of the
+	// Rendered before the frame is painted, so a chart at a new width is never shown scaled. The layout changes the height of the
 	// figure, so it is watched again from the next frame: that is not a new resize, and no "ResizeObserver loop" error comes.
 	let destroyed = false;
 	const resizer = new ResizeObserver(() => {
@@ -240,7 +240,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		putMasksOn(state.svg);
 		void state.figure.offsetWidth;
 		paperRoles(state, true);
-		// On paper the drawing shrinks and its text does not, so a chart from a wide window is laid out for the paper, about 700px wide.
+		// On paper the drawing shrinks and its text does not, so a chart from a wide window is rendered again for the paper, about 700px wide.
 		const root = document.documentElement;
 		const width = root.style.width;
 		root.style.width = "700px";
@@ -327,7 +327,7 @@ export const prepare = async (found: HTMLElement[], config: Config): Promise<HTM
 	// A header with `data-chart="line"` is a series in a chart, not a chart.
 	const figures = adoptTables(found.filter((element) => !element.hasAttribute(MADE) && element.tagName !== "TH"));
 	warnNotFigure(figures);
-	// So the room it keeps until it is laid out is as high as it will be.
+	// So the room it keeps until it is rendered is as high as it will be.
 	for (const figure of figures) {
 		const aspect = Number.parseFloat(figure.getAttribute("data-chart-aspect") ?? "");
 		if (aspect > 0) figure.style.setProperty("--_room", String(aspect));

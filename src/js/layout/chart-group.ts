@@ -19,7 +19,7 @@ const agreedOn = new WeakMap<HTMLElement, string>();
 
 let agreeing = false;
 
-/** Charts of a group with `data-chart-group-scale` lay out once to measure, and then again with one scale, and per line of the page one height. */
+/** Charts of a group with `data-chart-group-scale` are rendered once to measure, and then again with one scale, and per line of the page one height. */
 export const agree = (figure: HTMLElement, layoutOne: (state: ChartState, config: Config) => boolean): void => {
 	const group = groupOf(figure);
 	if (!group?.shared || agreeing) return;
@@ -51,7 +51,7 @@ export const agree = (figure: HTMLElement, layoutOne: (state: ChartState, config
 	agreeing = false;
 };
 
-/** Keeps a chart that was laid out, so its group can lay it out again. */
+/** Keeps a chart that was rendered, so its group can render it again. */
 export const remember = (state: ChartState, config: Config): void => {
 	laidOut.set(state.figure, { state, config });
 };

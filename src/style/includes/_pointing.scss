@@ -1,11 +1,10 @@
 @use "tokens" as *;
 
-// Numbers cannot be selected, so pointing at a row does not start a selection.
+// A drag over the chart for the tooltip or crosshair starts no selection, also not of the table and text around the chart,
+// and a long press on a phone shows no menu.
 .tablechart-plot[data-hover] {
 	cursor: default;
-
-	:where(.tablechart-value) {
-		user-select: none;
-		-webkit-user-select: none;
-	}
+	user-select: none;
+	-webkit-user-select: none;
+	-webkit-touch-callout: none;
 }
