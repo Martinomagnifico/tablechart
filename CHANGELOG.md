@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.5.1] - 2026-11-18
+
+### Changed
+- `--tablechart-value-inside-weight` sets a weight, but no longer defaults to semibold.
+
 ## [1.5.0] - 2026-11-18
 
 ### Added

@@ -25,11 +25,10 @@
 		position: absolute;
 		right: 100%;
 	}
-	// Semibold inside a bar, because the colour around a number makes its letters look thinner.
 	&[data-place="inside"] {
 		transform: translate(-50%, -50%);
 		color: var(--_ink, #{ink($barfill)});
-		font-weight: var(--tablechart-value-inside-weight, 600);
+		font-weight: var(--tablechart-value-inside-weight, inherit);
 	}
 
 	&[data-place="around"] {
@@ -61,7 +60,7 @@
 		display: none;
 	}
 
-	// A number of a line fully inside a column, in the colour of the numbers of the column. Not semibold: wider, it may no longer fit.
+	// A number of a line fully inside a column, in the colour of the numbers of the column.
 	&[data-over] {
 		color: var(--_ink, currentColor);
 	}
