@@ -15,9 +15,8 @@
 	padding: var(--tablechart-tooltip-padding, 0.45em 0.7em);
 	border: var(--tablechart-tooltip-border, 1px solid color-mix(in oklab, currentColor 28%, transparent));
 	border-radius: var(--tablechart-tooltip-radius, 0.4em);
-	// Lighter than the chart's background, with a clear shadow, so it stands out from what is behind it.
-	// White in light mode; in dark mode a little lighter than the chart's background. It follows the chart's colour scheme.
-	background: var(--tablechart-tooltip-surface, light-dark(#fff, oklch(from var(--tablechart-surface, var(--_surface, Canvas)) calc(l + 0.06) c h)));
+	// White in light mode; in dark mode the chart's background, which the contrast of the series colours is checked against.
+	background: var(--tablechart-tooltip-surface, light-dark(#fff, var(--tablechart-surface, var(--_surface, Canvas))));
 	color: var(--tablechart-tooltip-color, var(--_color, CanvasText));
 	box-shadow: var(--tablechart-tooltip-shadow, 0 1px 3px rgb(0 0 0 / 0.12), 0 6px 18px rgb(0 0 0 / 0.18));
 	line-height: 1.35;

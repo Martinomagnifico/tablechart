@@ -10,6 +10,7 @@
 - A number of that line gets the edge where it touches a column or the line. Fully inside a column, it gets the colour of the column numbers.
 - If the line covers a number inside a column, that number moves to the foot of the column.
 - Numbers inside bars are semibold, `--tablechart-value-inside-weight`.
+- In dark mode, the tooltip has the background of the chart, which the contrast of the series colours is checked against.
 
 ### Fixed
 - A number no longer cuts a hole in a column or a line.

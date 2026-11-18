@@ -1,8 +1,8 @@
 {
 	"size": {
 		"js": 45.03,
-		"css": 7.85,
-		"total": 52.88,
+		"css": 7.83,
+		"total": 52.85,
 		"entries": {
 			"init": 44.93,
 			"create": 44.83,
@@ -12,7 +12,7 @@
 			"Script tag (IIFE)": 45.28,
 			"tablechart/additional-types": 4.88,
 			"Additional types script tag": 4.22,
-			"Stylesheet (CSS)": 7.85
+			"Stylesheet (CSS)": 7.83
 		}
 	}
 }
