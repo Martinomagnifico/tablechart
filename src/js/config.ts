@@ -128,6 +128,12 @@ export interface Config {
 	replay: boolean;
 	/** The attribute for translation keys, for a translation script. `false` turns keys off. */
 	langattribute: string | false;
+	/** Functions that turn a response in a structure of its own into one that Tablechart reads, by name. A figure picks one with `data-chart-transform`. */
+	transforms: Record<string, (data: unknown) => unknown>;
+	/** The name of the transform for every figure with `data-chart-src` and no `data-chart-transform`. */
+	transform: string | null;
+	/** The message in a figure whose data could not load. */
+	loaderror: string;
 	/** Show messages in the console for whoever is working on the page. */
 	debug?: boolean;
 }
@@ -162,4 +168,7 @@ export const defaultConfig: Config = {
 	threshold: 0.5,
 	replay: false,
 	langattribute: "data-i18n",
+	transforms: {},
+	transform: null,
+	loaderror: "The data for this chart could not be loaded.",
 };

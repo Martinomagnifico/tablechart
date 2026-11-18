@@ -5,6 +5,8 @@
 ### Added
 - `data-axis="right"` on a column header: a second value axis, for values with another unit.
 - `data-chart-legend="toggle"` and `legend: "toggle"`: a legend whose names turn their series off and on.
+- `data-chart-transform` and the `transforms` option: a function that turns JSON in another structure into rows.
+- A message in the figure if the data of `data-chart-src` cannot load, instead of a chart from incomplete data. `loaderror` sets its text.
 - A column, bar or slice with less than 3:1 contrast with the background gets an edge with enough, as WCAG 1.4.11 asks.
 
 ### Changed

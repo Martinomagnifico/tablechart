@@ -5,7 +5,8 @@ export { layout } from "./layout/layout";
 export { setShown } from "./show/shown";
 export { stepTo, type StepPlan } from "./show/steps";
 export { entranceOf, prepare } from "./show/init";
-export { adoptTables, loadSources, readMarkdownRows } from "./build/sources";
+export { adoptTables, readMarkdownRows } from "./build/sources";
+export { loadSources } from "./build/source";
 export { assignKeys } from "./build/read-table";
 export { checkContrast, checkTextContrast } from "./colour/contrast";
 export {

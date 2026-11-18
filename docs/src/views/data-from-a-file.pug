@@ -1,0 +1,228 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Data from a file or API"
+	- pagedescription = "A chart in Tablechart from a JSON file or an API endpoint, a transform for JSON in another structure, and what happens if the data cannot load."
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Data from a file or API
+				p.lead A table from a JSON file or an API endpoint, after the page has loaded.
+
+	+section("A JSON file or endpoint")
+		p A table can also arrive after the page has loaded, from a JSON file or from an API endpoint. The response is turned into a table, and the chart is rendered from that table. This needs JavaScript and a server: a page opened from your computer, with an address that starts with #[code file://], cannot read a file. Without JavaScript, only the header row written in the figure remains, if there is one. See #[a(href=url('/accessibility.html')) Accessibility].
+
+		p If the figure has #[code data-chart-src] with the address of a JSON file, Tablechart reads the file and makes a table from it. If you #[strong also] had an HTML table in there, that is then replaced, unless it has a #[em header row]: see #[a(href="#missing-names") Missing names].
+
+		+chart(null, '1')
+			figure(data-chart="column" data-chart-src=url('/data/apples.json'))
+				figcaption: b Apples sold by variety
+
+		h3#json-structure JSON structure
+		p The rows can be written in two ways. As a list of rows, each with its #[code label] and its #[code value], or its #[code values] if there are more value columns:
+
+		+codeblock('JSON').
+			[
+				{ "label": "Jan 2025", "value": "12.4" },
+				{ "label": "Feb 2025", "value": "-3.1" },
+				{ "label": "Mar 2025", "value": "8.7" }
+			]
+
+		p Or as names with their value, or their values:
+
+		+codeblock('JSON').
+			{ "Spring": "58", "Summer": "72", "Autumn": "70" }
+
+		+codeblock('JSON').
+			{ "Elstar": ["118", "131"], "Jonagold": ["140", "135"], "Braeburn": ["109", "121"] }
+
+		p If you want to name the columns too, put the rows, in either way, in an object with #[code rows]. #[code series] has the names of the value columns, and #[code label] the name of the first column:
+
+		+codeblock('JSON').
+			{
+				"label": "Variety",
+				"series": ["2022", "2026"],
+				"rows": [
+					{ "label": "Elstar", "values": ["118", "131"] },
+					{ "label": "Jonagold", "values": ["140", "135"] },
+					{ "label": "Braeburn", "values": ["109", "121"] }
+				]
+			}
+
+		p If you want a value to keep its decimals, write it as a string, such as #[code "1.0"]. A row in a list with #[code "kind": "total"] is a total. A row with #[code "short"] has a short name under the chart, and a row with #[code "note"] a note, such as #[code { "label": "March 2024", "value": "34.1", "note": "Share issue" }]. The table then gets a column of notes, named by #[code "note"] in the object with #[code rows], or else #[code Note]. See #[a(href=url('/features/annotations.html#notes')) Notes]. In names with values, names that are whole numbers, such as #[code "2022"], come first and from low to high, whatever their order in the file. Other names keep their order.
+
+		h3#missing-names Missing names
+
+		p If the file has only rows (so data only, like the top 3 examples above), without #[code label] and #[code series], the table has no header row, and screen readers cannot say what the columns are.
+
+		p Then write just the header row in the figure yourself, in a table with only a #[code thead]. Tablechart keeps it and adds the rows from the file. A header row in the figure goes before the names in the file. Screen readers use the header row to name the columns, and with #[code data-i18n] on a #[code th], a translation script translates it.
+
+		+codeblock('HTML').
+			<figure data-chart="column" data-chart-src="/api/profit-per-month/">
+				<figcaption><b>Profit per month</b></figcaption>
+				<table>
+					<thead>
+						<tr><th>Month</th><th>Profit</th></tr>
+					</thead>
+				</table>
+			</figure>
+
+	+section("What if my API gives other JSON?")
+		p Tablechart reads the structures above. Many APIs send their data in a structure of their own, for example with every column in a list of its own:
+
+		+codeblock('JSON').
+			{
+				"months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+				"rain": [67, 56, 53, 41, 58, 65]
+			}
+
+		p Tablechart cannot tell which list has the names and which one the values. A #[em transform] tells it. A transform is a small function of your own. It gets the JSON, and gives back rows in one of the structures above. This one makes a row of each month, with the rain of that month as its value:
+
+		+codeblock('JS').
+			const perMonth = (data) =>
+				data.months.map((month, index) => ({ label: month, value: data.rain[index] }));
+
+			init({ transforms: { perMonth } });
+
+		p There are two parts. In your JavaScript, the #[code transforms] option of #[code init()] gives the transform a name, once for the whole page. In the HTML, the attribute #[code data-chart-transform] on a figure says which transform that chart uses, by that name:
+
+		+chart(null, '1')
+			figure(data-chart="column" data-chart-src=url('/data/rain.json') data-chart-transform="perMonth")
+				figcaption: b Rain per month
+				table
+					thead
+						tr
+							th Month
+							th Rain (mm)
+
+		p The file has no column names. A screen reader reads the chart as a table, and uses the header row to say what each value is: "Rain (mm), 67" instead of only "67". So the header row is written in the figure, and the rows of the transform go under it. See #[a(href="#missing-names") Missing names].
+
+		h3#one-transform-for-every-chart One transform for every chart
+		p If every endpoint on a page has the same structure, the #[code transform] option sets one transform for every figure with #[code data-chart-src]:
+
+		+codeblock('JS').
+			init({ transforms: { perMonth }, transform: "perMonth" });
+
+		p A figure with #[code data-chart-transform] uses its own transform instead. If a file is already in one of the structures above, #[code data-chart-transform="none"] on its figure reads the file as it is.
+
+		h3#what-a-transform-does What a transform does
+		ul
+			li It runs after the response is read as JSON, and before the table is made.
+			li It gives back one of the structures above. Anything else, such as a text, a number or nothing, counts as an error: see #[a(href="#when-the-data-cannot-load") When the data cannot load].
+			li It runs at once, so it cannot fetch a second response.
+			li A header row written in the figure is kept, and the rows of the transform go under it.
+
+	+section("A real example: rain from a weather API")
+		p #[a(href="https://open-meteo.com") Open-Meteo] is a free weather API that needs no key. This address asks it for the rain of every day in 2025, at a place in the Netherlands:
+
+		+codeblock('plaintext', 'URL').
+			https://archive-api.open-meteo.com/v1/archive?latitude=51.9&longitude=5.4&start_date=2025-01-01&end_date=2025-12-31&daily=precipitation_sum&timezone=Europe%2FAmsterdam
+
+		h3#the-response The response
+		p The response starts with information about the place, such as where it is and its time zone. The data itself is in #[code daily], in two lists: the 365 dates of the year, and the rain on each of those days, in millimetres. Shortened, the response looks like this:
+
+		+codeblock('JSON').
+			{
+				"latitude": 51.915638,
+				"longitude": 5.4395604,
+				"timezone": "Europe/Amsterdam",
+				"daily_units": { "time": "iso8601", "precipitation_sum": "mm" },
+				"daily": {
+					"time": ["2025-01-01", "2025-01-02", "2025-01-03", …],
+					"precipitation_sum": [12.0, 4.0, 1.8, …]
+				}
+			}
+
+		h3#what-tablechart-expects What Tablechart expects
+		p For a chart with the rain per month, Tablechart expects twelve rows, each with a name and a value:
+
+		+codeblock('JSON').
+			[
+				{ "label": "Jan", "value": "95.4" },
+				{ "label": "Feb", "value": "37.6" },
+				…
+			]
+
+		p The response does not fit in two ways. The dates and the amounts are in two lists, so Tablechart cannot tell which amount goes with which date. And the response has days, where the chart has months.
+
+		h3#the-transform The transform
+		p The transform solves both. It goes through the days, adds the rain of each day to its month, and then makes a row of each month:
+
+		+codeblock('JS').
+			const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+			const rainPerMonth = (data) => {
+				const totals = Array(12).fill(0);
+				data.daily.time.forEach((day, index) => {
+					const month = Number(day.slice(5, 7)) - 1; // "2025-03-14" is month 2, March
+					totals[month] += data.daily.precipitation_sum[index] ?? 0;
+				});
+				return totals.map((total, month) => ({ label: MONTHS[month], value: total.toFixed(1) }));
+			};
+
+			init({ transforms: { rainPerMonth } });
+
+		p A day without data is #[code null] in the response, and counts as no rain. #[code toFixed(1)] keeps one decimal, as a string, so the numbers in the chart have one decimal too.
+
+		h3#the-chart The chart
+		p The response has no column names either. So that a screen reader can say what each value is, the header row is written in the figure, as in the example above:
+
+		+chart(null, '1')
+			figure(data-chart="column" data-chart-src="https://archive-api.open-meteo.com/v1/archive?latitude=51.9&longitude=5.4&start_date=2025-01-01&end_date=2025-12-31&daily=precipitation_sum&timezone=Europe%2FAmsterdam" data-chart-transform="rainPerMonth")
+				figcaption
+					b Rain per month, 2025
+					br
+					span millimetres
+				table
+					thead
+						tr
+							th Month
+							th Rain (mm)
+
+		h3#with-a-summary With a summary
+		p A #[a(href=url('/features/summary.html')) summary] works the same with data from an API. Its sentences are written in the figure, with placeholders, and the summary fills them in once the table is made. The total, the wettest and the driest month then come from the response:
+
+		+chart(null, '1')
+			figure(data-chart="column" data-chart-summary="always" data-chart-src="https://archive-api.open-meteo.com/v1/archive?latitude=51.9&longitude=5.4&start_date=2025-01-01&end_date=2025-12-31&daily=precipitation_sum&timezone=Europe%2FAmsterdam" data-chart-transform="rainPerMonth")
+				figcaption
+					b Rain per month, 2025
+					br
+					span millimetres
+				table
+					thead
+						tr
+							th Month
+							th Rain (mm)
+				div.chart-summary
+					p In 2025, {total} mm of rain fell. The wettest month was {highest.name}, with {highest.value} mm. The driest was {lowest.name}, with {lowest.value} mm.
+
+		p With #[code data-chart-summary="always"], the summary is also shown on the page. Without it, only a screen reader reads it, right after the title of the chart.
+
+		p.small Weather data by #[a(href="https://open-meteo.com") Open-Meteo.com], under #[a(href="https://creativecommons.org/licenses/by/4.0/") CC BY 4.0].
+
+	+section("When the data cannot load")
+		p A chart is only built from complete data. If the table cannot be made from the response, the chart is not built, and the figure shows a short message in its place. This happens if:
+		ul
+			li the file or endpoint cannot be fetched: a network error, a 404, or a response that is not valid JSON
+			li the transform in #[code data-chart-transform], or in the #[code transform] option, is not in the #[code transforms] option
+			li the transform throws an error, or gives back something that is not one of the structures
+			li the rows fail one of the checks below
+
+		p The message is #[em "The data for this chart could not be loaded."] The #[code loaderror] option sets another text. It has #[code role="status"], so a screen reader announces it without interrupting, and the translation key #[code tablechart-load-error], so a translation script translates it. The console names the figure, the step that failed (fetch, parse, transform or check), and the cause. The table written in the figure stays as it was.
+
+		h3#checks Checks
+		p Before a chart is rendered, the rows are checked for:
+		ul
+			li at least one row
+			li a name in every row
+			li the same number of values in every row, as many as there are columns
+			li a number, a text or #[code null] in every value. As in a table, a value without a number, such as #[code "n/a"], is missing.
+		p The console names the row that failed. The same checks apply to a file that is read without a transform.
+
+		h3#no-fallback No fallback
+		p If a transform fails, the response is not read as it is. A response in the wrong structure could be read as a different table, and a wrong chart is worse than no chart. If you want the response read as it is, set #[code data-chart-transform="none"] on the figure.
+
+	+section("Next")
+		p For a table in the page, or from Markdown, see #[a(href=url('/data.html')) Data in the page]. For what a screen reader gets from a chart, see #[a(href=url('/accessibility.html')) Accessibility].

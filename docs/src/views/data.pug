@@ -1,15 +1,15 @@
 extends /views/templates/layouts/_base
 
 append variables
-	- pagetitle = "Data"
-	- pagedescription = "Where a chart's data comes from in Tablechart: a table in your HTML, a table from Markdown, or a JSON file."
+	- pagetitle = "Data in the page"
+	- pagedescription = "Where a chart's data comes from in Tablechart: a table in your HTML, or a table from Markdown."
 
 block content
 	.lane
 		.container
 			.page-header
-				h1 Data
-				p.lead A table in your HTML, a table from Markdown or a JSON file.
+				h1 Data in the page
+				p.lead A table in your HTML, or a table from Markdown.
 
 	+section("A table")
 		p A chart is a #[code figure] with #[code data-chart] and a table in it. Each row of the table is a bar or a point. The first cell of a row is its name, the other cells are its values.
@@ -76,62 +76,7 @@ block content
 					td Makes a line dashed or dotted
 
 	+section("A JSON file or endpoint")
-		p If the figure has #[code data-chart-src] with the address of a JSON file, Tablechart reads the file and makes a table from it, and then Tablechart creates the chart from that table. If you #[strong also] had an HTML table in there, that is then replaced, unless it has a #[em header row]: see #[a(href="#missing-names") Missing names]. The table is made by JavaScript, so without JavaScript there is no table: see #[a(href=url('/accessibility.html')) Accessibility].
-
-		+chart(null, '1')
-			figure(data-chart="column" data-chart-src=url('/data/apples.json'))
-				figcaption: b Apples sold by variety
-
-		p A browser cannot read a file from a page that is opened from your computer, with an address that starts with #[code file://]. So the page needs to come from a server.
-
-		h3#json-structure JSON structure
-		p The rows can be written in two ways. As a list of rows, each with its #[code label] and its #[code value], or its #[code values] if there are more value columns:
-
-		+codeblock('JSON').
-			[
-				{ "label": "Jan 2025", "value": "12.4" },
-				{ "label": "Feb 2025", "value": "-3.1" },
-				{ "label": "Mar 2025", "value": "8.7" }
-			]
-
-		p Or as names with their value, or their values:
-
-		+codeblock('JSON').
-			{ "Spring": "58", "Summer": "72", "Autumn": "70" }
-
-		+codeblock('JSON').
-			{ "Elstar": ["118", "131"], "Jonagold": ["140", "135"], "Braeburn": ["109", "121"] }
-
-		p If you want to name the columns too, put the rows, in either way, in an object with #[code rows]. #[code series] has the names of the value columns, and #[code label] the name of the first column:
-
-		+codeblock('JSON').
-			{
-				"label": "Variety",
-				"series": ["2022", "2026"],
-				"rows": [
-					{ "label": "Elstar", "values": ["118", "131"] },
-					{ "label": "Jonagold", "values": ["140", "135"] },
-					{ "label": "Braeburn", "values": ["109", "121"] }
-				]
-			}
-
-		p If you want a value to keep its decimals, write it as a string, such as #[code "1.0"]. A row in a list with #[code "kind": "total"] is a total. A row with #[code "short"] has a short name under the chart, and a row with #[code "note"] a note, such as #[code { "label": "March 2024", "value": "34.1", "note": "Share issue" }]. The table then gets a column of notes, named by #[code "note"] in the object with #[code rows], or else #[code Note]. See #[a(href=url('/features/annotations.html#notes')) Notes]. In names with values, names that are whole numbers, such as #[code "2022"], come first and from low to high, whatever their order in the file. Other names keep their order.
-
-		h3#missing-names Missing names
-
-		p If the file has only rows (so data only, like the top 3 examples above), without #[code label] and #[code series], the table has no header row, and screen readers cannot say what the columns are.
-
-		p Then write just the header row in the figure yourself, in a table with only a #[code thead]. Tablechart keeps it and adds the rows from the file. A header row in the figure goes before the names in the file. Screen readers use the header row to name the columns, and with #[code data-i18n] on a #[code th], a translation script translates it.
-
-		+codeblock('HTML').
-			<figure data-chart="column" data-chart-src="/api/profit-per-month/">
-				<figcaption><b>Profit per month</b></figcaption>
-				<table>
-					<thead>
-						<tr><th>Month</th><th>Profit</th></tr>
-					</thead>
-				</table>
-			</figure>
+		p If the data comes from a JSON file or an API endpoint, see #[a(href=url('/data-from-a-file.html')) Data from a file or API].
 
 	+section("A table from Markdown")
 		p If your Markdown tool can add attributes to a table, add #[code data-chart] to the table. This example uses #[a(href="https://github.com/arve0/markdown-it-attrs") markdown-it-attrs], which reads the attributes from the line after the table.

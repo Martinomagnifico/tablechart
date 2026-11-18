@@ -23,7 +23,10 @@ block content
 					td Makes the figure a chart: #[code column], #[code bar], #[code line], #[code area], #[code waterfall], #[code donut] or #[code pie], or #[code scatter] or #[code candlestick] from the #[a(href=url('/types/additional-types.html')) additional types]
 				tr
 					td: code data-chart-src
-					td Reads the data from a JSON file. See #[a(href=url('/data.html')) Data].
+					td Reads the data from a JSON file or API endpoint. See #[a(href=url('/data-from-a-file.html')) Data from a file or API].
+				tr
+					td: code data-chart-transform
+					td The transform for the JSON of #[code data-chart-src], by its name in the #[code transforms] option. #[code none] reads the JSON as it is. See #[a(href=url('/data-from-a-file.html#what-if-my-api-gives-other-json')) What if my API gives other JSON?]
 				tr
 					td: code data-chart-stack
 					td Puts the values of a row on top of each other, in a column, bar, line or area chart

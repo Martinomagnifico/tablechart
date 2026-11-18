@@ -452,3 +452,11 @@
 	font-size: var(--tablechart-crop-size, 0.85em);
 	color: var(--tablechart-crop-color, inherit);
 }
+
+// The message in a figure whose data could not load, where the chart would be.
+.tablechart-load-error {
+	margin: 1em 0;
+	padding: 0.8em 1em;
+	border: 1px dashed color-mix(in oklab, currentColor 35%, transparent);
+	border-radius: 0.4em;
+}

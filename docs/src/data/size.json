@@ -1,18 +1,18 @@
 {
 	"size": {
-		"js": 50.67,
-		"css": 8.16,
-		"total": 58.83,
+		"js": 51.46,
+		"css": 8.2,
+		"total": 59.66,
 		"entries": {
-			"init": 50.57,
-			"create": 50.47,
-			"tablechart": 50.67,
-			"tablechart/core": 46.06,
-			"Both entries": 50.94,
-			"Script tag (IIFE)": 50.91,
+			"init": 51.36,
+			"create": 51.26,
+			"tablechart": 51.46,
+			"tablechart/core": 46.86,
+			"Both entries": 51.72,
+			"Script tag (IIFE)": 51.7,
 			"tablechart/additional-types": 4.88,
 			"Additional types script tag": 4.22,
-			"Stylesheet (CSS)": 8.16
+			"Stylesheet (CSS)": 8.2
 		}
 	}
 }

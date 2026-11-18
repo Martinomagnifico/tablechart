@@ -255,7 +255,7 @@ block content
 
 		h3(id="without-javascript") Without JavaScript
 		p If JavaScript does not run, there is no chart. The table is then shown instead, with its title.
-		p A chart with #[code data-chart-src] has no table until JavaScript has read the JSON file. If JavaScript does not run, or the file cannot be read, there is no table and no chart. If you want to be sure that the data is always available, write the table in the HTML instead of as a JSON data source.
+		p A chart with #[code data-chart-src] has no table until JavaScript has read the JSON file. If JavaScript does not run, there is no table and no chart. If the file cannot be read, the figure has a short message instead of the chart, which a screen reader announces. If you want to be sure that the data is always available, write the table in the HTML instead of as a JSON data source.
 
 	+section("Standards")
 		p Websites in the European Union must meet the European Accessibility Act, which refers to the standard EN 301 549, and through it to WCAG 2.1 at level AA. For a chart, the most important requirements are a text alternative (WCAG 1.1.1) and information that is available as structure (WCAG 1.3.1). A real data table meets both, and Tablechart keeps that table in the page. For a long table, a summary is the alternative a listener can use, and in a PDF it is often the only one.

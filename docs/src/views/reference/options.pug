@@ -149,6 +149,18 @@ block content
 					td: code "data-i18n"
 					td The attribute for translation keys. #[code false] adds no translation keys.
 				tr
+					td: code transforms
+					td: code {}
+					td Functions that turn JSON in another structure into rows, by name. A figure picks one with #[code data-chart-transform]. See #[a(href=url('/data-from-a-file.html#what-if-my-api-gives-other-json')) What if my API gives other JSON?]
+				tr
+					td: code transform
+					td: code null
+					td The name of the transform for every figure with #[code data-chart-src] and no #[code data-chart-transform].
+				tr
+					td: code loaderror
+					td: code "The data for this chart could not be loaded."
+					td The message in a figure whose data could not load. See #[a(href=url('/data-from-a-file.html#when-the-data-cannot-load')) When the data cannot load].
+				tr
 					td: code debug
 					td: code false
 					td If #[code true], Tablechart shows messages in the console, with how long each chart takes to build and to draw. A chart that takes more than 50 ms gets a warning. The contrast check runs without it too. See #[a(href=url('/accessibility.html')) Accessibility].

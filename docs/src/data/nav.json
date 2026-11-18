@@ -13,8 +13,19 @@
             "href": "/get-started.html"
         },
         {
-            "text": "Data",
-            "href": "/data.html"
+            "title": "Data",
+            "links": [
+                {
+                    "text": "Data | In the page",
+                    "label": "In the page",
+                    "href": "/data.html"
+                },
+                {
+                    "text": "Data | From a file or API",
+                    "label": "From a file or API",
+                    "href": "/data-from-a-file.html"
+                }
+            ]
         },
         {
             "text": "Accessibility",

@@ -10,7 +10,8 @@ import { edgeBars } from "../colour/edges";
 import { checkContrast, checkOldColours, checkTextContrast } from "../colour/contrast";
 import { debug } from "../shared/debug";
 import { assignKeys } from "../build/read-table";
-import { adoptTables, loadSources, readMarkdownRows } from "../build/sources";
+import { adoptTables, readMarkdownRows } from "../build/sources";
+import { loadSources } from "../build/source";
 import { stepTo } from "./steps";
 import { releaseTooltip } from "./tooltip";
 import { morph, snapshot } from "./morph";
@@ -360,14 +361,16 @@ const warnNotFigure = (figures: HTMLElement[]): void => {
 /** Turns elements into figures with a table and translation keys, all at once, so duplicate keys are found. */
 export const prepare = async (found: HTMLElement[], config: Config): Promise<HTMLElement[]> => {
 	// A header with `data-chart="line"` is a series in a chart, not a chart.
-	const figures = adoptTables(found.filter((element) => !element.hasAttribute(MADE) && element.tagName !== "TH"));
-	warnNotFigure(figures);
+	const adopted = adoptTables(found.filter((element) => !element.hasAttribute(MADE) && element.tagName !== "TH"));
+	warnNotFigure(adopted);
 	// So the room it keeps until it is rendered is as high as it will be.
-	for (const figure of figures) {
+	for (const figure of adopted) {
 		const aspect = Number.parseFloat(figure.getAttribute("data-chart-aspect") ?? "");
 		if (aspect > 0) figure.style.setProperty("--_room", String(aspect));
 	}
-	await loadSources(figures);
+	// A figure whose data could not load has a message instead of a chart.
+	const failed = await loadSources(adopted, config);
+	const figures = adopted.filter((figure) => !failed.has(figure));
 	readMarkdownRows(figures);
 	assignKeys(figures, config.langattribute);
 	// The table is complete now, also one from a file, so a summary can read it.
