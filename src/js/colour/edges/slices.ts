@@ -42,7 +42,9 @@ const narrower = (shape: Shape, edge: number, inside: boolean): Shape => {
 	const innerCut = inside ? edge : 0;
 	const radius = shape.radius + (innerCut - edge) / 2;
 	const scale = radius / shape.radius;
+
 	const scaled = (value: string) => String(short(Number.parseFloat(value) * scale));
+
 	return {
 		radius: short(radius),
 		width: short(shape.width - edge - innerCut),
@@ -72,6 +74,7 @@ const insideGroup = (svg: SVGSVGElement, slice: SVGCircleElement): Element => {
 export const clearSlices = (svg: SVGSVGElement): void => {
 	for (const copy of svg.querySelectorAll(`.${SLICE_EDGE_CLASS}`)) copy.remove();
 	const group = svg.querySelector(`g[${INSIDE}]`);
+
 	// The group with the gaps that the slices came from; without gaps, a slice goes back to where the group is.
 	const home = group?.previousElementSibling instanceof SVGGElement ? group.previousElementSibling : null;
 
@@ -79,6 +82,7 @@ export const clearSlices = (svg: SVGSVGElement): void => {
 		setShape(slice, JSON.parse(slice.dataset.full ?? "{}") as Shape);
 		delete slice.dataset.full;
 		slice.removeAttribute("data-edge");
+
 		if (home) home.append(slice);
 		else group?.before(slice);
 	}
@@ -89,6 +93,7 @@ export const clearSlices = (svg: SVGSVGElement): void => {
 		slices.sort((first, second) => Number(first.dataset.slice) - Number(second.dataset.slice));
 		home.append(...slices);
 	}
+
 	group?.remove();
 };
 
@@ -105,9 +110,11 @@ export const edgeSlices = (
 	for (const slice of Array.from(svg.querySelectorAll<SVGCircleElement>(`circle.${SLICE_CLASS}`))) {
 		const colour = edge(rgbOf(getComputedStyle(slice).stroke).slice(0, 3));
 		const key = figure.querySelector<HTMLElement>(`.tablechart-categories span[data-slice="${slice.getAttribute("data-slice")}"]`);
+
 		// A slice with an edge has enough contrast at that edge, so the contrast check leaves it out.
 		slice.toggleAttribute("data-edge", !!colour);
 		key?.toggleAttribute("data-edge", !!colour);
+
 		if (!colour) {
 			key?.style.removeProperty("--_edge");
 			continue;

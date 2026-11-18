@@ -10,9 +10,10 @@ const METHODS = {
 		part: 3,
 		text: 4.5,
 		large: 3,
+
 		// Two decimals, so 2.98 does not read as 3.0.
-		show: (c: number) => `${(Math.floor(c * 100) / 100).toFixed(2)}:1`,
-		need: (c: number) => `${c}:1`,
+		show: (contrast: number) => `${(Math.floor(contrast * 100) / 100).toFixed(2)}:1`,
+		need: (contrast: number) => `${contrast}:1`,
 		partRule: "WCAG 1.4.11",
 		textRule: "WCAG 1.4.3",
 	},
@@ -20,8 +21,8 @@ const METHODS = {
 		part: 30,
 		text: 60,
 		large: 45,
-		show: (c: number) => `Lc ${Math.floor(c)}`,
-		need: (c: number) => `Lc ${c}`,
+		show: (contrast: number) => `Lc ${Math.floor(contrast)}`,
+		need: (contrast: number) => `Lc ${contrast}`,
 		partRule: "APCA, WCAG 3 draft",
 		textRule: "APCA, WCAG 3 draft",
 	},
@@ -35,37 +36,44 @@ export const checkContrast = (figure: HTMLElement): void => {
 	// The names of the value columns, from the header row; a chart with one value column needs none.
 	const names = Array.from(tableOf(figure)?.querySelectorAll("thead tr:first-child > *") ?? []).map((cell) => (cell.textContent ?? "").trim());
 	const rows = Array.from(tableOf(figure)?.querySelectorAll("tbody tr > :first-child") ?? []).map((cell) => (cell.textContent ?? "").trim());
+
 	const parts: [string, string, (element: Element) => string][] = [
 		[".tablechart-series", "Line", (element) => getComputedStyle(element).stroke],
 		[".tablechart-slice", "Slice", (element) => getComputedStyle(element).stroke],
 		[".tablechart-bar, .tablechart-piece", "Bar", (element) => getComputedStyle(element).fill],
 	];
+
 	// One message per kind, column and colour, with the rows that have that colour if not all of them do.
 	const found = new Map<string, { kind: string; column: string; rows: Set<string>; all: number; contrast: number }>();
+
 	for (const [selector, kind, paint] of parts) {
 		// A bar with an edge has enough contrast at that edge.
 		const elements = Array.from(figure.querySelectorAll(`:is(${selector}):not([data-muted], [data-edge])`));
+
 		for (const element of elements) {
 			const paintOf = paint(element);
-			const [r, g, b, a] = rgbOf(paintOf);
+			const [red, green, blue, alpha] = rgbOf(paintOf);
+
 			// A see-through colour is what it makes on the background.
-			const color = [r, g, b].map((value, k) => value * a + surface[k] * (1 - a));
+			const color = [red, green, blue].map((value, index) => value * alpha + surface[index] * (1 - alpha));
 			const contrast = contrastOf(methodOf(figure), color, surface);
 			if (contrast >= method.part) continue;
-			const s = element.getAttribute("data-series");
+			const seriesAttribute = element.getAttribute("data-series");
 			const row = rows[Number(element.getAttribute("data-row") ?? 0) - 1] ?? "";
-			const column = kind === "Slice" ? "" : s ? names[Number(s)] : "";
+			const column = kind === "Slice" ? "" : seriesAttribute ? names[Number(seriesAttribute)] : "";
 			const key = `${kind}|${column}|${paintOf}`;
 			const entry = found.get(key) ?? { kind, column, rows: new Set(), all: 0, contrast };
 			entry.rows.add(row);
-			entry.all = elements.filter((other) => other.getAttribute("data-series") === s).length;
+			entry.all = elements.filter((other) => other.getAttribute("data-series") === seriesAttribute).length;
 			found.set(key, entry);
 		}
 	}
+
 	for (const { kind, column, rows: hit, all, contrast } of found.values()) {
 		const named = Array.from(hit).filter(Boolean).map((row) => `"${row}"`);
 		const list = named.join(", ");
 		const several = named.length > 1;
+
 		// A line or a whole column has one colour; rows with a colour of their own are named.
 		const what =
 			kind === "Line"
@@ -75,6 +83,7 @@ export const checkContrast = (figure: HTMLElement): void => {
 					: hit.size >= all || !list
 						? `The bars${column ? ` of column "${column}"` : ""} have`
 						: `${several ? "Bars" : "Bar"} ${list}${column ? ` in column "${column}"` : ""} ${several ? "have" : "has"}`;
+
 		console.warn(
 			`[${LIBRARY_NAME}] ${what} a contrast of ${method.show(contrast)} with the background. It needs at least ${method.need(method.part)} (${method.partRule}).`,
 			figure
@@ -88,25 +97,30 @@ const TEXT_ON_SURFACE = ".tablechart-name, .tablechart-value:not([data-place='in
 /** Warns about text that does not stand out enough: a number inside a bar from that bar, other text from the background, once the chart is built. */
 export const checkTextContrast = (figure: HTMLElement): void => {
 	let tries = 0;
+
 	const run = () => {
 		const values = Array.from(figure.querySelectorAll<HTMLElement>(".tablechart-value:is([data-place='inside'], [data-place='middle'], [data-over])")).filter(
 			(value) => !value.hasAttribute("data-left-out") && !value.hidden
 		);
+
 		// Other text in a chart is on the background, such as the name next to a line.
 		const onSurface = Array.from(figure.querySelectorAll<HTMLElement>(TEXT_ON_SURFACE)).filter(
 			// A faint name of a line that is out of focus is left out, as its line is.
 			(text) => !text.hasAttribute("data-left-out") && !text.hidden && text.style.getPropertyValue("--m") !== "1" && (text.textContent ?? "").trim() && getComputedStyle(text).visibility !== "hidden"
 		);
+
 		// Text that is still fading in, such as on a slide that is not in view, is measured again a bit later.
 		if ([...values, ...onSurface].some((text) => rgbOf(getComputedStyle(text).color)[3] === 0 && tries < 20)) {
 			tries++;
 			setTimeout(later, 500);
 			return;
 		}
+
 		const rows = Array.from(tableOf(figure)?.querySelectorAll("tbody tr > :first-child") ?? []).map((cell) => (cell.textContent ?? "").trim());
 		const method = METHODS[methodOf(figure)];
 		const shape = figure.dataset.chart === "bar" ? "bar" : "column";
 		const found = new Map<string, { what: string; names: string[]; contrast: number; needed: number }>();
+
 		for (const value of values) {
 			const mark = markOf(figure, value);
 			if (!mark) continue;
@@ -122,12 +136,14 @@ export const checkTextContrast = (figure: HTMLElement): void => {
 			entry.names.push(`"${rows[Number(value.dataset.row) - 1] ?? ""}" ("${value.textContent?.trim()}")`);
 			found.set(key, entry);
 		}
+
 		const surface = surfaceOf(figure);
 		const faint = new Map<string, { names: string[]; contrast: number; needed: number }>();
+
 		for (const text of onSurface) {
 			const style = getComputedStyle(text);
-			const [r, g, b, a] = rgbOf(style.color);
-			const color = [r, g, b].map((value, k) => value * a + surface[k] * (1 - a));
+			const [red, green, blue, alpha] = rgbOf(style.color);
+			const color = [red, green, blue].map((value, index) => value * alpha + surface[index] * (1 - alpha));
 			const contrast = contrastOf(methodOf(figure), color, surface);
 			const size = Number.parseFloat(style.fontSize);
 			const needed = size >= 24 || (size >= 18.66 && Number(style.fontWeight) >= 700) ? method.large : method.text;
@@ -136,19 +152,23 @@ export const checkTextContrast = (figure: HTMLElement): void => {
 			entry.names.push(`"${text.textContent?.trim()}"`);
 			faint.set(style.color, entry);
 		}
+
 		for (const { names, contrast, needed } of faint.values())
 			console.warn(
 				`[${LIBRARY_NAME}] The text ${names.join(", ")} has a contrast of ${method.show(contrast)} with the background. Text needs at least ${method.need(needed)} (${method.textRule}).`,
 				figure
 			);
+
 		for (const { what, names, contrast, needed } of found.values()) {
 			const several = names.length > 1;
+
 			console.warn(
 				`[${LIBRARY_NAME}] The text inside the ${what}${several ? "s" : ""} of ${names.join(", ")} has a contrast of ${method.show(contrast)} with ${several ? "those" : "that"} ${what}${several ? "s" : ""}. Text needs at least ${method.need(needed)} (${method.textRule}).`,
 				figure
 			);
 		}
 	};
+
 	// The numbers get their colour as the chart builds, so this waits until it is shown and every transition has ended.
 	const later = () =>
 		requestAnimationFrame(() =>
@@ -157,28 +177,14 @@ export const checkTextContrast = (figure: HTMLElement): void => {
 				void Promise.all(running).then(run);
 			})
 		);
+
 	if (figure.classList.contains(SHOWN_CLASS)) return void later();
+
 	const watch = new MutationObserver(() => {
 		if (!figure.classList.contains(SHOWN_CLASS)) return;
 		watch.disconnect();
 		later();
 	});
+
 	watch.observe(figure, { attributes: true, attributeFilter: ["class"] });
-};
-
-// Old, kept until 1.3.0: one fixed colour for the numbers inside bars, without a contrast check.
-const OLD = ["bar", "piece", "up", "down", "total"].map((kind) => `--tablechart-${kind}-value-color`);
-const warned = new Set<string>();
-
-/** Warns once per page about each old variable that a chart still uses. */
-export const checkOldColours = (figure: HTMLElement): void => {
-	const style = getComputedStyle(figure);
-	for (const name of OLD) {
-		if (warned.has(name) || !style.getPropertyValue(name).trim()) continue;
-		warned.add(name);
-		console.warn(
-			`[${LIBRARY_NAME}] ${name} is old and goes in 1.3.0. --tablechart-value-on-dark and --tablechart-value-on-light set the colour of the numbers inside bars, with a contrast check.`,
-			figure
-		);
-	}
 };

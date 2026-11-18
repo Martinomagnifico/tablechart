@@ -36,16 +36,20 @@ export const SR_CLASS = "tablechart-sr";
 export const MINUS_CLASS = "tablechart-minus";
 export const SHOWN_CLASS = "is-shown";
 export const PRINTING_CLASS = "is-printing";
+
 // For a moment, while a chart is shown or hidden at once: no transitions, so it lands at its end.
 export const AT_ONCE_CLASS = "is-at-once";
+
 // Once a shown chart has finished building: a later change of colour, such as to dark mode, no longer waits for the build.
 export const BUILT_CLASS = "is-built";
+
 // A chart in a sequence that has not had its turn: the whole figure waits hidden.
 export const QUEUED_CLASS = "tablechart-queued";
 export const CONTROLS_CLASS = "tablechart-controls";
 export const AXIS_CLASS = "tablechart-axis";
 export const CROP_CLASS = "tablechart-crop";
 export const CROPTEXT = "Showing the last {shown} of {rows} rows. The table still contains all rows.";
+
 /** Between an axis and its numbers, in pixels. */
 export const AXIS_GAP = 6;
 export const TICK_CLASS = "tablechart-tick";
@@ -67,73 +71,106 @@ export interface LineStyle {
 export interface Config {
 	/** Which elements Tablechart turns into charts. */
 	selector: string;
+
 	/** Height of the plot as a share of its width. */
 	aspect: number;
+
 	/** Share of a band that a bar fills. */
 	barfill: number;
+
 	/** Share of a donut's radius that the ring itself takes. */
 	ringfill: number;
+
 	/** Locale for numbers. Unset, the document's language is used and followed when it changes. */
 	locale?: string;
+
 	/** Animate a chart when it builds. `"grow"` grows each element from zero, `"sweep"` reveals the chart in one movement; a figure overrides it with `data-chart-animate`, also with `"false"`. */
 	animate: boolean | Motion;
+
 	/** How far an animated parent is in before its chart builds: 0 when it starts moving, 1 when it is in. A figure overrides it with `data-chart-entrance`. */
 	entrance: number;
+
 	/** Where a column's number goes: on the bar, or inside it. A figure overrides it with `data-chart-labels`. */
 	labels: "outside" | "inside";
+
 	/**
 	 * Which values a line or area chart shows: `"auto"`, all if they fit and else the first, last, highest and lowest; `"all"`;
 	 * `"none"`; or a set, such as `"first last"`. `"auto last"` shows all if they fit, and else the last. A figure overrides it with `data-chart-values`.
 	 */
 	values: string;
+
 	/** A tick above each name under a line or area chart, at the place of its row. A figure overrides it with `data-chart-ticks`. */
 	ticks: boolean;
+
 	/** How a line or area runs between points: `straight`, `step` or `smooth`. A figure overrides it with `data-chart-shape`. */
 	shape: "straight" | "step" | "smooth";
+
 	/** Names of several lines in a legend instead of at the end of each line; `"toggle"` also lets a click turn a series off and on. A figure overrides it with `data-chart-legend`. */
 	legend: boolean | "toggle";
+
 	/** Numbers along the value axis of a column, bar, line, area or waterfall chart; `"right"` puts them on the right of an upright chart. A figure overrides it with `data-chart-axis`. */
 	axis: boolean | "right";
+
 	/** Gridlines across the plot at each number of the axis. A figure overrides it with `data-chart-grid`. */
 	grid: boolean;
+
 	/** The name of each marker beside it, on a scatter chart. A figure overrides it with `data-chart-names`. */
 	names: boolean;
+
 	/** A tooltip with the values of a row that is pointed at or tapped: `"auto"`, the default, only on a chart that does not show all its numbers; `true` always; `false` never. `"crosshair"`, on a line or area chart, shows a line through the row with its values at the side. A figure overrides it with `data-chart-tooltip`. */
 	tooltip: boolean | "auto" | "crosshair";
+
 	/** Where the tooltip goes in the page: an element or a selector, `body` by default. In a scaled element, such as the slides of a presentation, the tooltip has their scale. */
 	tooltipparent: HTMLElement | string | null;
+
 	/** The table under the chart: `"always"`, only in `"print"`, in print when numbers are left out (`"auto"`), or `"never"`. A figure overrides it with `data-chart-table`. */
 	table: "never" | "auto" | "print" | "always";
+
 	/** With `auto`, the table is printed only up to this many values, rows times value columns; a longer one prints the summary instead. */
 	tablelimit: number;
+
 	/** The look of each next line, instead of the 24 default looks; after the last one it starts again. `data-chart-lines` on a figure or a parent, and `data-marker` and `data-line` on a column header, still win. */
 	lines: LineStyle[] | null;
+
 	/** The summary of a chart, in a `.chart-summary`: `"always"`, only in `"print"`, in print when the table is not (`"auto"`), or `"never"`, for screen readers only. A figure overrides it with `data-chart-summary`. */
 	summary: "never" | "auto" | "print" | "always";
+
 	/** The name of the total that a donut without a total row works out, for screen readers. */
 	totallabel: string;
+
 	/** The line under a chart whose first rows are cropped, with `{shown}` and `{rows}`: one text, or a text per chart type and `default` for the others. */
 	croptext: string | Record<string, string>;
+
 	/** Previous and Next buttons under a chart that steps (`data-fragment`). `false` leaves them out, for buttons of your own. */
 	controls: boolean;
+
 	/** The text of the Previous button. */
 	previouslabel: string;
+
 	/** The text of the Next button. */
 	nextlabel: string;
+
 	/** Read by screen readers after the text of each button, so they know it only changes the chart. */
 	stephint: string;
+
 	/** How much of a chart must be in view before it builds, from 0 to 1. */
 	threshold: number;
+
 	/** Build again each time a chart scrolls back into view, not only the first time. */
 	replay: boolean;
+
 	/** The attribute for translation keys, for a translation script. `false` turns keys off. */
 	langattribute: string | false;
+
 	/** Functions that turn a response in a structure of its own into one that Tablechart reads, by name. A figure picks one with `data-chart-transform`. */
 	transforms: Record<string, (data: unknown) => unknown>;
+
 	/** The name of the transform for every figure with `data-chart-src` and no `data-chart-transform`. */
 	transform: string | null;
+
 	/** The message in a figure whose data could not load. */
 	loaderror: string;
+
 	/** Show messages in the console for whoever is working on the page. */
 	debug?: boolean;
 }

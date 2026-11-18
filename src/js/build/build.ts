@@ -34,12 +34,16 @@ import { makeRightAxis } from "./right-axis";
 
 /** Three passes: keys, then every text element, then geometry. Geometry makes no text, so a translation script that sweeps once finds it all. */
 
+// ---------------------------------------------------------------------------------------------------------------------------------
+
 const textBefore = (node: Node): string => {
 	let text = "";
+
 	for (let sibling = node.previousSibling; sibling; sibling = sibling.previousSibling) {
 		text = (sibling.textContent ?? "") + text;
 		if (text.trim()) break;
 	}
+
 	return text.trim();
 };
 
@@ -78,10 +82,12 @@ const addTotalRow = (figure: HTMLElement, centre: HTMLElement, config: Config): 
 	const table = tableOf(figure);
 	if (!table) return null;
 	const made = table.querySelector<HTMLElement>("tfoot [data-chart-total]");
+
 	if (made) {
 		made.dataset.value = centre.dataset.value ?? "0";
 		return made;
 	}
+
 	const row = (table.tFoot ?? table.createTFoot()).insertRow();
 	const name = document.createElement("th");
 	name.scope = "row";
@@ -102,11 +108,14 @@ const nameTable = (figure: HTMLElement): void => {
 	const caption = figure.querySelector<HTMLElement>(":scope > figcaption");
 	if (!caption) return;
 	pauseLines(caption);
+
 	const named = (element: Element) => element.hasAttribute("aria-label") || element.hasAttribute("aria-labelledby");
+
 	const link = (element: Element) => {
 		if (!caption.id) caption.id = `tablechart-caption-${++captions}`;
 		element.setAttribute("aria-labelledby", caption.id);
 	};
+
 	// Not every browser names a figure after its figcaption; a div may not have a name.
 	if (figure.tagName === "FIGURE" && !named(figure)) link(figure);
 	const table = tableOf(figure);
@@ -120,6 +129,7 @@ const LINE_ROUNDS = [null, "dashed", "dotted", "dash-dot"] as const;
 const lineStyles = (figure: HTMLElement, series: Series[], kind: string, config: Config): void => {
 	const asked = figure.closest("[data-chart-lines]")?.getAttribute("data-chart-lines");
 	let order = config.lines;
+
 	if (asked) {
 		try {
 			order = JSON.parse(asked);
@@ -127,13 +137,16 @@ const lineStyles = (figure: HTMLElement, series: Series[], kind: string, config:
 			console.warn(`[${LIBRARY_NAME}] data-chart-lines needs a JSON list, such as [{"marker":"none"}].`, figure);
 		}
 	}
+
 	const lines = kind === "line" || kind === "area" ? series : series.filter((one) => one.chart);
-	lines.forEach((one, k) => {
+
+	lines.forEach((one, index) => {
 		if (!order?.length) {
-			one.line ??= LINE_ROUNDS[Math.floor(k / 6) % LINE_ROUNDS.length];
+			one.line ??= LINE_ROUNDS[Math.floor(index / 6) % LINE_ROUNDS.length];
 			return;
 		}
-		const style = order[k % order.length];
+
+		const style = order[index % order.length];
 		one.marker ??= style.marker || style.open !== undefined ? [style.marker, style.open ? "open" : "filled"].filter(Boolean).join(" ") : null;
 		if (one.line === null && style.line !== "solid") one.line = style.line ?? null;
 	});
@@ -146,6 +159,8 @@ const legendOf = (figure: HTMLElement, config: Config): boolean | "toggle" => {
 	return asked === "toggle" ? "toggle" : asked !== "false";
 };
 
+// ---------------------------------------------------------------------------------------------------------------------------------
+
 /** Pass 2: everything a reader will read, before a translation script looks. */
 export const build = (
 	figure: HTMLElement,
@@ -156,15 +171,18 @@ export const build = (
 	// `asKind` builds the chart as another kind, such as a column chart as a bar chart on a narrow screen.
 	const kind = asKind ?? (figure.getAttribute("data-chart") || "column");
 	const type = CHARTS[kind];
+
 	if (!type) {
 		console.warn(
 			`[${LIBRARY_NAME}] Unknown chart type "${kind}". Known types: ${Object.keys(CHARTS).join(", ")}.`
 		);
+
 		figure.setAttribute("data-chart-empty", "");
 		return null;
 	}
 
 	const rows = readTable(figure, config.langattribute);
+
 	if (!rows.length) {
 		console.warn(
 			tableOf(figure)
@@ -172,6 +190,7 @@ export const build = (
 				: `[${LIBRARY_NAME}] A chart has no table, so there is nothing to draw.`,
 			figure
 		);
+
 		figure.setAttribute("data-chart-empty", "");
 		return null;
 	}
@@ -179,12 +198,15 @@ export const build = (
 	nameTable(figure);
 
 	let series = readSeries(figure, rows, config.langattribute);
+
 	if (series.length > 1 && !type.series && !type.columns) {
 		console.warn(
 			`[${LIBRARY_NAME}] A ${kind} chart uses only the first of its ${series.length} value columns.`
 		);
+
 		series = series.slice(0, 1);
 	}
+
 	// A line over the columns: `data-chart="line"` on a header, in a chart that takes it, and not on every header.
 	if (series.some((one) => one.chart)) {
 		const problem = !type.lines
@@ -192,11 +214,13 @@ export const build = (
 			: series.every((one) => one.chart)
 				? `Every series has data-chart="line", so the chart is a line chart: set data-chart="line" on the figure.`
 				: null;
+
 		if (problem) {
 			console.warn(`[${LIBRARY_NAME}] ${problem}`);
 			series = series.map((one) => ({ ...one, chart: null }));
 		}
 	}
+
 	// A second value axis: `data-axis="right"` on some headers, in a chart that takes it.
 	if (series.some((one) => one.axis === "right")) {
 		const problem = !type.twoAxes
@@ -204,15 +228,19 @@ export const build = (
 			: series.every((one) => one.axis === "right")
 				? `Every series has data-axis="right": set data-chart-axis="right" on the figure to put the value axis on the right.`
 				: null;
+
 		if (problem) {
 			console.warn(`[${LIBRARY_NAME}] ${problem}`);
 			series = series.map((one) => ({ ...one, axis: "left" }));
 		}
 	}
+
 	const twoAxes = series.some((one) => one.axis === "right");
 	lineStyles(figure, series, kind, config);
+
 	// A series turned off in the legend keeps its place, colour and marker; its cells count as missing, so the scale fits the rest.
 	const toggles = series.length > 1 && !type.columns && !type.centre && legendOf(figure, config) === "toggle";
+
 	if (toggles && off.size && off.size < series.length) {
 		series = series.map((one, index) => (off.has(index) ? { ...one, off: true } : one));
 		const firstOn = series.findIndex((one) => !one.off);
@@ -221,6 +249,7 @@ export const build = (
 			for (const index of off) {
 				if (row.cells[index]) row.cells[index] = { ...row.cells[index], missing: true, value: 0 };
 			}
+
 			// A row on its own is its first series, which must be one that is on.
 			Object.assign(row, row.cells[firstOn] ?? row.cells[0]);
 		}
@@ -228,15 +257,19 @@ export const build = (
 
 	// With every series of one axis turned off, the chart has one value axis, on the side of the series that are on.
 	const onSide = (side: "left" | "right") => series.some((one) => !one.off && one.axis === side);
+
 	const bothSides = twoAxes && onSide("left") && onSide("right");
 	const lined = series.some((one) => one.chart);
 	const several = series.length > 1;
+
 	// How many lines or bars share the colour steps, so the last is not too light.
 	if (several) figure.style.setProperty("--_series-count", String(series.length));
 
 	const stackAsked = figure.hasAttribute("data-chart-stack");
+
 	if (stackAsked && !type.stackable)
 		console.warn(`[${LIBRARY_NAME}] A ${kind} chart cannot be stacked.`);
+
 	if (stackAsked && lined) console.warn(`[${LIBRARY_NAME}] A chart with a line cannot be stacked.`);
 	if (stackAsked && twoAxes) console.warn(`[${LIBRARY_NAME}] A chart with two value axes cannot be stacked.`);
 	const stacked = stackAsked && !!type.stackable && several && !lined && !twoAxes;
@@ -247,53 +280,64 @@ export const build = (
 	plot.setAttribute("aria-hidden", "true");
 	const svg = svgEl("svg", { role: "presentation", focusable: "false" });
 	plot.appendChild(svg);
+
 	// The chart goes where the table is, so the author decides what is above and under it, such as a summary.
 	const spot = figure.querySelector(":scope > table");
+
 	const put = (node: HTMLElement) => (spot ? spot.before(node) : figure.append(node));
+
 	put(plot);
 
 	// The marks take their decimal places from the marks alone; the middle keeps the total's own.
-	const marked = type.centre ? rows.filter((r) => !r.isTotal) : rows;
+	const marked = type.centre ? rows.filter((row) => !row.isTotal) : rows;
+
 	const decimals = Math.max(
 		0,
-		largest(marked.flatMap((r) => r.cells.slice(0, series.length).map((c) => decimalsIn(c.number))))
+		largest(marked.flatMap((row) => row.cells.slice(0, series.length).map((cell) => decimalsIn(cell.number))))
 	);
 
-	const columnDecimals = series.map((_one, s) => Math.max(0, largest(rows.map((r) => decimalsIn(r.cells[s]?.number ?? "")))));
+	const decimalsOf = (seriesIndex: number) => largest(rows.map((row) => decimalsIn(row.cells[seriesIndex]?.number ?? "")));
+
+	const columnDecimals = series.map((_one, seriesIndex) => Math.max(0, decimalsOf(seriesIndex)));
+
 	// All numbers in one element, so a chart without steps can fade them in at once.
 	const numbers = document.createElement("div");
 	numbers.className = VALUES_CLASS;
 	plot.appendChild(numbers);
-	const seriesValues = series.map((_one, s) =>
-		rows.map((row, i) => {
-			const cell = row.cells[s] ?? row.cells[0];
+
+	const seriesValues = series.map((_one, seriesIndex) =>
+		rows.map((row, rowIndex) => {
+			const cell = row.cells[seriesIndex] ?? row.cells[0];
 			const node = htmlEl(VALUE_CLASS, numbers);
 			node.classList.add(...row.classes);
 			node.dataset.value = String(cell.value);
 			if (cell.prefix) node.dataset.prefix = cell.prefix;
 			if (cell.suffix) node.dataset.suffix = cell.suffix;
 			if (cell.missing) node.dataset.missing = cell.raw;
-			if (series[s].off) node.dataset.off = "";
-			if (several) node.dataset.series = String(s + 1);
+			if (series[seriesIndex].off) node.dataset.off = "";
+			if (several) node.dataset.series = String(seriesIndex + 1);
+
 			// A number of a line over columns keeps its size when the columns are grouped.
-			if (lined && series[s].chart) node.dataset.lined = "";
+			if (lined && series[seriesIndex].chart) node.dataset.lined = "";
+
 			// The fields of a mark, such as x and y, each keep the decimal places of their own column; as do series on two axes.
-			if (type.columns || twoAxes) node.dataset.decimals = String(columnDecimals[s]);
-			node.dataset.row = String(i + 1);
+			if (type.columns || twoAxes) node.dataset.decimals = String(columnDecimals[seriesIndex]);
+			node.dataset.row = String(rowIndex + 1);
 			node.style.setProperty("--i", String(row.slot));
-			if (type.numbers === false && (s || i)) node.dataset.place = "none";
+			if (type.numbers === false && (seriesIndex || rowIndex)) node.dataset.place = "none";
 			return node;
 		})
 	);
+
 	const values = seriesValues[0];
 
 	const totals =
 		stacked && type.totals
-			? rows.map((row, i) => {
+			? rows.map((row, rowIndex) => {
 					const node = htmlEl(VALUE_CLASS, numbers);
 					node.classList.add(...row.classes);
 					node.dataset.kind = "total";
-					node.dataset.row = String(i + 1);
+					node.dataset.row = String(rowIndex + 1);
 					node.dataset.value = String(stackTotal(row, series.length));
 					const first = row.cells[0];
 					if (first.prefix) node.dataset.prefix = first.prefix;
@@ -306,37 +350,45 @@ export const build = (
 	const last = rows[rows.length - 1];
 	const focused = series.some((one) => one.focus);
 	const legendAsked = figure.getAttribute("data-chart-legend");
+
 	// With two value axes, the names go in a legend: at the ends of the lines they would take room from both axes.
 	const legend =
 		several && !type.columns && (legendAsked === null ? !!config.legend || type.legend !== undefined || twoAxes : legendAsked !== "false")
 			? document.createElement("div")
 			: null;
+
 	if (legend) {
 		legend.className = LEGEND_CLASS;
+
 		// With toggles, the names are buttons; without, screen readers read the names in the table.
 		if (!toggles) {
 			legend.setAttribute("aria-hidden", "true");
 			legend.inert = true;
 		}
 	}
+
 	const lineSeries = series.filter((one) => one.chart);
+
 	const names = several && !type.columns
-		? series.map((one, s) => {
+		? series.map((one, seriesIndex) => {
 				const node = htmlEl(NAME_CLASS, legend ?? plot);
 				if (legend) node.dataset.place = "legend";
 				const swatch = one.chart ? undefined : (type.legend ?? type.swatch);
 				if (swatch) node.dataset.swatch = swatch;
 				node.textContent = one.name;
+
 				// A step line has no points, so its legend sample has none.
 				if (!swatch && shapeOf(figure, config) !== "step") {
 					// Over columns, a line takes its marker as the first of the lines, as it does on the chart.
-					const marker = one.chart ? markerOf(lineSeries, lineSeries.indexOf(one)) : markerOf(series, s);
+					const marker = one.chart ? markerOf(lineSeries, lineSeries.indexOf(one)) : markerOf(series, seriesIndex);
 					node.dataset.marker = marker.shape;
 					node.toggleAttribute("data-open", marker.open);
 				}
+
 				if (one.line && !swatch) node.dataset.line = one.line;
 				if (one.key && config.langattribute) node.setAttribute(config.langattribute, one.key);
-				node.dataset.series = String(s + 1);
+				node.dataset.series = String(seriesIndex + 1);
+
 				if (toggles) {
 					node.inert = false;
 					node.setAttribute("role", "button");
@@ -344,8 +396,9 @@ export const build = (
 					node.setAttribute("aria-pressed", String(!one.off));
 					node.toggleAttribute("data-off", !!one.off);
 				}
-				node.style.setProperty("--n", String(s));
-				node.style.setProperty("--palette", `var(--tablechart-color-${s + 1})`);
+
+				node.style.setProperty("--n", String(seriesIndex));
+				node.style.setProperty("--palette", `var(--tablechart-color-${seriesIndex + 1})`);
 				node.style.setProperty("--m", focused && !one.focus ? "1" : "0");
 				node.style.setProperty("--i", String(last.slot));
 				return node;
@@ -354,11 +407,14 @@ export const build = (
 
 	// Made with the rest of the text, so a translation script finds it; `relabel` fills it.
 	const centre = type.centre ? htmlEl(CENTRE_CLASS, plot) : null;
+
 	if (centre) {
 		const stated = rows.find((row) => row.isTotal);
+
 		const whole = stated
 			? stated.value
 			: rows.reduce((sum, row) => sum + Math.abs(row.value), 0);
+
 		centre.dataset.value = String(whole);
 		if (stated) centre.dataset.decimals = String(decimalsIn(stated.number));
 	}
@@ -370,21 +426,28 @@ export const build = (
 	const beside = type.categories === "beside";
 	const categories = document.createElement("div");
 	categories.className = CATEGORIES_CLASS;
+
 	// `inert` as well as `aria-hidden`: Safari with VoiceOver reads the names otherwise.
 	categories.setAttribute("aria-hidden", "true");
 	categories.inert = true;
+
 	if (beside) categories.dataset.place = "beside";
 	else if (type.centre) categories.dataset.place = "key";
+
 	categories.style.setProperty("--_columns", String(rows.length));
 	let slice = 0;
-	for (const [i, row] of rows.entries()) {
+
+	for (const [index, row] of rows.entries()) {
 		const span = document.createElement("span");
 		span.classList.add(...row.classes);
+
 		// The short name, if the row has one; its key then ends in `-short`, so a translation script gives it a short name too.
 		span.textContent = row.short ?? row.label;
 		if (row.key && config.langattribute) span.setAttribute(config.langattribute, row.short ? `${row.key}-short` : row.key);
+
 		if (type.centre) {
 			span.dataset.kind = row.isTotal ? "total" : "slice";
+
 			if (!row.isTotal) {
 				span.dataset.slice = String(slice + 1);
 				span.style.setProperty("--n", String(slice));
@@ -392,27 +455,33 @@ export const build = (
 				slice += 1;
 			}
 		}
+
 		span.style.setProperty("--i", String(row.slot));
-		span.dataset.row = String(i + 1);
+		span.dataset.row = String(index + 1);
 		categories.appendChild(span);
 	}
+
 	// How many slices share the colour steps, for a range from one colour to another.
 	if (type.centre) figure.style.setProperty("--_slice-count", String(slice));
+
 	if (beside) plot.appendChild(categories);
 	else put(categories);
+
 	if (legend) put(legend);
 	if (type.minBand) put(cropNote(figure, config));
 
 	// The headers of the first two value columns are the titles of the axes; layout makes the numbers along them.
 	const fields = series.filter((one) => !one.group);
+
 	// Off by default on the other types: `data-chart-axis` adds the numbers along the value axis, `data-chart-grid` the gridlines.
 	// With two value axes, both have their numbers: without them, the scales cannot be told apart.
 	const valueAxis = twoAxes || (!type.axes && !type.centre && turnedOn(figure, "data-chart-axis", config.axis || !!type.valueAxis));
+
 	const axes = type.axes
 		? {
-				titles: fields.slice(0, 2).map((one, s) => {
+				titles: fields.slice(0, 2).map((one, index) => {
 					const title = htmlEl(`${AXIS_CLASS}-title`, plot);
-					title.dataset.axis = s ? "y" : "x";
+					title.dataset.axis = index ? "y" : "x";
 					title.textContent = one.name;
 					if (one.key && config.langattribute) title.setAttribute(config.langattribute, one.key);
 					return title;
@@ -429,16 +498,20 @@ export const build = (
 					right: twoAxes ? !bothSides && onSide("right") : type.categories !== "beside" && axisRight(figure, config),
 				}
 			: null;
+
 	const rightAxis = bothSides ? makeRightAxis(plot, series, config) : null;
 	type.text?.({ figure, plot, rows, series, config });
 
 	// A chart that steps (`data-fragment`) builds a step at a time, from left to right. Without animation it is shown whole.
 	// A scatter chart has one step: the whole chart arrives together, after its axes and a quadrant, with `data-fragment` on the figure.
 	const plan = animated(figure, config) ? planSteps(figure, Boolean(type.axes)) : null;
+
 	if (type.axes && tableOf(figure)?.querySelector("tbody [data-fragment], thead [data-fragment]"))
 		debug.log(`A ${kind} chart has one step, with data-fragment on the figure; its rows and columns have no steps of their own.`, figure);
+
 	if (plan) figure.setAttribute("data-steps", "");
 	const keys = figure.getAttribute("data-chart-keys");
+
 	const controls =
 		plan && config.controls
 			? makeControls(
@@ -447,24 +520,30 @@ export const build = (
 					config.langattribute
 				)
 			: null;
+
 	if (controls) put(controls);
 
 	const annotations = Array.from(figure.querySelectorAll<HTMLElement>("[data-annotation]"))
 		.map((spec) => {
 			const name = spec.getAttribute("data-annotation") as string;
 			const annotationType = ANNOTATIONS[name];
+
 			if (!annotationType) {
 				console.warn(
 					`[${LIBRARY_NAME}] Unknown annotation "${name}". Known annotations: ${Object.keys(ANNOTATIONS).join(", ")}.`
 				);
+
 				return null;
 			}
+
 			const asked = Number.parseInt(spec.getAttribute("data-series") ?? "1", 10);
 			const index = asked >= 1 && asked <= series.length ? asked - 1 : 0;
+
 			if (asked !== index + 1)
 				console.warn(
 					`[${LIBRARY_NAME}] An annotation reads line ${asked}, which is not there; it reads line 1.`
 				);
+
 			return {
 				spec,
 				type: annotationType,
@@ -473,15 +552,16 @@ export const build = (
 				after: rows.length,
 			};
 		})
-		.filter((a): a is NonNullable<typeof a> => a !== null);
+		.filter((annotation): annotation is NonNullable<typeof annotation> => annotation !== null);
+
 	// A row with a cell in a column with `data-note` gets a note on a chart with its rows across. The note is in the table,
 	// with its row, so it is not written again for screen readers.
 	if (!beside && !type.centre && !type.axes)
-		for (const [i, row] of rows.entries()) {
+		for (const [index, row] of rows.entries()) {
 			if (!row.note) continue;
 			const spec = document.createElement("span");
 			spec.dataset.annotation = "note";
-			spec.dataset.row = String(i + 1);
+			spec.dataset.row = String(index + 1);
 			spec.textContent = row.note;
 			if (row.noteKey) spec.setAttribute("data-i18n", row.noteKey);
 			annotations.push({ spec, type: note, badge: note.create(spec, plot), series: 0, after: rows.length });
@@ -518,23 +598,31 @@ export const build = (
 		step: 0,
 		controls,
 	};
+
 	// Once every mark has moved into place, the masks that waited are put on.
 	const settle = () => settleMasks(figure, svg);
+
 	svg.addEventListener("transitionend", settle);
 	svg.addEventListener("transitioncancel", settle);
+
 	controls?.addEventListener("click", (event) => {
 		const go = (event.target as Element).closest("button")?.dataset.go;
 		if (go) stepTo(state, state.step + (go === "next" ? 1 : -1));
 	});
+
 	stepTo(state, 0, true);
 	const own = figure.getAttribute("data-chart-tooltip");
 	const tooltip = own === "false" ? false : own === "auto" || own === "crosshair" ? own : own !== null ? true : config.tooltip;
+
 	// A crosshair is for a line, an area or a type that has one; another chart gets the tooltip.
 	if (tooltip === "crosshair" && (kind === "line" || kind === "area" || type.crosshair)) attachCrosshair(state);
 	else if (tooltip) attachTooltip(state, config, tooltip === "auto");
+
 	relabel(state, config);
 	return state;
 };
+
+// ---------------------------------------------------------------------------------------------------------------------------------
 
 const MOTIONS: Record<string, Motion> = { grow: "grow", sweep: "sweep" };
 
@@ -550,9 +638,12 @@ const motionOf = (figure: HTMLElement, kind: string, config: Config, steps: bool
 	return ["donut", "pie", "waterfall"].includes(kind) ? (asked ?? "grow") : "grow";
 };
 
+// ---------------------------------------------------------------------------------------------------------------------------------
+
 /** Numbers are reformatted in place, so a language change costs no redraw. */
 export const relabel = (state: ChartState, config: Config): void => {
 	const values = [...state.seriesValues.flat(), ...state.totals, ...(state.totalCell ? [state.totalCell] : [])];
+
 	for (const node of state.centre ? [...values, state.centre] : values) {
 		if (node.dataset.missing !== undefined) node.textContent = node.dataset.missing;
 		else writeNumber(node, node.dataset.decimals ? Number(node.dataset.decimals) : state.decimals, config.locale);

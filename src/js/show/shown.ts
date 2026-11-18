@@ -13,9 +13,11 @@ export const setShown = (state: ChartState, shown: boolean, atOnce = false): voi
 	// The marks move back without masks too, and wait for them again on the next build.
 	if (!shown && !state.figure.hasAttribute("data-steps")) takeMasksOff(state.svg);
 	state.figure.classList.remove(BUILT_CLASS);
+
 	if (atOnce) {
 		state.figure.classList.add(AT_ONCE_CLASS);
 		state.figure.classList.toggle(SHOWN_CLASS, shown);
+
 		// Read now, so the end is what the next frame starts from, and taking the class off starts nothing.
 		void state.figure.offsetWidth;
 		if (shown) putMasksOn(state.svg);
@@ -23,7 +25,9 @@ export const setShown = (state: ChartState, shown: boolean, atOnce = false): voi
 		requestAnimationFrame(() => state.figure.classList.remove(AT_ONCE_CLASS));
 		return;
 	}
+
 	state.figure.classList.toggle(SHOWN_CLASS, shown);
+
 	// A build without transitions, such as one shown before its first frame, gets its masks too.
 	if (shown)
 		requestAnimationFrame(() =>
@@ -37,6 +41,7 @@ export const setShown = (state: ChartState, shown: boolean, atOnce = false): voi
 /** Marks a shown chart as built once every transition of its build has ended, or was cut short. */
 const whenBuilt = (figure: HTMLElement): void => {
 	const running = figure.getAnimations({ subtree: true }).map((animation) => animation.finished.catch(() => undefined));
+
 	void Promise.all(running).then(() => {
 		if (figure.classList.contains(SHOWN_CLASS)) figure.classList.add(BUILT_CLASS);
 	});

@@ -29,5 +29,6 @@ export const checkRows = (rows: SourceRow[], series: string[], authored: HTMLTab
 		const wrong = values.findIndex((value) => !isValue(value));
 		if (wrong >= 0) return `value ${wrong + 1} of ${place} ("${row.label}") is not a number, a text or null`;
 	}
+
 	return null;
 };

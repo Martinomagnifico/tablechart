@@ -6,13 +6,15 @@ import type { RightAxis, Series } from "../types";
 const titleOf = (plot: HTMLElement, side: "left" | "right", series: Series[], config: Config): HTMLElement => {
 	const title = htmlEl(`${AXIS_CLASS}-title`, plot);
 	title.dataset.axis = side;
-	for (const [k, one] of series.entries()) {
-		if (k) title.append(", ");
+
+	for (const [index, one] of series.entries()) {
+		if (index) title.append(", ");
 		const name = document.createElement("span");
 		name.textContent = one.name;
 		if (one.key && config.langattribute) name.setAttribute(config.langattribute, one.key);
 		title.append(name);
 	}
+
 	return title;
 };
 
@@ -23,7 +25,7 @@ export const makeRightAxis = (plot: HTMLElement, series: Series[], config: Confi
 		titleOf(plot, "left", series.filter((one) => one.axis !== "right"), config),
 		titleOf(plot, "right", series.filter((one) => one.axis === "right"), config),
 	],
-	series: series.flatMap((one, s) => (one.axis === "right" ? [s] : [])),
+	series: series.flatMap((one, seriesIndex) => (one.axis === "right" ? [seriesIndex] : [])),
 	scale: null,
 	aligned: false,
 });

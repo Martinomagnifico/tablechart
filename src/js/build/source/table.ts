@@ -7,6 +7,7 @@ const headFrom = (table: HTMLTableElement, series: string[], label: string): voi
 	const corner = document.createElement("th");
 	corner.textContent = label;
 	head.append(corner);
+
 	for (const name of series) {
 		const th = document.createElement("th");
 		th.textContent = name;
@@ -34,6 +35,7 @@ export const tableFrom = (rows: SourceRow[], series: string[], label: string, ta
 
 	const body = document.createElement("tbody");
 	table.append(body);
+
 	for (const row of rows) {
 		const tr = body.insertRow();
 		if (row.kind === "total") tr.dataset.kind = "total";

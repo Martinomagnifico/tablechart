@@ -7,6 +7,7 @@ export const debug = {
 	log(...args: unknown[]): void {
 		if (debug.enabled) console.log(`[${LIBRARY_NAME}]`, ...args);
 	},
+
 	/** Runs `work`, and with `debug: true` says how long it took, with a warning above 50 ms. */
 	timed<T>(what: string, figure: HTMLElement, work: () => T): T {
 		if (!debug.enabled) return work();
@@ -14,8 +15,10 @@ export const debug = {
 		const result = work();
 		const ms = performance.now() - start;
 		const rows = tableOf(figure)?.querySelectorAll("tbody tr").length ?? 0;
+
 		if (ms > 50) console.warn(`[${LIBRARY_NAME}] ${what} took ${ms.toFixed(1)} ms for ${rows} rows, more than 50 ms.`, figure);
 		else debug.log(`${what} took ${ms.toFixed(1)} ms for ${rows} rows.`, figure);
+
 		return result;
 	},
 };

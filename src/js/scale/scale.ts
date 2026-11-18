@@ -28,9 +28,9 @@ export const reachOf = (
 	values: number[],
 	stacks: { top: number; bottom: number }[] | null
 ): { extent: number; depth: number; steps: boolean } => {
-	const steps = segments.some((s) => s.kind === "up" || s.kind === "down");
-	const tops = stacks ? stacks.map((stack) => stack.top) : [...segments.flatMap((s) => [s.from, s.to, s.value]), ...values];
-	const lows = steps ? segments.flatMap((s) => [s.from, s.to]) : stacks ? stacks.map((stack) => stack.bottom) : values;
+	const steps = segments.some((segment) => segment.kind === "up" || segment.kind === "down");
+	const tops = stacks ? stacks.map((stack) => stack.top) : [...segments.flatMap((segment) => [segment.from, segment.to, segment.value]), ...values];
+	const lows = steps ? segments.flatMap((segment) => [segment.from, segment.to]) : stacks ? stacks.map((stack) => stack.bottom) : values;
 	return { extent: Math.max(largest(tops), 0), depth: Math.min(-largest(lows.map((value) => -value)), 0), steps };
 };
 
@@ -50,17 +50,25 @@ export const squeezeOf = (ask: {
 	if (from === null && to === null) return { squeeze: null, problems };
 	const lo = from ?? 0;
 	const hi = to ?? ceiling;
+
 	// The zigzag goes where the compressed part meets the part at full scale.
 	const gap = to === null ? lo : from === null ? hi : (lo + hi) / 2;
 	const percent = size?.match(/^\s*(\d+(?:\.\d+)?)\s*%\s*$/);
 	if (size !== null && !percent) problems.push(`data-size="${size}" is not a percentage, such as 30%. Using the default.`);
 	const share = Math.min(Math.max(percent ? Number(percent[1]) / 100 : to === null ? 0.22 : 0.3, 0.05), 0.8);
+
 	// Compressing any part of a floating step would make its height lie.
-	const floats = segments.some((s) => (s.kind === "up" || s.kind === "down") && Math.max(s.from, s.to) > lo && Math.min(s.from, s.to) < hi);
+	const isStep = (segment: Segment) => segment.kind === "up" || segment.kind === "down";
+
+	const crossesBreak = (segment: Segment) => Math.max(segment.from, segment.to) > lo && Math.min(segment.from, segment.to) < hi;
+
+	const floats = segments.some((segment) => isStep(segment) && crossesBreak(segment));
+
 	if (!breakable) problems.push("This kind of chart cannot break its scale.");
 	else if (depth < 0) problems.push("A chart with values below zero cannot break its scale.");
 	else if (lo < 0 || hi <= lo || hi > ceiling || (lo === 0 && hi === ceiling)) problems.push(`A break from ${lo} to ${hi} does not fit a scale that runs from 0 to ${extent}.`);
 	else if (floats) problems.push(`A break from ${lo} to ${hi} would cut a step that floats. Keep it below or above the steps.`);
 	else return { squeeze: { lo, hi, gap, share }, problems };
+
 	return { squeeze: null, problems };
 };

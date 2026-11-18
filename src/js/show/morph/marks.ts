@@ -14,6 +14,7 @@ export const morphMarks = (before: Snapshot, state: ChartState, mapping: Mapping
 	// A copy of a mark that is gone stays where it was in the old drawing.
 	const matrix = (shiftX: number, shiftY: number) =>
 		`matrix(${mapping.scaleX},0,0,${mapping.scaleY},${mapping.shiftX + shiftX},${mapping.shiftY + shiftY})`;
+
 	const inOldPlace = (ghost: Element) => {
 		ghost.setAttribute("transform", `${matrix(0, 0)} ${ghost.getAttribute("transform") ?? ""}`.trim());
 	};
@@ -34,11 +35,14 @@ export const morphMarks = (before: Snapshot, state: ChartState, mapping: Mapping
 
 		if (!old) {
 			fadeIn(element, duration);
+
 			// A new column comes up with the baseline, from where the baseline was.
 			const moves = baseline.x || baseline.y;
+
 			if (moves && onBaseline(element) && !element.hasAttribute("transform")) {
 				drift(element, `translate(${-baseline.x}px, ${-baseline.y}px)`, "none", duration, false);
 			}
+
 			continue;
 		}
 
@@ -46,11 +50,13 @@ export const morphMarks = (before: Snapshot, state: ChartState, mapping: Mapping
 			const from = mapPath(old.path, mapping);
 			if (from === path) continue;
 			const at = pathsBetween(from, path);
+
 			if (at) changes.push({ path: element, at });
 			else {
 				goAway(old.element);
 				fadeIn(element, duration);
 			}
+
 			continue;
 		}
 

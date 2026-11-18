@@ -9,8 +9,8 @@ export const REFERENCE_STEPS = 5;
 /** The next nice step: 1, 2, 2.5, 5, 10 and so on. Not a multiple of the one before, as only the number of steps is fixed. */
 const nextStep = (step: number): number => {
 	const power = 10 ** Math.floor(Math.log10(step) + EPSILON);
-	const m = Math.round((step / power) * 10) / 10;
-	return Number(((m < 2 ? 2 : m < 2.5 ? 2.5 : m < 5 ? 5 : 10) * power).toPrecision(12));
+	const leading = Math.round((step / power) * 10) / 10;
+	return Number(((leading < 2 ? 2 : leading < 2.5 ? 2.5 : leading < 5 ? 5 : 10) * power).toPrecision(12));
 };
 
 /** How many steps the values need below zero and above it. */
@@ -43,13 +43,17 @@ export const alignScales = (left: Scale, rightValues: number[]): { left: Scale; 
 	const values = rightValues.length ? rightValues : [0, 1];
 	const below = -left.min / left.step;
 	const above = left.max / left.step;
-	const whole = (n: number) => Math.abs(n - Math.round(n)) < 1e-6;
+
+	const whole = (value: number) => Math.abs(value - Math.round(value)) < 1e-6;
+
 	if (!left.step || left.min > 0 || left.max < 0 || !whole(below) || !whole(above))
 		return { left, right: ownScale(left, values), aligned: false };
+
 	const [leftBelow, leftAbove] = [Math.round(below), Math.round(above)];
 	const count = Math.max(1, leftBelow + leftAbove);
 	const span = Math.max(0, ...values) - Math.min(0, ...values) || 1;
 	let step = niceStep(span, count);
+
 	// At most one step more than the left has; a larger step always fits in the end.
 	for (let tries = 0; tries < 40; tries++) {
 		const [rightBelow, rightAbove] = stepsOf(values, step);
@@ -58,6 +62,7 @@ export const alignScales = (left: Scale, rightValues: number[]): { left: Scale; 
 		if (down + up <= count + 1) return { left: scaleFrom(down, up, left.step), right: scaleFrom(down, up, step), aligned: true };
 		step = nextStep(step);
 	}
+
 	return { left, right: ownScale(left, values), aligned: false };
 };
 
@@ -73,12 +78,14 @@ const isNice = (step: number): boolean => {
 /** The numbers of steps from 1 to 20 where both scales get a nice step and zero stays a tick. */
 const stepCountsOf = (left: Scale, right: Scale): number[] => {
 	const counts: number[] = [];
+
 	for (let steps = 1; steps <= 20; steps++) {
 		const leftStep = Number(((left.max - left.min) / steps).toPrecision(12));
 		const rightStep = Number(((right.max - right.min) / steps).toPrecision(12));
 		const zeroOnTick = Math.abs(left.min / leftStep - Math.round(left.min / leftStep)) < 1e-6;
 		if (isNice(leftStep) && isNice(rightStep) && zeroOnTick) counts.push(steps);
 	}
+
 	return counts;
 };
 
@@ -102,6 +109,7 @@ export const steadyScales = (
 	wanted: number
 ): { left: Scale; right: Scale; aligned: boolean } => {
 	const options: { left: Scale; right: Scale }[] = [];
+
 	for (const count of [REFERENCE_STEPS, 4, 6, 3]) {
 		const left = leftFor(count);
 		const aligned = alignScales(left, rightValues);
@@ -110,15 +118,21 @@ export const steadyScales = (
 		const separate = separateEnds(left, rightValues);
 		if (separate) options.push(separate);
 	}
+
 	if (!options.length) return alignScales(leftFor(REFERENCE_STEPS), rightValues);
 
-	const score = (option: { left: Scale; right: Scale }) => stepCountsOf(option.left, option.right).filter((steps) => steps >= 2 && steps <= 10).length;
+	const score = (option: { left: Scale; right: Scale }) => {
+		const counts = stepCountsOf(option.left, option.right);
+		return counts.filter((steps) => steps >= 2 && steps <= 10).length;
+	};
+
 	const best = options.reduce((chosen, option) => (score(option) > score(chosen) ? option : chosen));
 
 	const most = Math.max(1, Math.floor(wanted + EPSILON));
 	const steps = stepCountsOf(best.left, best.right).filter((count) => count <= most).at(-1) ?? 1;
 	const leftStep = Number(((best.left.max - best.left.min) / steps).toPrecision(12));
 	const rightStep = Number(((best.right.max - best.right.min) / steps).toPrecision(12));
+
 	return {
 		left: { ...best.left, step: leftStep, ticks: ticksOf(best.left.min, best.left.max, leftStep) },
 		right: { ...best.right, step: rightStep, ticks: ticksOf(best.right.min, best.right.max, rightStep) },

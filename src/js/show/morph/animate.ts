@@ -24,6 +24,7 @@ export const fadeOut = (element: Element, into: Element, duration: number, first
 	ghost.removeAttribute("mask");
 	ghost.removeAttribute("clip-path");
 	ghost.setAttribute("data-ghost", "");
+
 	if (first) into.prepend(ghost);
 	else into.append(ghost);
 
@@ -39,6 +40,7 @@ export const drift = (element: Element, from: string, to: string, duration: numb
 	style.transformOrigin = "0 0";
 	const moving = element.animate([{ transform: from }, { transform: to }], { duration, easing: EASE, fill: copy ? "forwards" : "none" });
 	if (copy) return;
+
 	moving.onfinish = () => {
 		style.transformBox = "";
 		style.transformOrigin = "";
@@ -69,6 +71,7 @@ export const move = (element: Element, from: Box, to: Box, duration: number): vo
 	style.transformOrigin = "0 0";
 	const start = { transform: `matrix(${scaleX},0,0,${scaleY},${shiftX},${shiftY})` };
 	const moving = element.animate([start, { transform: "none" }], { duration, easing: EASE });
+
 	moving.onfinish = () => {
 		style.transformBox = "";
 		style.transformOrigin = "";

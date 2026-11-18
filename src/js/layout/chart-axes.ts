@@ -13,6 +13,8 @@ import { htmlEl, placeAt, short, svgEl } from "../draw/svg";
 
 type ChartAxes = NonNullable<ChartState["axes"]>;
 
+// ---------------------------------------------------------------------------------------------------------------------------------
+
 /** The value axis of a column, bar or line chart: its scale and numbers, and the room beside the plot or under a bar chart. Null without a width. */
 export const valueAxisOf = (state: ChartState, config: Config, along: ChartAxes, aspect: number): Scale | null => {
 	const { plot, rows, type, series } = state;
@@ -23,21 +25,26 @@ export const valueAxisOf = (state: ChartState, config: Config, along: ChartAxes,
 	if (namesUnder) namesUnder.style.margin = "";
 	const guess = plot.clientWidth;
 	if (!guess) return null;
+
 	// As the scale does: a step of a waterfall is a size, so only where the steps start and end counts.
 	const segs = type.segments?.(rows) ?? [];
+
 	const all = state.stacked
 		? rows.flatMap((row) => Object.values(stackReach(row, series.length, type.running)))
-		: segs.some((s) => s.kind === "up" || s.kind === "down")
-			? segs.flatMap((s) => [s.from, s.to])
+		: segs.some((segment) => segment.kind === "up" || segment.kind === "down")
+			? segs.flatMap((segment) => [segment.from, segment.to])
 			: valuesOf(rows, leftSeries(state));
+
 	// A chart whose scale floats fits its values; the others reach zero.
 	const zero = type.floats ? [] : [0];
 	const min = Math.min(...zero, -largest(all.map((value) => -value)));
 	const max = Math.max(...zero, largest(all));
 	const font = Number.parseFloat(getComputedStyle(plot).fontSize) || 16;
+
 	// The scale ends on a number of the axis, or where `data-chart-scale` says; three numbers or more are the numbers themselves.
 	const { chartScaleY, chartScale } = state.figure.dataset;
 	const own = readScale(chartScaleY ?? chartScale);
+
 	// How many steps the room for the axis asks for.
 	const wanted = Math.max((sideways ? guess / 9 : Math.min(guess * aspect, heightRange(state.figure, 1)[1]) / 3) / font, 2);
 	const [from, to] = own ?? [Math.min(min, state.agreed?.bottom ?? min), Math.max(max, state.agreed?.ceiling ?? max)];
@@ -45,7 +52,15 @@ export const valueAxisOf = (state: ChartState, config: Config, along: ChartAxes,
 	// A scale with about `count` steps from `from` to `to`.
 	const scaleOver = (count: number): Scale => {
 		const step = niceStep(to - from, count);
-		const round = (value: number, up: boolean) => (own ? value : Number(((up ? Math.ceil : Math.floor)(value / step - 1e-9 * (up ? 1 : -1)) * step).toPrecision(12)));
+
+		const round = (value: number, up: boolean) => {
+			if (own) return value;
+
+			const toWhole = up ? Math.ceil : Math.floor;
+			const nudge = 1e-9 * (up ? 1 : -1);
+			return Number((toWhole(value / step - nudge) * step).toPrecision(12));
+		};
+
 		const lo = round(from, false);
 		const hi = round(to, true);
 		return { min: lo, max: hi, step, ticks: ticksOf(lo, hi, step) };
@@ -57,6 +72,7 @@ export const valueAxisOf = (state: ChartState, config: Config, along: ChartAxes,
 	// A second axis on the right: both scales have zero and their ticks at the same height.
 	// Their ends come from a fixed number of steps, so a resize changes only how many gridlines there are, not where the lines are.
 	const right = state.rightAxis;
+
 	if (right) {
 		const rightValues = valuesOf(rows, right.series);
 		const both = own ? alignScales(valueScale, rightValues) : steadyScales(scaleOver, rightValues, wanted);
@@ -64,46 +80,61 @@ export const valueAxisOf = (state: ChartState, config: Config, along: ChartAxes,
 		right.scale = both.right;
 		right.aligned = both.aligned;
 	}
+
 	// A scale that floats, as for prices, writes its numbers as the table does, so a value at the pointer fits beside it.
 	const written = type.floats ? rows.flatMap((row) => row.cells.slice(0, series.length).map((cell) => decimalsIn(cell.number))) : [];
 	writeTicks(along.ticks, valueScale, firstCell(state, leftSeries(state)), written, config);
 	if (right?.scale) writeTicks(right.ticks, right.scale, firstCell(state, right.series), [], config);
+
 	if (along.numbers) {
 		const ticks = [...along.ticks.children, ...(right?.ticks.children ?? [])] as HTMLElement[];
 		for (const tick of ticks) delete tick.dataset.place;
 		measureAll(ticks);
+
 		const widest = (box: HTMLElement) => `${largest([0, ...(Array.from(box.children) as HTMLElement[]).map((tick) => sizeOf(tick).width)]) + 10}px`;
+
 		if (sideways) plot.style.marginBottom = `${(ticks[0] ? sizeOf(ticks[0]).height : 0) + 6}px`;
 		else {
 			const side = along.right ? "marginRight" : "marginLeft";
 			plot.style[side] = widest(along.ticks);
 			if (right) plot.style.marginRight = widest(right.ticks);
+
 			if (namesUnder) {
 				namesUnder.style[side] = plot.style[side];
 				if (right) namesUnder.style.marginRight = plot.style.marginRight;
 			}
 		}
 	}
+
 	return valueScale;
 };
 
+// ---------------------------------------------------------------------------------------------------------------------------------
+
 /** The series on the left axis: all of them on a chart with one value axis. */
 export const leftSeries = (state: ChartState): number[] =>
-	state.series.flatMap((_one, s) => (state.rightAxis?.series.includes(s) ? [] : [s]));
+	state.series.flatMap((_one, seriesIndex) => (state.rightAxis?.series.includes(seriesIndex) ? [] : [seriesIndex]));
 
 const valuesOf = (rows: ChartState["rows"], series: number[]): number[] =>
-	rows.flatMap((row) => series.flatMap((s) => (row.cells[s] && !row.cells[s].missing ? [row.cells[s].value] : [])));
+	rows.flatMap((row) =>
+		series.flatMap((seriesIndex) => {
+			const cell = row.cells[seriesIndex];
+			return cell && !cell.missing ? [cell.value] : [];
+		})
+	);
 
 /** The first cell of the first row with a number, in the first of `series`, for the text around the numbers of its axis, such as `%`. */
 const firstCell = (state: ChartState, series: number[]) => {
-	const s = series[0] ?? 0;
-	return state.rows.find((row) => row.cells[s] && !row.cells[s].missing)?.cells[s] ?? state.rows[0]?.cells[s];
+	const seriesIndex = series[0] ?? 0;
+	const known = state.rows.find((row) => row.cells[seriesIndex] && !row.cells[seriesIndex].missing);
+	return known?.cells[seriesIndex] ?? state.rows[0]?.cells[seriesIndex];
 };
 
 /** The numbers along a value axis, left out until they are measured. */
 const writeTicks = (box: HTMLElement, scale: Scale, first: { prefix: string; suffix: string } | undefined, written: number[], config: Config): void => {
 	box.textContent = "";
 	const places = largest([...scale.ticks.map((value) => decimalsIn(String(value))), ...written]);
+
 	for (const value of scale.ticks) {
 		const tick = htmlEl(TICK_CLASS, box);
 		tick.dataset.value = String(value);
@@ -114,34 +145,41 @@ const writeTicks = (box: HTMLElement, scale: Scale, first: { prefix: string; suf
 	}
 };
 
+// ---------------------------------------------------------------------------------------------------------------------------------
+
 /** The scales and numbers of a chart with two axes, for a first guess at the room. Once they are measured, some may be left out. */
 export const frameScalesOf = (state: ChartState, config: Config, axes: ChartAxes, shaped: number, unit: number, widthPx: number): Scale[] => {
 	const { plot, rows, series } = state;
 	const font = Number.parseFloat(getComputedStyle(plot).fontSize) || 16;
-	const fields = series.flatMap((one, s) => (one.group ? [] : [s])).slice(0, 2);
-	const drawn = rows.filter((row) => fields.every((s) => row.cells[s] && !row.cells[s].missing));
+	const fields = series.flatMap((one, seriesIndex) => (one.group ? [] : [seriesIndex])).slice(0, 2);
+	const drawn = rows.filter((row) => fields.every((field) => row.cells[field] && !row.cells[field].missing));
 	const { chartScaleX, chartScaleY, chartScale } = state.figure.dataset;
 	const asked = [readScale(chartScaleX), readScale(chartScaleY ?? chartScale)];
-	const scales = fields.map((s, k) =>
+
+	const scales = fields.map((field, index) =>
 		scaleOf(
-			drawn.length ? drawn.map((row) => row.cells[s].value) : [0, 1],
-			Math.max(k ? shaped / unit / (font * 4) : widthPx / (font * 9), 4),
-			asked[k]
+			drawn.length ? drawn.map((row) => row.cells[field].value) : [0, 1],
+			Math.max(index ? shaped / unit / (font * 4) : widthPx / (font * 9), 4),
+			asked[index]
 		)
 	);
+
 	axes.ticks.textContent = "";
-	scales.forEach((scale, k) => {
-		const first = drawn[0]?.cells[fields[k]];
+
+	scales.forEach((scale, index) => {
+		const first = drawn[0]?.cells[fields[index]];
 		const places = largest(scale.ticks.map((value) => decimalsIn(String(value))));
+
 		for (const value of scale.ticks) {
 			const tick = htmlEl(TICK_CLASS, axes.ticks);
-			tick.dataset.axis = k ? "y" : "x";
+			tick.dataset.axis = index ? "y" : "x";
 			tick.dataset.value = String(value);
 			if (first?.prefix) tick.dataset.prefix = first.prefix;
 			if (first?.suffix) tick.dataset.suffix = first.suffix;
 			writeNumber(tick, places, config.locale);
 		}
 	});
+
 	return scales;
 };
 
@@ -149,8 +187,11 @@ export const frameScalesOf = (state: ChartState, config: Config, axes: ChartAxes
 export const placeFrame = (axes: ChartAxes, ticks: HTMLElement[], scales: Scale[], height: number, unit: number) => {
 	const gap = AXIS_GAP * unit;
 	const [titleX, titleY] = axes.titles;
+
 	const width = (node?: HTMLElement) => (node ? sizeOf(node).width * unit : 0);
+
 	const tall = (node?: HTMLElement) => (node ? sizeOf(node).height * unit : 0);
+
 	const across = ticks.filter((tick) => tick.dataset.axis === "x");
 	const up = ticks.filter((tick) => tick.dataset.axis === "y");
 	const tickHeight = tall(ticks[0]);
@@ -159,21 +200,31 @@ export const placeFrame = (axes: ChartAxes, ticks: HTMLElement[], scales: Scale[
 	const frame: NonNullable<Geometry["frame"]> = [left, top, VIEWBOX_WIDTH - left - largest([0, ...across.map(width)]) / 2, height - top - tall(titleX) - tickHeight - 2 * gap];
 	const [fx, fy, fw, fh] = frame;
 	const [sx, sy] = scales;
+
 	const scaleX = (value: number) => fx + ((value - sx.min) / (sx.max - sx.min || 1)) * fw;
+
 	const scaleY = (value: number) => fy + fh - ((value - sy.min) / (sy.max - sy.min || 1)) * fh;
+
 	// Fewer numbers where two would touch.
 	const widthAt = (value: number) => width(across.find((tick) => Number(tick.dataset.value) === value));
+
+	const apartAcross = (before: number, after: number) => scaleX(after) - scaleX(before) > (widthAt(after) + widthAt(before)) / 2 + gap;
+
+	const apartUp = (below: number, above: number) => scaleY(below) - scaleY(above) > tickHeight + gap / 2;
+
 	const shownTicks = [
-		thin(sx, (list) => list.every((v, k) => !k || scaleX(v) - scaleX(list[k - 1]) > (widthAt(v) + widthAt(list[k - 1])) / 2 + gap)).ticks,
-		thin(sy, (list) => list.every((v, k) => !k || scaleY(list[k - 1]) - scaleY(v) > tickHeight + gap / 2)).ticks,
+		thin(sx, (list) => list.every((value, index) => index === 0 || apartAcross(list[index - 1], value))).ticks,
+		thin(sy, (list) => list.every((value, index) => index === 0 || apartUp(list[index - 1], value))).ticks,
 	];
+
 	for (const tick of ticks) {
 		const value = Number(tick.dataset.value);
-		const k = tick.dataset.axis === "x" ? 0 : 1;
-		const shown = shownTicks[k].includes(value);
-		tick.dataset.place = shown ? (k ? "before" : "below") : "none";
-		if (shown) placeAt(tick, k ? fx - gap : scaleX(value), k ? scaleY(value) : fy + fh + gap, VIEWBOX_WIDTH, height);
+		const axisIndex = tick.dataset.axis === "x" ? 0 : 1;
+		const shown = shownTicks[axisIndex].includes(value);
+		tick.dataset.place = shown ? (axisIndex ? "before" : "below") : "none";
+		if (shown) placeAt(tick, axisIndex ? fx - gap : scaleX(value), axisIndex ? scaleY(value) : fy + fh + gap, VIEWBOX_WIDTH, height);
 	}
+
 	if (titleX) placeAt(titleX, fx + fw / 2, height - tall(titleX), VIEWBOX_WIDTH, height);
 	if (titleY) placeAt(titleY, 0, fy + fh / 2, VIEWBOX_WIDTH, height);
 	return { frame, x: scaleX, y: scaleY, shownTicks };
@@ -184,20 +235,22 @@ export const drawFrame = (state: ChartState, config: Config, frame: NonNullable<
 	const { svg } = state;
 	const [fx, fy, fw, fh] = frame;
 	const [across, up] = shownTicks;
+
 	if (turnedOn(state.figure, "data-chart-grid", config.grid))
 		svg.appendChild(
 			svgEl("path", {
 				class: GRID_CLASS,
-				d: [...across.map((v) => `M${short(scaleX(v))},${short(fy)}V${short(fy + fh)}`), ...up.map((v) => `M${short(fx)},${short(y(v))}H${short(fx + fw)}`)].join(""),
+				d: [...across.map((value) => `M${short(scaleX(value))},${short(fy)}V${short(fy + fh)}`), ...up.map((value) => `M${short(fx)},${short(y(value))}H${short(fx + fw)}`)].join(""),
 			})
 		);
+
 	svg.appendChild(
 		svgEl("path", {
 			class: AXIS_CLASS,
 			d: [
 				`M${short(fx)},${short(fy)}V${short(fy + fh)}H${short(fx + fw)}`,
-				...across.map((v) => `M${short(scaleX(v))},${short(fy + fh)}v${short(4 * unit)}`),
-				...up.map((v) => `M${short(fx)},${short(y(v))}h${short(-4 * unit)}`),
+				...across.map((value) => `M${short(scaleX(value))},${short(fy + fh)}v${short(4 * unit)}`),
+				...up.map((value) => `M${short(fx)},${short(y(value))}h${short(-4 * unit)}`),
 			].join(""),
 		})
 	);
@@ -214,6 +267,7 @@ export const placeValueAxis = (
 	height: number,
 	unit: number,
 	gutter: number,
+
 	// The ticks to show, such as those at the places of the left axis; `numbered` leaves out a number but keeps its gridline.
 	more: { shown?: number[]; numbered?: (value: number) => boolean; grid?: boolean } = {}
 ): number[] => {
@@ -221,6 +275,7 @@ export const placeValueAxis = (
 	const sideways = type.categories === "beside";
 	const gap = AXIS_GAP * unit;
 	const ticks = Array.from(along.ticks.children) as HTMLElement[];
+
 	const size = (value: number) => sizeOf(ticks.find((tick) => Number(tick.dataset.value) === value) ?? ticks[0]);
 
 	// Whether a number is clear of the one before it: side by side by their half widths, one above the other by a height.
@@ -229,6 +284,7 @@ export const placeValueAxis = (
 			const room = ((size(value).width + size(before).width) / 2) * unit + gap;
 			return at(value) - at(before) > room;
 		}
+
 		const room = size(value).height * unit + gap / 2;
 		return at(before) - at(value) > room;
 	};
@@ -239,24 +295,29 @@ export const placeValueAxis = (
 
 	const shown = more.shown ?? thin(valueScale, allClear).ticks.filter(outsideCut);
 	const numbered = shown.filter(more.numbered ?? (() => true));
+
 	// On the right, the axis is past the names at the ends of the lines, and the gridlines reach it.
 	const right = along.right && !sideways;
 	const edge = right ? VIEWBOX_WIDTH : 0;
+
 	for (const tick of ticks) {
 		const value = Number(tick.dataset.value);
 		const on = along.numbers && numbered.includes(value);
 		tick.dataset.place = on ? (sideways ? "below" : right ? "after" : "before") : "none";
 		if (on) placeAt(tick, sideways ? at(value) : right ? edge + gap : -gap, sideways ? height + gap : at(value), VIEWBOX_WIDTH, height);
 	}
+
 	const end = right && along.numbers ? VIEWBOX_WIDTH : VIEWBOX_WIDTH - gutter;
+
 	// Under the marks.
 	if (more.grid !== false && turnedOn(state.figure, "data-chart-grid", config.grid))
 		svg.prepend(
 			svgEl("path", {
 				class: GRID_CLASS,
-				d: shown.map((v) => (sideways ? `M${short(at(v))},0V${short(height)}` : `M0,${short(at(v))}H${short(end)}`)).join(""),
+				d: shown.map((value) => (sideways ? `M${short(at(value))},0V${short(height)}` : `M0,${short(at(value))}H${short(end)}`)).join(""),
 			})
 		);
+
 	// Down to the line under the chart, also where a line chart keeps room under its lowest numbers.
 	const rule = Number(svg.querySelector(".tablechart-rule")?.getAttribute("y1"));
 	const foot = Math.max(at(valueScale.min), Number.isFinite(rule) ? rule : 0);
@@ -264,9 +325,11 @@ export const placeValueAxis = (
 	// The line and its short marks apart, so after a legend toggle the line moves and the marks, which can change in number, fade.
 	// Each has its side, so it moves only along its own axis.
 	const side = sideways ? "bottom" : right ? "right" : "left";
+
 	const axisLine = sideways
 		? `M${short(at(valueScale.min))},${short(height)}H${short(at(valueScale.max))}`
 		: `M${edge},${short(at(valueScale.max))}V${short(foot)}`;
+
 	const markOf = (value: number): string =>
 		sideways ? `M${short(at(value))},${short(height)}v${short(4 * unit)}` : `M${edge},${short(at(value))}h${short((right ? 4 : -4) * unit)}`;
 
@@ -276,5 +339,6 @@ export const placeValueAxis = (
 			svgEl("path", { class: AXIS_CLASS, "data-side": side, "data-kind": "marks", d: numbered.map(markOf).join("") })
 		);
 	}
+
 	return shown;
 };

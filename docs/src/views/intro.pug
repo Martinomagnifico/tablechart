@@ -63,8 +63,8 @@ block content
 			li #[strong The text is real and styleable text.] Numbers, names and titles are HTML. They use the font of your page, stay sharp when the page is zoomed or scaled, and can be translated. #[em No more Times New Roman in your charts.]
 			li #[strong Styled with CSS.] A chart uses the text colour of the page. Colours, sizes and light and dark mode are CSS variables.
 			li #[strong Annotations follow the data.] A bracket or a trend arrow is placed by the numbers. If you change a number, the annotation moves with it.
-			li #[strong Small.] About #{Math.round(size.total)} kB of JavaScript and CSS together, gzipped. 
-			li #[strong The result is also small.] If Tablechart is used in a document that is converted to PDF, then the chart is still just vectors and text, not a bitmap image. Small and sharp at any zoom level.
+			li #[strong Size.] About #{Math.round(size.total)} kB of JavaScript and CSS together, gzipped. Part of that is for accessibility: the script checks the contrast of every line, bar, slice and text, gives each number inside a bar a colour that is readable on it, adds an edge to a part with too little contrast, and makes a legend with toggles work with a keyboard. See #[a(href=url('/accessibility.html')) Accessibility].
+			li #[strong The result is small.] If Tablechart is used in a document that is converted to PDF, then the chart is still just vectors and text, not a bitmap image. Small and sharp at any zoom level.
 
 		.card
 			p Tablechart is simple: every value is shown as a number on its bar or point. If a number does not fit, the chart has to omit it. If you hover over its bar or point (or tap it on a touch device), the tooltip shows it.

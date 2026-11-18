@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.5.0] - 2026-11-18
 
 ### Added
 - `data-axis="right"` on a column header: a second value axis, for values with another unit.
@@ -16,6 +16,9 @@
 - Numbers inside bars are semibold, `--tablechart-value-inside-weight`.
 - The legend of a donut or pie has squares instead of dots, as the other legends have.
 - In dark mode, the tooltip has the background of the chart, which the contrast of the series colours is checked against.
+
+### Removed
+- `--tablechart-bar-value-color`, `-piece-`, `-up-`, `-down-` and `-total-value-color`, as announced. `--tablechart-value-on-dark` and `--tablechart-value-on-light` replace them.
 
 ### Fixed
 - A number no longer cuts a hole in a column or a line.

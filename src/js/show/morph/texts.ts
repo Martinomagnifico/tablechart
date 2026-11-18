@@ -10,10 +10,12 @@ export const morphTexts = (before: Snapshot, state: ChartState, frame: Frame, ba
 	// An old place, in percent of the old plot, as a share of the new plot.
 	const from = before.frame.plot;
 	const to = frame.plot;
+
 	const left = (value: string): string => {
 		const pixels = from.left + (Number.parseFloat(value) / 100) * from.width - to.left;
 		return `${(pixels / (to.width || 1)) * 100}%`;
 	};
+
 	const top = (value: string): string => {
 		const pixels = from.top + (Number.parseFloat(value) / 100) * from.height - to.top;
 		return `${(pixels / (to.height || 1)) * 100}%`;
@@ -26,18 +28,22 @@ export const morphTexts = (before: Snapshot, state: ChartState, frame: Frame, ba
 	const newKeys = marksOf(state).map(markKey);
 
 	const seen = new Set<string>();
+
 	for (const element of textsOf(state)) {
 		const key = textKey(element);
 		seen.add(key);
 		const old = before.texts.get(key);
+
 		if (!old) {
 			fadeIn(element, duration);
+
 			// A number of a new column comes up with it, from where the baseline was.
 			if (moves && isColumnNumber(newKeys, element)) {
 				const transform = getComputedStyle(element).transform;
 				const own = transform === "none" ? "" : transform;
 				drift(element, `translate(${-shiftX}px, ${-shiftY}px) ${own}`.trim(), own || "none", duration, false);
 			}
+
 			continue;
 		}
 
@@ -47,6 +53,7 @@ export const morphTexts = (before: Snapshot, state: ChartState, frame: Frame, ba
 	}
 
 	const values = state.plot.querySelector(`.${VALUES_CLASS}`) ?? state.plot;
+
 	// The boxes of the numbers along the axes are as large as the plot, so any of them takes a number of either side.
 	const ticks = state.plot.querySelector(`.${TICK_CLASS}s`);
 
@@ -63,6 +70,7 @@ export const morphTexts = (before: Snapshot, state: ChartState, frame: Frame, ba
 		// A number of a column that is gone moves with the baseline, as its column does.
 		if (moves && into === values && isColumnNumber(before.marks.keys(), old.element)) {
 			const shift = `translate(${shiftX}px, ${shiftY}px)`;
+
 			// Its own transform, such as the centring on its place, read from the copy, which is on the page.
 			const transform = getComputedStyle(ghost).transform;
 			const own = transform === "none" ? "" : transform;

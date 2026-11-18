@@ -4,10 +4,13 @@ export type Value = string | number | null;
 
 export interface SourceRow {
 	label: string;
+
 	/** The name under the chart, where room is short, such as `"Nov ’21"` for `"November 2021"`. */
 	short?: string;
+
 	/** A note at this row, such as `"Share issue"`: a cell in a column with `data-note`. */
 	note?: string;
+
 	/** A string keeps its decimal places and the text around the number: `"1.0"`, `"71.8%"`. */
 	value?: Value;
 	values?: Value[];
@@ -37,9 +40,11 @@ export const rowsOf = (data: unknown): SourceTable | null => {
 	const object = data && typeof data === "object" && !Array.isArray(data) ? (data as Record<string, unknown>) : null;
 
 	let rows: SourceRow[] | undefined;
+
 	if (Array.isArray(data)) rows = data as SourceRow[];
 	else if (object?.rows) rows = Array.isArray(object.rows) ? (object.rows as SourceRow[]) : namedRows(object.rows);
 	else rows = namedRows(data);
+
 	if (!Array.isArray(rows)) return null;
 
 	return {

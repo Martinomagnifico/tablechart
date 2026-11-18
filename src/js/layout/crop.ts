@@ -10,24 +10,27 @@ const croppedOf = (state: ChartState): number => {
 	return least ? Math.max(0, state.rows.length - Math.max(1, Math.floor(state.plot.clientWidth / least))) : 0;
 };
 
-/** The chart without its first `k` rows. What the drawing gives back by row is moved back to the rows of the table. */
-const viewOf = (state: ChartState, k: number): ChartState => {
-	if (!k) return state;
+/** The chart without its first `cropped` rows. What the drawing gives back by row is moved back to the rows of the table. */
+const viewOf = (state: ChartState, cropped: number): ChartState => {
+	if (!cropped) return state;
+
 	const own: Partial<Record<keyof ChartState, unknown>> = {
-		rows: state.rows.slice(k),
-		values: state.values.slice(k),
-		seriesValues: state.seriesValues.map((labels) => labels.slice(k)),
-		categories: state.categories.slice(k),
+		rows: state.rows.slice(cropped),
+		values: state.values.slice(cropped),
+		seriesValues: state.seriesValues.map((labels) => labels.slice(cropped)),
+		categories: state.categories.slice(cropped),
 	};
-	const back: Partial<Record<keyof ChartState, (f: (...args: never[]) => unknown) => unknown>> = {
-		rowAt: (f) => (x: number, y: number) => {
-			const i = (f as (x: number, y: number) => number | null)(x, y);
-			return i === null ? null : i + k;
+
+	const back: Partial<Record<keyof ChartState, (method: (...args: never[]) => unknown) => unknown>> = {
+		rowAt: (method) => (x: number, y: number) => {
+			const rowIndex = (method as (x: number, y: number) => number | null)(x, y);
+			return rowIndex === null ? null : rowIndex + cropped;
 		},
-		rowBox: (f) => (i: number) => (f as (i: number) => unknown)(i - k),
-		pointOf: (f) => (i: number) => (f as (i: number) => unknown)(i - k),
-		crossingOf: (f) => (i: number) => (f as (i: number) => unknown)(i - k),
+		rowBox: (method) => (rowIndex: number) => (method as (rowIndex: number) => unknown)(rowIndex - cropped),
+		pointOf: (method) => (rowIndex: number) => (method as (rowIndex: number) => unknown)(rowIndex - cropped),
+		crossingOf: (method) => (rowIndex: number) => (method as (rowIndex: number) => unknown)(rowIndex - cropped),
 	};
+
 	return new Proxy(state, {
 		get: (target, key) => (key in own ? own[key as keyof ChartState] : Reflect.get(target, key)),
 		set: (target, key, value) => {
@@ -38,36 +41,49 @@ const viewOf = (state: ChartState, k: number): ChartState => {
 	});
 };
 
-/** Hides the first `k` names and numbers, and fills the line under the chart. */
-const mark = (state: ChartState, config: Config, k: number): void => {
-	state.categories.forEach((name, i) => name.toggleAttribute("data-cropped", i < k));
+/** Hides the first `croppedRows` names and numbers, and fills the line under the chart. */
+const mark = (state: ChartState, config: Config, croppedRows: number): void => {
+	state.categories.forEach((name, index) => name.toggleAttribute("data-cropped", index < croppedRows));
+
 	// A run that goes on from a cropped row, such as the last days of a month.
-	const nameOf = (i: number) => state.categories[i]?.textContent?.trim();
-	state.categories.forEach((name, i) => name.toggleAttribute("data-cut", !!k && i === k && nameOf(i) === nameOf(i - 1)));
-	for (const labels of state.seriesValues) labels.forEach((label, i) => label.toggleAttribute("data-cropped", i < k));
-	state.categories[0]?.parentElement?.style.setProperty("--_columns", String(state.rows.length - k));
+	const nameOf = (index: number) => state.categories[index]?.textContent?.trim();
+
+	const isCut = (index: number) => !!croppedRows && index === croppedRows && nameOf(index) === nameOf(index - 1);
+
+	state.categories.forEach((name, index) => name.toggleAttribute("data-cut", isCut(index)));
+	for (const labels of state.seriesValues) labels.forEach((label, index) => label.toggleAttribute("data-cropped", index < croppedRows));
+	state.categories[0]?.parentElement?.style.setProperty("--_columns", String(state.rows.length - croppedRows));
 	const line = state.figure.querySelector<HTMLElement>(`:scope > .${CROP_CLASS}`);
 	if (!line) return;
-	line.hidden = !k;
+	line.hidden = !croppedRows;
 	const [template, text] = Array.from(line.children) as HTMLElement[];
-	const count = (n: number) => new Intl.NumberFormat(config.locale).format(n);
-	text.textContent = (template.textContent ?? "").replace("{shown}", count(state.rows.length - k)).replace("{rows}", count(state.rows.length));
+
+	const count = (value: number) => new Intl.NumberFormat(config.locale).format(value);
+
+	text.textContent = (template.textContent ?? "").replace("{shown}", count(state.rows.length - croppedRows)).replace("{rows}", count(state.rows.length));
 };
 
 /** A layout that crops first. The numbers of an axis take room beside the plot, so after the first try it may crop a few rows more. */
 export const withCrop =
 	(lay: Lay): Lay =>
 	(state, config) => {
-		let k = croppedOf(state);
-		mark(state, config, k);
-		let done = lay(viewOf(state, k), config);
+		let cropped = croppedOf(state);
+		mark(state, config, cropped);
+		let done = lay(viewOf(state, cropped), config);
 		const again = croppedOf(state);
-		if (done && again !== k) {
-			k = again;
-			mark(state, config, k);
-			done = lay(viewOf(state, k), config);
+
+		if (done && again !== cropped) {
+			cropped = again;
+			mark(state, config, cropped);
+			done = lay(viewOf(state, cropped), config);
 		}
+
 		// The marks count their rows from the first one shown; the tooltip finds them by the row of the table.
-		if (done && k) for (const node of state.svg.querySelectorAll<SVGElement>("[data-row]")) node.dataset.row = String(Number(node.dataset.row) + k);
+		if (done && cropped) {
+			for (const node of state.svg.querySelectorAll<SVGElement>("[data-row]")) {
+				node.dataset.row = String(Number(node.dataset.row) + cropped);
+			}
+		}
+
 		return done;
 	};

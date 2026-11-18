@@ -9,6 +9,7 @@ export { adoptTables, readMarkdownRows } from "./build/sources";
 export { loadSources } from "./build/source";
 export { assignKeys } from "./build/read-table";
 export { checkContrast, checkTextContrast } from "./colour/contrast";
+
 export {
 	AT_ONCE_CLASS,
 	type Config,
@@ -19,4 +20,5 @@ export {
 	QUEUED_CLASS,
 	SHOWN_CLASS,
 } from "./config";
+
 export type { ChartState, ChartType, Row, Series } from "./types";

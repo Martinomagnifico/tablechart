@@ -12,6 +12,7 @@ export const bracketRows = (spec: HTMLElement, count: number): [number, number] 
 		const asked = Number.parseInt(spec.getAttribute(name) ?? "", 10);
 		return Number.isFinite(asked) ? asked - 1 : fallback;
 	};
+
 	return [read("data-from", 0), read("data-to", count - 1)];
 };
 
@@ -22,12 +23,14 @@ export const bracket: AnnotationType = {
 		const { rows, cx, y, unit, labelHeight, badgeHeight, height, svg, after } = geo;
 
 		const [i1, i2] = bracketRows(spec, rows.length);
-		const a = rows[i1];
-		const b = rows[i2];
-		if (!a || !b) {
+		const startRow = rows[i1];
+		const endRow = rows[i2];
+
+		if (!startRow || !endRow) {
 			console.warn(
 				`[${LIBRARY_NAME}] A bracket points at a row that is not there (row ${i1 + 1} to ${i2 + 1}, of ${rows.length}).`
 			);
+
 			return;
 		}
 
@@ -35,24 +38,27 @@ export const bracket: AnnotationType = {
 		const gap = 4 * unit;
 		const x1 = cx(i1);
 		const x2 = cx(i2);
-		const top = Math.min(y(a.value), y(b.value)) - labelHeight - gap - badgeHeight * 0.9;
+		const top = Math.min(y(startRow.value), y(endRow.value)) - labelHeight - gap - badgeHeight * 0.9;
+
 		const foot = (value: number) => y(value) - labelHeight - gap;
 
-		const d = `M ${x1} ${foot(a.value)} L ${x1} ${top} L ${x2} ${top} L ${x2} ${foot(b.value) - head}`;
+		const pathData = `M ${x1} ${foot(startRow.value)} L ${x1} ${top} L ${x2} ${top} L ${x2} ${foot(endRow.value) - head}`;
+
 		// In pixels: a stroke that does not scale is dashed at the size the figure is shown.
 		const len =
-			(foot(a.value) - top + Math.abs(x2 - x1) + (foot(b.value) - head - top)) / unit + 1;
+			(foot(startRow.value) - top + Math.abs(x2 - x1) + (foot(endRow.value) - head - top)) / unit + 1;
 
 		svg.appendChild(
 			svgEl("path", {
 				class: LINE_CLASS,
 				"data-note": geo.note,
-				d,
+				d: pathData,
 				style: `--len:${len.toFixed(1)}; ${timing("--after", after)}`,
 			})
 		);
 
-		const ty = foot(b.value);
+		const ty = foot(endRow.value);
+
 		svg.appendChild(
 			svgEl("polygon", {
 				class: HEAD_CLASS,
@@ -67,6 +73,6 @@ export const bracket: AnnotationType = {
 			badge.style.setProperty("--after", String(after));
 		}
 
-		checkAgainst(badge, pctChange(a.value, b.value), `${a.value} to ${b.value}`, geo);
+		checkAgainst(badge, pctChange(startRow.value, endRow.value), `${startRow.value} to ${endRow.value}`, geo);
 	},
 };

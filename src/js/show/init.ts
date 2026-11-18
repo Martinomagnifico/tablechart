@@ -7,7 +7,7 @@ import { animated } from "../shared/settings";
 import { putMasksOn, setShown } from "./shown";
 import { inkInside, inkNames, measureSurface } from "../colour/colour";
 import { edgeBars } from "../colour/edges";
-import { checkContrast, checkOldColours, checkTextContrast } from "../colour/contrast";
+import { checkContrast, checkTextContrast } from "../colour/contrast";
 import { debug } from "../shared/debug";
 import { assignKeys } from "../build/read-table";
 import { adoptTables, readMarkdownRows } from "../build/sources";
@@ -18,32 +18,45 @@ import { morph, snapshot } from "./morph";
 import { focusName, listenToLegend, toggled } from "./toggle";
 import type { ChartState } from "../types";
 
+// ---------------------------------------------------------------------------------------------------------------------------------
+
 export interface TablechartChart {
 	figure: HTMLElement;
+
 	/** Lays the chart out again, for example after a script has changed its text. */
 	refresh(): void;
+
 	/** Stops watching scroll, size and language. The chart stays as it is. */
 	destroy(): void;
+
 	/** On a chart that steps (`data-fragment`): shows one step more. */
 	next(): void;
+
 	/** On a chart that steps: shows one step less. */
 	previous(): void;
+
 	/** On a chart that steps: shows the chart up to `step`, from 0 to `steps`. */
 	stepTo(step: number): void;
+
 	/** Builds the chart again, with its animation. A chart with steps goes back to its first step. */
 	replay(): void;
+
 	/** Takes the chart back to its start, to build when it scrolls into view. */
 	reset(): void;
+
 	/** How many steps are shown. */
 	readonly step: number;
+
 	/** How many steps the chart has; 0 for a chart that does not step. */
 	readonly steps: number;
 }
 
 export interface TablechartInstance {
 	charts: TablechartChart[];
+
 	/** Renders every chart again, for example after a script has changed its text. */
 	refresh(): void;
+
 	/** Stops watching scroll, size and language. The charts stay as they are. */
 	destroy(): void;
 }
@@ -53,6 +66,8 @@ declare global {
 		tablechart?: TablechartChart;
 	}
 }
+
+// ---------------------------------------------------------------------------------------------------------------------------------
 
 const MADE = "data-chart-made";
 const READY = "data-tablechart-ready";
@@ -72,9 +87,11 @@ export const entranceOf = (figure: HTMLElement, config: Config): number => {
 const entrance = async (figure: HTMLElement, share: number): Promise<void> => {
 	if (reduced()) return;
 	await new Promise(requestAnimationFrame);
+
 	const animations: Animation[] = figure
 		.getAnimations()
 		.filter((animation) => animation instanceof CSSAnimation);
+
 	for (
 		let parent = figure.parentElement;
 		parent && parent !== document.body;
@@ -82,7 +99,9 @@ const entrance = async (figure: HTMLElement, share: number): Promise<void> => {
 	) {
 		animations.push(...parent.getAnimations());
 	}
+
 	let left = 0;
+
 	for (const animation of animations) {
 		const timing = animation.effect?.getComputedTiming();
 		const duration = Number(timing?.activeDuration ?? 0);
@@ -90,6 +109,7 @@ const entrance = async (figure: HTMLElement, share: number): Promise<void> => {
 		const moment = Number(timing.delay ?? 0) + duration * share;
 		left = Math.max(left, moment - Number(animation.currentTime ?? 0));
 	}
+
 	if (left > 0) await wait(left);
 };
 
@@ -98,6 +118,7 @@ const hiddenAround = (figure: HTMLElement): HTMLElement | null => {
 	for (let element: HTMLElement | null = figure; element && element !== document.body; element = element.parentElement) {
 		if (getComputedStyle(element).opacity === "0") return element;
 	}
+
 	return null;
 };
 
@@ -105,20 +126,26 @@ const hiddenAround = (figure: HTMLElement): HTMLElement | null => {
 const startOf = (element: HTMLElement): Promise<void> =>
 	new Promise((resolve) => {
 		const events = ["animationstart", "transitionrun"];
+
 		const done = () => {
 			for (const name of events) document.removeEventListener(name, started, true);
 			changes.disconnect();
 			resolve();
 		};
+
 		const started = (event: Event) => {
 			if (event.target instanceof Node && event.target.contains(element)) done();
 		};
+
 		const changes = new MutationObserver(() => {
 			if (getComputedStyle(element).opacity !== "0") done();
 		});
+
 		for (const name of events) document.addEventListener(name, started, true);
 		changes.observe(element, { attributes: true, attributeFilter: ["class", "style"] });
 	});
+
+// ---------------------------------------------------------------------------------------------------------------------------------
 
 const speakers = new Set<{ relabel(): void; refresh(): void }>();
 let language: MutationObserver | null = null;
@@ -126,15 +153,18 @@ let language: MutationObserver | null = null;
 const listen = (chart: { relabel(): void; refresh(): void }): void => {
 	speakers.add(chart);
 	if (language) return;
+
 	// A language change reformats the numbers, then renders the charts again after a translation script has run.
 	language = new MutationObserver(() => {
 		for (const one of speakers) one.relabel();
+
 		requestAnimationFrame(() =>
 			requestAnimationFrame(() => {
 				for (const one of speakers) one.refresh();
 			})
 		);
 	});
+
 	language.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
 };
 
@@ -155,18 +185,24 @@ const kindFor = (figure: HTMLElement): string | null => {
 	return SWITCHABLE.includes(asked) ? asked : own;
 };
 
+// ---------------------------------------------------------------------------------------------------------------------------------
+
 const watch = (first: ChartState, config: Config): TablechartChart => {
 	let state = first;
 	let kind = kindFor(state.figure);
+
 	// The width it was last rendered at; null until it is rendered.
 	let placed: number | null = null;
+
 	// The contrast is checked once per chart, also when it is rendered again from scratch.
 	let checked = false;
 	let inView = false;
 	let waiting = false;
 	let forPaper = false;
+
 	// The series turned off in a legend with toggles, by their place in the table; a chart built again keeps them off.
 	let off = new Set<number>();
+
 	// A chart built again for a toggle is shown at once, without its build.
 	let keepShown = false;
 
@@ -181,7 +217,9 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 			setShown(state, true);
 			return done();
 		}
+
 		const shown = state.figure.classList.contains("is-shown");
+
 		if (inView && placed !== null && !shown && !waiting) {
 			waiting = true;
 			const hidden = reduced() ? null : hiddenAround(state.figure);
@@ -212,12 +250,13 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		const width = state.plot.clientWidth;
 		if (!width || width === placed) return;
 		if (!debug.timed("Drawing", state.figure, () => layout(state, config))) return;
+
 		if (!checked) {
 			checked = true;
 			checkContrast(state.figure);
 			checkTextContrast(state.figure);
-			checkOldColours(state.figure);
 		}
+
 		placed = width;
 		if (keepShown) setShown(state, true, true);
 		keepShown = false;
@@ -227,6 +266,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 	// Rendered before the frame is painted, so a chart at a new width is never shown scaled. The layout changes the height of the
 	// figure, so it is watched again from the next frame: that is not a new resize, and no "ResizeObserver loop" error comes.
 	let destroyed = false;
+
 	const resizer = new ResizeObserver(() => {
 		place();
 		resizer.unobserve(state.figure);
@@ -250,6 +290,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		putMasksOn(state.svg);
 		void state.figure.offsetWidth;
 		paperRoles(state, true);
+
 		// On paper the drawing shrinks and its text does not, so a chart from a wide window is rendered again for the paper, about 700px wide.
 		const root = document.documentElement;
 		const width = root.style.width;
@@ -258,6 +299,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		if (forPaper) layout(state, config);
 		root.style.width = width;
 	};
+
 	const printed = () => {
 		state.figure.classList.remove(PRINTING_CLASS);
 		paperRoles(state, false);
@@ -269,6 +311,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		placed = null;
 		place();
 	};
+
 	const speaker = { relabel: () => relabel(state, config), refresh };
 
 	// The marks that stay move to their new place, unless the chart has no animation.
@@ -286,15 +329,19 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		placed = null;
 		keepShown = shown;
 		place();
+
 		// A layout can change the width of the plot, such as for the numbers of an axis: rendered again before anything moves.
 		for (let tries = 0; tries < 2 && state.plot.clientWidth !== placed; tries++) {
 			placed = null;
 			place();
 		}
+
 		if (before) morph(before, state);
 		focusName(state.figure, series);
 	};
+
 	const stopPresses = listenToLegend(state.figure, press);
+
 	// Before the first layout, so a chart that starts narrow is the right kind straight away.
 	switchKind();
 
@@ -315,6 +362,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 			if (state.plan) return stepTo(state, 0);
 			if (!animated(state.figure, config)) return;
 			setShown(state, false, true);
+
 			// After the frame that ends the jump back, so the build runs with its transitions.
 			requestAnimationFrame(() => destroyed || setShown(state, true));
 		},
@@ -342,16 +390,21 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 			if (state.figure.tablechart === chart) delete state.figure.tablechart;
 		},
 	};
+
 	state.figure.tablechart = chart;
 	return chart;
 };
 
+// ---------------------------------------------------------------------------------------------------------------------------------
+
 // Once per page: a chart works in any element, but only a figure with a figcaption gives it a title for screen readers.
 let warnedFigure = false;
+
 const warnNotFigure = (figures: HTMLElement[]): void => {
 	const other = figures.find((figure) => figure.tagName !== "FIGURE");
 	if (warnedFigure || !other) return;
 	warnedFigure = true;
+
 	console.warn(
 		`[${LIBRARY_NAME}] A chart is a <${other.tagName.toLowerCase()}>. Use a <figure> with a <figcaption>, so the chart has a title, also for screen readers.`,
 		other
@@ -363,16 +416,19 @@ export const prepare = async (found: HTMLElement[], config: Config): Promise<HTM
 	// A header with `data-chart="line"` is a series in a chart, not a chart.
 	const adopted = adoptTables(found.filter((element) => !element.hasAttribute(MADE) && element.tagName !== "TH"));
 	warnNotFigure(adopted);
+
 	// So the room it keeps until it is rendered is as high as it will be.
 	for (const figure of adopted) {
 		const aspect = Number.parseFloat(figure.getAttribute("data-chart-aspect") ?? "");
 		if (aspect > 0) figure.style.setProperty("--_room", String(aspect));
 	}
+
 	// A figure whose data could not load has a message instead of a chart.
 	const failed = await loadSources(adopted, config);
 	const figures = adopted.filter((figure) => !failed.has(figure));
 	readMarkdownRows(figures);
 	assignKeys(figures, config.langattribute);
+
 	// The table is complete now, also one from a file, so a summary can read it.
 	for (const figure of figures) figure.dispatchEvent(new CustomEvent("tablechart:table", { bubbles: true }));
 	return figures;
@@ -382,6 +438,7 @@ export const prepare = async (found: HTMLElement[], config: Config): Promise<HTM
 const paperRoles = ({ figure, plot, svg }: ChartState, on: boolean): void => {
 	const name = ["aria-labelledby", "aria-label"].find((attribute) => figure.hasAttribute(attribute));
 	if (figure.tagName !== "FIGURE" || !name || (figure.hasAttribute("role") && figure.getAttribute("role") !== "group")) return;
+
 	if (on) {
 		figure.setAttribute("role", "group");
 		plot.removeAttribute("aria-hidden");
@@ -403,18 +460,23 @@ const make = (figure: HTMLElement, config: Config): TablechartChart | null => {
 	return watch(state, config);
 };
 
+// ---------------------------------------------------------------------------------------------------------------------------------
+
 // A switch between light and dark changes the colours, not the sizes: the background is measured again, and the numbers inside bars follow.
 // A site can also switch with a class or an attribute on `html` or `body`, so those are followed too, also when the colours fade to the new ones.
 let following = false;
 const textColours = new WeakMap<HTMLElement, string>();
+
 const followScheme = (): void => {
 	if (following || typeof matchMedia !== "function") return;
 	following = true;
+
 	const recolour = () => {
 		for (const figure of document.querySelectorAll<HTMLElement>(`[${MADE}]`)) {
 			const text = getComputedStyle(figure).color;
 			const changed = measureSurface(figure) || textColours.get(figure) !== text;
 			textColours.set(figure, text);
+
 			if (changed) {
 				inkInside(figure);
 				inkNames(figure);
@@ -422,13 +484,17 @@ const followScheme = (): void => {
 			}
 		}
 	};
+
 	matchMedia("(prefers-color-scheme: dark)").addEventListener("change", recolour);
 	const watch = new MutationObserver(recolour);
 	for (const root of [document.documentElement, document.body]) watch.observe(root, { attributes: true });
+
 	document.addEventListener("transitionend", (event) => {
 		if (event.target === document.documentElement || event.target === document.body) recolour();
 	});
 };
+
+// ---------------------------------------------------------------------------------------------------------------------------------
 
 /** Makes a chart of one figure; returns the existing chart if there is one, or null without data. */
 export const create = async (
@@ -455,11 +521,14 @@ export const init = async (
 	starting += 1;
 	document.documentElement.removeAttribute(READY);
 	const figures = await prepare(Array.from(root.querySelectorAll<HTMLElement>(config.selector)), config);
+
 	const charts = figures
 		.map((figure) => make(figure, config))
 		.filter((chart): chart is TablechartChart => chart !== null);
+
 	debug.log(`Made ${charts.length} chart(s).`);
 	starting -= 1;
+
 	// For a script that prints the page, such as to a PDF: every chart of every `init` is there.
 	if (!starting) {
 		document.documentElement.setAttribute(READY, "");

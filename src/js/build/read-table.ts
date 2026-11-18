@@ -8,6 +8,7 @@ import { tableOf } from "../shared/table";
 const readCell = (td: Element | null): Cell => {
 	const raw = (td?.textContent || "").trim();
 	const parts = raw.match(/^(.*?)(-?\d+(?:[.,]\d+)?)(.*)$/);
+
 	return {
 		raw,
 		number: parts?.[2] ?? "",
@@ -22,25 +23,27 @@ const readCell = (td: Element | null): Cell => {
 export const noteColumns = (figure: HTMLElement): number[] =>
 	Array.from(tableOf(figure)?.querySelector("thead tr:last-child")?.children ?? [])
 		.slice(1)
-		.flatMap((head, i) => (head.hasAttribute("data-note") ? [i] : []));
+		.flatMap((head, index) => (head.hasAttribute("data-note") ? [index] : []));
 
 /** The note of a row, as the table has it now, also after a translation: its cell, or null. */
 export const noteCell = (figure: HTMLElement, index: number): HTMLTableCellElement | null => {
 	const columns = noteColumns(figure);
 	const tds = tableOf(figure)?.querySelectorAll("tbody tr")[index]?.querySelectorAll("td") ?? [];
-	const cell = columns.map((c) => tds[c]).find((td) => td?.textContent?.trim());
+	const cell = columns.map((column) => tds[column]).find((td) => td?.textContent?.trim());
 	return cell ?? null;
 };
 
 /** Every cell after the label is a value, one per series; the row's own value is its first. A note column is not. */
 export const readTable = (figure: HTMLElement, langattribute: string | false = "data-i18n"): Row[] => {
 	const notes = noteColumns(figure);
-	return Array.from(tableOf(figure)?.querySelectorAll("tbody tr") ?? []).map((tr, i) => {
+
+	return Array.from(tableOf(figure)?.querySelectorAll("tbody tr") ?? []).map((tr, index) => {
 		const th = tr.querySelector("th");
 		const tds = Array.from(tr.querySelectorAll("td"));
-		const cells = tds.filter((_td, c) => !notes.includes(c)).map(readCell);
+		const cells = tds.filter((_td, column) => !notes.includes(column)).map(readCell);
 		if (!cells.length) cells.push(readCell(null));
-		const note = notes.map((c) => tds[c]).find((td) => td?.textContent?.trim());
+		const note = notes.map((column) => tds[column]).find((td) => td?.textContent?.trim());
+
 		return {
 			...cells[0],
 			label: (th?.textContent || "").trim(),
@@ -52,7 +55,7 @@ export const readTable = (figure: HTMLElement, langattribute: string | false = "
 			cells,
 			classes: Array.from(tr.classList),
 			isTotal: tr.getAttribute("data-kind") === "total",
-			slot: i,
+			slot: index,
 		};
 	});
 };
@@ -66,8 +69,10 @@ const lineOf = (value: string | null | undefined): "dashed" | "dotted" | "dash-d
 export const readSeries = (figure: HTMLElement, rows: Row[], langattribute: string | false = "data-i18n"): Series[] => {
 	const heads = seriesHeads(figure);
 	const count = Math.max(1, largest(rows.map((row) => row.cells.length)));
-	return Array.from({ length: count }, (_, i) => {
-		const head = heads[i];
+
+	return Array.from({ length: count }, (_, index) => {
+		const head = heads[index];
+
 		return {
 			name: (head?.textContent || "").trim(),
 			key: (langattribute && head?.getAttribute(langattribute)) || null,
@@ -91,45 +96,55 @@ export const assignKeys = (figures: HTMLElement[], langattribute: string | false
 		if (!prefix) continue;
 
 		if (used.has(prefix)) {
-			const n = (used.get(prefix) as number) + 1;
-			used.set(prefix, n);
+			const count = (used.get(prefix) as number) + 1;
+			used.set(prefix, count);
+
 			console.warn(
-				`[${LIBRARY_NAME}] Two charts have data-chart-keys="${prefix}", so this one uses "${prefix}-${n}" to keep their translations apart.`
+				`[${LIBRARY_NAME}] Two charts have data-chart-keys="${prefix}", so this one uses "${prefix}-${count}" to keep their translations apart.`
 			);
-			prefix = `${prefix}-${n}`;
+
+			prefix = `${prefix}-${count}`;
 		} else {
 			used.set(prefix, 1);
 		}
 
-		tableOf(figure)?.querySelectorAll("tbody th").forEach((th, i) => {
+		tableOf(figure)?.querySelectorAll("tbody th").forEach((th, index) => {
 			if (!th.getAttribute(langattribute))
-				th.setAttribute(langattribute, `${prefix}-row${i + 1}`);
+				th.setAttribute(langattribute, `${prefix}-row${index + 1}`);
 		});
+
 		const heads = seriesHeads(figure);
+
 		if (heads.length > 1)
-			heads.forEach((head, i) => {
+			heads.forEach((head, index) => {
 				if (!head.getAttribute(langattribute))
-					head.setAttribute(langattribute, `${prefix}-col${i + 1}`);
+					head.setAttribute(langattribute, `${prefix}-col${index + 1}`);
 			});
+
 		// The cells of a group column name the groups: one key per group.
-		heads.forEach((head, i) => {
+		heads.forEach((head, index) => {
 			if (!head.hasAttribute("data-group")) return;
 			const groups: string[] = [];
-			tableOf(figure)?.querySelectorAll(`tbody tr > td:nth-of-type(${i + 1})`).forEach((td) => {
+
+			tableOf(figure)?.querySelectorAll(`tbody tr > td:nth-of-type(${index + 1})`).forEach((td) => {
 				const name = (td.textContent || "").trim();
 				if (!groups.includes(name)) groups.push(name);
 				if (!td.getAttribute(langattribute)) td.setAttribute(langattribute, `${prefix}-group${groups.indexOf(name) + 1}`);
 			});
 		});
+
 		// A note has a key by its row, such as `harvest-note14`.
 		const notes = noteColumns(figure);
+
 		tableOf(figure)?.querySelectorAll("tbody tr").forEach((tr, row) => {
 			const tds = tr.querySelectorAll("td");
-			for (const c of notes) {
-				const td = tds[c];
+
+			for (const column of notes) {
+				const td = tds[column];
 				if (td?.textContent?.trim() && !td.getAttribute(langattribute)) td.setAttribute(langattribute, `${prefix}-note${row + 1}`);
 			}
 		});
+
 		debug?.log?.(
 			`Keys for "${prefix}" written onto ${tableOf(figure)?.querySelectorAll("tbody th").length ?? 0} rows`
 		);

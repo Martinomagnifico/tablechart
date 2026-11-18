@@ -9,10 +9,12 @@ export const svgEl = <K extends keyof SVGElementTagNameMap>(
 	attrs: Record<string, string | number> = {}
 ): SVGElementTagNameMap[K] => {
 	const node = document.createElementNS(SVGNS, name);
+
 	for (const key in attrs) {
 		const value = attrs[key];
 		node.setAttribute(key, String(typeof value === "number" ? short(value) : value));
 	}
+
 	return node;
 };
 
@@ -45,28 +47,33 @@ let fades = 0;
 
 const defsOf = (svg: SVGSVGElement): SVGDefsElement => {
 	let defs = svg.querySelector<SVGDefsElement>(":scope > defs");
+
 	if (!defs) {
 		defs = svgEl("defs");
 		svg.prepend(defs);
 	}
+
 	return defs;
 };
 
 /** Rounds the marked end of each bar: an SVG `rect` can only round all its corners, so it becomes a `path`. Last, as a break in the scale reads the rects. */
 export const roundEnds = (svg: SVGSVGElement, radius: number): void => {
 	for (const rect of svg.querySelectorAll<SVGRectElement>("rect[data-end]")) {
-		const [x, y, w, h] = ["x", "y", "width", "height"].map((name) => Number(rect.getAttribute(name)));
+		const [x, y, rectWidth, rectHeight] = ["x", "y", "width", "height"].map((name) => Number(rect.getAttribute(name)));
 		const end = rect.getAttribute("data-end");
 		const sideways = end === "left" || end === "right";
-		const r = short(Math.min(radius, sideways ? h / 2 : w / 2, sideways ? w : h));
-		const arc = (dx: number, dy: number) => `a${r},${r} 0 0 1 ${dx},${dy}`;
-		const d = {
-			top: `M${x},${short(y + h)}v${short(r - h)}${arc(r, -r)}h${short(w - 2 * r)}${arc(r, r)}v${short(h - r)}z`,
-			bottom: `M${short(x + w)},${y}v${short(h - r)}${arc(-r, r)}h${short(2 * r - w)}${arc(-r, -r)}v${short(r - h)}z`,
-			right: `M${x},${y}h${short(w - r)}${arc(r, r)}v${short(h - 2 * r)}${arc(-r, r)}h${short(r - w)}z`,
-			left: `M${short(x + w)},${short(y + h)}h${short(r - w)}${arc(-r, -r)}v${short(2 * r - h)}${arc(r, -r)}h${short(w - r)}z`,
+		const corner = short(Math.min(radius, sideways ? rectHeight / 2 : rectWidth / 2, sideways ? rectWidth : rectHeight));
+
+		const arc = (dx: number, dy: number) => `a${corner},${corner} 0 0 1 ${dx},${dy}`;
+
+		const pathData = {
+			top: `M${x},${short(y + rectHeight)}v${short(corner - rectHeight)}${arc(corner, -corner)}h${short(rectWidth - 2 * corner)}${arc(corner, corner)}v${short(rectHeight - corner)}z`,
+			bottom: `M${short(x + rectWidth)},${y}v${short(rectHeight - corner)}${arc(-corner, corner)}h${short(2 * corner - rectWidth)}${arc(-corner, -corner)}v${short(corner - rectHeight)}z`,
+			right: `M${x},${y}h${short(rectWidth - corner)}${arc(corner, corner)}v${short(rectHeight - 2 * corner)}${arc(-corner, corner)}h${short(corner - rectWidth)}z`,
+			left: `M${short(x + rectWidth)},${short(y + rectHeight)}h${short(corner - rectWidth)}${arc(-corner, -corner)}v${short(2 * corner - rectHeight)}${arc(corner, -corner)}h${short(rectWidth - corner)}z`,
 		}[end as "top"];
-		const path = svgEl("path", { d });
+
+		const path = svgEl("path", { d: pathData });
 		for (const { name, value } of Array.from(rect.attributes)) if (!["x", "y", "width", "height"].includes(name)) path.setAttribute(name, value);
 		rect.replaceWith(path);
 	}
@@ -76,13 +83,16 @@ export const roundEnds = (svg: SVGSVGElement, radius: number): void => {
 export const fadeFill = (svg: SVGSVGElement, top: number, zero: number, bottom: number, attrs: Record<string, string>): string => {
 	const id = `tablechart-fade-${++fades}`;
 	const fill = svgEl("linearGradient", { id, gradientUnits: "userSpaceOnUse", x1: 0, x2: 0, y1: short(top), y2: short(bottom), ...attrs });
+
 	const stops = [
 		...(top < zero ? [{ offset: 0, faded: false }] : []),
 		{ offset: bottom > top ? (zero - top) / (bottom - top) : 0, faded: true },
 		...(bottom > zero ? [{ offset: 1, faded: false }] : []),
 	];
+
 	for (const { offset, faded } of stops)
 		fill.appendChild(svgEl("stop", { class: FADE_STOP_CLASS, offset: short(offset), ...(faded && { "data-faded": "" }) }));
+
 	defsOf(svg).appendChild(fill);
 	return id;
 };
@@ -91,15 +101,18 @@ export const fadeFill = (svg: SVGSVGElement, top: number, zero: number, bottom: 
 const outlineOf = (rect: SVGElement): string => {
 	// An open marker: a circle, or a polygon such as a diamond.
 	if (rect.tagName === "circle") {
-		const [cx, cy, r] = ["cx", "cy", "r"].map((name) => Number(rect.getAttribute(name)) || 0);
-		return `M${short(cx - r)},${short(cy)}a${short(r)},${short(r)} 0 1 0 ${short(2 * r)},0a${short(r)},${short(r)} 0 1 0 ${short(-2 * r)},0z`;
+		const [cx, cy, radius] = ["cx", "cy", "r"].map((name) => Number(rect.getAttribute(name)) || 0);
+		return `M${short(cx - radius)},${short(cy)}a${short(radius)},${short(radius)} 0 1 0 ${short(2 * radius)},0a${short(radius)},${short(radius)} 0 1 0 ${short(-2 * radius)},0z`;
 	}
+
 	if (rect.tagName === "polygon") return `M${(rect.getAttribute("points") ?? "").trim().split(/\s+/).join("L")}z`;
-	const [x, y, w, h, rx0, ry0] = ["x", "y", "width", "height", "rx", "ry"].map((name) => Number(rect.getAttribute(name)) || 0);
-	const rx = Math.min(rx0, w / 2);
-	const ry = Math.min(ry0, h / 2);
+	const [x, y, rectWidth, rectHeight, rx0, ry0] = ["x", "y", "width", "height", "rx", "ry"].map((name) => Number(rect.getAttribute(name)) || 0);
+	const rx = Math.min(rx0, rectWidth / 2);
+	const ry = Math.min(ry0, rectHeight / 2);
+
 	const arc = (dx: number, dy: number) => (rx && ry ? `a${short(rx)},${short(ry)} 0 0 1 ${short(dx)},${short(dy)}` : "");
-	return `M${short(x + rx)},${short(y)}h${short(w - 2 * rx)}${arc(rx, ry)}v${short(h - 2 * ry)}${arc(-rx, ry)}h${short(2 * rx - w)}${arc(-rx, -ry)}v${short(2 * ry - h)}${arc(rx, -ry)}z`;
+
+	return `M${short(x + rx)},${short(y)}h${short(rectWidth - 2 * rx)}${arc(rx, ry)}v${short(rectHeight - 2 * ry)}${arc(-rx, ry)}h${short(2 * rx - rectWidth)}${arc(-rx, -ry)}v${short(2 * ry - rectHeight)}${arc(rx, -ry)}z`;
 };
 
 /**
@@ -110,6 +123,7 @@ export const clipAround = (svg: SVGSVGElement, holes: SVGElement[], width: numbe
 	if (!holes.length || !only.length) return;
 	const id = `tablechart-clip-${++clips}`;
 	const clip = svgEl("clipPath", { id, clipPathUnits: "userSpaceOnUse" });
+
 	// Larger than the chart, as the mask is, with every hole left out of it.
 	const outside = `M${-width},${-height}h${width * 3}v${height * 3}h${-width * 3}z`;
 	clip.appendChild(svgEl("path", { d: outside + holes.map(outlineOf).join(""), "clip-rule": "evenodd" }));
@@ -125,28 +139,36 @@ export const cutOut = (svg: SVGSVGElement, holes: SVGElement[], width: number, h
 	if (!holes.length) return;
 	const id = `tablechart-cut-${++cuts}`;
 	const mask = svgEl("mask", { id, maskUnits: "userSpaceOnUse" });
+
 	// Larger than the chart, so a mark that reaches past the edge is not cut off.
 	mask.appendChild(
 		svgEl("rect", { x: -width, y: -height, width: width * 3, height: height * 3, fill: "white" })
 	);
+
 	for (const hole of holes) {
 		hole.setAttribute("fill", "black");
 		mask.appendChild(hole);
 	}
+
 	const defs = defsOf(svg);
 	defs.appendChild(mask);
+
 	if (only) {
 		for (const one of only) one.setAttribute("mask", `url(#${id})`);
 		return;
 	}
+
 	let group: SVGGElement | null = null;
+
 	for (const child of Array.from(svg.childNodes)) {
 		if (child === defs) continue;
+
 		if (loose && child instanceof Element && child.matches(loose)) {
 			group = null;
 			svg.appendChild(child);
 			continue;
 		}
+
 		group ??= svg.appendChild(svgEl("g", { mask: `url(#${id})` }));
 		group.appendChild(child);
 	}

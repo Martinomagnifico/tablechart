@@ -25,6 +25,7 @@ export const mapBetween = (from: Frame, to: Frame): Mapping => {
 	const scaleY = from.scaleY / to.scaleY;
 	const shiftX = (from.svg.left - to.svg.left) / to.scaleX;
 	const shiftY = (from.svg.top - to.svg.top) / to.scaleY;
+
 	return {
 		scaleX,
 		shiftX,
@@ -53,6 +54,7 @@ const mapNumber = (value: number, role: string, relative: boolean, mapping: Mapp
 export const mapPath = (path: string, mapping: Mapping): string => {
 	let command = "";
 	let index = 0;
+
 	return path.replace(TOKEN, (token) => {
 		if (/[A-Za-z]/.test(token)) {
 			command = token;
@@ -80,6 +82,7 @@ export const pathsBetween = (from: string, to: string): ((progress: number) => s
 
 	const start = fromNumbers.map(Number);
 	const end = toNumbers.map(Number);
+
 	return (progress) =>
 		between
 			.map((part, index) => {

@@ -23,22 +23,24 @@ export const place = (
 	corner = 12
 ): void => {
 	const box = tip.getBoundingClientRect();
-	const w = box.width;
-	const h = box.height;
+	const tipWidth = box.width;
+	const tipHeight = box.height;
+
 	// The arrow is placed from inside the border.
 	const border = Number.parseFloat(getComputedStyle(tip).borderLeftWidth) || 0;
+
 	// The arrow is a turned square on the inner edge of the border: half of it sticks out, less the border.
 	const gap = arrow.getBoundingClientRect().height / 2 + (space - border) * frame.scale;
 	const inset = corner * frame.scale;
 	const { clientWidth: vw, clientHeight: vh } = document.documentElement;
 	const above = anchor.top - pad;
 	const below = vh - anchor.bottom - pad;
-	const top = h + gap <= above ? true : h + gap <= below ? false : above >= below;
-	const y = top ? anchor.top - gap - h : anchor.bottom + gap;
+	const top = tipHeight + gap <= above ? true : tipHeight + gap <= below ? false : above >= below;
+	const y = top ? anchor.top - gap - tipHeight : anchor.bottom + gap;
 	const middle = anchor.left + anchor.width / 2;
-	const x = Math.max(pad, Math.min(middle - w / 2, vw - w - pad));
+	const x = Math.max(pad, Math.min(middle - tipWidth / 2, vw - tipWidth - pad));
 	tip.style.left = `${(x - frame.x) / frame.scale}px`;
-	tip.style.top = `${(Math.max(pad, Math.min(y, vh - h - pad)) - frame.y) / frame.scale}px`;
+	tip.style.top = `${(Math.max(pad, Math.min(y, vh - tipHeight - pad)) - frame.y) / frame.scale}px`;
 	tip.dataset.side = top ? "top" : "bottom";
-	arrow.style.left = `${Math.max(inset, Math.min(middle - x, w - inset)) / frame.scale - border}px`;
+	arrow.style.left = `${Math.max(inset, Math.min(middle - x, tipWidth - inset)) / frame.scale - border}px`;
 };

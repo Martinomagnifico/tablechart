@@ -9,7 +9,13 @@ import { largest } from "../shared/format";
 
 /** Only the numbers on the side of zero where the series of the axis have values: no rainfall below zero. Gridlines stay. */
 const numberedFor = (state: ChartState, series: number[]) => {
-	const values = state.rows.flatMap((row) => series.flatMap((s) => (row.cells[s] && !row.cells[s].missing ? [row.cells[s].value] : [])));
+	const values = state.rows.flatMap((row) =>
+		series.flatMap((seriesIndex) => {
+			const cell = row.cells[seriesIndex];
+			return cell && !cell.missing ? [cell.value] : [];
+		})
+	);
+
 	const below = values.some((value) => value < 0);
 	const above = values.some((value) => value > 0) || !below;
 	return (value: number) => (value >= 0 || below) && (value <= 0 || above);
@@ -37,18 +43,23 @@ export const placeBothAxes = (
 	gutter: number
 ): void => {
 	const right = state.rightAxis as RightAxis;
-	const leftSeries = state.series.flatMap((_one, s) => (right.series.includes(s) ? [] : [s]));
+	const leftSeries = state.series.flatMap((_one, seriesIndex) => (right.series.includes(seriesIndex) ? [] : [seriesIndex]));
 	const shown = placeValueAxis(state, config, along, left, y, null, height, unit, gutter, { numbered: numberedFor(state, leftSeries) });
+
 	// Where the scales are aligned, the right shows the ticks at the places of those shown on the left.
 	const scale = right.scale as Scale;
-	const same = right.aligned ? scale.ticks.filter((_value, k) => shown.includes(left.ticks[k])) : undefined;
+	const same = right.aligned ? scale.ticks.filter((_value, index) => shown.includes(left.ticks[index])) : undefined;
+
 	placeValueAxis(state, config, { titles: [], ticks: right.ticks, numbers: true, right: true }, scale, yRight, null, height, unit, gutter, {
 		shown: same,
 		numbered: numberedFor(state, right.series),
 		grid: false,
 	});
+
 	const [leftTitle, rightTitle] = right.titles;
+
 	const margin = (side: "marginLeft" | "marginRight") => (Number.parseFloat(state.plot.style[side]) || 0) * unit;
+
 	// At the top, in the room the layout keeps for them over the marks and their numbers.
 	const level = largest(right.titles.map((title) => sizeOf(title).height)) * unit + 2 * unit;
 	placeAt(leftTitle, -margin("marginLeft"), level, VIEWBOX_WIDTH, height);

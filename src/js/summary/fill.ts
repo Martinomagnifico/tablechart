@@ -23,34 +23,42 @@ const shows = (element: HTMLElement, results: Results): boolean => {
 /** A copy of the template with each placeholder replaced by its value, for the reader; the template keeps its key. */
 const fillOne = (template: HTMLElement, results: Results, config: SummaryConfig, locale: string | undefined): HTMLElement => {
 	const out = template.cloneNode(true) as HTMLElement;
+
 	for (const name of [TEMPLATE, "hidden", "id", "data-summary", "data-none", "data-when", "data-series", ...(config.langattribute ? [config.langattribute] : [])])
 		out.removeAttribute(name);
+
 	out.setAttribute(FILLED, "");
 	const found = Object.values(results).filter((one): one is Result => !!one);
 	const values = Object.assign({}, ...found.map((one) => one.values));
 	const counts = Object.assign({}, ...found.map((one) => one.counts ?? {}));
+
 	// A part of a sentence with `data-summary` follows the same rules, such as "Without the outliers," only when there are some.
 	for (const part of out.querySelectorAll<HTMLElement>("[data-summary]")) {
 		if (!shows(part, results)) part.remove();
 		else for (const name of ["data-summary", "data-none", "data-when"]) part.removeAttribute(name);
 	}
+
 	// An element with `data-each` is repeated for each item, such as each outlier. Items in a sentence are joined as a list in the language
 	// of the page; rows of a table and items of a list stay as they are.
 	for (const each of out.querySelectorAll<HTMLElement>("[data-each]")) {
 		const items = results[each.dataset.each ?? ""]?.items ?? [];
+
 		const copies = items.map((item) => {
 			const copy = each.cloneNode(true) as HTMLElement;
 			copy.removeAttribute("data-each");
 			replace(copy, { ...values, ...item.values }, { ...counts, ...item.counts }, config, locale);
 			return copy;
 		});
+
 		if (each.matches("tr, li")) {
 			each.replaceWith(...copies);
 			continue;
 		}
-		const joined = new Intl.ListFormat(locale, { type: "conjunction" }).formatToParts(copies.map((_copy, i) => String(i)));
+
+		const joined = new Intl.ListFormat(locale, { type: "conjunction" }).formatToParts(copies.map((_copy, index) => String(index)));
 		each.replaceWith(...joined.map((part) => (part.type === "element" ? copies[Number(part.value)] : part.value)));
 	}
+
 	replace(out, values, counts, config, locale);
 	return out;
 };
@@ -69,13 +77,14 @@ export const fill = (figure: HTMLElement, options: Partial<SummaryConfig> = star
 
 	for (const old of box.querySelectorAll(`:scope > [${FILLED}]`)) old.remove();
 	const bySeries = new Map<number, Results>();
+
 	for (const template of box.querySelectorAll<HTMLElement>(":scope > *")) {
 		template.setAttribute(TEMPLATE, "");
 		template.hidden = true;
 		const first = String(FIRST_SERIES[figure.getAttribute("data-chart") ?? ""] ?? 1);
-		const s = template.dataset.series === "total" ? -1 : Math.max(1, Number.parseInt(template.dataset.series ?? first, 10) || 1) - 1;
-		if (!bySeries.has(s)) bySeries.set(s, analyse(figure, s, config, locale));
-		const results = bySeries.get(s) as Results;
+		const seriesIndex = template.dataset.series === "total" ? -1 : Math.max(1, Number.parseInt(template.dataset.series ?? first, 10) || 1) - 1;
+		if (!bySeries.has(seriesIndex)) bySeries.set(seriesIndex, analyse(figure, seriesIndex, config, locale));
+		const results = bySeries.get(seriesIndex) as Results;
 		if (!shows(template, results)) continue;
 		template.after(fillOne(template, results, config, locale));
 	}

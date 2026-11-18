@@ -12,13 +12,20 @@ type Box = { row: number; x: number; y: number; width: number; height: number; s
 const barsIn = (svg: SVGSVGElement): Box[] =>
 	Array.from(svg.querySelectorAll<SVGElement>(`.${BAR_CLASS}`)).map((bar) => {
 		const rects = bar.tagName === "rect" ? [bar] : Array.from(bar.querySelectorAll("rect"));
+
 		const read = (rect: Element, name: string) => Number(rect.getAttribute(name));
+
 		const x = Math.min(...rects.map((rect) => read(rect, "x")));
 		const y = Math.min(...rects.map((rect) => read(rect, "y")));
 		const right = Math.max(...rects.map((rect) => read(rect, "x") + read(rect, "width")));
 		const bottom = Math.max(...rects.map((rect) => read(rect, "y") + read(rect, "height")));
+
 		// A bar with its own part of a waterfall's motion: its cut appears when the bar is done.
-		const part = ["--start", "--span"].map((name) => bar.style.getPropertyValue(name) && `${name}:${bar.style.getPropertyValue(name)}`).filter(Boolean).join("; ");
+		const part = ["--start", "--span"]
+			.map((name) => bar.style.getPropertyValue(name) && `${name}:${bar.style.getPropertyValue(name)}`)
+			.filter(Boolean)
+			.join("; ");
+
 		return { row: Number(bar.dataset.row), x, y, width: right - x, height: bottom - y, sideways: bar.dataset.grow === "right", part };
 	});
 
@@ -40,12 +47,14 @@ export const axisBreak: AnnotationType = {
 			const length = thickness + overhang * 2;
 			const tilt = length * 0.3;
 			const rise = length * 0.06;
+
 			if (box.sideways) {
 				const top = box.y - overhang;
 				if (!zigzag) return [[at - tilt / 2, top], [at + tilt / 2, top + length]];
 				const third = length / 3;
 				return [[at - rise, top], [at + rise, top + third], [at - rise, top + 2 * third], [at + rise, top + length]];
 			}
+
 			const left = box.x - overhang;
 			if (!zigzag) return [[left, at + tilt / 2], [left + length, at - tilt / 2]];
 			const third = length / 3;
@@ -54,12 +63,13 @@ export const axisBreak: AnnotationType = {
 
 		const path = (corners: Corner[], close = false): string =>
 			corners
-				.map(([x, at], i) => `${i === 0 ? "M" : "L"} ${x.toFixed(1)} ${at.toFixed(1)}`)
+				.map(([x, at], index) => `${index === 0 ? "M" : "L"} ${x.toFixed(1)} ${at.toFixed(1)}`)
 				.join(" ") + (close ? " Z" : "");
 
 		// Larger than the chart, so a mark that reaches past the edge is not cut off.
 		const id = `tablechart-break-${++masks}`;
 		const mask = svgEl("mask", { id, maskUnits: "userSpaceOnUse" });
+
 		mask.appendChild(
 			svgEl("rect", {
 				x: -VIEWBOX_WIDTH,
@@ -69,9 +79,11 @@ export const axisBreak: AnnotationType = {
 				fill: "white",
 			})
 		);
+
 		const cuts: Corner[][] = [];
 
 		const level = y(breakAt);
+
 		for (const box of barsIn(svg)) {
 			// A column is cut where the scale jumps; a bar on its side where the bar chart put its cut.
 			const across = box.sideways ? geo.breakX : level;
@@ -96,6 +108,7 @@ export const axisBreak: AnnotationType = {
 				);
 			}
 		}
+
 		if (!cuts.length) return;
 
 		// The edges are drawn after the masked group, so they are not masked.

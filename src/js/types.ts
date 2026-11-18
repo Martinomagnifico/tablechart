@@ -5,16 +5,20 @@ import type { StepPlan } from "./show/steps";
 
 /** How a line or an area runs from one point to the next. */
 export type Shape = "straight" | "step" | "smooth";
+
 /** How a chart builds: each element grows from zero, or the chart is revealed in one movement. */
 export type Motion = "grow" | "sweep";
 
 export interface Cell {
 	raw: string;
+
 	/** As written, so its decimal places survive. Empty when the cell holds no number. */
 	number: string;
+
 	/** Text around the number, such as `%` or a footnote `*`, kept either side of the formatted number. */
 	prefix: string;
 	suffix: string;
+
 	/** No number, such as "n/a": no mark, and the label says what the cell says. Counts as zero. */
 	missing: boolean;
 	value: number;
@@ -22,18 +26,23 @@ export interface Cell {
 
 export interface Row extends Cell {
 	label: string;
+
 	/** `data-short` on the row's header: the name under the chart, where room is short. The table and the summary have `label`. */
 	short: string | null;
+
 	/** `data-value="show"` on the row: its value is always shown on a line. */
 	pinned: boolean;
+
 	/** The text of its cell in a column with `data-note`, such as "Share issue", and its translation key. */
 	note: string | null;
 	noteKey: string | null;
 	key: string | null;
 	cells: Cell[];
+
 	/** Copied to everything drawn for the row, so one class styles all of it. */
 	classes: string[];
 	isTotal: boolean;
+
 	/** The stagger counts from here. */
 	slot: number;
 }
@@ -41,17 +50,23 @@ export interface Row extends Cell {
 export interface Series {
 	name: string;
 	key: string | null;
+
 	/** `data-kind="focus"`, or bold in Markdown: the others are shown fainter. */
 	focus: boolean;
+
 	/** `data-marker` on the header, such as `square` or `diamond open`. */
 	marker: string | null;
 	line: "dashed" | "dotted" | "dash-dot" | null;
+
 	/** `data-group` on the header: the cells name a group, such as "Predefined". */
 	group: boolean;
+
 	/** `data-chart="line"` on the header, in a chart that takes it: a line over the other marks. */
 	chart: "line" | null;
+
 	/** `data-axis="right"` on the header: the series has the value axis on the right, with a scale of its own. */
 	axis: "left" | "right";
+
 	/** Turned off in a legend with toggles: its cells count as missing, and it has no marks or numbers. */
 	off?: boolean;
 }
@@ -65,6 +80,7 @@ export interface Segment extends Row {
 /** Which values a line shows, from `data-chart-values`: all, none, a set of rows, or all if they fit and else the set. */
 export interface ValuePick {
 	mode: "auto" | "all" | "set";
+
 	/** `first`, `last`, `highest`, `lowest`, `outliers`. Rows with `data-value="show"` are always in the set. */
 	keys: string[];
 }
@@ -75,76 +91,105 @@ export interface Geometry {
 	segments: Segment[];
 	cx: (index: number) => number;
 	y: (value: number) => number;
+
 	/** The scale of one series, on a chart with two value axes. */
 	yOf?: (series: number) => (value: number) => number;
+
 	/** Across: on a chart with two axes, and the value scale of a bar chart, set by its drawing. */
 	x?: (value: number) => number;
+
 	/** The plot inside the axes, on a chart with axes. */
 	frame?: [number, number, number, number];
+
 	/** A chart that knows better which row is pointed at sets this, in screen pixels from the plot's corner. */
 	rowAt?: (x: number, y: number) => number | null;
+
 	/** Where the tooltip of a row points, in viewBox units, for a row whose mark may not be drawn, such as a point of a long line. */
 	pointOf?: (index: number) => [number, number] | null;
+
 	/** The crosshair of a row, on a line or area chart. */
 	crossingOf?: (index: number) => Crossing | null;
+
 	/** The side of the numbers of the value axis; null without them. */
 	axisSide: "left" | "right" | null;
+
 	/** A CSS length set on the figure, such as `--tablechart-marker-size`, in viewBox units. */
 	length: (name: string, fallback: string) => number | null;
 	barWidth: number;
 	barMax: number;
+
 	/** How round the end of a bar is, in viewBox units; 0 for square. */
 	barRadius: number;
+
 	/** How round the corners of a donut's slices are, in viewBox units; 0 for square. */
 	sliceRadius: number;
 	height: number;
+
 	/** viewBox units per screen pixel. */
 	unit: number;
 	labelHeight: number;
 	badgeHeight: number;
+
 	/** How many stagger steps the data takes, so commentary can land after it. */
 	after: number;
+
 	/** An annotation's number in the figure, from 1, set as `data-note` on its marks. Zero for the chart. */
 	note: number;
+
 	/** Where the break's mark goes, as a value. Null when the scale runs straight through. */
 	breakAt: number | null;
+
 	/** The break itself, for a chart that makes a scale of its own, such as a bar chart. */
 	squeeze: Squeeze | null;
+
 	/** The empty space where the scale jumps, in viewBox units. */
 	breakGap: number;
+
 	/** The range of the value axis, on a chart with an axis or gridlines; a chart that makes its own scale reaches it. */
 	domain: [number, number] | null;
+
 	/** Where a bar chart is cut across, in viewBox units; set by its drawing. */
 	breakX?: number;
 	labels: "outside" | "inside";
+
 	/** Where a number inside its bar goes, from `--tablechart-value-align`; null for the chart's own default. */
 	insideAlign: "start" | "center" | "end" | null;
 	stacked: boolean;
 	shape: Shape;
+
 	/** Which values a line or an area shows. */
 	pick: ValuePick;
+
 	/** The last number of each line goes next to its name. */
 	numbersAtEnd: boolean;
+
 	/** Empty when the chart is not stacked or its kind shows no totals. */
 	totals: HTMLElement[];
 	svg: SVGSVGElement;
 	plot: HTMLElement;
+
 	/** Made by `build`; a chart only places them. */
 	values: HTMLElement[];
 	series: Series[];
+
 	/** The series this drawing draws: all of them, or in a chart with columns and a line, those of its own kind. */
 	own: number[];
 	seriesValues: HTMLElement[][];
+
 	/** Empty with one series. */
 	names: HTMLElement[];
+
 	/** A chart with its names beside the marks places these; one with them under the plot does not. */
 	categories: HTMLElement[];
 	centre: HTMLElement | null;
 	config: Config;
+
 	/** Numbers an annotation worked out, against the ones the author wrote. */
 	checks: Check[];
+
 	/** The labels of annotations placed so far, as left, top, width and height, so the next one finds room. */
 	taken: [number, number, number, number][];
+
 	/** Holes in the lines and areas, such as under an open marker: the core leaves them out with a clip, from the start. */
 	lineHoles: SVGElement[];
 }
@@ -158,42 +203,59 @@ export interface Check {
 
 export interface ChartType {
 	aspect?: number;
+
 	/** A row marked as a total goes in the middle rather than among the marks. */
 	centre?: boolean;
+
 	/** A break in the scale works here; a waterfall keeps its floating steps clear of it. */
 	breakable?: boolean;
 	stackable?: boolean;
+
 	/** A stack is a running sum, so each line follows the one under it; otherwise values below zero stack down from zero. */
 	running?: boolean;
 	totals?: boolean;
+
 	/** The sample in front of a legend name when it is not a line; the legend shows only when asked. */
 	swatch?: "box";
 	categories?: "under" | "beside";
 	series?: boolean;
+
 	/** The value columns are the fields of one mark, such as x and y, rather than series: no names for them. */
 	columns?: boolean;
+
 	/** An axis across and an axis up, from the first two value columns, with their headers as titles. */
 	axes?: boolean;
+
 	/** A series with `data-chart="line"` on its header is a line over the marks, on the same scale. */
 	lines?: boolean;
+
 	/** A series with `data-axis="right"` on its header has a value axis of its own, on the right. */
 	twoAxes?: boolean;
+
 	/** Several series side by side, as groups of bars: their numbers are smaller, so the plot is marked `data-grouped` before anything is measured. */
 	groups?: boolean;
+
 	/** False: no numbers on the chart. They stay out of the layout, which costs a lot with many rows. */
 	numbers?: false;
+
 	/** The scale fits the values without reaching zero, as for prices. */
 	floats?: boolean;
+
 	/** The value axis is shown unless the figure has `data-chart-axis="false"`. */
 	valueAxis?: boolean;
+
 	/** A tick above each name under the chart, as under a line. */
 	ticks?: boolean;
+
 	/** A crosshair with `tooltip: "crosshair"`; the drawing sets `crossingOf`. */
 	crosshair?: boolean;
+
 	/** The least width of a row, in pixels: rows that do not fit are cropped from the start, with a line under the chart that says so. */
 	minBand?: number;
+
 	/** Text of its own, made with the rest of the text so a translation script finds it, such as a legend. */
 	text?: (input: { figure: HTMLElement; plot: HTMLElement; rows: Row[]; series: Series[]; config: Config }) => void;
+
 	/** With several series, always a legend, with a sample of this shape. */
 	legend?: "box";
 	headroom?: (geo: HeadroomInput) => number;
@@ -206,13 +268,17 @@ export interface ChartType {
 		stacked: boolean;
 		labels: Geometry["labels"];
 	}) => number;
+
 	/** Room under the baseline for numbers that hang below a mark near it. */
 	footroom?: (geo: HeadroomInput) => number;
+
 	/** Default: one bar per row from the baseline. */
 	segments?: (rows: Row[]) => Segment[];
 	draw: (geo: Geometry) => void;
+
 	/** The lines of the tooltip of a row. Default: each value with the name of its series, and the total of a stack. */
 	tooltip?: (state: ChartState, index: number, config: Config) => TooltipLine[];
+
 	/** Annotations that come with this type, such as `quadrant` with `scatter`; `addType` adds them. */
 	annotations?: Record<string, AnnotationType>;
 }
@@ -222,18 +288,24 @@ export interface Crossing {
 	x: number;
 	from: number;
 	to: number;
+
 	/** Where the value labels go: at the value axis, or the left edge of the plot without one. */
 	edge: number;
+
 	/** Where a line across the plot ends: at the row farthest from the axis. */
 	end: number;
+
 	/** The side of the axis numbers that the value labels go over. */
 	axis: "left" | "right" | null;
 	height: number;
+
 	/** `colour` is the colour of the label, if not the colour of the line. */
 	points: { series: number; y: number; dot: SVGElement; colour?: string }[];
+
 	/** With it, the line across follows the pointer, with the value of the scale there; within `snap` pixels of a point, it goes through that point. */
 	textAt?: (y: number) => string;
 	snap?: number;
+
 	/** The top and bottom of a mark that the line down leaves free, such as a candle with its wick. */
 	around?: [number, number];
 }
@@ -243,8 +315,10 @@ export interface TooltipLine {
 	/** The name of the series; empty for a chart with one series. */
 	name: string;
 	value: string;
+
 	/** A small key in the colour of the series. */
 	colour?: string;
+
 	/** The shape of that key, as in the legend: a line with its point, or a box. */
 	sample?: { marker: string | null; open: boolean; line: string | null; box: boolean; point?: string; edge?: string };
 }
@@ -257,6 +331,7 @@ export interface HeadroomInput {
 	series: number;
 	focused: boolean;
 	stacked: boolean;
+
 	/** False with `data-chart-values="none"` and no row with `data-value="show"`: a line then needs no room for numbers. */
 	numbers: boolean;
 }
@@ -269,11 +344,14 @@ export interface AnnotationType {
 
 export interface RightAxis {
 	ticks: HTMLElement;
+
 	/** The title of each axis, left and right: the names of its series. */
 	titles: [HTMLElement, HTMLElement];
+
 	/** The series on the right, from 0. */
 	series: number[];
 	scale: Scale | null;
+
 	/** Its ticks are at the places of those on the left, so one set of gridlines serves both. */
 	aligned: boolean;
 }
@@ -281,6 +359,7 @@ export interface RightAxis {
 export interface ChartState {
 	/** What the chart needs by itself, for a group that shares a scale; null for a chart that cannot share one. */
 	measured?: { height: number; room: number; floor: number; ceiling: number; bottom: number } | null;
+
 	/** What its group with `data-chart-group-scale` agreed on. */
 	agreed?: { height: number; room: number; floor: number; ceiling: number; bottom: number };
 	figure: HTMLElement;
@@ -295,35 +374,46 @@ export interface ChartState {
 	names: HTMLElement[];
 	categories: HTMLElement[];
 	centre: HTMLElement | null;
+
 	/** The axis titles and the place for the numbers along the axes. Without `numbers`, only for gridlines. */
 	axes: { titles: HTMLElement[]; ticks: HTMLElement; numbers: boolean; right: boolean } | null;
+
 	/** The second value axis, for the series with `data-axis="right"`; null on a chart with one value axis. */
 	rightAxis: RightAxis | null;
 	stacked: boolean;
 	totals: HTMLElement[];
 	totalCell: HTMLElement | null;
+
 	/** In screen pixels from the plot's corner. Null for a chart whose rows are not side by side. */
 	rowAt: ((x: number, y: number) => number | null) | null;
+
 	/** As percentages: left, top, width and height. */
 	rowBox: ((index: number) => [number, number, number, number]) | null;
+
 	/** Where the tooltip of a row points, in viewBox units; set by a chart such as a line. */
 	pointOf: ((index: number) => [number, number] | null) | null;
+
 	/** The crosshair of a row, on a line or area chart. */
 	crossingOf: ((index: number) => Crossing | null) | null;
+
 	/** The crosshair, once it is attached, so a new layout can take it away. */
 	crosshair: { hide: () => void } | null;
 	annotations: {
 		spec: HTMLElement;
 		type: AnnotationType;
 		badge: HTMLElement | null;
+
 		/** From 0; `data-series` counts from 1. */
 		series: number;
 		after: number;
 	}[];
+
 	/** The steps of a chart that steps (`data-fragment`); null for one that does not. */
 	plan: StepPlan | null;
+
 	/** How many steps are shown. */
 	step: number;
+
 	/** The Previous and Next buttons, if Tablechart made them. */
 	controls: HTMLElement | null;
 	checks: Check[];

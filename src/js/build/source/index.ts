@@ -19,12 +19,15 @@ class Failure extends Error {
 
 const fetchJson = async (src: string): Promise<unknown> => {
 	let response: Response;
+
 	try {
 		response = await fetch(src);
 	} catch (error) {
 		throw new Failure("fetch", (error as Error).message);
 	}
+
 	if (!response.ok) throw new Failure("fetch", `${response.status} ${response.statusText}`.trim());
+
 	try {
 		return await response.json();
 	} catch {
@@ -37,6 +40,7 @@ const transformed = (figure: HTMLElement, config: Config, data: unknown): unknow
 	const chosen = transformFor(figure, config);
 	if ("missing" in chosen) throw new Failure("transform", `no transform named "${chosen.missing}" is registered in the transforms option`);
 	if (!chosen.name) return data;
+
 	try {
 		return chosen.run(data);
 	} catch (error) {
@@ -60,11 +64,14 @@ const loadOne = async (figure: HTMLElement, config: Config): Promise<boolean> =>
 
 		for (const table of tables) if (table !== authored) table.remove();
 		const table = tableFrom(source.rows, source.series, source.label, authored ?? undefined, source.note);
+
 		if (!authored) {
 			const caption = figure.querySelector(":scope > figcaption");
+
 			if (caption) caption.after(table);
 			else figure.prepend(table);
 		}
+
 		if (!table.tHead) debug?.log?.(`The table from "${src}" has no header row, so a screen reader cannot name its columns.`);
 		debug?.log?.(`Read ${source.rows.length} rows from "${src}"`);
 		return true;
@@ -79,10 +86,12 @@ const loadOne = async (figure: HTMLElement, config: Config): Promise<boolean> =>
 export const loadSources = async (figures: HTMLElement[], config: Config = defaultConfig): Promise<Set<HTMLElement>> => {
 	const failed = new Set<HTMLElement>();
 	const sourced = figures.filter((figure) => figure.hasAttribute("data-chart-src"));
+
 	await Promise.all(
 		sourced.map(async (figure) => {
 			if (!(await loadOne(figure, config))) failed.add(figure);
 		})
 	);
+
 	return failed;
 };

@@ -7,7 +7,7 @@ const sizes = new WeakMap<Element, Size>();
 export const measureAll = (elements: Iterable<HTMLElement | null | undefined>): void => {
 	const all = [...elements].filter((element): element is HTMLElement => !!element);
 	const read = all.map((element) => ({ width: element.offsetWidth, height: element.offsetHeight }));
-	all.forEach((element, k) => sizes.set(element, read[k]));
+	all.forEach((element, index) => sizes.set(element, read[index]));
 };
 
 /** The size `measureAll` read, or a fresh read for an element it did not see. */

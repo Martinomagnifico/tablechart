@@ -7,8 +7,10 @@ export const snapToPixels = (mark: SVGGeometryElement, svg: SVGSVGElement): void
 	if (!matrix || !matrix.a || !matrix.d) return;
 
 	const ratio = window.devicePixelRatio || 1;
+
 	// A place in the drawing, rounded to a pixel of the screen, and back in the drawing.
 	const snapX = (value: number) => (Math.round((matrix.a * value + matrix.e) * ratio) / ratio - matrix.e) / matrix.a;
+
 	const snapY = (value: number) => (Math.round((matrix.d * value + matrix.f) * ratio) / ratio - matrix.f) / matrix.d;
 
 	const x = Number(mark.getAttribute("x"));

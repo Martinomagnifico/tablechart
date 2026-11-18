@@ -14,6 +14,7 @@ export const edgeSamples = (figure: HTMLElement, edge: (fill: number[]) => numbe
 		probe.remove();
 
 		name.toggleAttribute("data-edge", !!colour);
+
 		if (colour) name.style.setProperty("--_edge", `rgb(${colour.join(" ")})`);
 		else name.style.removeProperty("--_edge");
 	}

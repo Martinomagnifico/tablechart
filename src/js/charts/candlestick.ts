@@ -4,12 +4,13 @@ import type { ChartType, Row, Series } from "../types";
 const CANDLE_CLASS = "tablechart-candle";
 
 /** The first four value columns: open, high, low and close. */
-const fieldsOf = (series: Series[]): number[] => series.flatMap((one, s) => (one.group ? [] : [s])).slice(0, 4);
+const fieldsOf = (series: Series[]): number[] => series.flatMap((one, seriesIndex) => (one.group ? [] : [seriesIndex])).slice(0, 4);
 
 /** Open, high, low and close of a row, or null if one is missing. */
 const pricesOf = (row: Row, fields: number[]): [number, number, number, number] | null => {
-	const cells = fields.map((s) => row.cells[s]);
-	return cells.length === 4 && cells.every((cell) => cell && !cell.missing) ? (cells.map((cell) => cell.value) as [number, number, number, number]) : null;
+	const cells = fields.map((field) => row.cells[field]);
+	const complete = cells.length === 4 && cells.every((cell) => cell && !cell.missing);
+	return complete ? (cells.map((cell) => cell.value) as [number, number, number, number]) : null;
 };
 
 /** One candle per row: a body from open to close, and a wick from low to high. A rising candle is hollow, a falling one filled. */
@@ -20,6 +21,7 @@ export const candlestick: ChartType = {
 	valueAxis: true,
 	ticks: true,
 	crosshair: true,
+
 	// A free pixel, the outline, the inside and the outline again.
 	minBand: 4,
 
@@ -30,33 +32,39 @@ export const candlestick: ChartType = {
 		const fields = fieldsOf(geo.series);
 		const all = rows.map((row) => pricesOf(row, fields));
 		const lows = all.flatMap((prices) => (prices ? [prices[2]] : []));
+
 		// With its outline of a pixel, a body keeps a free pixel to the next candle.
 		const band = rows.length > 1 ? cx(1) - cx(0) : VIEWBOX_WIDTH;
 		const width = Math.max(Math.min(barWidth, band - 2 * unit), unit);
 
-		all.forEach((prices, i) => {
+		all.forEach((prices, rowIndex) => {
 			if (!prices) return;
 			const [open, high, low, close] = prices;
 			const up = close >= open;
+
 			// A body as thin as a line where open and close are the same.
 			const middle = (y(open) + y(close)) / 2;
 			const tall = Math.max(Math.abs(y(open) - y(close)), unit);
 			const top = middle - tall / 2;
+
 			const candle = svgEl("g", {
-				class: withRow(`${BAR_CLASS} ${CANDLE_CLASS}`, rows[i]),
-				"data-row": i + 1,
+				class: withRow(`${BAR_CLASS} ${CANDLE_CLASS}`, rows[rowIndex]),
+				"data-row": rowIndex + 1,
 				"data-move": up ? "up" : "down",
+
 				// It grows the way the price went.
 				...(!up && { "data-grow": "down" }),
-				style: timing("--i", rows[i].slot),
+				style: timing("--i", rows[rowIndex].slot),
 			});
+
 			// The wick stops at the body, so a hollow body stays empty.
 			const wick = (from: number, to: number) => {
-				if (to - from > 0.01) candle.append(svgEl("line", { class: `${CANDLE_CLASS}-wick`, x1: cx(i), x2: cx(i), y1: from, y2: to }));
+				if (to - from > 0.01) candle.append(svgEl("line", { class: `${CANDLE_CLASS}-wick`, x1: cx(rowIndex), x2: cx(rowIndex), y1: from, y2: to }));
 			};
+
 			wick(y(high), top);
 			wick(top + tall, y(low));
-			candle.append(svgEl("rect", { class: `${CANDLE_CLASS}-body`, x: cx(i) - width / 2, y: top, width, height: tall }));
+			candle.append(svgEl("rect", { class: `${CANDLE_CLASS}-body`, x: cx(rowIndex) - width / 2, y: top, width, height: tall }));
 			svg.append(candle);
 		});
 
@@ -70,6 +78,7 @@ export const candlestick: ChartType = {
 		const first = rows.find((row) => row.cells[close] && !row.cells[close].missing)?.cells[close];
 		const places = Math.max(0, largest(rows.map((row) => decimalsIn(row.cells[close]?.number ?? ""))));
 		const span = y(highest) - y(lowest) || 1;
+
 		const textAt = (at: number) => {
 			const [sign, rest] = splitSign(lowest + ((at - y(lowest)) / span) * (highest - lowest), places, config.locale);
 			return `${first?.prefix ?? ""}${sign}${rest}${first?.suffix ?? ""}`;
@@ -77,23 +86,25 @@ export const candlestick: ChartType = {
 
 		// The line across follows the pointer, and goes to the open, high, low or close within 8 pixels of it, with a dot there.
 		const right = geo.axisSide === "right";
-		geo.crossingOf = (i) => {
-			const prices = all[i];
+
+		geo.crossingOf = (rowIndex) => {
+			const prices = all[rowIndex];
 			if (!prices) return null;
-			const body = svg.querySelector(`.${CANDLE_CLASS}[data-row="${i + 1}"] .${CANDLE_CLASS}-body`);
+			const body = svg.querySelector(`.${CANDLE_CLASS}[data-row="${rowIndex + 1}"] .${CANDLE_CLASS}-body`);
 			const colour = body ? getComputedStyle(body).stroke : undefined;
+
 			return {
-				x: cx(i),
+				x: cx(rowIndex),
 				from: domain ? y(domain[1]) : 0,
 				to: rule,
 				edge: right ? VIEWBOX_WIDTH : 0,
 				end: right ? 0 : VIEWBOX_WIDTH,
 				axis: geo.axisSide,
 				height,
-				points: fields.map((s, k) => ({
-					series: s,
-					y: y(prices[k]),
-					dot: svgEl("circle", { class: "tablechart-crosshair-point", cx: cx(i), cy: y(prices[k]), r: 3 * unit, style: `--tablechart-point-color:${colour}` }),
+				points: fields.map((field, index) => ({
+					series: field,
+					y: y(prices[index]),
+					dot: svgEl("circle", { class: "tablechart-crosshair-point", cx: cx(rowIndex), cy: y(prices[index]), r: 3 * unit, style: `--tablechart-point-color:${colour}` }),
 					colour,
 				})),
 				textAt,
@@ -107,13 +118,16 @@ export const candlestick: ChartType = {
 	tooltip(state, index, config) {
 		const fields = fieldsOf(state.series);
 		const prices = pricesOf(state.rows[index], fields);
-		return fields.map((s, k) => {
-			const value = state.seriesValues[s]?.[index]?.textContent ?? "";
+
+		return fields.map((field, fieldIndex) => {
+			const value = state.seriesValues[field]?.[index]?.textContent ?? "";
+
 			const change =
-				k === 3 && prices && prices[0]
+				fieldIndex === 3 && prices && prices[0]
 					? ` (${new Intl.NumberFormat(config.locale, { style: "percent", signDisplay: "exceptZero", maximumFractionDigits: 1 }).format((prices[3] - prices[0]) / prices[0])})`
 					: "";
-			return { name: state.series[s].name, value: value + change };
+
+			return { name: state.series[field].name, value: value + change };
 		});
 	},
 };

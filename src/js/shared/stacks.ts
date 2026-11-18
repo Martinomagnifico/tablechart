@@ -14,21 +14,23 @@ export const groupLayout = (band: number, count: number, barMax: number) => {
 	const gap = 0.15;
 	const size = Math.min((band * 0.7) / (count + (count - 1) * gap), barMax);
 	const total = count * size + (count - 1) * size * gap;
+
 	return {
 		size,
 		gap: size * gap,
-		offset: (s: number) => -total / 2 + s * size * (1 + gap),
+		offset: (seriesIndex: number) => -total / 2 + seriesIndex * size * (1 + gap),
 	};
 };
 
-export const seriesMark = (geo: Geometry, row: Row, s: number) => {
-	const one = geo.series[s];
+export const seriesMark = (geo: Geometry, row: Row, seriesIndex: number) => {
+	const one = geo.series[seriesIndex];
 	const focused = geo.series.some((other) => other.focus);
 	const muted = focused && !one.focus;
+
 	return {
-		"data-series": s + 1,
+		"data-series": seriesIndex + 1,
 		...(muted && { "data-muted": "" }),
-		style: `--n:${s}; --m:${muted ? 1 : 0}; --palette:var(--tablechart-color-${s + 1}); ${timing("--i", row.slot)}`,
+		style: `--n:${seriesIndex}; --m:${muted ? 1 : 0}; --palette:var(--tablechart-color-${seriesIndex + 1}); ${timing("--i", row.slot)}`,
 	};
 };
 
@@ -45,19 +47,23 @@ export interface StackPiece {
 export const stackOf = (row: Row, count: number, running = false): StackPiece[] => {
 	let up = 0;
 	let down = 0;
-	return Array.from({ length: count }, (_, s) => {
-		const cell = row.cells[s] ?? row.cells[0];
+
+	return Array.from({ length: count }, (_, seriesIndex) => {
+		const cell = row.cells[seriesIndex] ?? row.cells[0];
 		const value = cell.missing ? 0 : cell.value;
+
 		if (running) {
 			const from = up;
 			up += value;
 			return { from, to: up, cell };
 		}
+
 		if (value < 0) {
 			const from = down;
 			down += value;
 			return { from, to: down, cell };
 		}
+
 		const from = up;
 		up += value;
 		return { from, to: up, cell };
@@ -67,6 +73,7 @@ export const stackOf = (row: Row, count: number, running = false): StackPiece[] 
 /** How far a stack reaches above and below zero. */
 export const stackReach = (row: Row, count: number, running = false): { top: number; bottom: number } => {
 	const pieces = stackOf(row, count, running);
+
 	return {
 		top: Math.max(0, ...pieces.map((piece) => piece.to)),
 		bottom: Math.min(0, ...pieces.map((piece) => piece.to)),
@@ -80,11 +87,11 @@ export const stackTotal = (row: Row, count: number): number => {
 };
 
 /** The colour of a series on a number inside one of its pieces, so its ink follows the fill. */
-export const inkOf = (label: HTMLElement, geo: Geometry, s: number): void => {
+export const inkOf = (label: HTMLElement, geo: Geometry, seriesIndex: number): void => {
 	const focused = geo.series.some((one) => one.focus);
-	label.style.setProperty("--n", String(s));
-	label.style.setProperty("--m", focused && !geo.series[s].focus ? "1" : "0");
-	label.style.setProperty("--palette", `var(--tablechart-color-${s + 1})`);
+	label.style.setProperty("--n", String(seriesIndex));
+	label.style.setProperty("--m", focused && !geo.series[seriesIndex].focus ? "1" : "0");
+	label.style.setProperty("--palette", `var(--tablechart-color-${seriesIndex + 1})`);
 };
 
 /** Marks the end of a bar that shows its value, to be rounded when `--tablechart-bar-radius` is set. */
@@ -92,27 +99,33 @@ export const endOf = (geo: Geometry, side: "top" | "bottom" | "left" | "right"):
 	geo.barRadius ? { "data-end": side } : {};
 
 /** Whether another piece of the stack starts where this one ends, so this one leaves a gap at its far end. Not at zero, not at the end. */
-export const gapAfter = (pieces: StackPiece[], k: number): boolean =>
-	pieces.some((other, j) => j !== k && !other.cell.missing && other.to !== other.from && other.from === pieces[k].to);
+export const gapAfter = (pieces: StackPiece[], pieceIndex: number): boolean =>
+	pieces.some((other, otherIndex) => {
+		const shown = !other.cell.missing && other.to !== other.from;
+		return otherIndex !== pieceIndex && shown && other.from === pieces[pieceIndex].to;
+	});
 
 /** The pieces of a stack are in one group, so it grows as one bar. */
 export const stackMarks = (
 	geo: Geometry,
 	row: Row,
-	i: number,
+	rowIndex: number,
 	attrs: Record<string, string | number> = {},
 	origin = ""
 ) => {
-	const bar = { class: withRow(BAR_CLASS, row), "data-kind": "bar", "data-row": i + 1, ...attrs };
+	const bar = { class: withRow(BAR_CLASS, row), "data-kind": "bar", "data-row": rowIndex + 1, ...attrs };
+
 	// A stack with parts on both sides of zero grows from zero, not from its end.
 	const style = timing("--i", row.slot) + (origin ? `; transform-origin: ${origin}` : "");
 	const group = svgEl("g", { ...bar, "data-stack": "", style });
 	geo.svg.appendChild(group);
-	return (s: number, shape: Record<string, string | number>) => {
+
+	return (seriesIndex: number, shape: Record<string, string | number>) => {
 		// Its row and direction too, so a piece can grow on a step of its own.
 		const grow: Record<string, string | number> = attrs["data-grow"] !== undefined ? { "data-grow": attrs["data-grow"] } : {};
+
 		group.appendChild(
-			svgEl("rect", { ...grow, ...shape, class: withRow(PIECE_CLASS, row), "data-row": i + 1, ...seriesMark(geo, row, s) })
+			svgEl("rect", { ...grow, ...shape, class: withRow(PIECE_CLASS, row), "data-row": rowIndex + 1, ...seriesMark(geo, row, seriesIndex) })
 		);
 	};
 };

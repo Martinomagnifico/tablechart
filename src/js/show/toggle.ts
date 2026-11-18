@@ -4,8 +4,10 @@ import { NAME_CLASS } from "../config";
 /** The series that are off after series `series` is pressed, or null if it is the last one on, which stays on. */
 export const toggled = (off: ReadonlySet<number>, series: number, count: number): Set<number> | null => {
 	const next = new Set(off);
+
 	if (next.has(series)) next.delete(series);
 	else next.add(series);
+
 	return next.size < count ? next : null;
 };
 
@@ -32,6 +34,7 @@ export const listenToLegend = (figure: HTMLElement, press: (series: number) => v
 
 	figure.addEventListener("click", click);
 	figure.addEventListener("keydown", key);
+
 	return () => {
 		figure.removeEventListener("click", click);
 		figure.removeEventListener("keydown", key);

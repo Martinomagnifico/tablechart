@@ -27,6 +27,7 @@ export interface Frame {
 export interface Snapshot {
 	marks: Map<string, Mark[]>;
 	texts: Map<string, Text>;
+
 	// Where each name under or beside the chart was on the screen, by its row.
 	names: DOMRect[];
 	frame: Frame;
@@ -73,6 +74,7 @@ export const boxOf = (element: Element): Box | null => {
 export const frameOf = (state: ChartState): Frame => {
 	const svg = state.svg.getBoundingClientRect();
 	const view = state.svg.viewBox.baseVal;
+
 	return {
 		svg,
 		plot: state.plot.getBoundingClientRect(),
@@ -86,6 +88,7 @@ export const frameOf = (state: ChartState): Frame => {
 /** Where every mark and number is, before the chart is rendered again. */
 export const snapshot = (state: ChartState): Snapshot => {
 	const marks = new Map<string, Mark[]>();
+
 	for (const element of marksOf(state)) {
 		const key = markKey(element);
 		const list = marks.get(key) ?? [];
@@ -94,6 +97,7 @@ export const snapshot = (state: ChartState): Snapshot => {
 	}
 
 	const texts = new Map<string, Text>();
+
 	for (const element of textsOf(state)) {
 		texts.set(textKey(element), { element, left: element.style.left, top: element.style.top });
 	}

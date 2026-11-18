@@ -18,6 +18,7 @@ export const baselineDrift = (before: Snapshot, state: ChartState, mapping: Mapp
 
 	const [oldX, oldY, oldWidth] = mapBox(oldRule.box, mapping);
 	const [newX, newY] = newBox;
+
 	// A rule across the chart moves up or down; a rule from top to bottom moves sideways.
 	const across = oldWidth > 0;
 	return across ? { x: 0, y: newY - oldY } : { x: newX - oldX, y: 0 };
@@ -30,9 +31,11 @@ export const onBaseline = (element: Element): boolean =>
 /** Whether a number belongs to a column, a bar or a part of a stack, by the keys of the marks of its drawing. */
 export const isColumnNumber = (markKeys: Iterable<string>, text: HTMLElement): boolean => {
 	const rowAndSeries = `|${text.dataset.row ?? ""}|${text.dataset.series ?? ""}|`;
+
 	for (const key of markKeys) {
 		const column = key.startsWith(`${BAR_CLASS}|`) || key.startsWith(`${PIECE_CLASS}|`);
 		if (column && key.includes(rowAndSeries)) return true;
 	}
+
 	return false;
 };

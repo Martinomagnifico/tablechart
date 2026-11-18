@@ -53,10 +53,12 @@ export const neighbour = (mark: SVGGeometryElement, side: Side): Neighbour | nul
 		const across = sideways
 			? otherBox.y < at(box, "bottom") && at(otherBox, "bottom") > box.y
 			: otherBox.x < at(box, "right") && at(otherBox, "right") > box.x;
+
 		const gap = (at(otherBox, BASE[side]) - at(box, side)) * ahead;
 		const closer = !nearest || gap < Math.abs(nearest.to - nearest.from);
 		if (across && gap > -0.5 && closer) nearest = { other, from: at(box, side), to: at(otherBox, BASE[side]) };
 	}
+
 	return nearest;
 };
 
@@ -71,10 +73,12 @@ export const openSides = (mark: SVGGeometryElement, rules: SVGLineElement[]): Se
 		if (isSideways(base)) return x1 === x2 && Math.abs(x1 - at(box, base)) < 0.5;
 		return y1 === y2 && Math.abs(y1 - at(box, base)) < 0.5;
 	});
+
 	if (onRule) open.add(base);
 
 	for (const side of SIDES) {
 		if (neighbour(mark, side)) open.add(side);
 	}
+
 	return open;
 };

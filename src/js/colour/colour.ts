@@ -7,16 +7,17 @@ export const rgbOf = (color: string): [number, number, number, number] => {
 	canvas.clearRect(0, 0, 1, 1);
 	canvas.fillStyle = color;
 	canvas.fillRect(0, 0, 1, 1);
-	const [r, g, b, a] = canvas.getImageData(0, 0, 1, 1).data;
-	return [r, g, b, a / 255];
+	const [red, green, blue, alpha] = canvas.getImageData(0, 0, 1, 1).data;
+	return [red, green, blue, alpha / 255];
 };
 
-export const luminance = ([r, g, b]: number[]): number => {
+export const luminance = ([red, green, blue]: number[]): number => {
 	const channel = (value: number) => {
-		const v = value / 255;
-		return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+		const fraction = value / 255;
+		return fraction <= 0.03928 ? fraction / 12.92 : ((fraction + 0.055) / 1.055) ** 2.4;
 	};
-	return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+
+	return 0.2126 * channel(red) + 0.7152 * channel(green) + 0.0722 * channel(blue);
 };
 
 /** The method from `--tablechart-contrast-wcag`: 2 for the contrast ratio of WCAG 2, 3 for APCA from the WCAG 3 draft. */
@@ -24,17 +25,17 @@ export const methodOf = (figure: HTMLElement): 2 | 3 =>
 	getComputedStyle(figure).getPropertyValue("--tablechart-contrast-wcag").trim() === "3" ? 3 : 2;
 
 // APCA 0.0.98G: lightness with its own curve, and a soft clamp for near black.
-const apcaY = ([r, g, b]: number[]): number => {
-	const y = 0.2126729 * (r / 255) ** 2.4 + 0.7151522 * (g / 255) ** 2.4 + 0.072175 * (b / 255) ** 2.4;
+const apcaY = ([red, green, blue]: number[]): number => {
+	const y = 0.2126729 * (red / 255) ** 2.4 + 0.7151522 * (green / 255) ** 2.4 + 0.072175 * (blue / 255) ** 2.4;
 	return y < 0.022 ? y + (0.022 - y) ** 1.414 : y;
 };
 
 /** The APCA lightness contrast (Lc) of text on a background, without its sign: from 0 to about 106. */
 export const apca = (text: number[], background: number[]): number => {
-	const t = apcaY(text);
-	const b = apcaY(background);
-	if (Math.abs(b - t) < 0.0005) return 0;
-	const sapc = b > t ? (b ** 0.56 - t ** 0.57) * 1.14 : (b ** 0.65 - t ** 0.62) * 1.14;
+	const textY = apcaY(text);
+	const backgroundY = apcaY(background);
+	if (Math.abs(backgroundY - textY) < 0.0005) return 0;
+	const sapc = backgroundY > textY ? (backgroundY ** 0.56 - textY ** 0.57) * 1.14 : (backgroundY ** 0.65 - textY ** 0.62) * 1.14;
 	return Math.abs(sapc) < 0.1 ? 0 : (Math.abs(sapc) - 0.027) * 100;
 };
 
@@ -43,8 +44,8 @@ export const contrastOf = (method: 2 | 3, text: number[], background: number[]):
 	method === 3 ? apca(text, background) : ratio(text, background);
 
 /** The contrast of two colours, as WCAG counts it: from 1 to 21. */
-export const ratio = (a: number[], b: number[]): number => {
-	const [light, dark] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+export const ratio = (first: number[], second: number[]): number => {
+	const [light, dark] = [luminance(first), luminance(second)].sort((x, y) => y - x);
 	return (light + 0.05) / (dark + 0.05);
 };
 
@@ -66,15 +67,23 @@ const resolve = (figure: HTMLElement, color: string): [number, number, number, n
 export const measureSurface = (figure: HTMLElement): boolean => {
 	const layers: number[][] = [];
 	let color: number[] | null = null;
+
 	for (let element: HTMLElement | null = figure; element && !color; element = element.parentElement) {
 		const { background, backgroundColor } = element.dataset;
 		const slide = backgroundColor || (background && CSS.supports("color", background) ? background : "");
 		const layer = rgbOf(slide || getComputedStyle(element).backgroundColor);
+
 		if (layer[3] >= 1) color = layer;
 		else if (layer[3] > 0) layers.push(layer);
 	}
+
 	color ??= resolve(figure, "Canvas");
-	for (const [r, g, b, a] of layers.reverse()) color = [r, g, b].map((value, k) => value * a + (color as number[])[k] * (1 - a));
+
+	for (const [red, green, blue, alpha] of layers.reverse()) {
+		const below = color as number[];
+		color = [red, green, blue].map((value, index) => value * alpha + below[index] * (1 - alpha));
+	}
+
 	const measured = `rgb(${color.slice(0, 3).map(Math.round).join(" ")})`;
 	if (figure.style.getPropertyValue("--_surface") === measured) return false;
 	figure.style.setProperty("--_surface", measured);
@@ -89,6 +98,7 @@ export const surfaceOf = (figure: HTMLElement): [number, number, number, number]
 export const markOf = (figure: HTMLElement, value: HTMLElement): Element | null => {
 	// A number of a line inside a column takes the series of that column.
 	const series = value.dataset.over ?? value.dataset.series;
+
 	return figure.querySelector(
 		`:is(.tablechart-bar, .tablechart-piece, .tablechart-slice)[data-row="${value.dataset.row}"]${series ? `[data-series="${series}"]` : ""}`
 	);
@@ -122,8 +132,10 @@ export const inkInside = (figure: HTMLElement): void => {
 	const values = figure.querySelectorAll<HTMLElement>(".tablechart-value:is([data-place='inside'], [data-over])");
 	if (!values.length) return;
 	const ink = inkerOf(figure);
+
 	for (const value of values) {
 		const mark = markOf(figure, value);
+
 		// A pie gives the numbers on its slices one colour itself.
 		if (!mark || value.hasAttribute("data-left-out") || mark.classList.contains("tablechart-slice")) continue;
 		value.style.setProperty("--_ink", ink(rgbOf(paintOf(mark))));
@@ -133,12 +145,15 @@ export const inkInside = (figure: HTMLElement): void => {
 /** The colour of text on a fill, chosen as for a number inside a bar. */
 const inkSetup = (figure: HTMLElement) => {
 	const surface = surfaceOf(figure).slice(0, 3);
+
 	// The point where black and white have the same contrast with a colour.
 	const lightSurface = luminance(surface) > 0.179;
+
 	const own = (name: string, fallback: number[]) => {
-		const [r, g, b, a] = resolve(figure, `var(${name}, transparent)`);
-		return a > 0 ? [r, g, b] : fallback;
+		const [red, green, blue, alpha] = resolve(figure, `var(${name}, transparent)`);
+		return alpha > 0 ? [red, green, blue] : fallback;
 	};
+
 	const method = methodOf(figure);
 	const needed = Number.parseFloat(getComputedStyle(figure).getPropertyValue("--tablechart-value-contrast")) || (method === 3 ? 60 : 5);
 	const text = rgbOf(getComputedStyle(figure).color).slice(0, 3);
@@ -149,6 +164,7 @@ const inkSetup = (figure: HTMLElement) => {
 
 export const inkerOf = (figure: HTMLElement): ((fill: number[]) => string) => {
 	const { method, needed, onDark, onLight } = inkSetup(figure);
+
 	return (fill) => {
 		const best = contrastOf(method, onDark, fill) > contrastOf(method, onLight, fill) ? onDark : onLight;
 		const ink = contrastOf(method, best, fill) >= needed ? best : blackOrWhite(fill, needed, method);
@@ -167,13 +183,15 @@ export const inkNames = (figure: HTMLElement): void => {
 	const needed = method === 3 ? 60 : 4.5;
 	const surface = surfaceOf(figure).slice(0, 3);
 	const text = rgbOf(getComputedStyle(figure).color).slice(0, 3);
+
 	for (const name of names) {
 		const line = figure.querySelector(`.tablechart-series[data-series="${name.dataset.series}"]:not([data-muted])`);
 		name.style.removeProperty("--_ink");
 		if (!line) continue;
 		const own = rgbOf(getComputedStyle(line).stroke).slice(0, 3);
+
 		for (let step = 0; step <= 20; step++) {
-			const color = own.map((value, k) => Math.round(value + ((text[k] - value) * step) / 20));
+			const color = own.map((value, index) => Math.round(value + ((text[index] - value) * step) / 20));
 			if (contrastOf(method, color, surface) < needed && step < 20) continue;
 			if (step) name.style.setProperty("--_ink", `rgb(${color.join(" ")})`);
 			break;
@@ -185,10 +203,12 @@ export const inkNames = (figure: HTMLElement): void => {
 export const sharedInk = (figure: HTMLElement, fills: number[][]): { ink: string; fits: boolean[] } => {
 	const { method, needed, onDark, onLight } = inkSetup(figure);
 	let best = { ink: onDark, fits: fills.map(() => false), count: -1 };
+
 	for (const ink of [onDark, onLight, WHITE, BLACK]) {
 		const fits = fills.map((fill) => contrastOf(method, ink, fill) >= needed);
 		const count = fits.filter(Boolean).length;
 		if (count > best.count) best = { ink, fits, count };
 	}
+
 	return { ink: `rgb(${best.ink.join(" ")})`, fits: best.fits };
 };

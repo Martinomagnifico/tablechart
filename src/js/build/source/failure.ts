@@ -18,10 +18,12 @@ export const fail = (figure: HTMLElement, config: Config, src: string, step: Ste
 	if (config.langattribute) message.setAttribute(config.langattribute, KEY);
 
 	const caption = figure.querySelector(":scope > figcaption");
+
 	if (caption) caption.after(message);
 	else figure.prepend(message);
 
 	const local = window.location.protocol === "file:" && step === "fetch";
+
 	console.warn(
 		`[${LIBRARY_NAME}] The chart data in "${src}" could not be loaded, at the ${step} step: ${cause}.` +
 			(local ? " A page opened as a file cannot fetch files; open it from a server." : ""),

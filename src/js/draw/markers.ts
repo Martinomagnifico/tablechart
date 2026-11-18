@@ -10,13 +10,14 @@ export interface Marker {
 }
 
 /** Filled circle, open circle, filled square, and so on; `data-marker` on the column header sets another, or `none` for no points. */
-export const markerOf = (series: Series[], s: number): Marker => {
-	const own = series[s]?.marker?.toLowerCase().split(/\s+/) ?? [];
+export const markerOf = (series: Series[], seriesIndex: number): Marker => {
+	const own = series[seriesIndex]?.marker?.toLowerCase().split(/\s+/) ?? [];
 	if (own.includes("none")) return { shape: "none", open: false };
 	const asked = SHAPES.find((shape) => own.includes(shape));
+
 	return {
-		shape: asked ?? SHAPES[Math.floor(s / 2) % SHAPES.length],
-		open: own.includes("open") || (!own.includes("filled") && !asked && s % 2 === 1),
+		shape: asked ?? SHAPES[Math.floor(seriesIndex / 2) % SHAPES.length],
+		open: own.includes("open") || (!own.includes("filled") && !asked && seriesIndex % 2 === 1),
 	};
 };
 
@@ -32,20 +33,25 @@ export const markerEl = (
 		const half = size * 0.88;
 		return svgEl("rect", { x: x - half, y: y - half, width: half * 2, height: half * 2, ...attrs });
 	}
+
 	if (shape === "diamond") {
 		const half = size * 1.2;
+
 		return svgEl("polygon", {
 			points: `${x},${y - half} ${x + half},${y} ${x},${y + half} ${x - half},${y}`,
 			...attrs,
 		});
 	}
+
 	if (shape === "triangle") {
 		// Its box is centred on the point, not its centre of mass, so a name beside it and a line through it are at its middle.
 		const half = size * 1.3;
+
 		return svgEl("polygon", {
 			points: `${x},${y - half * 0.75} ${x + half * 0.87},${y + half * 0.75} ${x - half * 0.87},${y + half * 0.75}`,
 			...attrs,
 		});
 	}
+
 	return svgEl("circle", { cx: x, cy: y, r: size, ...attrs });
 };

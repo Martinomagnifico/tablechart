@@ -9,19 +9,24 @@ import { checkAgainst, createBadge } from "./badge";
 
 /** The mean or the median of `numbers`, each counted `weights` times, or the number the author wrote. */
 const valueOf = (asked: string, numbers: number[], weights: number[]): number | null => {
-	const total = weights.reduce((sum, w) => sum + w, 0);
-	if (asked === "mean") return total ? numbers.reduce((sum, n, i) => sum + n * weights[i], 0) / total : null;
+	const total = weights.reduce((sum, weight) => sum + weight, 0);
+	if (asked === "mean") return total ? numbers.reduce((sum, value, number) => sum + value * weights[number], 0) / total : null;
+
 	if (asked === "median") {
-		const sorted = numbers.map((n, i) => [n, weights[i]]).sort((a, b) => a[0] - b[0]);
+		const sorted = numbers.map((value, index) => [value, weights[index]]).sort((first, second) => first[0] - second[0]);
 		let reached = 0;
-		for (const [k, [n, w]] of sorted.entries()) {
-			reached += w;
+
+		for (const [index, [value, weight]] of sorted.entries()) {
+			reached += weight;
+
 			// Exactly half way: between this number and the next.
-			if (Math.abs(reached - total / 2) < 1e-9 && sorted[k + 1]) return (n + sorted[k + 1][0]) / 2;
-			if (reached > total / 2) return n;
+			if (Math.abs(reached - total / 2) < 1e-9 && sorted[index + 1]) return (value + sorted[index + 1][0]) / 2;
+			if (reached > total / 2) return value;
 		}
+
 		return null;
 	}
+
 	const value = Number.parseFloat(asked);
 	return Number.isFinite(value) ? value : null;
 };
@@ -48,28 +53,36 @@ export const reference: AnnotationType = {
 		let across: boolean;
 		let at: number | null;
 		let value: number | null;
+
 		if (byName) {
 			const names = shown.map((row) => numberIn(row.label));
+
 			if (geo.categories[0]?.parentElement?.dataset.place === "beside" || names.some(Number.isNaN)) {
 				console.warn(`[${LIBRARY_NAME}] A reference line among the names needs names that are numbers, under columns or points.`);
 				return;
 			}
-			const v = valueOf(asked, names, shown.map((row) => row.value));
+
+			const level = valueOf(asked, names, shown.map((row) => row.value));
+
 			// Between the two names around it, as if the names were a scale.
-			const k = v === null ? -1 : names.findIndex((n, i) => n <= v && v <= (names[i + 1] ?? n));
-			const [here, next] = [shown[k], shown[k + 1] ?? shown[k]].map((row) => cx(rows.indexOf(row)));
-			const share = v === null || k < 0 || names[k + 1] === undefined || names[k + 1] === names[k] ? 0 : (v - names[k]) / (names[k + 1] - names[k]);
-			value = v;
-			at = k < 0 ? null : here + share * (next - here);
+			const index = level === null ? -1 : names.findIndex((name, index) => name <= level && level <= (names[index + 1] ?? name));
+			const [here, next] = [shown[index], shown[index + 1] ?? shown[index]].map((row) => cx(rows.indexOf(row)));
+			const below = names[index];
+			const above = names[index + 1];
+			const between = level !== null && index >= 0 && above !== undefined && above !== below;
+			const share = between ? (level - below) / (above - below) : 0;
+			value = level;
+			at = index < 0 ? null : here + share * (next - here);
 			across = false;
 		} else {
 			// `data-axis="y"` on a scatter chart: a line across, at a value of the axis up. The mean and the median are of that column.
 			const up = Boolean(geo.frame) && spec.getAttribute("data-axis") === "y";
-			const column = geo.frame ? (geo.series.flatMap((one, s) => (one.group ? [] : [s]))[up ? 1 : 0] ?? 0) : 0;
+			const column = geo.frame ? (geo.series.flatMap((one, seriesIndex) => (one.group ? [] : [seriesIndex]))[up ? 1 : 0] ?? 0) : 0;
 			value = valueOf(asked, shown.map((row) => row.cells[column]?.value ?? row.value), shown.map(() => 1));
 			across = up || !x;
 			at = value === null ? null : x && !up ? x(value) : y(value);
 		}
+
 		if (at === null || value === null) {
 			console.warn(`[${LIBRARY_NAME}] A reference line needs a number, "mean" or "median", not "${asked}".`);
 			return;
@@ -79,6 +92,7 @@ export const reference: AnnotationType = {
 		const [left, top, right, foot] = geo.frame
 			? [geo.frame[0], geo.frame[1], geo.frame[0] + geo.frame[2], geo.frame[1] + geo.frame[3]]
 			: [0, 0, rows.length > 0 ? cx(rows.length - 1) + cx(0) : VIEWBOX_WIDTH, x ? height : y(0)];
+
 		// Under the points and markers, so a small marker on the line stays visible; over bars and lines.
 		svg.insertBefore(
 			svgEl("line", {
@@ -93,16 +107,18 @@ export const reference: AnnotationType = {
 
 		// On the line near its end, where the line is cut out under it; else beside the line, or a line lower, clear of other labels.
 		if (badge) {
-			const w = sizeOf(badge).width * unit;
-			const h = sizeOf(badge).height * unit;
+			const badgeWidth = sizeOf(badge).width * unit;
+			const badgeHeight = sizeOf(badge).height * unit;
 			const gap = 4 * unit;
+
 			const candidates: Box[] = across
-				? [[right - w, at - h / 2, w, h], [right - w, at - h - gap, w, h], [right - w, at + gap, w, h]]
-				: [top, top + h, top + 2 * h].flatMap((y0): Box[] => [[at - w / 2, y0, w, h], [at + gap, y0, w, h], [at - gap - w, y0, w, h]]);
+				? [[right - badgeWidth, at - badgeHeight / 2, badgeWidth, badgeHeight], [right - badgeWidth, at - badgeHeight - gap, badgeWidth, badgeHeight], [right - badgeWidth, at + gap, badgeWidth, badgeHeight]]
+				: [top, top + badgeHeight, top + 2 * badgeHeight].flatMap((y0): Box[] => [[at - badgeWidth / 2, y0, badgeWidth, badgeHeight], [at + gap, y0, badgeWidth, badgeHeight], [at - gap - badgeWidth, y0, badgeWidth, badgeHeight]]);
+
 			const [pick] = avoidCollisions([candidates], geo.taken, [0, 0, VIEWBOX_WIDTH, height]);
 			const box = candidates[pick ?? 0];
 			geo.taken.push(box);
-			placeAt(badge, box[0] + w / 2, box[1] + h / 2, VIEWBOX_WIDTH, height);
+			placeAt(badge, box[0] + badgeWidth / 2, box[1] + badgeHeight / 2, VIEWBOX_WIDTH, height);
 			badge.style.setProperty("--after", String(after));
 			if (asked === "mean" || asked === "median") checkAgainst(badge, value, `the ${asked}`, geo, "");
 		}

@@ -17,13 +17,16 @@ const GEOMETRY = ["x", "y", "width", "height", "d"];
 const clearEdges = (figure: HTMLElement, svg: SVGSVGElement, marks: SVGGeometryElement[], rules: SVGLineElement[]): void => {
 	for (const old of svg.querySelectorAll(`clipPath[data-edge], .${EDGE_CLASS}`)) old.remove();
 	clearSlices(svg);
+
 	for (const mark of marks) {
 		mark.removeAttribute("data-edge");
 		if (mark.getAttribute("clip-path")?.includes("-edge-")) mark.removeAttribute("clip-path");
 	}
+
 	for (const rule of rules) {
 		for (const name of ["stroke", "opacity", "stroke-width"]) rule.style.removeProperty(name);
 	}
+
 	for (const name of figure.querySelectorAll(SAMPLE)) name.removeAttribute("data-edge");
 };
 
@@ -31,9 +34,11 @@ const clearEdges = (figure: HTMLElement, svg: SVGSVGElement, marks: SVGGeometryE
 const clipOf = (mark: SVGGeometryElement, id: string): SVGClipPathElement => {
 	const clip = svgEl("clipPath", { id, "data-edge": "" });
 	const shape = svgEl(mark.tagName as "rect" | "path");
+
 	for (const name of GEOMETRY) {
 		if (mark.hasAttribute(name)) shape.setAttribute(name, mark.getAttribute(name) ?? "");
 	}
+
 	clip.append(shape);
 	return clip;
 };
@@ -61,7 +66,9 @@ export const edgeBars = (figure: HTMLElement, svg: SVGSVGElement | null = figure
 	const needed = method === 3 ? 30 : 3;
 	const surface = surfaceOf(figure).slice(0, 3);
 	const text = rgbOf(style.color).slice(0, 3);
+
 	const edgeOf = (fill: number[]) => edgeColour(fill, text, surface, method, needed);
+
 	edgeSamples(figure, edgeOf);
 
 	// A donut or pie has slices instead of bars, and no baseline.
@@ -90,6 +97,7 @@ export const edgeBars = (figure: HTMLElement, svg: SVGSVGElement | null = figure
 			defs = svgEl("defs");
 			svg.prepend(defs);
 		}
+
 		snapToPixels(mark, svg);
 		defs.append(clipOf(mark, `${prefix}${index}`));
 
@@ -105,6 +113,7 @@ export const edgeBars = (figure: HTMLElement, svg: SVGSVGElement | null = figure
 	// A gap between two parts gets the side lines of the part past it, or else of the part before it.
 	for (const [mark, colour] of colours) {
 		const end = endOf(mark);
+
 		for (const side of [BASE[end], end]) {
 			const next = neighbour(mark, side);
 			if (!next || (side === end && colours.has(next.other))) continue;

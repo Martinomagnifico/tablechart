@@ -24,21 +24,28 @@ export const agree = (figure: HTMLElement, layoutOne: (state: ChartState, config
 	const group = groupOf(figure);
 	if (!group?.shared || agreeing) return;
 	const members = group.figures.flatMap((one) => laidOut.get(one) ?? []).filter(({ state }) => state.plot.clientWidth);
-	const signature = members.map(({ state }) => `${state.plot.clientWidth}:${state.rows.map((row) => row.cells.map((cell) => cell.value)).join()}`).join("|");
+
+	const signatureOf = (state: ChartState) => `${state.plot.clientWidth}:${state.rows.map((row) => row.cells.map((cell) => cell.value)).join()}`;
+
+	const signature = members.map(({ state }) => signatureOf(state)).join("|");
 	const first = group.figures[0];
 	if (agreedOn.get(first) === signature) return;
 	agreedOn.set(first, signature);
 	agreeing = true;
+
 	for (const { state, config } of members) {
 		state.agreed = undefined;
 		layoutOne(state, config);
 	}
+
 	const measured = members.flatMap(({ state }) => (state.measured ? [{ state, ...state.measured, top: state.figure.getBoundingClientRect().top }] : []));
 	const ceiling = largest(measured.map((one) => one.ceiling));
 	const bottom = -largest(measured.map((one) => -one.bottom));
+
 	for (const one of measured) {
 		// Within a few pixels is the same line of the page.
 		const line = measured.filter((other) => Math.abs(other.top - one.top) < 4);
+
 		one.state.agreed = {
 			ceiling,
 			bottom,
@@ -47,6 +54,7 @@ export const agree = (figure: HTMLElement, layoutOne: (state: ChartState, config
 			floor: largest(line.map((other) => other.floor)),
 		};
 	}
+
 	for (const { state, config } of members) layoutOne(state, config);
 	agreeing = false;
 };

@@ -11,9 +11,11 @@ const reported = new Set<string>();
 /** The author's total always wins; a total that is more than 1% off the steps before it is only reported in the console. */
 const checkTotal = (stated: number, computed: number): void => {
 	if (Math.abs(stated - computed) <= Math.abs(computed) / 100) return;
+
 	const message =
 		`[${LIBRARY_NAME}] A total reads ${stated}, but the steps before it add up to ` +
 		`${Number(computed.toFixed(6))}. The chart shows your number.`;
+
 	if (reported.has(message)) return;
 	reported.add(message);
 	console.warn(message);
@@ -23,6 +25,7 @@ const checkTotal = (stated: number, computed: number): void => {
 const segments = (rows: Row[]): Segment[] => {
 	let running = 0;
 	let stepped = false;
+
 	return rows.map((row) => {
 		if (row.isTotal) {
 			if (stepped) checkTotal(row.value, running);
@@ -30,9 +33,11 @@ const segments = (rows: Row[]): Segment[] => {
 			running = row.value;
 			return { ...row, from: 0, to: row.value, kind: "total" as const };
 		}
+
 		const from = running;
 		running += row.value;
 		stepped = true;
+
 		return {
 			...row,
 			from,
@@ -44,6 +49,7 @@ const segments = (rows: Row[]): Segment[] => {
 
 export const waterfall: ChartType = {
 	segments,
+
 	// Its totals stand on the baseline; the scale refuses a break through a floating step.
 	breakable: true,
 
@@ -52,38 +58,44 @@ export const waterfall: ChartType = {
 
 	draw({ segments: segs, cx, y, barWidth, height, unit, svg, values, breakAt, insideAlign }: Geometry) {
 		const baseline = y(0);
+
 		// If any number is wider than its bar, every number goes outside, so a narrow chart does not mix the two.
 		const narrow = tooWide(values, barWidth, unit);
 		const align = insideAlign ?? "center";
 
-		const bars = segs.map((seg, i) => {
+		const bars = segs.map((seg, index) => {
 			const top = y(Math.max(seg.from, seg.to));
 			const length = Math.abs(y(seg.from) - y(seg.to));
+
 			// A bar cut by a break has its number on top, clear of the cut.
 			const cut = breakAt !== null && Math.min(seg.from, seg.to) < breakAt && Math.max(seg.from, seg.to) > breakAt;
+
 			// A total grows away from the baseline, but the closing total grows from the last connector to the baseline.
-			const closing = seg.kind === "total" && i > 0 && i === segs.length - 1;
+			const closing = seg.kind === "total" && index > 0 && index === segs.length - 1;
 			const down = seg.kind === "down" || (seg.kind === "total" && (closing ? seg.to >= 0 : seg.to < 0));
-			return { top, length, down, inside: !cut && !narrow && tallEnough(values[i], length, unit) };
+			return { top, length, down, inside: !cut && !narrow && tallEnough(values[index], length, unit) };
 		});
+
 		// At the start or end, a number is as far from it as the widest number is from the sides.
 		const digits = values[0] ? sizeOf(values[0]).height * unit * 0.56 : 0;
 		let side = Number.POSITIVE_INFINITY;
-		for (const [i, bar] of bars.entries()) if (bar.inside) side = Math.min(side, (barWidth - sizeOf(values[i]).width * unit) / 2);
+		for (const [index, bar] of bars.entries()) if (bar.inside) side = Math.min(side, (barWidth - sizeOf(values[index]).width * unit) / 2);
 
 		// The columns grow one after the other at one speed, with no pause between them, and the last slows to a stop.
 		// A connector draws while the next column starts, in a third of its time.
 		const total = segs.length;
+
 		const part = (from: number, share: number, last = false) =>
 			`--start:${(from / total).toFixed(4)}; --span:${(share / total).toFixed(4)}; --ease:${last ? STOP : "linear"};`;
 
 		// A connector spans only the gap to the next column, and arrives with that column.
-		segs.forEach((seg, i) => {
-			const next = segs[i + 1];
+		segs.forEach((seg, index) => {
+			const next = segs[index + 1];
 			if (!next) return;
 			const level = y(seg.to);
-			const x1 = cx(i) + barWidth / 2;
-			const x2 = cx(i + 1) - barWidth / 2;
+			const x1 = cx(index) + barWidth / 2;
+			const x2 = cx(index + 1) - barWidth / 2;
+
 			svg.appendChild(
 				svgEl("line", {
 					class: CONNECTOR_CLASS,
@@ -91,31 +103,33 @@ export const waterfall: ChartType = {
 					x2,
 					y1: level,
 					y2: level,
-					"data-row": i + 2,
-					style: `${timing("--i", next.slot)}; ${part(i + 1, 1 / 3)}`,
+					"data-row": index + 2,
+					style: `${timing("--i", next.slot)}; ${part(index + 1, 1 / 3)}`,
 				})
 			);
 		});
 
-		segs.forEach((seg, i) => {
-			const { top, length: barHeight, down, inside } = bars[i];
+		segs.forEach((seg, index) => {
+			const { top, length: barHeight, down, inside } = bars[index];
+
 			svg.appendChild(
 				svgEl("rect", {
 					class: withRow(BAR_CLASS, seg),
 					"data-kind": seg.kind,
-					"data-row": i + 1,
+					"data-row": index + 1,
 					"data-grow": down ? "down" : "up",
-					x: cx(i) - barWidth / 2,
+					x: cx(index) - barWidth / 2,
 					y: top,
 					width: barWidth,
 					height: Math.max(barHeight, 1),
-					style: `${timing("--i", seg.slot)}; ${part(i, 1, i === segs.length - 1)}`,
+					style: `${timing("--i", seg.slot)}; ${part(index, 1, index === segs.length - 1)}`,
 				})
 			);
 
-			const label = values[i];
-			label.style.setProperty("--start", (i / total).toFixed(4));
+			const label = values[index];
+			label.style.setProperty("--start", (index / total).toFixed(4));
 			label.style.setProperty("--span", (1 / total).toFixed(4));
+
 			// The end is where the bar grows to: the top of a step up, the bottom of a step down.
 			// A step too short for the full space has its number in the middle.
 			const pad = Math.min(Math.max(side, digits * END_GAP), (barHeight - digits) / 2);
@@ -124,13 +138,15 @@ export const waterfall: ChartType = {
 			const along = align === "center" ? top + barHeight / 2 : (align === "end") !== down ? near : far;
 			label.dataset.place = inside ? "inside" : "outside";
 			label.dataset.kind = seg.kind;
+
 			// A label outside a falling step hangs below it, so its own height is added.
 			const ly = inside
 				? along
 				: seg.kind === "down"
 					? top + barHeight + sizeOf(label).height * unit + 3 * unit
 					: top - 3 * unit;
-			placeAt(label, cx(i), ly, VIEWBOX_WIDTH, height);
+
+			placeAt(label, cx(index), ly, VIEWBOX_WIDTH, height);
 		});
 
 		svg.appendChild(

@@ -30,10 +30,12 @@ export const fitTogether = (
 ): number => {
 	target.style.setProperty(property, "1");
 	let scale = 1;
+
 	for (const label of labels) {
 		const { size, room } = measure(label);
 		if (size > room) scale = Math.min(scale, room / size);
 	}
+
 	const fit = scale >= min ? scale : 0;
 	target.style.setProperty(property, String(fit || min));
 	return fit;
@@ -41,18 +43,23 @@ export const fitTogether = (
 
 /** Pushes items apart where they are closer than `gap`. A group that had to move stays centred on where its items wanted to be. */
 export const spread = <T extends { y: number }>(items: T[], gap: number): T[] => {
-	items.sort((a, b) => a.y - b.y);
+	items.sort((first, second) => first.y - second.y);
 	const groups: { items: T[]; sum: number }[] = [];
+
 	const topOf = (group: { items: T[]; sum: number }) => group.sum / group.items.length - ((group.items.length - 1) * gap) / 2;
+
 	for (const item of items) {
 		let group = { items: [item], sum: item.y };
+
 		for (let above = groups.at(-1); above && topOf(above) + above.items.length * gap > topOf(group); above = groups.at(-1)) {
 			groups.pop();
 			group = { items: [...above.items, ...group.items], sum: above.sum + group.sum };
 		}
+
 		groups.push(group);
 	}
-	for (const group of groups) group.items.forEach((item, k) => (item.y = topOf(group) + k * gap));
+
+	for (const group of groups) group.items.forEach((item, index) => (item.y = topOf(group) + index * gap));
 	return items;
 };
 
@@ -67,12 +74,13 @@ const ANCHORS: Record<string, [number, number]> = {
 /** Where a placed label is, as a box: from its anchor by `data-place`, or else `anchor`, such as [0, 0] for its top left. */
 export const boxOf = (label: HTMLElement, unit: number, width: number, height: number, anchor: [number, number] = [0.5, 0.5]): Box => {
 	const [ax, ay] = ANCHORS[label.dataset.place ?? ""] ?? anchor;
-	const { width: w, height: h } = sizeOf(label);
+	const { width: labelWidth, height: labelHeight } = sizeOf(label);
+
 	return [
-		(Number.parseFloat(label.style.left) / 100) * width - w * unit * ax,
-		(Number.parseFloat(label.style.top) / 100) * height - h * unit * ay,
-		w * unit,
-		h * unit,
+		(Number.parseFloat(label.style.left) / 100) * width - labelWidth * unit * ax,
+		(Number.parseFloat(label.style.top) / 100) * height - labelHeight * unit * ay,
+		labelWidth * unit,
+		labelHeight * unit,
 	];
 };
 
@@ -81,9 +89,9 @@ export const keepInside = (labels: HTMLElement[], unit: number, width: number): 
 	for (const label of labels) {
 		if (label.dataset.place === "none" || !label.style.left) continue;
 		const [ax] = ANCHORS[label.dataset.place ?? ""] ?? [0.5, 0.5];
-		const w = sizeOf(label).width * unit;
+		const labelWidth = sizeOf(label).width * unit;
 		const x = (Number.parseFloat(label.style.left) / 100) * width;
-		const moved = Math.min(Math.max(x, w * ax), width - w * (1 - ax));
+		const moved = Math.min(Math.max(x, labelWidth * ax), width - labelWidth * (1 - ax));
 		if (moved !== x) label.style.left = `${(moved / width) * 100}%`;
 	}
 };
@@ -95,14 +103,18 @@ export const keepInside = (labels: HTMLElement[], unit: number, width: number): 
 export const thinOut = (labels: HTMLElement[], unit: number, width: number, height: number): void => {
 	const shown = labels.filter((label) => label.dataset.place !== "none" && !label.hasAttribute("data-left-out"));
 	const step = stepOf(shown, unit, width, height);
-	shown.forEach((label, i) => {
-		if (i % step) label.setAttribute("data-left-out", "");
+
+	shown.forEach((label, index) => {
+		if (index % step) label.setAttribute("data-left-out", "");
 	});
 };
 
 // With a little room between two numbers, so they do not read as one.
-const apart = (a: number[], b: number[], gap: number) =>
-	a[0] + a[2] + gap <= b[0] || b[0] + b[2] + gap <= a[0] || a[1] + a[3] <= b[1] || b[1] + b[3] <= a[1];
+const apart = (first: number[], second: number[], gap: number) =>
+	first[0] + first[2] + gap <= second[0] ||
+	second[0] + second[2] + gap <= first[0] ||
+	first[1] + first[3] <= second[1] ||
+	second[1] + second[3] <= first[1];
 
 /** The smallest step, every first, second, third or more of these numbers, at which none overlap; 1 if they all fit. */
 export const stepOf = (shown: HTMLElement[], unit: number, width: number, height: number): number => {
@@ -110,7 +122,7 @@ export const stepOf = (shown: HTMLElement[], unit: number, width: number, height
 	const boxes = shown.map((label) => boxOf(label, unit, width, height));
 	const gap = 2 * unit;
 	let step = 1;
-	while (step < shown.length && boxes.some((box, i) => i >= step && i % step === 0 && !apart(boxes[i - step], box, gap))) step++;
+	while (step < shown.length && boxes.some((box, index) => index >= step && index % step === 0 && !apart(boxes[index - step], box, gap))) step++;
 	return step;
 };
 
@@ -122,31 +134,41 @@ export const keepClear = (labels: HTMLElement[], marks: Map<number, Box>, sidewa
 	const shown = labels.filter((label) => label.dataset.place !== "none" && !label.hasAttribute("data-left-out"));
 	const boxes = shown.map((label) => boxOf(label, unit, width, height));
 	const gap = 2 * unit;
+
 	// The rows side by side, across or down; a number can only reach the marks next to its own, so the search stops where they end.
-	const rows = [...marks.keys()].sort((a, b) => a - b);
+	const rows = [...marks.keys()].sort((first, second) => first - second);
 	const across = !sideways;
+
 	// Whether a mark is wholly past the box, in the direction of the search.
 	const past = (box: Box, mark: Box, step: number) =>
 		across ? (step > 0 ? mark[0] >= box[0] + box[2] : mark[0] + mark[2] <= box[0]) : step > 0 ? mark[1] >= box[1] + box[3] : mark[1] + mark[3] <= box[1];
-	const at = new Map(rows.map((row, i) => [row, i]));
+
+	const at = new Map(rows.map((row, rowIndex) => [row, rowIndex]));
+
 	// A number inside its own bar covers no other.
-	const clash = (k: number) => {
-		if (shown[k].dataset.place === "inside") return false;
-		const box = boxes[k] as Box;
-		const own = at.get(Number(shown[k].dataset.row)) ?? -1;
+	const clash = (index: number) => {
+		if (shown[index].dataset.place === "inside") return false;
+		const box = boxes[index] as Box;
+		const own = at.get(Number(shown[index].dataset.row)) ?? -1;
+
 		for (const step of [-1, 1])
-			for (let i = own + step; i >= 0 && i < rows.length; i += step) {
-				const mark = marks.get(rows[i]) as Box;
+			for (let index = own + step; index >= 0 && index < rows.length; index += step) {
+				const mark = marks.get(rows[index]) as Box;
 				if (past(box, mark, step)) break;
 				if (overlaps(mark, box)) return true;
 			}
+
 		return false;
 	};
-	if (stepOf(shown, unit, width, height) === 1 && !shown.some((_label, k) => clash(k))) return;
-	const size = (k: number) => Math.abs(Number(shown[k].dataset.value) || 0);
+
+	if (stepOf(shown, unit, width, height) === 1 && !shown.some((_label, index) => clash(index))) return;
+
+	const size = (index: number) => Math.abs(Number(shown[index].dataset.value) || 0);
+
 	const kept: number[] = [];
-	for (const k of shown.map((_label, k) => k).sort((a, b) => size(b) - size(a) || a - b)) {
-		if (!clash(k) && kept.every((other) => apart(boxes[other], boxes[k], gap))) kept.push(k);
-		else shown[k].setAttribute("data-left-out", "");
+
+	for (const index of shown.map((_label, index) => index).sort((first, second) => size(second) - size(first) || first - second)) {
+		if (!clash(index) && kept.every((other) => apart(boxes[other], boxes[index], gap))) kept.push(index);
+		else shown[index].setAttribute("data-left-out", "");
 	}
 };

@@ -6,39 +6,49 @@ import { clearCrosshair, drawCrosshair } from "./draw";
 export const attachCrosshair = (state: ChartState): void => {
 	const { plot, figure } = state;
 	plot.setAttribute("data-hover", "");
+
 	// A drag over the chart for its values starts no selection of the text around it.
 	plot.addEventListener("selectstart", (event) => event.preventDefault());
+
 	// The row and the series of the line across.
 	let shown: string | null = null;
+
 	const hide = () => {
 		shown = null;
 		clearCrosshair(state);
 	};
+
 	state.crosshair = { hide };
 
 	const point = (event: PointerEvent) => {
 		if (!plot.classList.contains(PLACED_CLASS) || !figure.classList.contains(BUILT_CLASS) || !state.rowAt) return;
 		const box = plot.getBoundingClientRect();
+
 		// The plot can be scaled with a CSS transform.
 		const scale = box.width / plot.offsetWidth || 1;
 		const index = state.rowAt((event.clientX - box.left) / scale, (event.clientY - box.top) / scale);
 		if (index === null) return hide();
 		const drawing = state.svg.getBoundingClientRect();
 		const near = ((event.clientY - drawing.top) / drawing.height) * state.svg.viewBox.baseVal.height;
+
 		// Drawn again only for another row, when another line is nearest, or when a line that follows the pointer moves.
 		const crossing = state.crossingOf?.(index);
-		const nearest = crossing?.points.reduce((a, b) => (Math.abs(b.y - near) < Math.abs(a.y - near) ? b : a));
+		const nearest = crossing?.points.reduce((best, candidate) => (Math.abs(candidate.y - near) < Math.abs(best.y - near) ? candidate : best));
 		const key = `${index} ${crossing?.textAt ? Math.round(near) : nearest?.series}`;
+
 		// A second tap on the same place closes it.
 		if (key === shown) return event.type === "pointerdown" && event.pointerType !== "mouse" ? hide() : undefined;
 		shown = drawCrosshair(state, index, near) === null ? null : key;
 	};
+
 	plot.addEventListener("pointermove", point);
 	plot.addEventListener("pointerdown", point);
+
 	// A mouse that leaves takes it away; a tap stays until a tap elsewhere.
 	plot.addEventListener("pointerleave", (event) => {
 		if (event.pointerType === "mouse") hide();
 	});
+
 	document.addEventListener("pointerdown", (event) => {
 		if (shown !== null && !plot.contains(event.target as Node)) hide();
 	});
