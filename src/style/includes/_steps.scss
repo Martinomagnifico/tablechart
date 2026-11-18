@@ -10,7 +10,7 @@ $reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px 
 // On screen only, as the build animation: on paper every step is shown.
 @media screen {
 	:where([data-animate][data-steps]) {
-		:where(.tablechart-series),
+		:where(.tablechart-series, .tablechart-halo[data-kind="line"]),
 		:where(.tablechart-area-fill > *) {
 			clip-path: inset(-10px calc(100% + 10px) -10px -10px);
 			transition: clip-path #{$duration} ease;
@@ -57,7 +57,7 @@ $reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px 
 		:where(.tablechart-head),
 		:where(.tablechart-badge),
 		:where(.tablechart-centre),
-		:where(.tablechart-point),
+		:where(.tablechart-point, .tablechart-halo[data-kind="point"]),
 		:where(.tablechart-hole) {
 			opacity: #{$shown};
 		}
@@ -79,7 +79,7 @@ $reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px 
 		:where(.tablechart-connector) {
 			clip-path: inset(-10px calc((1 - #{$shown}) * (100% + 20px) - 10px) -10px -10px);
 		}
-		:where(.tablechart-series),
+		:where(.tablechart-series, .tablechart-halo[data-kind="line"]),
 		:where(.tablechart-area-fill > *) {
 			clip-path: #{$reveal};
 		}

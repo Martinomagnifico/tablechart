@@ -2,7 +2,7 @@ import { sizeOf } from "../layout/measure";
 import { BAR_CLASS, RULE_CLASS, VIEWBOX_WIDTH } from "../config";
 import { timing } from "../shared/timing";
 import { endOf, gapAfter, groupLayout, inkOf, seriesMark, stackMarks, stackOf, stackReach } from "../shared/stacks";
-import { fitTogether, tallEnough, tooWide } from "../layout/labels";
+import { END_GAP, fitTogether, GROUP_FIT_MIN, tallEnough, tooWide } from "../layout/labels";
 import { placeAt, svgEl, withRow } from "../draw/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
 
@@ -73,7 +73,7 @@ export const column: ChartType = {
 			const layout = groupLayout(band, geo.own.length, geo.barMax);
 			// All numbers shrink together to fit above their bars, or all are left out.
 			const shown = geo.own.flatMap((s) => geo.seriesValues[s]).filter((label) => label.dataset.missing === undefined);
-			const fit = fitTogether(geo.plot, shown, (label) => ({ size: sizeOf(label).width * unit, room: layout.size + layout.gap * 0.5 }), "--_fit");
+			const fit = fitTogether(geo.plot, shown, (label) => ({ size: sizeOf(label).width * unit, room: layout.size + layout.gap * 0.5 }), "--_fit", GROUP_FIT_MIN);
 			// As on a single column: if any number is wider than its column, every number goes above.
 			const inGroup = labels === "inside" && !tooWide(shown, layout.size, unit);
 			const digits = shown[0] ? sizeOf(shown[0]).height * unit * 0.56 : 0;
@@ -109,7 +109,7 @@ export const column: ChartType = {
 						);
 					const inside = inGroup && tallEnough(label, Math.abs(baseline - end), unit);
 					const toward = below ? -1 : 1;
-					const pad = Math.min(side, (Math.abs(baseline - end) - digits) / 2);
+					const pad = Math.min(Math.max(side, digits * END_GAP), (Math.abs(baseline - end) - digits) / 2);
 					const along =
 						insideAlign === "center"
 							? (end + baseline) / 2
@@ -172,7 +172,7 @@ export const column: ChartType = {
 				);
 			// Measured from the end of the column towards the baseline, up or down.
 			const toward = below ? -1 : 1;
-			const pad = Math.min(side, (Math.abs(baseline - end) - digits) / 2);
+			const pad = Math.min(Math.max(side, digits * END_GAP), (Math.abs(baseline - end) - digits) / 2);
 			const along =
 				insideAlign === "center"
 					? (end + baseline) / 2

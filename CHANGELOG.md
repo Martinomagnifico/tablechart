@@ -5,6 +5,12 @@
 ### Added
 - `data-axis="right"` on a column header, a second value axis with its own scale, for values with another unit, such as temperature next to rainfall.
 
+### Changed
+- A line over columns, its points, and its numbers that are partly over a column get an edge in the background colour, `--tablechart-halo-width`, so they stand out from a column of a similar colour. A number no longer cuts a hole in the column, which arrived abruptly at the end of the build.
+- A number that crosses a line gets the same edge, rather than a hole in the line, which was there before the number arrived.
+- The numbers of columns or bars side by side start at full size, and get only as small as their columns need, down to half their size.
+- Numbers inside bars are semibold, `--tablechart-value-inside-weight`, because the colour around them makes them look thinner.
+
 ## [1.4.3] - 2026-11-17
 
 ### Fixed

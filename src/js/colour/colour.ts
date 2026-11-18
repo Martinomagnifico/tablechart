@@ -86,10 +86,13 @@ export const surfaceOf = (figure: HTMLElement): [number, number, number, number]
 	resolve(figure, "var(--tablechart-surface, var(--_surface, Canvas))");
 
 /** The bar or part of a stack that a number inside it belongs to. */
-export const markOf = (figure: HTMLElement, value: HTMLElement): Element | null =>
-	figure.querySelector(
-		`:is(.tablechart-bar, .tablechart-piece, .tablechart-slice)[data-row="${value.dataset.row}"]${value.dataset.series ? `[data-series="${value.dataset.series}"]` : ""}`
+export const markOf = (figure: HTMLElement, value: HTMLElement): Element | null => {
+	// A number of a line inside a column takes the series of that column.
+	const series = value.dataset.over ?? value.dataset.series;
+	return figure.querySelector(
+		`:is(.tablechart-bar, .tablechart-piece, .tablechart-slice)[data-row="${value.dataset.row}"]${series ? `[data-series="${series}"]` : ""}`
 	);
+};
 
 /** The colour of a mark: a slice is a stroke, a bar a fill. */
 export const paintOf = (mark: Element): string => {
@@ -116,7 +119,7 @@ const blackOrWhite = (fill: number[], needed: number, method: 2 | 3): number[] =
  * on a dark background). Set as `--_ink`, so the number still fades in with the chart.
  */
 export const inkInside = (figure: HTMLElement): void => {
-	const values = figure.querySelectorAll<HTMLElement>(".tablechart-value[data-place='inside']");
+	const values = figure.querySelectorAll<HTMLElement>(".tablechart-value:is([data-place='inside'], [data-over])");
 	if (!values.length) return;
 	const ink = inkerOf(figure);
 	for (const value of values) {

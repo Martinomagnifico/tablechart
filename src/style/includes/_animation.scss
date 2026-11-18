@@ -45,7 +45,7 @@
 		}
 
 		// Revealed from left to right by a clip, at an even speed, so a dashed or dotted line keeps its pattern while it grows.
-		:where(.tablechart-series) {
+		:where(.tablechart-series, .tablechart-halo[data-kind="line"]) {
 			clip-path: inset(-10px calc(100% + 10px) -10px -10px);
 			transition: clip-path calc(var(--d, 1) * #{$stagger}) linear;
 			transition-delay: calc(max(var(--i) - 1, 0) * #{$stagger});
@@ -57,7 +57,7 @@
 			transition-delay: calc(max(var(--i) - 1, 0) * #{$stagger});
 		}
 
-		:where(.tablechart-point, .tablechart-hole) {
+		:where(.tablechart-point, .tablechart-halo[data-kind="point"], .tablechart-hole) {
 			opacity: 0;
 			transition: opacity #{$fade} ease;
 			transition-delay: calc(var(--i) * #{$stagger} + 0.048 * #{$duration});
@@ -233,10 +233,10 @@
 		:where(.tablechart-bar:is([data-grow="right"], [data-grow="left"])) {
 			transform: scaleX(1);
 		}
-		:where(.tablechart-series) {
+		:where(.tablechart-series, .tablechart-halo[data-kind="line"]) {
 			clip-path: inset(-10px);
 		}
-		:where(.tablechart-point),
+		:where(.tablechart-point, .tablechart-halo[data-kind="point"]),
 		:where(.tablechart-hole),
 		:where(.tablechart-area-fill) {
 			opacity: 1;
@@ -276,7 +276,7 @@
 	$rise: var(--_rise);
 
 	:where([data-animate="grow"]:is([data-chart="line"], [data-chart="area"])) {
-		:where(.tablechart-series, .tablechart-area) {
+		:where(.tablechart-series, .tablechart-halo[data-kind="line"], .tablechart-area) {
 			clip-path: none;
 			transform: scaleY(0);
 			transform-box: view-box;
@@ -288,7 +288,7 @@
 			opacity: 1;
 			transition: none;
 		}
-		:where(.tablechart-point, .tablechart-hole:not([data-for])) {
+		:where(.tablechart-point, .tablechart-halo[data-kind="point"], .tablechart-hole:not([data-for])) {
 			opacity: 0;
 			transform: translateY(var(--rise, 0));
 			transition: transform #{$rise} #{$easing}, opacity calc(0.15s / #{$speed}) ease;
@@ -301,10 +301,10 @@
 	}
 
 	:where([data-animate="grow"]:is([data-chart="line"], [data-chart="area"]).is-shown) {
-		:where(.tablechart-series, .tablechart-area) {
+		:where(.tablechart-series, .tablechart-halo[data-kind="line"], .tablechart-area) {
 			transform: scaleY(1);
 		}
-		:where(.tablechart-point, .tablechart-hole:not([data-for])) {
+		:where(.tablechart-point, .tablechart-halo[data-kind="point"], .tablechart-hole:not([data-for])) {
 			opacity: 1;
 			transform: none;
 		}
@@ -335,7 +335,7 @@
 	:where([data-animate]:not([data-steps])) {
 		#{$label} {
 			opacity: 1;
-			transition-property: color;
+			transition-property: color, -webkit-text-stroke-color;
 		}
 		// The other text and annotations too: only paint changes, no fade of opacity.
 		:where(.tablechart-name, .tablechart-legend, .tablechart-badge, .tablechart-centre) {
@@ -383,10 +383,11 @@
 		}
 	}
 
-	// Weighs more than the colours of the labels, so they start transparent.
+	// Weighs more than the colours of the labels, so they start transparent; the edge of a number fades in with its colour.
 	[data-animate]:not([data-steps]):not(.is-shown) .tablechart-values .tablechart-value,
 	[data-chart="scatter"][data-animate]:not([data-steps]):not(.is-shown) .tablechart-categories[data-place="beside"] span {
 		color: transparent;
+		-webkit-text-stroke-color: transparent;
 	}
 
 	[data-animate]:not([data-steps]):not(.is-shown) :is(.tablechart-name, .tablechart-badge, .tablechart-badge .tablechart-caption, .tablechart-centre) {

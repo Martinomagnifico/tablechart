@@ -1,7 +1,7 @@
 import { sizeOf } from "../layout/measure";
 import { BAR_CLASS, CONNECTOR_CLASS, LIBRARY_NAME, RULE_CLASS, VIEWBOX_WIDTH } from "../config";
 import { STOP, timing } from "../shared/timing";
-import { tallEnough, tooWide } from "../layout/labels";
+import { END_GAP, tallEnough, tooWide } from "../layout/labels";
 import { placeAt, svgEl, withRow } from "../draw/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
 
@@ -118,7 +118,7 @@ export const waterfall: ChartType = {
 			label.style.setProperty("--span", (1 / total).toFixed(4));
 			// The end is where the bar grows to: the top of a step up, the bottom of a step down.
 			// A step too short for the full space has its number in the middle.
-			const pad = Math.min(side, (barHeight - digits) / 2);
+			const pad = Math.min(Math.max(side, digits * END_GAP), (barHeight - digits) / 2);
 			const near = top + pad + digits / 2;
 			const far = top + barHeight - pad - digits / 2;
 			const along = align === "center" ? top + barHeight / 2 : (align === "end") !== down ? near : far;

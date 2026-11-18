@@ -26,6 +26,7 @@ export const FADE_STOP_CLASS = "tablechart-area-stop";
 export const NAME_CLASS = "tablechart-name";
 export const LEGEND_CLASS = "tablechart-legend";
 export const POINT_CLASS = "tablechart-point";
+export const HALO_CLASS = "tablechart-halo";
 export const HOLE_CLASS = "tablechart-hole";
 export const CENTRE_CLASS = "tablechart-centre";
 export const LEADER_CLASS = "tablechart-leader";

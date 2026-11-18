@@ -23,8 +23,9 @@
 	fill: #{$seriesink};
 }
 
-.tablechart-plot[data-grouped] :where(.tablechart-value) {
-	font-size: calc(var(--tablechart-value-group-size, 0.95em) * var(--_fit, 1));
+// Numbers of columns side by side get only as small as their columns need. The numbers of a line keep their size.
+.tablechart-plot[data-grouped] :where(.tablechart-value:not([data-lined])) {
+	font-size: calc(var(--tablechart-value-group-size, var(--tablechart-value-size, calc(#{$namesize} * 1.3))) * var(--_fit, 1));
 }
 
 // Strokes are in screen pixels, so a rule has the same weight at any size.
@@ -88,6 +89,21 @@
 }
 .tablechart-series[data-line="dash-dot"] {
 	stroke-dasharray: var(--tablechart-series-dash-dot, 6 4 0 4);
+}
+
+// Over columns, an edge in the background colour behind a line and its points: 60% of `--tablechart-halo-width`.
+.tablechart-halo {
+	fill: none;
+	stroke: #{$surface};
+	stroke-width: calc(var(--tablechart-series-width, 2px) + 1.2 * var(--tablechart-halo-width, 2.5px));
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	vector-effect: non-scaling-stroke;
+
+	&[data-kind="point"] {
+		fill: #{$surface};
+		stroke-width: calc(2px + 1.2 * var(--tablechart-halo-width, 2.5px));
+	}
 }
 
 .tablechart-point {

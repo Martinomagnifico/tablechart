@@ -498,9 +498,8 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 	const holeUnder = textHoles(plot, unit);
 	// A growing line keeps its holes in the mask, which follows it as it grows.
 	const grows = state.figure.getAttribute("data-animate") === "grow";
-	const crossing = seriesValues.flat().filter((label) => label.hasAttribute("data-cut")).flatMap(holeUnder);
-	// The numbers of a line over columns are holes in the columns under them, as a badge is.
-	const numberHoles = [...lineSeries.flatMap((s) => seriesValues[s].flatMap(holeUnder)), ...(grows ? crossing : [])];
+	// A number of a line over columns, or one that crosses a line, has an edge in the background colour rather than a hole under
+	// it: the edge arrives with the number, and a hole would be there before it.
 	if (framing.length || references.length) {
 		const texts = [...seriesValues.flat(), ...state.totals, ...(type.categories === "beside" ? state.categories : [])];
 		const under = texts.flatMap(holeUnder);
@@ -525,21 +524,21 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 	// A trend or a bracket is drawn while the chart builds, so it is kept out of each badge by a clip, from the start: it stops at the
 	// badge rather than running through it until the mask comes. Its arrowhead too.
 	clipAround(svg, holes, VIEWBOX_WIDTH, height, Array.from(svg.querySelectorAll<SVGElement>(`.${LINE_CLASS}, .${HEAD_CLASS}`)));
-	// The holes in the lines and areas, under open markers and values that cross a line, are there as the lines arrive.
+	// The holes in the lines and areas under open markers are there as the lines arrive.
 	// A line has its own clip as it sweeps in, so it gets a group for this one.
-	if (!grows && (geo.lineHoles.length || crossing.length)) {
+	if (!grows && geo.lineHoles.length) {
 		const lines = Array.from(svg.querySelectorAll<SVGElement>(`.${SERIES_CLASS}`)).map((path) => {
 			const group = svgEl("g", {});
 			path.before(group);
 			group.append(path);
 			return group;
 		});
-		clipAround(svg, [...geo.lineHoles, ...crossing], VIEWBOX_WIDTH, height, [...lines, ...svg.querySelectorAll<SVGElement>(`.${AREA_CLASS}`)]);
+		clipAround(svg, geo.lineHoles, VIEWBOX_WIDTH, height, [...lines, ...svg.querySelectorAll<SVGElement>(`.${AREA_CLASS}`)]);
 	}
 	// What is kept out of the badges another way stays out of that group: under its mask, a line that is drawn or fades would make
 	// Safari draw the whole group again on each frame. And the mask would wait for it.
 	const loose = [REFERENCE_CLASS, QUADRANT_CLASS, LINE_CLASS, HEAD_CLASS, GRID_CLASS];
-	cutOut(svg, [...holes, ...numberHoles], VIEWBOX_WIDTH, height, undefined, loose.map((name) => `.${name}`).join(", "));
+	cutOut(svg, holes, VIEWBOX_WIDTH, height, undefined, loose.map((name) => `.${name}`).join(", "));
 	// Under a mask, Safari draws everything again on every frame, so every mask waits while the marks still have to build.
 	if (state.figure.hasAttribute("data-animate") && !state.figure.hasAttribute("data-steps") && !state.figure.classList.contains(SHOWN_CLASS))
 		takeMasksOff(svg);

@@ -2,6 +2,14 @@
 
 // Labels are HTML, not SVG `<text>`, which would scale with the viewBox and drift from the text around it.
 
+// The edge of a number of a line that reaches a column, or of a number that crosses a line: a stroke in the background colour, under
+// the letters. Wide enough to cover the inner parts of some fonts, which Safari strokes too.
+.tablechart-values > :is([data-halo], [data-cut]) {
+	-webkit-text-stroke: calc(2 * var(--tablechart-halo-width, 2.5px)) #{$surface};
+	paint-order: stroke fill;
+	stroke-linejoin: round;
+}
+
 .tablechart-value {
 	position: absolute;
 	transform: translate(-50%, -100%);
@@ -17,9 +25,11 @@
 		position: absolute;
 		right: 100%;
 	}
+	// Semibold inside a bar, because the colour around a number makes its letters look thinner.
 	&[data-place="inside"] {
 		transform: translate(-50%, -50%);
 		color: var(--tablechart-bar-value-color, var(--_ink, #{ink($barfill)}));
+		font-weight: var(--tablechart-value-inside-weight, 600);
 	}
 
 	&[data-place="around"] {
@@ -49,6 +59,11 @@
 
 	&[data-place="none"] {
 		display: none;
+	}
+
+	// A number of a line fully inside a column, in the colour of the numbers of the column. Not semibold: wider, it may no longer fit.
+	&[data-over] {
+		color: var(--_ink, currentColor);
 	}
 
 	// Hidden rather than removed, so it can still be measured. The tooltip of its row shows it.

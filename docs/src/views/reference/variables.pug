@@ -66,7 +66,8 @@ block content
 		+vars([
 			['--tablechart-value-align', '<code>end</code>, <code>center</code> on a waterfall', 'Where a number inside its bar goes: <code>start</code>, <code>center</code> or <code>end</code>'],
 			['--tablechart-value-color', 'The text colour', 'The numbers on the bars, outside the bars'],
-			['--tablechart-value-group-size', '<code>0.95em</code>', 'The numbers of columns or bars side by side'],
+			['--tablechart-value-inside-weight', '<code>600</code>', 'The weight of the numbers inside the bars'],
+			['--tablechart-value-group-size', '<code>--tablechart-value-size</code>', 'The numbers of columns or bars side by side'],
 			['--tablechart-value-size', '1.3 times the name size', 'The numbers on the bars'],
 		])
 
@@ -109,6 +110,7 @@ block content
 			['--tablechart-series-muted-share', '<code>45%</code>', 'How much of its colour a line keeps next to a highlighted line'],
 			['--tablechart-series-own-color', 'From the palette or the series colour', 'The colour of one line, set on <code>[data-series="2"]</code> and so on'],
 			['--tablechart-series-width', '<code>2px</code>', 'The width of a line'],
+			['--tablechart-halo-width', '<code>2.5px</code>', 'The edge in the background colour around a number of a line that touches a column, so they stand out from a column of a similar colour, and around a number that crosses a line. The line and its points get 60% of it'],
 		])
 
 	+section("Donut")

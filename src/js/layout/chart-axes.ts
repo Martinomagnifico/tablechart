@@ -213,13 +213,22 @@ export const placeValueAxis = (
 	const gap = AXIS_GAP * unit;
 	const ticks = Array.from(along.ticks.children) as HTMLElement[];
 	const size = (value: number) => sizeOf(ticks.find((tick) => Number(tick.dataset.value) === value) ?? ticks[0]);
-	const shown =
-		more.shown ??
-		thin(valueScale, (list) =>
-			list.every((v, k) =>
-				!k || (sideways ? at(v) - at(list[k - 1]) > ((size(v).width + size(list[k - 1]).width) / 2) * unit + gap : at(list[k - 1]) - at(v) > size(v).height * unit + gap / 2)
-			)
-		).ticks.filter((v) => !compress || v <= compress.lo || v >= compress.hi);
+
+	// Whether a number is clear of the one before it: side by side by their half widths, one above the other by a height.
+	const clearOf = (value: number, before: number): boolean => {
+		if (sideways) {
+			const room = ((size(value).width + size(before).width) / 2) * unit + gap;
+			return at(value) - at(before) > room;
+		}
+		const room = size(value).height * unit + gap / 2;
+		return at(before) - at(value) > room;
+	};
+
+	const allClear = (values: number[]): boolean => values.every((value, index) => index === 0 || clearOf(value, values[index - 1]));
+
+	const outsideCut = (value: number): boolean => !compress || value <= compress.lo || value >= compress.hi;
+
+	const shown = more.shown ?? thin(valueScale, allClear).ticks.filter(outsideCut);
 	const numbered = shown.filter(more.numbered ?? (() => true));
 	// On the right, the axis is past the names at the ends of the lines, and the gridlines reach it.
 	const right = along.right && !sideways;

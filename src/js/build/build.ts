@@ -248,6 +248,8 @@ export const build = (
 			if (cell.suffix) node.dataset.suffix = cell.suffix;
 			if (cell.missing) node.dataset.missing = cell.raw;
 			if (several) node.dataset.series = String(s + 1);
+			// A number of a line over columns keeps its size when the columns are grouped.
+			if (lined && series[s].chart) node.dataset.lined = "";
 			// The fields of a mark, such as x and y, each keep the decimal places of their own column; as do series on two axes.
 			if (type.columns || twoAxes) node.dataset.decimals = String(columnDecimals[s]);
 			node.dataset.row = String(i + 1);

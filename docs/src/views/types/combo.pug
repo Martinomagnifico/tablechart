@@ -34,7 +34,7 @@ block content
 								td= row[2]
 
 		p A line suits values that have an order, such as months or years. The legend shows a box for the columns and a line for the line.
-		p If a number of the line is on a column, the column is cut away under the number, so the number can be read. The numbers of the columns are inside the columns if they fit. If a point of the line would cover a number, or a number has no room, the chart has to omit it. If you hover over a column (or tap it on a touch device), a tooltip shows all numbers at that place.
+		p The line and its points have an edge in the background colour, so they stand out from a column of a similar colour. A number of the line that is fully inside a column gets the colour of the numbers of the columns. A number that is partly over a column, or touches the line inside a column, gets the edge. #[code --tablechart-halo-width] sets how wide that edge is. The numbers of the columns are inside the columns if they fit. If a point of the line would cover a number, or a number has no room, the chart has to omit it. If you hover over a column (or tap it on a touch device), a tooltip shows all numbers at that place.
 
 	+section("Several columns and a line")
 		p With more than one value column without #[code data-chart="line"], each row is a group of columns, and the line goes through the middle of each group. Several columns can have #[code data-chart="line"], and each one is a line.
@@ -135,3 +135,6 @@ block content
 			li A chart with a line, or with two value axes, cannot be stacked.
 			li A chart with two value axes cannot have a #[a(href=url('/features/scale-break.html')) break in its scale].
 			li If every value column has #[code data-axis="right"], the chart has one axis. If you want that axis on the right, add #[code data-chart-axis="right"] to the figure.
+
+	+section("Next")
+		p If you want to change the edge around the line and its numbers, see #[code --tablechart-halo-width] in #[a(href=url('/reference/variables.html')) CSS variables].

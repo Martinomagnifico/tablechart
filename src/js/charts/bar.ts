@@ -4,7 +4,7 @@ import { sizeOf } from "../layout/measure";
 import { BAR_CLASS, RULE_CLASS, VIEWBOX_WIDTH } from "../config";
 import { timing } from "../shared/timing";
 import { endOf, gapAfter, groupLayout, inkOf, seriesMark, stackMarks, stackOf, stackReach } from "../shared/stacks";
-import { fitsLength, fitTogether } from "../layout/labels";
+import { fitsLength, fitTogether, GROUP_FIT_MIN } from "../layout/labels";
 import { placeAt, svgEl, withRow } from "../draw/svg";
 import type { ChartType, Geometry, Row, Segment } from "../types";
 
@@ -163,7 +163,7 @@ export const bar: ChartType = {
 		if (several) {
 			// All numbers shrink together to fit beside their bars, or all are left out.
 			const shown = geo.seriesValues.flat().filter((label) => label.dataset.missing === undefined);
-			const fit = fitTogether(geo.plot, shown, (label) => ({ size: sizeOf(label).height * unit, room: layout.size + layout.gap * 0.5 }), "--_fit");
+			const fit = fitTogether(geo.plot, shown, (label) => ({ size: sizeOf(label).height * unit, room: layout.size + layout.gap * 0.5 }), "--_fit", GROUP_FIT_MIN);
 			geo.rows.forEach((row, i) => {
 				geo.series.forEach((_one, s) => {
 					const cell = row.cells[s] ?? row.cells[0];

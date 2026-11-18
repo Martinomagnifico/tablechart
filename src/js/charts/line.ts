@@ -1,5 +1,5 @@
 import { sizeOf } from "../layout/measure";
-import { AREA_CLASS, AREA_FILL_CLASS, HOLE_CLASS, POINT_CLASS, RULE_CLASS, SERIES_CLASS, VIEWBOX_WIDTH } from "../config";
+import { AREA_CLASS, AREA_FILL_CLASS, BAR_CLASS, HALO_CLASS, HOLE_CLASS, PIECE_CLASS, POINT_CLASS, RULE_CLASS, SERIES_CLASS, VIEWBOX_WIDTH } from "../config";
 import { stackOf } from "../shared/stacks";
 import { markerEl, markerOf } from "../draw/markers";
 import { boxOf, spread, stepOf } from "../layout/labels";
@@ -163,6 +163,20 @@ const trend = (area: boolean): ChartType => ({
 			svg.appendChild(group);
 		};
 
+		// Over columns, an edge in the background colour behind a line or a point, so it stands out from a column of a similar colour.
+		const withHalo = (mark: SVGElement, kind: "line" | "point"): SVGElement => {
+			if (!mixed) return mark;
+			const halo = mark.cloneNode() as SVGElement;
+			halo.setAttribute("class", HALO_CLASS);
+			halo.dataset.kind = kind;
+
+			// The edge of a point goes under the lines, so a line still reaches its point.
+			const firstLine = kind === "point" ? svg.querySelector(`.${SERIES_CLASS}`) : null;
+			if (firstLine) firstLine.before(halo);
+			else svg.appendChild(halo);
+			return mark;
+		};
+
 		// One path per run, so a dashed line runs on without a break and a line is one element, however long.
 		const drawLine = (s: number) => {
 			const one = series[s];
@@ -170,14 +184,17 @@ const trend = (area: boolean): ChartType => ({
 				const top = pointsOf(s, a, b, topValue);
 				const d = [`M${fixed(leftOf(a))},${fixed(top[0][1])}`, ...through(top, slopesOf(topSlopes, s, a, b), 1)].join(" ");
 				svg.appendChild(
-					svgEl("path", {
-						class: SERIES_CLASS,
-						...marks[s].attrs,
-						d,
-						...(one.line && { "data-line": one.line }),
-						...runAttrs(a, b),
-						style: `${marks[s].ink}${runTiming(a, b)}`,
-					})
+					withHalo(
+						svgEl("path", {
+							class: SERIES_CLASS,
+							...marks[s].attrs,
+							d,
+							...(one.line && { "data-line": one.line }),
+							...runAttrs(a, b),
+							style: `${marks[s].ink}${runTiming(a, b)}`,
+						}),
+						"line"
+					)
 				);
 			}
 		};
@@ -209,14 +226,17 @@ const trend = (area: boolean): ChartType => ({
 			own.forEach((s) => {
 				for (const i of shown(s)) {
 					svg.appendChild(
-						point(s, i, {
-							class: POINT_CLASS,
-							...marks[s].attrs,
-							"data-marker": markers[s].shape,
-							...(markers[s].open && { "data-open": "" }),
-							"data-row": i + 1,
-							style: marks[s].ink,
-						})
+						withHalo(
+							point(s, i, {
+								class: POINT_CLASS,
+								...marks[s].attrs,
+								"data-marker": markers[s].shape,
+								...(markers[s].open && { "data-open": "" }),
+								"data-row": i + 1,
+								style: marks[s].ink,
+							}),
+							"point"
+						)
 					);
 				}
 			});
@@ -493,7 +513,7 @@ const trend = (area: boolean): ChartType => ({
 				return [px - 6 * unit, py - 6 * unit, 12 * unit, 12 * unit];
 			});
 			const placed: Box[] = [];
-			// A value that crosses a line gets a hole in the line under it, so it can be read.
+			// A value that crosses a line gets an edge in the background colour, so it can be read.
 			const crossing = new Set<number>();
 			const chosen = items.map((item, k) => {
 				const boxes = spots[k].map((spot) => boxOf(item, spot));
@@ -572,6 +592,53 @@ const trend = (area: boolean): ChartType => ({
 			label.removeAttribute("data-left-out");
 			label.removeAttribute("data-cut");
 			placeAt(label, end.x - 4 * unit, end.y, VIEWBOX_WIDTH, height);
+		}
+
+		// A number of the line fully inside a column, clear of the line, looks like a number of the column. One that touches a column gets an edge.
+		if (mixed) {
+			const columns = Array.from(svg.querySelectorAll<SVGGraphicsElement>(`:is(.${BAR_CLASS}, .${PIECE_CLASS})`), (column) => {
+				const { x, y: top, width, height: tall } = column.getBBox();
+				return { series: column.dataset.series ?? "", box: [x, top, width, tall] as Box };
+			});
+			const edge = (Number.parseFloat(getComputedStyle(svg).getPropertyValue("--tablechart-halo-width")) || 2.5) * unit;
+
+			// Whether the first box is inside the second.
+			const within = ([x, top, width, tall]: Box, [outerX, outerTop, outerWidth, outerTall]: Box): boolean =>
+				x >= outerX && top >= outerTop && x + width <= outerX + outerWidth && top + tall <= outerTop + outerTall;
+
+			// The digits, about the middle 56% of the line height, and the edge around them.
+			const digitsOf = (label: HTMLElement): Box => {
+				const [x, top, width, tall] = boxOf(label, unit, VIEWBOX_WIDTH, height);
+				return [x - edge, top + tall * 0.22 - edge, width + 2 * edge, tall * 0.56 + 2 * edge];
+			};
+
+			// The lines and their points: a number that touches them needs the edge, also inside a column.
+			const lineBoxes: Box[] = own.flatMap((s) =>
+				rows.flatMap((_row, i): Box[] => {
+					if (missing(s, i)) return [];
+					const [px, py] = pointAt(s, i);
+					const point: Box = [px - 4 * unit, py - 4 * unit, 8 * unit, 8 * unit];
+					const toNext = i === last || missing(s, i + 1) ? [] : piecesOf(s, i, i + 1, unit);
+					return [point, ...toNext];
+				})
+			);
+
+			for (const s of own) {
+				for (const label of seriesValues[s]) {
+					const shown = label.dataset.place !== "none" && !label.hasAttribute("data-left-out");
+					const digits = digitsOf(label);
+					const onLine = lineBoxes.some((piece) => overlaps(digits, piece));
+					const holder = shown && !onLine ? columns.find((column) => within(digits, column.box)) : undefined;
+					const reaches = shown && !holder && columns.some((column) => overlaps(digits, column.box));
+
+					label.toggleAttribute("data-halo", reaches);
+					if (holder) label.dataset.over = holder.series;
+					else {
+						delete label.dataset.over;
+						label.style.removeProperty("--_ink");
+					}
+				}
+			}
 		}
 
 		// With numbers under the lower line, the rule is the foot of the plot rather than zero, unless values go below zero.

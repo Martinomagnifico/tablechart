@@ -14,6 +14,12 @@ export const tallEnough = (label: HTMLElement, height: number, unit: number): bo
 export const fitsLength = (label: HTMLElement, length: number, unit: number): boolean =>
 	length >= sizeOf(label).width * unit * 1.5;
 
+/** The least gap between a number inside a bar and the end of the bar, as a part of the height of the digits. */
+export const END_GAP = 0.75;
+
+/** Numbers side by side start at full size, so they may get smaller further than other labels. */
+export const GROUP_FIT_MIN = 0.5;
+
 /** Scales labels together, down to `min`. Returns 0 if they do not fit even then. */
 export const fitTogether = (
 	target: HTMLElement,
