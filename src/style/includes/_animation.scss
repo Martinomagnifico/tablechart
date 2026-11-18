@@ -105,7 +105,7 @@
 		}
 
 		// A slice is one element, like a bar: a big slice turns faster than a small one.
-		:where(.tablechart-slice) {
+		:where(.tablechart-slice, .tablechart-slice-edge) {
 			stroke-dasharray: 0 var(--circ);
 			transition: stroke-dasharray #{$duration} #{$easing};
 			transition-delay: calc(var(--i) * #{$stagger});
@@ -261,7 +261,7 @@
 		:where(.tablechart-break[data-part="edge"]) {
 			stroke-opacity: 1;
 		}
-		:where(.tablechart-slice) {
+		:where(.tablechart-slice, .tablechart-slice-edge) {
 			stroke-dasharray: var(--arc) calc(var(--circ) - var(--arc));
 		}
 		:where(.tablechart-connector) {
@@ -315,7 +315,7 @@
 	$ring: var(--_ring);
 
 	:where([data-animate="sweep"]:is([data-chart="donut"], [data-chart="pie"])) {
-		:where(.tablechart-slice) {
+		:where(.tablechart-slice, .tablechart-slice-edge) {
 			transition: stroke-dasharray calc(var(--span, 1) * #{$ring}) var(--ease, linear);
 			transition-delay: calc(var(--start, 0) * #{$ring});
 		}

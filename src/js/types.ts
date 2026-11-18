@@ -246,7 +246,7 @@ export interface TooltipLine {
 	/** A small key in the colour of the series. */
 	colour?: string;
 	/** The shape of that key, as in the legend: a line with its point, or a box. */
-	sample?: { marker: string | null; open: boolean; line: string | null; box: boolean; point?: string };
+	sample?: { marker: string | null; open: boolean; line: string | null; box: boolean; point?: string; edge?: string };
 }
 
 export interface HeadroomInput {

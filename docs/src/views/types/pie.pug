@@ -33,7 +33,7 @@ block content
 		p The numbers inside all have one colour. It gets to be the one with enough contrast on the most slices, with the same settings as a number inside a bar. On a slice where that colour has too little contrast, the number is next to the slice. If you want all numbers next to their slices, add #[code data-chart-labels="outside"] to the figure.
 
 	+section("A total row")
-		p A pie has no middle, so it does not show a total. If a row has #[code data-kind="total"], it is not a slice. Screen readers read it in the table. If there is no total row, Tablechart adds a hidden row with the sum, as on a #[a(href=url('/types/donut.html#the-number-in-the-middle')) donut].
+		p A pie has no middle, so it does not show a total. If a row has #[code data-kind="total"], it is not a slice. Screen readers read it in the table. If there is no total row, Tablechart adds a hidden row with the sum, as on a #[a(href=url('/types/donut.html#the-central-value')) donut].
 
 	+section("Gaps and corners")
 		p The gaps between the slices go from the middle to the edge. If you want wider or no gaps, set #[code --tablechart-slice-gap]. With #[code --tablechart-slice-radius], the outer corners of the slices are round.

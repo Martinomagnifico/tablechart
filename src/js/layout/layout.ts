@@ -30,6 +30,7 @@ import type { Scale } from "../scale/axis";
 import { withCrop } from "./crop";
 import type { Box } from "./collision";
 import { inkInside, inkNames, measureSurface } from "../colour/colour";
+import { edgeBars } from "../colour/edges";
 import { applySteps } from "../show/steps";
 import { drawFrame, frameScalesOf, leftSeries, placeFrame, placeValueAxis, valueAxisOf } from "./chart-axes";
 import { placeBothAxes, rightScaleOf } from "./right-axis";
@@ -576,6 +577,7 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 	measureSurface(state.figure);
 	inkInside(state.figure);
 	inkNames(state.figure);
+	edgeBars(state.figure, svg);
 	lineUpNames(state.figure);
 	return true;
 });

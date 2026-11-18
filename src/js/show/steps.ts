@@ -52,7 +52,7 @@ export const planSteps = (figure: HTMLElement, together = false): StepPlan | nul
 
 	// A row's slot is its place among the rows that arrive with it, so they still arrive one after the other.
 	let unstepped = 0;
-	// A donut's total is the number in the middle, not a slice: it has no step of its own and comes with the last slice. A pie's is hidden.
+	// A donut's total is the central value, not a slice: it has no step of its own and comes with the last slice. A pie's is hidden.
 	const donut = ["donut", "pie"].includes(figure.getAttribute("data-chart") ?? "");
 	const middle = (tr: Element) => donut && tr.getAttribute("data-kind") === "total";
 	// A scatter chart: one step for all its rows.
@@ -197,7 +197,7 @@ export const applySteps = (state: ChartState): void => {
 		else if (column && column.step !== null) set(element, column.step, "--i", row);
 		else if (plan.rows[row]) set(element, plan.rows[row].step, "--i", plan.rows[row].slot);
 	}
-	// The number in the middle of a donut comes after the last slice.
+	// The central value of a donut comes after the last slice.
 	const centre = state.figure.querySelector<HTMLElement>(`.${CENTRE_CLASS}`);
 	if (centre) {
 		const steps = [...plan.rows, ...plan.cells.flat()].map((one) => one.step ?? -1);

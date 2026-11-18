@@ -97,6 +97,11 @@
 	@include legend-box;
 	margin-top: var(--tablechart-legend-gap, 0.6em);
 	font-size: #{$namesize};
+
+	// With toggles, a quick second click on a name or a drag over the legend selects no text.
+	&:has([role="button"]) {
+		user-select: none;
+	}
 }
 
 .tablechart-name[data-place="legend"] {
@@ -150,13 +155,21 @@
 		mask-size: contain;
 		mask-repeat: no-repeat;
 	}
+	// The colour of the box is also a variable, so its edge can be measured while the box still fades in.
+	&[data-swatch="box"] {
+		--_sample: #{$seriesink};
+	}
 	&[data-swatch="box"]::before {
-		width: 0.7em;
-		height: 0.7em;
+		width: var(--tablechart-legend-key-size, 0.7em);
+		height: var(--tablechart-legend-key-size, 0.7em);
 		vertical-align: -0.05em;
 		border-radius: 0.15em;
-		background: #{$seriesink};
+		background: var(--_sample);
 		mask: none;
+	}
+	// The edge of its bars, if their colour has too little contrast.
+	&[data-swatch="box"][data-edge]::before {
+		box-shadow: inset 0 0 0 var(--tablechart-bar-edge-width, 1px) var(--_edge);
 	}
 }
 
@@ -289,11 +302,17 @@
 .tablechart-categories :where(span[data-kind="slice"])::before {
 	content: "";
 	display: inline-block;
-	width: var(--tablechart-legend-key-size, 0.6em);
-	height: var(--tablechart-legend-key-size, 0.6em);
+	width: var(--tablechart-legend-key-size, 0.7em);
+	height: var(--tablechart-legend-key-size, 0.7em);
 	margin-right: 0.4em;
-	border-radius: 50%;
+	vertical-align: -0.05em;
+	border-radius: 0.15em;
 	background: #{$sliceink};
+}
+
+// The edge of its slice, if the colour has too little contrast.
+.tablechart-categories :where(span[data-slice][data-edge])::before {
+	box-shadow: inset 0 0 0 var(--tablechart-bar-edge-width, 1px) var(--_edge);
 }
 
 .tablechart-categories[data-place="key"] {

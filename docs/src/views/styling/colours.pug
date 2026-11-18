@@ -28,6 +28,109 @@ block content
 								th= row[0]
 								td= row[1]
 
+	+section("Colours with low contrast")
+		p If a column or bar has a colour with less than 3:1 contrast with the background, it gets an edge that has enough (WCAG 1.4.11). The edge is in the colour of the bar, moved towards the text colour as far as needed. It is inside the bar, so the bar keeps its size. Where the bar is on the baseline, the baseline is its edge. Then the baseline gets a contrast of 4.5:1, so it is darker than the edges. #[code --tablechart-bar-edge-width] sets the width of the edge (1px by default). If you want no edge, set #[code --tablechart-bar-edge: none].
+
+		+style.
+			.pale {
+				--tablechart-bar-color: light-dark(#f3d77a, #4a4a8a);
+			}
+
+		+chart(null, '1')
+			figure.pale(data-chart="column")
+				table
+					tbody
+						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '-30'], ['Winter', '91']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		+chart(null, '1')
+			figure.pale(data-chart="bar" style="--tablechart-bar-radius: 6px")
+				table
+					tbody
+						each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '91']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		p A palette works the same way: each series gets an edge only if its own colour has too little contrast. In the chart below, the first two colours get an edge and the third does not. Between the parts of a stack is a gap in the background colour. The parts have no edge along it, and the edges at the sides go on across it. The squares in the legend and in the tooltip get the same edge.
+
+		+style.
+			.pastel {
+				--tablechart-color-1: light-dark(#a8d8ea, #2e4a6b);
+				--tablechart-color-2: light-dark(#f6c6a8, #6b3a2e);
+				--tablechart-color-3: light-dark(#5a7d9a, #9fc3e0);
+			}
+
+		+chart(null, '1')
+			figure.pastel(data-chart="column" data-chart-stack)
+				table
+					thead
+						tr
+							th Season
+							th Apples
+							th Pears
+							th Plums
+					tbody
+						each row in [['Spring', '20', '14', '9'], ['Summer', '31', '22', '15'], ['Autumn', '42', '28', '12'], ['Winter', '18', '11', '6']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+								td= row[3]
+
+		p A slice of a donut or pie gets the same edge, all round its shape: along the outside and the inside of the ring, along the gaps, and round the corners if the slices are rounded. A pie has no inside, so it has no edge there. The dots in the legend get the edge too.
+
+		+chart(null, '1')
+			figure.pastel(data-chart="donut")
+				table
+					thead
+						tr
+							th Fruit
+							th Share
+					tbody
+						each row in [['Apples', '45'], ['Pears', '30'], ['Plums', '25']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		+chart(null, '1')
+			figure.pastel(data-chart="donut" style="--tablechart-slice-radius: 8px")
+				table
+					thead
+						tr
+							th Fruit
+							th Share
+					tbody
+						each row in [['Apples', '45'], ['Pears', '30'], ['Plums', '25']]
+							tr
+								th= row[0]
+								td= row[1]
+
+		p In a combo chart, the columns get the edge. A line has no edge, so in the chart below it has a dark colour of its own.
+
+		+style.
+			.pale-combo {
+				--tablechart-color-1: light-dark(#f3d77a, #4a4a8a);
+				--tablechart-color-2: light-dark(#7a4f00, #e8d48a);
+			}
+
+		+chart(null, '1')
+			figure.pale-combo(data-chart="column")
+				table
+					thead
+						tr
+							th Season
+							th Sold
+							th(data-chart="line") Target
+					tbody
+						each row in [['Spring', '58', '50'], ['Summer', '72', '80'], ['Autumn', '30', '45'], ['Winter', '91', '85']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
 	+section("Waterfall colours")
 		p These set the colours of rising steps, falling steps and totals. The number inside a bar gets a colour with enough contrast with the bar. See #[a(href=url('/styling/text.html#numbers-inside-bars-or-columns')) Numbers inside bars or columns].
 

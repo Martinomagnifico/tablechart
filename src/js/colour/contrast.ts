@@ -43,7 +43,8 @@ export const checkContrast = (figure: HTMLElement): void => {
 	// One message per kind, column and colour, with the rows that have that colour if not all of them do.
 	const found = new Map<string, { kind: string; column: string; rows: Set<string>; all: number; contrast: number }>();
 	for (const [selector, kind, paint] of parts) {
-		const elements = Array.from(figure.querySelectorAll(`${selector}:not([data-muted])`));
+		// A bar with an edge has enough contrast at that edge.
+		const elements = Array.from(figure.querySelectorAll(`:is(${selector}):not([data-muted], [data-edge])`));
 		for (const element of elements) {
 			const paintOf = paint(element);
 			const [r, g, b, a] = rgbOf(paintOf);

@@ -74,6 +74,8 @@ block content
 	+section("Bars and columns")
 		+vars([
 			['--tablechart-bar-color', 'The text colour', 'All bars and a single line'],
+			['--tablechart-bar-edge', 'None', '<code>none</code> leaves out the edge of a column or bar with too little contrast'],
+			['--tablechart-bar-edge-width', '<code>1px</code>', 'How wide that edge is'],
 			['--tablechart-bar-max', '<code>60px</code>', 'The widest a bar may be'],
 			['--tablechart-bar-radius', '<code>--tablechart-corner-radius</code>', 'How round the end of a column or bar is, in <code>px</code> or <code>em</code>'],
 			['--tablechart-corner-radius', '<code>0</code>', 'How round the corners of columns, bars and slices are, in <code>px</code> or <code>em</code>'],
@@ -115,7 +117,7 @@ block content
 
 	+section("Donut")
 		+vars([
-			['--tablechart-centre-color', 'The text colour', 'The number in the middle of a donut'],
+			['--tablechart-centre-color', 'The text colour', 'The central value of a donut'],
 			['--tablechart-centre-size', '<code>1.6em</code>', 'The size of that number'],
 			['--tablechart-leader-color', 'The text colour', 'The line from a slice to its number'],
 			['--tablechart-leader-opacity', '<code>0.45</code>', 'The opacity of that line'],
@@ -137,7 +139,7 @@ block content
 			['--tablechart-legend-focus-offset', '<code>2px</code>', 'The space between that focus ring and the name'],
 			['--tablechart-legend-focus-width', '<code>2px</code>', 'How wide that focus ring is'],
 			['--tablechart-legend-gap', '<code>0.6em</code>', 'The space above the legend'],
-			['--tablechart-legend-key-size', '<code>0.6em</code>', 'The dot before each name in the legend'],
+			['--tablechart-legend-key-size', '<code>0.7em</code>', 'The square before each name in the legend of columns, bars, areas, donuts and pies'],
 			['--tablechart-legend-off-opacity', '<code>0.3</code>', 'The sample of a series that is turned off in a legend with toggles'],
 			['--tablechart-legend-padding', '<code>0</code>', 'The padding of the legend'],
 			['--tablechart-legend-radius', '<code>0</code>', 'The corners of the legend'],

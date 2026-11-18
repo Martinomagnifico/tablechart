@@ -37,10 +37,10 @@ const fitsIn = (at: number[], width: number, tall: number, cx: number, cy: numbe
 		})
 	);
 
-/** Each slice is a circle with one dash, so the ring draws itself round. A total row is the number in the middle. */
+/** Each slice is a circle with one dash, so the ring draws itself round. A total row is the central value. */
 const slices = (rows: Row[]): Row[] => rows.filter((row) => !row.isTotal);
 
-/** A ring of slices: as thick as the `ringfill` option, or with `fill` 1 a pie, which has no number in the middle. */
+/** A ring of slices: as thick as the `ringfill` option, or with `fill` 1 a pie, which has no central value. */
 const ring = (fill?: number): ChartType => ({
 	aspect: 0.66,
 	centre: true,
@@ -161,43 +161,61 @@ const ring = (fill?: number): ChartType => ({
 		}
 
 		// A gap is a line across the ring, cut with a mask: a shorter dash would leave a gap wider outside than inside.
-		if (partings.length > 1) {
-			const inner = radius - thickness / 2 - 1;
-			const outer2 = radius + thickness / 2 + 1;
-			const id = `tablechart-slices-${++masks}`;
+		// `grow` makes every cut wider, for the slices inside an edge: the gaps, the rounded corners, and the inside and outside.
+		const pie = radius - thickness / 2 <= unit;
+		const gap = Number.parseFloat(getComputedStyle(svg).getPropertyValue("--tablechart-slice-gap").trim() || "4");
+		const gapMask = (id: string, grow: number): SVGMaskElement => {
 			const mask = svgEl("mask", { id, maskUnits: "userSpaceOnUse" });
-			mask.appendChild(
-				svgEl("rect", { x: 0, y: 0, width: VIEWBOX_WIDTH, height, fill: "white" })
-			);
+			mask.appendChild(svgEl("rect", { x: 0, y: 0, width: VIEWBOX_WIDTH, height, fill: "white" }));
+			const inner = radius - thickness / 2 - 1;
+			const outerEnd = radius + thickness / 2 + 1;
+
 			for (const angle of partings) {
-				mask.appendChild(
-					svgEl("line", {
-						class: DIVIDE_CLASS,
-						x1: middleX + Math.cos(angle) * inner,
-						y1: middleY + Math.sin(angle) * inner,
-						x2: middleX + Math.cos(angle) * outer2,
-						y2: middleY + Math.sin(angle) * outer2,
-					})
-				);
+				const line = svgEl("line", {
+					class: DIVIDE_CLASS,
+					x1: middleX + Math.cos(angle) * inner,
+					y1: middleY + Math.sin(angle) * inner,
+					x2: middleX + Math.cos(angle) * outerEnd,
+					y2: middleY + Math.sin(angle) * outerEnd,
+				});
+				if (grow) line.style.strokeWidth = `calc(var(--tablechart-slice-gap, 4) + ${short(2 * grow)})`;
+				mask.appendChild(line);
 			}
+
 			if (sliceRadius > 0) {
-				const gap = Number.parseFloat(getComputedStyle(svg).getPropertyValue("--tablechart-slice-gap").trim() || "4");
 				// A pie has no inner edge, so only its outer corners are round.
-				const edges = radius - thickness / 2 > unit ? [radius - thickness / 2, radius + thickness / 2] : [radius + thickness / 2];
-				const roundOf = (k: number) => Math.min(sliceRadius, thickness / 2, Math.max((sweeps[k] * edges[0] - gap) / 2, 0));
+				const edges = pie ? [radius + thickness / 2 - grow] : [radius - thickness / 2 + grow, radius + thickness / 2 - grow];
+				// How round a corner can be, by the length of the slice along its shortest edge.
+				const shortest = pie ? radius + thickness / 2 : radius - thickness / 2;
+				const roundOf = (k: number) => Math.min(sliceRadius, thickness / 2, Math.max((sweeps[k] * shortest - gap) / 2, 0));
 				partings.forEach((angle, k) => {
 					const before = roundOf((k - 1 + partings.length) % partings.length);
-					for (const [side, r] of [[1, roundOf(k)], [-1, before]] as const) {
-						if (r > 0) for (const edge of edges) mask.appendChild(svgEl("path", { d: cornerCut(middleX, middleY, angle, edge, side, gap / 2, r, edge === edges.at(-1)), fill: "black" }));
+					for (const [side, round] of [[1, roundOf(k)], [-1, before]] as const) {
+						const corner = Math.max(round - grow, 0);
+						if (!corner) continue;
+						for (const edge of edges) {
+							const cut = cornerCut(middleX, middleY, angle, edge, side, gap / 2 + grow, corner, edge === edges.at(-1));
+							mask.appendChild(svgEl("path", { d: cut, fill: "black" }));
+						}
 					}
 				});
 			}
+			return mask;
+		};
+
+		if (partings.length > 1) {
+			const id = `tablechart-slices-${++masks}`;
 			const group = svgEl("g", { mask: `url(#${id})` });
 			for (const slice of Array.from(svg.querySelectorAll(`.${SLICE_CLASS}`))) group.appendChild(slice);
 			const defs = svgEl("defs");
-			defs.appendChild(mask);
+			defs.appendChild(gapMask(id, 0));
+
+			// The mask for slices inside an edge, one edge width narrower all round; used only if a slice gets an edge.
+			const edgeWidth = (Number.parseFloat(getComputedStyle(svg).getPropertyValue("--tablechart-bar-edge-width")) || 1) * unit;
+			defs.appendChild(gapMask(`${id}-inside`, edgeWidth));
+			svg.dataset.sliceMask = `${id}-inside`;
 			svg.prepend(defs, group);
-		}
+		} else delete svg.dataset.sliceMask;
 
 		if (centre) {
 			centre.hidden = fill === 1;

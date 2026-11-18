@@ -139,6 +139,7 @@ const rowLines = (state: ChartState, index: number, config: Config): TooltipLine
 						line: named.dataset.line ?? null,
 						point: getComputedStyle(named).getPropertyValue("--tablechart-point-color").trim(),
 						box: named.dataset.swatch === "box",
+						edge: named.style.getPropertyValue("--_edge"),
 					}
 				: undefined,
 		});
@@ -200,7 +201,10 @@ const show = (state: ChartState, index: number, config: Config): void => {
 			const key = document.createElement("span");
 			key.className = `${TIP_CLASS}-key`;
 			key.style.backgroundColor = colour;
-			if (sample?.box) key.dataset.sample = "box";
+			if (sample?.box) {
+				key.dataset.sample = "box";
+				if (sample.edge) key.style.setProperty("--_edge", sample.edge);
+			}
 			// A series without a box is a line, also a step line without points.
 			else if (sample) {
 				key.dataset.sample = "line";

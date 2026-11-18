@@ -23,6 +23,25 @@
 	fill: #{$seriesink};
 }
 
+// An edge with enough contrast, inside a column or bar whose colour has too little.
+:is(.tablechart-bar, .tablechart-piece)[data-edge] {
+	stroke: var(--_edge);
+	stroke-width: var(--_edge-width);
+	stroke-dasharray: var(--_edge-dash, none);
+}
+
+// The edge of a slice with too little contrast: an arc along the outside of the ring, and one along the inside.
+.tablechart-slice-edge {
+	fill: none;
+	stroke: var(--_edge);
+}
+
+// Its side lines across a gap in a stack.
+.tablechart-edge {
+	fill: none;
+	stroke: var(--_edge);
+}
+
 // Numbers of columns side by side get only as small as their columns need. The numbers of a line keep their size.
 .tablechart-plot[data-grouped] :where(.tablechart-value:not([data-lined])) {
 	font-size: calc(var(--tablechart-value-group-size, var(--tablechart-value-size, calc(#{$namesize} * 1.3))) * var(--_fit, 1));

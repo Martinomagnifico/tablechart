@@ -83,7 +83,7 @@ $reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px 
 		:where(.tablechart-area-fill > *) {
 			clip-path: #{$reveal};
 		}
-		:where(.tablechart-slice) {
+		:where(.tablechart-slice, .tablechart-slice-edge) {
 			stroke-dasharray: calc(var(--arc) * #{$shown}) calc(var(--circ) - var(--arc) * #{$shown});
 		}
 	}

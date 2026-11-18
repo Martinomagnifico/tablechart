@@ -39,7 +39,7 @@ block content
 			li A number #[em inside] a bar or column gets at least 5:1 with it where possible, a little more than the 4.5:1 that is needed, so it is easier to read. It is in one of two colours that you can set, or else black or white. #[code --tablechart-value-contrast] sets the 5:1. With APCA it is Lc 60, see below. See #[a(href=url('/styling/text.html#numbers-inside-bars-or-columns')) Numbers inside bars or columns].
 			li The parts of a stack and the slices of a donut have a gap in the background colour between them. So two parts in similar colours do not need contrast with each other, only with the background.
 			li Without a palette, each next line, part or slice is lighter than the one before it, so it has less contrast with the background. With many lines or slices, the last ones can have less than 3:1. If so, a palette or a range of colours helps: if both ends of a range have at least 3:1 with the background, every step between them has too. See #[a(href=url('/styling/colours.html#a-range-of-colours')) A range of colours].
-			li If you set your own colours, they need the same contrast with the background: 3:1 for a bar or a line.
+			li If a column, bar or slice has a colour with less than 3:1 contrast with the background, Tablechart gives it an edge that has enough. See #[a(href=url('/styling/colours.html#colours-with-low-contrast')) Colours with low contrast]. A line gets no edge, so its colour still needs 3:1.
 			li A name next to a line has the colour of its line. A line only needs 3:1, but a name is text and needs 4.5:1. If the colour of the line has less, the name gets darker or lighter towards the text colour, just far enough to reach 4.5:1, so it still looks like its line.
 		p The console warns about each line, bar, slice or text with too little contrast, with its name and the contrast it has. That is also text on the background, such as the names next to the lines and the numbers along an axis. The check runs for every chart once it is drawn, also without the #[code debug] option, because a printed page or a PDF has the same colours.
 
@@ -192,7 +192,7 @@ block content
 								td= row[3]
 
 		h3(id="the-total-of-a-donut") The total of a donut
-		p If a donut has no total row, the number in the middle is the sum of the slices. Tablechart adds it to the table, in a hidden row at the bottom, so screen readers read it with a name: "Total, 74.5". The #[code totallabel] option sets the name.
+		p If a donut has no total row, the central value is the sum of the slices. Tablechart adds it to the table, in a hidden row at the bottom, so screen readers read it with a name: "Total, 74.5". The #[code totallabel] option sets the name.
 
 		h3(id="annotations") Annotations
 		p The text of an annotation, such as #[code +24%] on a bracket, stays in the page under the table, hidden from sight. Screen readers read it there. The badge in the drawing is hidden from them.

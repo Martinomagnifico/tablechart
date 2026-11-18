@@ -78,6 +78,7 @@
 		width: 0.7em;
 		height: 0.7em;
 		border-radius: 0.15em;
+		box-shadow: inset 0 0 0 var(--tablechart-bar-edge-width, 1px) var(--_edge, transparent);
 	}
 }
 

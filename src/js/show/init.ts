@@ -6,6 +6,7 @@ import { layout } from "../layout/layout";
 import { animated } from "../shared/settings";
 import { putMasksOn, setShown } from "./shown";
 import { inkInside, inkNames, measureSurface } from "../colour/colour";
+import { edgeBars } from "../colour/edges";
 import { checkContrast, checkOldColours, checkTextContrast } from "../colour/contrast";
 import { debug } from "../shared/debug";
 import { assignKeys } from "../build/read-table";
@@ -414,6 +415,7 @@ const followScheme = (): void => {
 			if (changed) {
 				inkInside(figure);
 				inkNames(figure);
+				edgeBars(figure);
 			}
 		}
 	};

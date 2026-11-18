@@ -5,12 +5,14 @@
 ### Added
 - `data-axis="right"` on a column header: a second value axis, for values with another unit.
 - `data-chart-legend="toggle"` and `legend: "toggle"`: a legend whose names turn their series off and on.
+- A column, bar or slice with less than 3:1 contrast with the background gets an edge with enough, as WCAG 1.4.11 asks.
 
 ### Changed
 - A line over columns and its points get an edge in the background colour, `--tablechart-halo-width`.
 - A number of that line gets the edge where it touches a column or the line. Fully inside a column, it gets the colour of the column numbers.
 - If the line covers a number inside a column, that number moves to the foot of the column.
 - Numbers inside bars are semibold, `--tablechart-value-inside-weight`.
+- The legend of a donut or pie has squares instead of dots, as the other legends have.
 - In dark mode, the tooltip has the background of the chart, which the contrast of the series colours is checked against.
 
 ### Fixed
