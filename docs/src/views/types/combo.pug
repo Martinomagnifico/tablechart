@@ -34,7 +34,7 @@ block content
 								td= row[2]
 
 		p A line suits values that have an order, such as months or years. The legend shows a box for the columns and a line for the line.
-		p The line and its points have an edge in the background colour, so they stand out from a column of a similar colour. A number of the line that is fully inside a column gets the colour of the numbers of the columns. A number that is partly over a column, or touches the line inside a column, gets the edge. #[code --tablechart-halo-width] sets how wide that edge is. The numbers of the columns are inside the columns if they fit. If a point of the line would cover a number, or a number has no room, the chart has to omit it. If you hover over a column (or tap it on a touch device), a tooltip shows all numbers at that place.
+		p The line and its points have an edge in the background colour, so they stand out from a column of a similar colour. A number of the line that is fully inside a column gets the colour of the numbers of the columns. A number that is partly over a column, or touches the line inside a column, gets the edge. #[code --tablechart-halo-width] sets how wide that edge is. The numbers of the columns are inside the columns if they fit. If the line or one of its points would cover a number inside a column, that number moves to the foot of its column. If the line covers it there too, or a number has no room, the chart has to omit it. If you hover over a column (or tap it on a touch device), a tooltip shows all numbers at that place.
 
 	+section("Several columns and a line")
 		p With more than one value column without #[code data-chart="line"], each row is a group of columns, and the line goes through the middle of each group. Several columns can have #[code data-chart="line"], and each one is a line.
@@ -82,7 +82,7 @@ block content
 								td= row[1]
 								td= row[2]
 
-		p Both axes show their numbers, and each axis has the names of its columns as its title. Zero is at the same height on both axes, and so is every number, so one set of gridlines fits both. If a column on the right has values below zero and the left has none, the left axis shows no numbers below zero.
+		p Both axes show their numbers, and each axis has the names of its columns as its title. Zero is at the same height on both axes, and so is every number, so one set of gridlines fits both. If the chart gets narrower or wider, both axes keep their ends, so the lines keep their places against each other. Only the number of gridlines changes. If a column on the right has values below zero and the left has none, the left axis shows no numbers below zero.
 		p Each column keeps its own decimal places.
 
 	+section("Columns on both axes")
@@ -123,7 +123,7 @@ block content
 							th Rainfall (mm)
 							th(data-axis="right") Temperature (°C)
 					tbody
-						each row in [['Jan', '67', '3.4'], ['Feb', '56', '3.8'], ['Mar', '53', '6.6'], ['Apr', '41', '9.9'], ['May', '58', '13.4'], ['Jun', '65', '16.1']]
+						each row in [['Jul', '74', '18.3'], ['Aug', '80', '18.0'], ['Sep', '76', '15.0'], ['Oct', '85', '11.0'], ['Nov', '82', '7.1'], ['Dec', '79', '4.2']]
 							tr
 								th= row[0]
 								td= row[1]

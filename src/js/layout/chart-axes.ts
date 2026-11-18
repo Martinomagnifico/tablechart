@@ -7,7 +7,7 @@ import { stackReach } from "../shared/stacks";
 import { measureAll, sizeOf } from "./measure";
 import { writeNumber } from "../shared/numbers";
 import type { Squeeze } from "../scale/scale";
-import { alignScales } from "../scale/align";
+import { alignScales, steadyScales } from "../scale/align";
 import { heightRange, turnedOn } from "../shared/settings";
 import { htmlEl, placeAt, short, svgEl } from "../draw/svg";
 
@@ -38,22 +38,31 @@ export const valueAxisOf = (state: ChartState, config: Config, along: ChartAxes,
 	// The scale ends on a number of the axis, or where `data-chart-scale` says; three numbers or more are the numbers themselves.
 	const { chartScaleY, chartScale } = state.figure.dataset;
 	const own = readScale(chartScaleY ?? chartScale);
-	if (own && own.length > 2) valueScale = { min: own[0], max: own[own.length - 1], step: 0, ticks: own };
-	else {
-		const [from, to] = own ?? [Math.min(min, state.agreed?.bottom ?? min), Math.max(max, state.agreed?.ceiling ?? max)];
-		const step = niceStep(to - from, Math.max((sideways ? guess / 9 : Math.min(guess * aspect, heightRange(state.figure, 1)[1]) / 3) / font, 2));
+	// How many steps the room for the axis asks for.
+	const wanted = Math.max((sideways ? guess / 9 : Math.min(guess * aspect, heightRange(state.figure, 1)[1]) / 3) / font, 2);
+	const [from, to] = own ?? [Math.min(min, state.agreed?.bottom ?? min), Math.max(max, state.agreed?.ceiling ?? max)];
+
+	// A scale with about `count` steps from `from` to `to`.
+	const scaleOver = (count: number): Scale => {
+		const step = niceStep(to - from, count);
 		const round = (value: number, up: boolean) => (own ? value : Number(((up ? Math.ceil : Math.floor)(value / step - 1e-9 * (up ? 1 : -1)) * step).toPrecision(12)));
 		const lo = round(from, false);
 		const hi = round(to, true);
-		valueScale = { min: lo, max: hi, step, ticks: ticksOf(lo, hi, step) };
-	}
+		return { min: lo, max: hi, step, ticks: ticksOf(lo, hi, step) };
+	};
+
+	if (own && own.length > 2) valueScale = { min: own[0], max: own[own.length - 1], step: 0, ticks: own };
+	else valueScale = scaleOver(wanted);
+
 	// A second axis on the right: both scales have zero and their ticks at the same height.
+	// Their ends come from a fixed number of steps, so a resize changes only how many gridlines there are, not where the lines are.
 	const right = state.rightAxis;
 	if (right) {
-		const aligned = alignScales(valueScale, valuesOf(rows, right.series));
-		valueScale = aligned.left;
-		right.scale = aligned.right;
-		right.aligned = aligned.aligned;
+		const rightValues = valuesOf(rows, right.series);
+		const both = own ? alignScales(valueScale, rightValues) : steadyScales(scaleOver, rightValues, wanted);
+		valueScale = both.left;
+		right.scale = both.right;
+		right.aligned = both.aligned;
 	}
 	// A scale that floats, as for prices, writes its numbers as the table does, so a value at the pointer fits beside it.
 	const written = type.floats ? rows.flatMap((row) => row.cells.slice(0, series.length).map((cell) => decimalsIn(cell.number))) : [];

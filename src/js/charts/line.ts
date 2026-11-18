@@ -269,10 +269,50 @@ const trend = (area: boolean): ChartType => ({
 						return [[px - 4 * unit, py - 4 * unit, 8 * unit, 8 * unit]];
 					})
 				);
-		const columnsShown = columnNumbers.filter(({ label, box }) => {
-			const covered = pointBoxes.some((point) => overlaps(point, box));
-			if (covered) label.setAttribute("data-left-out", "");
-			return !covered;
+
+		// And a number the line runs through: small boxes along each piece of the line, as wide as the line and its edge.
+		const lineBoxes = step
+			? []
+			: own.flatMap((s) =>
+					rows.flatMap((_row, i): Box[] => {
+						if (i === last || missing(s, i) || missing(s, i + 1)) return [];
+						const [x1, y1] = pointAt(s, i);
+						const [x2, y2] = pointAt(s, i + 1);
+						const count = Math.max(1, Math.ceil(Math.hypot(x2 - x1, y2 - y1) / (3 * unit)));
+						return Array.from({ length: count + 1 }, (_n, k): Box => {
+							const alongX = x1 + ((x2 - x1) * k) / count;
+							const alongY = y1 + ((y2 - y1) * k) / count;
+							return [alongX - 3 * unit, alongY - 3 * unit, 6 * unit, 6 * unit];
+						});
+					})
+				);
+
+		const covered = (box: Box): boolean =>
+			pointBoxes.some((point) => overlaps(point, box)) || lineBoxes.some((piece) => overlaps(piece, box));
+
+		// Where a number inside a column that stands up would be at the foot of the column, or null if it cannot go there.
+		const footOf = ({ label, box }: { label: HTMLElement; box: Box }): Box | null => {
+			const column = svg.querySelector(`.${BAR_CLASS}[data-row="${label.dataset.row}"][data-series="${label.dataset.series}"]`);
+			if (label.dataset.place !== "inside" || !column || column.hasAttribute("data-grow")) return null;
+
+			const foot = Number(column.getAttribute("y")) + Number(column.getAttribute("height"));
+			const moved: Box = [box[0], foot - box[3] - unit, box[2], box[3]];
+			return moved[1] < box[1] ? null : moved;
+		};
+
+		// A number inside a column that the line covers goes to the foot of its column, if the line leaves it free there.
+		for (const item of columnNumbers) {
+			if (!covered(item.box)) continue;
+			const moved = footOf(item);
+			if (!moved || covered(moved)) continue;
+			item.label.style.top = `${((moved[1] + moved[3] / 2) / height) * 100}%`;
+			item.box = moved;
+		}
+
+		const columnsShown = columnNumbers.filter((item) => {
+			if (!covered(item.box)) return true;
+			item.label.setAttribute("data-left-out", "");
+			return false;
 		});
 
 		// On a step chart, the last row from row i on that has the same value.
@@ -318,8 +358,10 @@ const trend = (area: boolean): ChartType => ({
 			if (!several || focused || series.length > 2) return area || step || crosses(s, i, alone) <= crosses(s, i, flip(alone)) ? alone : flip(alone);
 			const other = cellAt(1 - s, i);
 			if (!other || other.missing) return alone;
-			// The higher of two goes above its point; on a tie, the first does.
-			if (cell.value > other.value || (cell.value === other.value && s === 0)) return "above";
+			// The higher point of two goes above, measured on screen, as two axes can have different scales; on a tie, the first does.
+			const ownY = pointAt(s, i)[1];
+			const otherY = pointAt(1 - s, i)[1];
+			if (ownY < otherY || (ownY === otherY && s === 0)) return "above";
 			// In an area chart, a number under its point may not cross zero.
 			if (area && cell.value >= 0 && pointAt(s, i)[1] + 7 * unit + labelHeight > baseline) return "above";
 			return "below";

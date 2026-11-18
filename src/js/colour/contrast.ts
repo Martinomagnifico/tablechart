@@ -82,13 +82,13 @@ export const checkContrast = (figure: HTMLElement): void => {
 };
 
 // Text in a chart with the background behind it. A badge can have a background of its own, so it is left out.
-const TEXT_ON_SURFACE = ".tablechart-name, .tablechart-value:not([data-place='inside'], [data-place='middle']), .tablechart-categories span, .tablechart-centre, .tablechart-tick, .tablechart-quadrant-name, figcaption b, figcaption span";
+const TEXT_ON_SURFACE = ".tablechart-name, .tablechart-value:not([data-place='inside'], [data-place='middle'], [data-over]), .tablechart-categories span, .tablechart-centre, .tablechart-tick, .tablechart-quadrant-name, figcaption b, figcaption span";
 
 /** Warns about text that does not stand out enough: a number inside a bar from that bar, other text from the background, once the chart is built. */
 export const checkTextContrast = (figure: HTMLElement): void => {
 	let tries = 0;
 	const run = () => {
-		const values = Array.from(figure.querySelectorAll<HTMLElement>(".tablechart-value[data-place='inside'], .tablechart-value[data-place='middle']")).filter(
+		const values = Array.from(figure.querySelectorAll<HTMLElement>(".tablechart-value:is([data-place='inside'], [data-place='middle'], [data-over])")).filter(
 			(value) => !value.hasAttribute("data-left-out") && !value.hidden
 		);
 		// Other text in a chart is on the background, such as the name next to a line.
