@@ -320,8 +320,11 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		if (!wanted) return;
 		const shown = state.figure.classList.contains(SHOWN_CLASS);
 		const before = shown && animated(state.figure, config) && !reduced() ? snapshot(state) : null;
+		const keptHeight = { pixels: state.svg.getBoundingClientRect().height, figureWidth: state.figure.clientWidth };
 		const next = build(state.figure, config, kind, wanted);
 		if (!next) return;
+
+		next.keptHeight = keptHeight;
 		off = wanted;
 		unbuild(state);
 		stepTo(next, state.step, true);

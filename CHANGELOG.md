@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.5.2] - 2026-11-18
+
+### Fixed
+- A legend toggle/button click no longer shifts the chart.
+
+
 ## [1.5.1] - 2026-11-18
 
 ### Changed

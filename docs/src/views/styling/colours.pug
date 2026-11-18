@@ -2,14 +2,31 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Styling | Colours"
-	- pagedescription = "Colours in Tablechart: one colour for all bars, colours for a waterfall, and a palette."
+	- pagedescription = "Colours in Tablechart: the text colour, one colour for all bars, colours for a waterfall, and a palette."
 
 block content
 	.lane
 		.container
 			.page-header
 				h1 Colours
-				p.lead One colour for all bars, colours for a waterfall, and a palette.
+				p.lead The text colour, one colour for all bars, colours for a waterfall, and a palette.
+
+	+section("The text colour")
+		p A chart has the text colour of the element it is in. The bars, the lines, the names and the numbers next to the bars all get that colour. Without a palette, each next line or slice is a lighter shade of it. If the page has another text colour in dark mode, the chart gets that colour too. See #[a(href=url('/styling/light-dark.html')) Light and dark].
+
+		p In this example, no colour is set, so the chart has the text colour of this page:
+
+		.plain
+			+chart
+				figure(data-chart="column")
+					table
+						tbody
+							each row in [['Spring', '58'], ['Summer', '72'], ['Autumn', '70'], ['Winter', '91']]
+								tr
+									th= row[0]
+									td= row[1]
+
+		p If you want another colour for the chart only, set #[code --tablechart-color] on the figure. If you want the bars in another colour than the text, see #[a(href="#one-colour") One colour].
 
 	+section("One colour")
 		p #[code --tablechart-bar-color] sets the colour of all bars, and of a single line.

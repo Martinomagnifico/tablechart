@@ -170,7 +170,8 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 	// viewBox units per screen pixel.
 	const unit = VIEWBOX_WIDTH / widthPx;
 	const [least, most] = heightRange(state.figure, unit);
-	const shaped = Math.min(VIEWBOX_WIDTH * aspect, most);
+	const kept = state.keptHeight?.figureWidth === state.figure.clientWidth ? state.keptHeight.pixels * unit : null;
+	const shaped = kept ?? Math.min(VIEWBOX_WIDTH * aspect, most);
 
 	plot.classList.add(PLACED_CLASS);
 

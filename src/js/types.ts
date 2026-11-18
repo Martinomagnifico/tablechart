@@ -362,6 +362,9 @@ export interface ChartState {
 
 	/** What its group with `data-chart-group-scale` agreed on. */
 	agreed?: { height: number; room: number; floor: number; ceiling: number; bottom: number };
+
+	/** The height in pixels before a legend toggle, kept while the figure has the same width, so the legend stays in place. */
+	keptHeight?: { pixels: number; figureWidth: number };
 	figure: HTMLElement;
 	plot: HTMLElement;
 	svg: SVGSVGElement;
