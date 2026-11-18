@@ -139,11 +139,19 @@ const lineStyles = (figure: HTMLElement, series: Series[], kind: string, config:
 	});
 };
 
+/** `data-chart-legend`, or else the `legend` option: true, false or "toggle". */
+const legendOf = (figure: HTMLElement, config: Config): boolean | "toggle" => {
+	const asked = figure.getAttribute("data-chart-legend");
+	if (asked === null) return config.legend;
+	return asked === "toggle" ? "toggle" : asked !== "false";
+};
+
 /** Pass 2: everything a reader will read, before a translation script looks. */
 export const build = (
 	figure: HTMLElement,
 	config: Config,
-	asKind: string | null = null
+	asKind: string | null = null,
+	off: ReadonlySet<number> = new Set()
 ): ChartState | null => {
 	// `asKind` builds the chart as another kind, such as a column chart as a bar chart on a narrow screen.
 	const kind = asKind ?? (figure.getAttribute("data-chart") || "column");
@@ -203,6 +211,24 @@ export const build = (
 	}
 	const twoAxes = series.some((one) => one.axis === "right");
 	lineStyles(figure, series, kind, config);
+	// A series turned off in the legend keeps its place, colour and marker; its cells count as missing, so the scale fits the rest.
+	const toggles = series.length > 1 && !type.columns && !type.centre && legendOf(figure, config) === "toggle";
+	if (toggles && off.size && off.size < series.length) {
+		series = series.map((one, index) => (off.has(index) ? { ...one, off: true } : one));
+		const firstOn = series.findIndex((one) => !one.off);
+
+		for (const row of rows) {
+			for (const index of off) {
+				if (row.cells[index]) row.cells[index] = { ...row.cells[index], missing: true, value: 0 };
+			}
+			// A row on its own is its first series, which must be one that is on.
+			Object.assign(row, row.cells[firstOn] ?? row.cells[0]);
+		}
+	}
+
+	// With every series of one axis turned off, the chart has one value axis, on the side of the series that are on.
+	const onSide = (side: "left" | "right") => series.some((one) => !one.off && one.axis === side);
+	const bothSides = twoAxes && onSide("left") && onSide("right");
 	const lined = series.some((one) => one.chart);
 	const several = series.length > 1;
 	// How many lines or bars share the colour steps, so the last is not too light.
@@ -247,6 +273,7 @@ export const build = (
 			if (cell.prefix) node.dataset.prefix = cell.prefix;
 			if (cell.suffix) node.dataset.suffix = cell.suffix;
 			if (cell.missing) node.dataset.missing = cell.raw;
+			if (series[s].off) node.dataset.off = "";
 			if (several) node.dataset.series = String(s + 1);
 			// A number of a line over columns keeps its size when the columns are grouped.
 			if (lined && series[s].chart) node.dataset.lined = "";
@@ -281,13 +308,16 @@ export const build = (
 	const legendAsked = figure.getAttribute("data-chart-legend");
 	// With two value axes, the names go in a legend: at the ends of the lines they would take room from both axes.
 	const legend =
-		several && !type.columns && (legendAsked === null ? config.legend || type.legend !== undefined || twoAxes : legendAsked !== "false")
+		several && !type.columns && (legendAsked === null ? !!config.legend || type.legend !== undefined || twoAxes : legendAsked !== "false")
 			? document.createElement("div")
 			: null;
 	if (legend) {
 		legend.className = LEGEND_CLASS;
-		legend.setAttribute("aria-hidden", "true");
-		legend.inert = true;
+		// With toggles, the names are buttons; without, screen readers read the names in the table.
+		if (!toggles) {
+			legend.setAttribute("aria-hidden", "true");
+			legend.inert = true;
+		}
 	}
 	const lineSeries = series.filter((one) => one.chart);
 	const names = several && !type.columns
@@ -307,6 +337,13 @@ export const build = (
 				if (one.line && !swatch) node.dataset.line = one.line;
 				if (one.key && config.langattribute) node.setAttribute(config.langattribute, one.key);
 				node.dataset.series = String(s + 1);
+				if (toggles) {
+					node.inert = false;
+					node.setAttribute("role", "button");
+					node.tabIndex = 0;
+					node.setAttribute("aria-pressed", String(!one.off));
+					node.toggleAttribute("data-off", !!one.off);
+				}
 				node.style.setProperty("--n", String(s));
 				node.style.setProperty("--palette", `var(--tablechart-color-${s + 1})`);
 				node.style.setProperty("--m", focused && !one.focus ? "1" : "0");
@@ -385,9 +422,14 @@ export const build = (
 				right: false,
 			}
 		: valueAxis || (!type.centre && turnedOn(figure, "data-chart-grid", config.grid))
-			? { titles: [], ticks: htmlEl(`${TICK_CLASS}s`, plot), numbers: valueAxis, right: !twoAxes && type.categories !== "beside" && axisRight(figure, config) }
+			? {
+					titles: [],
+					ticks: htmlEl(`${TICK_CLASS}s`, plot),
+					numbers: valueAxis,
+					right: twoAxes ? !bothSides && onSide("right") : type.categories !== "beside" && axisRight(figure, config),
+				}
 			: null;
-	const rightAxis = twoAxes ? makeRightAxis(plot, series, config) : null;
+	const rightAxis = bothSides ? makeRightAxis(plot, series, config) : null;
 	type.text?.({ figure, plot, rows, series, config });
 
 	// A chart that steps (`data-fragment`) builds a step at a time, from left to right. Without animation it is shown whole.

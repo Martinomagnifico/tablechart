@@ -105,6 +105,35 @@
 	color: inherit;
 	font-size: inherit;
 
+	// A name that turns its series off and on. The name of a series that is off keeps its contrast, with a line through it.
+	// An underline, as on a link, shows that the name can be clicked. The sample is not underlined.
+	&[role="button"] {
+		cursor: pointer;
+		user-select: none;
+		border-radius: 0.2em;
+		// Room at the sides as above and below the square of the sample, inside the focus ring. The legend keeps its spacing.
+		padding-inline: calc((1lh - 0.7em) / 2);
+		margin-inline: calc((1lh - 0.7em) / -2);
+		text-decoration-line: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 0.2em;
+		text-decoration-color: color-mix(in oklab, currentColor 45%, transparent);
+
+		&:hover {
+			text-decoration-color: currentColor;
+		}
+	}
+
+	// Off, a line through the name instead of the underline.
+	&[data-off] {
+		text-decoration-line: line-through;
+		text-decoration-color: currentColor;
+
+		&::before {
+			opacity: var(--tablechart-legend-off-opacity, 0.3);
+		}
+	}
+
 	// A sample of the line and its point, as two masks over the colour. A step line has no point.
 	// In pixels, as the points on the chart are, so a point has the same size in all three places.
 	&::before {
@@ -129,6 +158,12 @@
 		background: #{$seriesink};
 		mask: none;
 	}
+}
+
+// The focus ring of a name in a legend with toggles. Without weight, so a focus style of the page wins if it has one.
+:where(.tablechart-name[role="button"]:focus-visible) {
+	outline: var(--tablechart-legend-focus-width, 2px) solid var(--tablechart-legend-focus-color, currentColor);
+	outline-offset: var(--tablechart-legend-focus-offset, 2px);
 }
 
 // The line and point of each sample, for the legend and the tooltip.

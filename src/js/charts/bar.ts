@@ -37,7 +37,8 @@ export const bar: ChartType = {
 
 	draw(geo: Geometry) {
 		const { segments: segs, height, unit, svg, values, categories, config, barMax } = geo;
-		const several = geo.series.length > 1;
+		// A series turned off in a legend has no bar, and the group closes up.
+		const several = geo.own.length > 1;
 		// The widest name decides where every bar starts.
 		const names = Math.max(largest(categories.map((name) => sizeOf(name).width * unit)), 0);
 		const left = Math.min(names + 10 * unit, VIEWBOX_WIDTH * 0.42);
@@ -65,7 +66,7 @@ export const bar: ChartType = {
 		const band = height / segs.length;
 		const cy = (i: number) => (i + 0.5) * band;
 		const thickness = Math.min(band * config.barfill, barMax);
-		const layout = groupLayout(band, geo.series.length, barMax);
+		const layout = groupLayout(band, geo.own.length, barMax);
 		// A number after its bar is as far from it as from the top and bottom inside it. Digits are about 56% of the line height.
 		const first = values[0] ?? geo.totals[0];
 		const digits = first ? sizeOf(first).height * unit * 0.56 : 0;
@@ -76,7 +77,7 @@ export const bar: ChartType = {
 		const roomFor = (labels: HTMLElement[]) =>
 			labels.length ? largest(labels.map(widthOf)) + gap + 4 * unit : 0;
 		const valueOf = (s: number, i: number) => (geo.rows[i].cells[s] ?? geo.rows[i].cells[0]).value;
-		const grouped = geo.seriesValues.flatMap((labels, s) => labels.map((label, i) => ({ label, value: valueOf(s, i) })));
+		const grouped = geo.own.flatMap((s) => geo.seriesValues[s].map((label, i) => ({ label, value: valueOf(s, i) })));
 		// A stack wholly below zero has its total before it.
 		const backwards = (i: number) => {
 			const reach = stackReach(geo.rows[i], geo.series.length);
@@ -162,10 +163,10 @@ export const bar: ChartType = {
 
 		if (several) {
 			// All numbers shrink together to fit beside their bars, or all are left out.
-			const shown = geo.seriesValues.flat().filter((label) => label.dataset.missing === undefined);
+			const shown = geo.own.flatMap((s) => geo.seriesValues[s]).filter((label) => label.dataset.missing === undefined);
 			const fit = fitTogether(geo.plot, shown, (label) => ({ size: sizeOf(label).height * unit, room: layout.size + layout.gap * 0.5 }), "--_fit", GROUP_FIT_MIN);
 			geo.rows.forEach((row, i) => {
-				geo.series.forEach((_one, s) => {
+				geo.own.forEach((s, k) => {
 					const cell = row.cells[s] ?? row.cells[0];
 					const label = geo.seriesValues[s][i];
 					if (cell.missing) {
@@ -174,7 +175,7 @@ export const bar: ChartType = {
 					}
 					const end = x(cell.value);
 					const back = cell.value < 0;
-					const top = cy(i) + layout.offset(s);
+					const top = cy(i) + layout.offset(k);
 					// A value of zero has no bar. A very small one is at least one unit, on its own side of the zero line.
 					const wide = Math.max(Math.abs(end - zero), 1);
 					if (cell.value !== 0)
@@ -246,6 +247,8 @@ export const bar: ChartType = {
 						height: thickness,
 						...endOf(geo, back ? "left" : "right"),
 						style: timing("--i", seg.slot),
+						// The one series left on in a legend keeps its colour.
+						...(geo.own.length < geo.series.length && seriesMark(geo, seg, geo.own[0])),
 					})
 				);
 

@@ -14,6 +14,7 @@ import {
 	HOLE_CLASS,
 	QUADRANT_CLASS,
 	REFERENCE_CLASS,
+	RULE_CLASS,
 	SERIES_CLASS,
 	LIBRARY_NAME,
 	SHOWN_CLASS,
@@ -165,7 +166,7 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 	}
 	plot.style.removeProperty("--_fit");
 	// Grouped numbers are smaller. Marked before they are measured, so the first layout measures them as every later one does.
-	plot.toggleAttribute("data-grouped", !!type.groups && !state.stacked && series.filter((one) => !one.chart && !one.group).length > 1);
+	plot.toggleAttribute("data-grouped", !!type.groups && !state.stacked && series.filter((one) => !one.chart && !one.group && !one.off).length > 1);
 	state.categories[0]?.parentElement?.style.removeProperty("--_beside");
 
 	// The numbers along the axes, for a first guess at the room. Once they are measured, some may be left out.
@@ -394,12 +395,23 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 			values: seriesValues[s],
 		};
 	};
+	// Columns and bars of a series turned off in a legend are left out, and the others close up; a line has no values there.
+	const on = series.flatMap((one, s) => (one.off ? [] : [s]));
 	if (lineSeries.length) {
 		// The columns first, then the line over them, in the same bands.
-		const bars = series.flatMap((one, s) => (one.chart ? [] : [s]));
-		type.draw({ ...geo, own: bars, ...(bars.length === 1 && { ...only(bars[0]), y: yOf?.(bars[0]) ?? y }) });
+		const bars = on.filter((s) => !series[s].chart);
+		if (bars.length) type.draw({ ...geo, own: bars, ...(bars.length === 1 && { ...only(bars[0]), y: yOf?.(bars[0]) ?? y }) });
+		else svg.appendChild(svgEl("line", { class: RULE_CLASS, x1: 0, x2: VIEWBOX_WIDTH, y1: y(0), y2: y(0) }));
 		line.draw({ ...geo, own: lineSeries });
+	} else if (type.groups && on.length < series.length) {
+		type.draw({ ...geo, own: on, ...(on.length === 1 && { ...only(on[0]), y: yOf?.(on[0]) ?? y }) });
 	} else type.draw(geo);
+
+	// The numbers of a series turned off are not shown.
+	for (const [s, one] of series.entries()) {
+		if (!one.off) continue;
+		for (const label of seriesValues[s]) label.dataset.place = "none";
+	}
 	if (geo.rowAt) state.rowAt = geo.rowAt;
 	state.pointOf = geo.pointOf ?? null;
 	state.crossingOf = geo.crossingOf ?? null;

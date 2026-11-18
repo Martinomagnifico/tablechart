@@ -125,7 +125,7 @@ const rowLines = (state: ChartState, index: number, config: Config): TooltipLine
 	const several = state.series.length > 1;
 	const lines: TooltipLine[] = [];
 	for (const [s, labels] of state.seriesValues.entries()) {
-		if (!arrived(state, labels[index])) continue;
+		if (state.series[s].off || !arrived(state, labels[index])) continue;
 		const named = several ? state.figure.querySelector<HTMLElement>(`.tablechart-name[data-series="${s + 1}"]`) : null;
 		lines.push({
 			name: several ? (named?.textContent ?? state.series[s].name) : "",

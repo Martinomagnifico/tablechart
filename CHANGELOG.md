@@ -4,6 +4,7 @@
 
 ### Added
 - `data-axis="right"` on a column header: a second value axis, for values with another unit.
+- `data-chart-legend="toggle"` and `legend: "toggle"`: a legend whose names turn their series off and on.
 
 ### Changed
 - A line over columns and its points get an edge in the background colour, `--tablechart-halo-width`.

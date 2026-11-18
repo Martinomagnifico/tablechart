@@ -260,15 +260,21 @@ export const placeValueAxis = (
 	// Down to the line under the chart, also where a line chart keeps room under its lowest numbers.
 	const rule = Number(svg.querySelector(".tablechart-rule")?.getAttribute("y1"));
 	const foot = Math.max(at(valueScale.min), Number.isFinite(rule) ? rule : 0);
-	if (along.numbers)
-		svg.appendChild(
-			svgEl("path", {
-				class: AXIS_CLASS,
-				d: [
-					sideways ? `M${short(at(valueScale.min))},${short(height)}H${short(at(valueScale.max))}` : `M${edge},${short(at(valueScale.max))}V${short(foot)}`,
-					...numbered.map((v) => (sideways ? `M${short(at(v))},${short(height)}v${short(4 * unit)}` : `M${edge},${short(at(v))}h${short((right ? 4 : -4) * unit)}`)),
-				].join(""),
-			})
+
+	// The line and its short marks apart, so after a legend toggle the line moves and the marks, which can change in number, fade.
+	// Each has its side, so it moves only along its own axis.
+	const side = sideways ? "bottom" : right ? "right" : "left";
+	const axisLine = sideways
+		? `M${short(at(valueScale.min))},${short(height)}H${short(at(valueScale.max))}`
+		: `M${edge},${short(at(valueScale.max))}V${short(foot)}`;
+	const markOf = (value: number): string =>
+		sideways ? `M${short(at(value))},${short(height)}v${short(4 * unit)}` : `M${edge},${short(at(value))}h${short((right ? 4 : -4) * unit)}`;
+
+	if (along.numbers) {
+		svg.append(
+			svgEl("path", { class: AXIS_CLASS, "data-side": side, d: axisLine }),
+			svgEl("path", { class: AXIS_CLASS, "data-side": side, "data-kind": "marks", d: numbered.map(markOf).join("") })
 		);
+	}
 	return shown;
 };

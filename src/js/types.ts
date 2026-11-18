@@ -52,6 +52,8 @@ export interface Series {
 	chart: "line" | null;
 	/** `data-axis="right"` on the header: the series has the value axis on the right, with a scale of its own. */
 	axis: "left" | "right";
+	/** Turned off in a legend with toggles: its cells count as missing, and it has no marks or numbers. */
+	off?: boolean;
 }
 
 export interface Segment extends Row {

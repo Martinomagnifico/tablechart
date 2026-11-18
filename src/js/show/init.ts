@@ -1,6 +1,6 @@
 import "../../style/tablechart.scss";
 
-import { type Config, defaultConfig, LIBRARY_NAME, PRINTING_CLASS } from "../config";
+import { type Config, defaultConfig, LIBRARY_NAME, PRINTING_CLASS, SHOWN_CLASS } from "../config";
 import { build, relabel, unbuild } from "../build/build";
 import { layout } from "../layout/layout";
 import { animated } from "../shared/settings";
@@ -12,6 +12,8 @@ import { assignKeys } from "../build/read-table";
 import { adoptTables, loadSources, readMarkdownRows } from "../build/sources";
 import { stepTo } from "./steps";
 import { releaseTooltip } from "./tooltip";
+import { morph, snapshot } from "./morph";
+import { focusName, listenToLegend, toggled } from "./toggle";
 import type { ChartState } from "../types";
 
 export interface TablechartChart {
@@ -161,6 +163,10 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 	let inView = false;
 	let waiting = false;
 	let forPaper = false;
+	// The series turned off in a legend with toggles, by their place in the table; a chart built again keeps them off.
+	let off = new Set<number>();
+	// A chart built again for a toggle is shown at once, without its build.
+	let keepShown = false;
 
 	// A chart that builds once has no more use for the scroll.
 	const done = (): void => {
@@ -190,7 +196,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 	const switchKind = (): void => {
 		const wanted = kindFor(state.figure);
 		if (!wanted || wanted === kind) return;
-		const next = debug.timed("Building", state.figure, () => build(state.figure, config, wanted));
+		const next = debug.timed("Building", state.figure, () => build(state.figure, config, wanted, off));
 		if (!next) return;
 		unbuild(state);
 		stepTo(next, state.step, true);
@@ -211,6 +217,8 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 			checkOldColours(state.figure);
 		}
 		placed = width;
+		if (keepShown) setShown(state, true, true);
+		keepShown = false;
 		void show();
 	};
 
@@ -260,6 +268,31 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		place();
 	};
 	const speaker = { relabel: () => relabel(state, config), refresh };
+
+	// The marks that stay move to their new place, unless the chart has no animation.
+	const press = (series: number): void => {
+		const wanted = toggled(off, series, state.series.length);
+		if (!wanted) return;
+		const shown = state.figure.classList.contains(SHOWN_CLASS);
+		const before = shown && animated(state.figure, config) && !reduced() ? snapshot(state) : null;
+		const next = build(state.figure, config, kind, wanted);
+		if (!next) return;
+		off = wanted;
+		unbuild(state);
+		stepTo(next, state.step, true);
+		state = next;
+		placed = null;
+		keepShown = shown;
+		place();
+		// A layout can change the width of the plot, such as for the numbers of an axis: rendered again before anything moves.
+		for (let tries = 0; tries < 2 && state.plot.clientWidth !== placed; tries++) {
+			placed = null;
+			place();
+		}
+		if (before) morph(before, state);
+		focusName(state.figure, series);
+	};
+	const stopPresses = listenToLegend(state.figure, press);
 	// Before the first layout, so a chart that starts narrow is the right kind straight away.
 	switchKind();
 
@@ -302,6 +335,7 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 			window.removeEventListener("beforeprint", print);
 			window.removeEventListener("afterprint", printed);
 			unlisten(speaker);
+			stopPresses();
 			releaseTooltip(state);
 			if (state.figure.tablechart === chart) delete state.figure.tablechart;
 		},

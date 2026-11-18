@@ -44,6 +44,69 @@ block content
 	+section("Donut legend")
 		p A donut chart always has a legend under the ring. See #[a(href=url('/types/donut.html')) Donut].
 
+	+section("Turn series off and on")
+		p With #[code data-chart-legend="toggle"], each name in the legend is a button, underlined as a link is. If you click a name, or press Enter or Space on it, its series is turned off, and the name gets a line through it. If you click it again, the series is turned on again. The last series that is on stays on.
+
+		+chart(null, '1')
+			figure(data-chart="column" data-chart-legend="toggle")
+				figcaption
+					b Apples sold
+					br
+					span thousands
+				table
+					thead
+						tr
+							th Month
+							th Farm shop
+							th Market
+							th Online
+					tbody
+						each row in [['Jan', '34', '41', '120'], ['Feb', '38', '45', '140'], ['Mar', '42', '53', '180'], ['Apr', '51', '49', '210']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+								td= row[3]
+
+		p If a series is turned off, the chart is rendered again for the series that are left:
+		ul
+			li The scale fits the values that are left, so small values get more room.
+			li In a group, the other columns or bars close up. In a stack, the total is the sum of the parts that are left.
+			li The numbers are placed again, so a number that had no room can come back.
+			li The tooltip shows only the series that are on.
+		p The columns, lines, points and numbers that stay move to their new place. What is new fades in, and what is gone fades out. If the chart has no animation, or the reader asked for less motion, the chart changes at once.
+		p The table does not change, so a screen reader still reads all values. Toggles work on line, area, column and bar charts with several value columns, and on a combo chart. If you want toggles on every chart with a legend, set the #[code legend] option to #[code "toggle"].
+
+		+codeblock('JS').
+			init({ legend: "toggle" });
+
+		p If a name has focus from the keyboard, it gets a focus ring. If the page has its own focus style for #[code :focus-visible], the names use that style. If not, #[code --tablechart-legend-focus-color], #[code --tablechart-legend-focus-width] and #[code --tablechart-legend-focus-offset] set the colour, width and space of the ring.
+
+	+section("Toggles with two value axes")
+		p On a chart with #[a(href=url('/types/combo.html#two-value-axes')) two value axes], each axis has a scale for the series that are on at its side. If every series of one axis is turned off, the chart has one value axis, on the side of the series that are left. If you turn one of them on again, the second axis comes back.
+		p In this example, rainfall and irrigation use the axis on the left, and temperature the axis on the right. If you turn off Temperature, the chart has one axis, on the left. If you turn off Rainfall and Irrigation, the temperature line keeps its axis on the right.
+
+		+chart(null, '1,5')
+			figure(data-chart="column" data-chart-grid data-chart-legend="toggle")
+				figcaption
+					b Water at the orchard
+					br
+					span per month
+				table
+					thead
+						tr
+							th Month
+							th Rainfall (mm)
+							th Irrigation (mm)
+							th(data-chart="line" data-axis="right") Temperature (°C)
+					tbody
+						each row in [['Apr', '41', '12', '9.9'], ['May', '58', '18', '13.4'], ['Jun', '65', '30', '16.1'], ['Jul', '74', '42', '18.3'], ['Aug', '80', '35', '18.0'], ['Sep', '76', '15', '15.0']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+								td= row[3]
+
 	+section("Style the legend")
 		p A legend is as wide as its items. These variables set its background, border, padding and corners. By default, there are none.
 

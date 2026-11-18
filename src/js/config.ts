@@ -90,8 +90,8 @@ export interface Config {
 	ticks: boolean;
 	/** How a line or area runs between points: `straight`, `step` or `smooth`. A figure overrides it with `data-chart-shape`. */
 	shape: "straight" | "step" | "smooth";
-	/** Names of several lines in a legend instead of at the end of each line. A figure overrides it with `data-chart-legend`. */
-	legend: boolean;
+	/** Names of several lines in a legend instead of at the end of each line; `"toggle"` also lets a click turn a series off and on. A figure overrides it with `data-chart-legend`. */
+	legend: boolean | "toggle";
 	/** Numbers along the value axis of a column, bar, line, area or waterfall chart; `"right"` puts them on the right of an upright chart. A figure overrides it with `data-chart-axis`. */
 	axis: boolean | "right";
 	/** Gridlines across the plot at each number of the axis. A figure overrides it with `data-chart-grid`. */
