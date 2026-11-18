@@ -249,7 +249,18 @@ const watch = (first: ChartState, config: Config): TablechartChart => {
 		switchKind();
 		const width = state.plot.clientWidth;
 		if (!width || width === placed) return;
-		if (!debug.timed("Drawing", state.figure, () => layout(state, config))) return;
+
+		// New marks of a chart that steps start at their step, without moving there from fully shown.
+		const settling = !!state.plan && state.figure.classList.contains(SHOWN_CLASS);
+		state.figure.toggleAttribute("data-settling", settling);
+		const done = debug.timed("Drawing", state.figure, () => layout(state, config));
+
+		if (settling) {
+			void state.figure.getBoundingClientRect();
+			state.figure.removeAttribute("data-settling");
+		}
+
+		if (!done) return;
 
 		if (!checked) {
 			checked = true;

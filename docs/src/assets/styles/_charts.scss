@@ -410,10 +410,11 @@
 	.tablechart-series[data-line] {
 		stroke-dasharray: none;
 	}
-	.tablechart-name[data-place="legend"]::before {
-		height: 0.2em;
-		vertical-align: 0.2em;
-		mask: none;
+	// The plain line of the legend, without a point or a gap for one. Important, to win from the dashed and open samples.
+	.tablechart-name[data-place="legend"] {
+		--_line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M0 6H36'/%3E%3C/svg%3E") !important;
+		--_mark: none !important;
+		--_band: 0 !important;
 	}
 }
 

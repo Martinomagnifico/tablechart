@@ -1,63 +1,7 @@
-let canvas: CanvasRenderingContext2D | null = null;
-
-/** Any CSS colour as red, green and blue, from 0 to 255, with its alpha from 0 to 1, by painting it. */
-export const rgbOf = (color: string): [number, number, number, number] => {
-	canvas ??= document.createElement("canvas").getContext("2d", { willReadFrequently: true });
-	if (!canvas) return [0, 0, 0, 1];
-	canvas.clearRect(0, 0, 1, 1);
-	canvas.fillStyle = color;
-	canvas.fillRect(0, 0, 1, 1);
-	const [red, green, blue, alpha] = canvas.getImageData(0, 0, 1, 1).data;
-	return [red, green, blue, alpha / 255];
-};
-
-export const luminance = ([red, green, blue]: number[]): number => {
-	const channel = (value: number) => {
-		const fraction = value / 255;
-		return fraction <= 0.03928 ? fraction / 12.92 : ((fraction + 0.055) / 1.055) ** 2.4;
-	};
-
-	return 0.2126 * channel(red) + 0.7152 * channel(green) + 0.0722 * channel(blue);
-};
-
-/** The method from `--tablechart-contrast-wcag`: 2 for the contrast ratio of WCAG 2, 3 for APCA from the WCAG 3 draft. */
-export const methodOf = (figure: HTMLElement): 2 | 3 =>
-	getComputedStyle(figure).getPropertyValue("--tablechart-contrast-wcag").trim() === "3" ? 3 : 2;
-
-// APCA 0.0.98G: lightness with its own curve, and a soft clamp for near black.
-const apcaY = ([red, green, blue]: number[]): number => {
-	const y = 0.2126729 * (red / 255) ** 2.4 + 0.7151522 * (green / 255) ** 2.4 + 0.072175 * (blue / 255) ** 2.4;
-	return y < 0.022 ? y + (0.022 - y) ** 1.414 : y;
-};
-
-/** The APCA lightness contrast (Lc) of text on a background, without its sign: from 0 to about 106. */
-export const apca = (text: number[], background: number[]): number => {
-	const textY = apcaY(text);
-	const backgroundY = apcaY(background);
-	if (Math.abs(backgroundY - textY) < 0.0005) return 0;
-	const sapc = backgroundY > textY ? (backgroundY ** 0.56 - textY ** 0.57) * 1.14 : (backgroundY ** 0.65 - textY ** 0.62) * 1.14;
-	return Math.abs(sapc) < 0.1 ? 0 : (Math.abs(sapc) - 0.027) * 100;
-};
-
-/** The contrast of text on a background as the method measures it: a ratio for WCAG 2, Lc for APCA. */
-export const contrastOf = (method: 2 | 3, text: number[], background: number[]): number =>
-	method === 3 ? apca(text, background) : ratio(text, background);
-
-/** The contrast of two colours, as WCAG counts it: from 1 to 21. */
-export const ratio = (first: number[], second: number[]): number => {
-	const [light, dark] = [luminance(first), luminance(second)].sort((x, y) => y - x);
-	return (light + 0.05) / (dark + 0.05);
-};
-
-// A colour as CSS resolves it in the chart, so a variable, `light-dark()` or `Canvas` gets its value there.
-const resolve = (figure: HTMLElement, color: string): [number, number, number, number] => {
-	const probe = document.createElement("span");
-	probe.style.color = color;
-	figure.append(probe);
-	const value = rgbOf(getComputedStyle(probe).color);
-	probe.remove();
-	return value;
-};
+import { contrastOf, luminance, methodOf } from "./core/methods";
+import { blackOrWhite, BLACK, pick, WHITE } from "./core/pick";
+import { css, over, resolve, rgbOf } from "./core/rgb";
+import { towards } from "./core/towards";
 
 /**
  * Measures the colour behind a chart, as `--_surface`: the first background up from the figure that is not see-through, with
@@ -79,12 +23,9 @@ export const measureSurface = (figure: HTMLElement): boolean => {
 
 	color ??= resolve(figure, "Canvas");
 
-	for (const [red, green, blue, alpha] of layers.reverse()) {
-		const below = color as number[];
-		color = [red, green, blue].map((value, index) => value * alpha + below[index] * (1 - alpha));
-	}
+	for (const layer of layers.reverse()) color = over(layer, color);
 
-	const measured = `rgb(${color.slice(0, 3).map(Math.round).join(" ")})`;
+	const measured = css(color.map(Math.round));
 	if (figure.style.getPropertyValue("--_surface") === measured) return false;
 	figure.style.setProperty("--_surface", measured);
 	return true;
@@ -108,18 +49,6 @@ export const markOf = (figure: HTMLElement, value: HTMLElement): Element | null 
 export const paintOf = (mark: Element): string => {
 	const style = getComputedStyle(mark);
 	return mark.classList.contains("tablechart-slice") ? style.stroke : style.fill;
-};
-
-const WHITE = [255, 255, 255];
-const BLACK = [0, 0, 0];
-
-// The one that reaches the goal. With WCAG 2, on a middle colour both just pass 4.5:1, and white is easier to read there.
-const blackOrWhite = (fill: number[], needed: number, method: 2 | 3): number[] => {
-	const white = contrastOf(method, WHITE, fill);
-	const black = contrastOf(method, BLACK, fill);
-	if (white >= needed) return WHITE;
-	if (black >= needed) return BLACK;
-	return (method === 2 && white >= 4.5) || white > black ? WHITE : BLACK;
 };
 
 /**
@@ -155,7 +84,7 @@ const inkSetup = (figure: HTMLElement) => {
 	};
 
 	const method = methodOf(figure);
-	const needed = Number.parseFloat(getComputedStyle(figure).getPropertyValue("--tablechart-value-contrast")) || (method === 3 ? 60 : 5);
+	const needed = Number.parseFloat(getComputedStyle(figure).getPropertyValue("--tablechart-value-contrast")) || method.goal;
 	const text = rgbOf(getComputedStyle(figure).color).slice(0, 3);
 	const onDark = own("--tablechart-value-on-dark", lightSurface ? surface : text);
 	const onLight = own("--tablechart-value-on-light", lightSurface ? text : surface);
@@ -167,8 +96,8 @@ export const inkerOf = (figure: HTMLElement): ((fill: number[]) => string) => {
 
 	return (fill) => {
 		const best = contrastOf(method, onDark, fill) > contrastOf(method, onLight, fill) ? onDark : onLight;
-		const ink = contrastOf(method, best, fill) >= needed ? best : blackOrWhite(fill, needed, method);
-		return `rgb(${ink.join(" ")})`;
+		const { colour, fits } = pick([best, WHITE, BLACK], [fill], needed, method);
+		return css(fits[0] ? colour : blackOrWhite(fill, method));
 	};
 };
 
@@ -180,7 +109,7 @@ export const inkNames = (figure: HTMLElement): void => {
 	const names = figure.querySelectorAll<HTMLElement>(".tablechart-name:not([data-place='legend'])");
 	if (!names.length) return;
 	const method = methodOf(figure);
-	const needed = method === 3 ? 60 : 4.5;
+	const needed = method.text;
 	const surface = surfaceOf(figure).slice(0, 3);
 	const text = rgbOf(getComputedStyle(figure).color).slice(0, 3);
 
@@ -189,26 +118,13 @@ export const inkNames = (figure: HTMLElement): void => {
 		name.style.removeProperty("--_ink");
 		if (!line) continue;
 		const own = rgbOf(getComputedStyle(line).stroke).slice(0, 3);
-
-		for (let step = 0; step <= 20; step++) {
-			const color = own.map((value, index) => Math.round(value + ((text[index] - value) * step) / 20));
-			if (contrastOf(method, color, surface) < needed && step < 20) continue;
-			if (step) name.style.setProperty("--_ink", `rgb(${color.join(" ")})`);
-			break;
-		}
+		if (contrastOf(method, own, surface) < needed) name.style.setProperty("--_ink", css(towards(own, text, surface, needed, method)));
 	}
 };
 
 /** One colour for the numbers on several fills, such as the slices of a pie: the one with enough contrast on the most of them, and on which. */
 export const sharedInk = (figure: HTMLElement, fills: number[][]): { ink: string; fits: boolean[] } => {
 	const { method, needed, onDark, onLight } = inkSetup(figure);
-	let best = { ink: onDark, fits: fills.map(() => false), count: -1 };
-
-	for (const ink of [onDark, onLight, WHITE, BLACK]) {
-		const fits = fills.map((fill) => contrastOf(method, ink, fill) >= needed);
-		const count = fits.filter(Boolean).length;
-		if (count > best.count) best = { ink, fits, count };
-	}
-
-	return { ink: `rgb(${best.ink.join(" ")})`, fits: best.fits };
+	const { colour, fits } = pick([onDark, onLight, WHITE, BLACK], fills, needed, method);
+	return { ink: css(colour), fits };
 };

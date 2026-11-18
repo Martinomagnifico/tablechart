@@ -11,8 +11,10 @@ let mainCode = null;
 
 const CSS_TARGET = ['chrome123', 'edge123', 'firefox120', 'safari17.5'];
 
+const APCA_NOTICE = '/*! Includes apca-w3 0.1.9 (APCA): Copyright © 2019-2022 by Andrew Somers. All Rights Reserved. W3 LICENSE. https://github.com/Myndex/apca-w3 */';
+
 // One script for a <script> tag. The additional types take the helpers of the core from `Tablechart.kit`, so they hold no copy.
-const iife = (entry, fileName, rollupOptions = {}) =>
+const iife = (entry, fileName, rollupOptions = {}, preamble) =>
   build({
     configFile: false,
     build: {
@@ -30,7 +32,9 @@ const iife = (entry, fileName, rollupOptions = {}) =>
       terserOptions: {
         // Smaller bundle.
         mangle: { properties: { regex: /^_/ } },
-        compress: { passes: 3 }
+        compress: { passes: 3 },
+        // Such as the copyright notice of apca-w3: terser drops its own @preserve comment, so it goes on top.
+        format: { preamble }
       },
       target: 'es2020',
       rollupOptions
@@ -40,7 +44,7 @@ const iife = (entry, fileName, rollupOptions = {}) =>
 const iifeBuild = () => ({
   name: 'iife-build',
   closeBundle: async () => {
-    await iife('src/js/index.iife.ts', 'tablechart.js');
+    await iife('src/js/index.iife.ts', 'tablechart.js', {}, APCA_NOTICE);
     const kit = (id) => /[/\\]kit(\.ts)?$/.test(id);
     await iife('src/js/additional-types.iife.ts', 'tablechart-additional-types.js', {
       external: kit,
@@ -99,6 +103,8 @@ export default defineConfig({
           if (/\.[mc]?[jt]s$/.test(id) && id !== MAIN_ENTRY && id !== CORE_ENTRY && mainCode.has(id)) return 'shared';
         },
         chunkFileNames: chunk => chunk.name.endsWith('.d') ? 'tablechart-shared.d.mts' : 'tablechart-shared.mjs',
+        // Keeps the copyright notice of apca-w3, which is marked @preserve.
+        comments: { legal: true },
       },
     },
     sourcemap: false,

@@ -1,7 +1,7 @@
 // A slice of a donut or pie whose colour has too little contrast gets an edge all round its shape, also along the gaps and round corners.
 // Under the slice is a copy in the colour of the edge; the slice itself is one edge width narrower, and its gaps one edge width wider.
 import { short } from "../../draw/svg";
-import { rgbOf } from "../colour";
+import { css, rgbOf } from "../core/rgb";
 
 export const SLICE_EDGE_CLASS = "tablechart-slice-edge";
 
@@ -120,7 +120,7 @@ export const edgeSlices = (
 			continue;
 		}
 
-		const rgb = `rgb(${colour.join(" ")})`;
+		const rgb = css(colour);
 		key?.style.setProperty("--_edge", rgb);
 
 		// The copy in the colour of the edge has the whole shape, in the place of the slice.

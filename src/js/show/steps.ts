@@ -1,4 +1,4 @@
-import { BAR_CLASS, CENTRE_CLASS, CONNECTOR_CLASS, CONTROLS_CLASS, PIECE_CLASS, SLICE_CLASS, SR_CLASS } from "../config";
+import { BAR_CLASS, CENTRE_CLASS, CONNECTOR_CLASS, CONTROLS_CLASS, PIECE_CLASS, SHOWN_CLASS, SLICE_CLASS, SR_CLASS } from "../config";
 import { sweepTiming } from "../shared/timing";
 import { svgEl } from "../draw/svg";
 import type { ChartState } from "../types";
@@ -127,14 +127,30 @@ export const planSteps = (figure: HTMLElement, together = false): StepPlan | nul
 
 // ---------------------------------------------------------------------------------------------------------------------------------
 
-// A line or area run is revealed up to the last of its rows whose step has been taken.
+// Going back, a copy of a line or area as it was fades out, while the line itself is cut back at once: a clip cannot fade.
+const leave = (figure: HTMLElement, run: SVGElement): void => {
+	const moving = figure.hasAttribute("data-animate") && figure.classList.contains(SHOWN_CLASS);
+	if (!moving || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+	const ghost = run.cloneNode() as SVGElement;
+	ghost.setAttribute("data-leaving", "");
+	run.after(ghost);
+
+	const gone = () => ghost.remove();
+	ghost.addEventListener("transitionend", gone);
+	setTimeout(gone, 2000);
+	requestAnimationFrame(() => requestAnimationFrame(() => (ghost.style.opacity = "0")));
+};
+
+// A line or area run is revealed up to the last of its rows whose step has been taken. At an even speed, as in the build, so
+// it reaches each new point when that point arrives: `--_lead` is when it starts and `--_span` how long it takes, in stagger steps.
 const reveal = (state: ChartState): void => {
 	const plan = state.plan;
 	if (!plan) return;
 
 	const shown = (step: number | null) => step === null || state.step - step >= 1;
 
-	for (const run of state.figure.querySelectorAll<SVGElement>("[data-from]")) {
+	for (const run of state.figure.querySelectorAll<SVGElement>("[data-from]:not([data-leaving])")) {
 		const from = Number(run.dataset.from) - 1;
 		const to = Number(run.dataset.to) - 1;
 		const series = (run.closest("[data-series]") as SVGElement | null)?.dataset.series;
@@ -143,10 +159,32 @@ const reveal = (state: ChartState): void => {
 
 		const stepAt = (index: number) => plan.cells[index]?.[seriesIndex]?.step ?? plan.rows[index]?.step ?? null;
 
+		// When the point of a row arrives, as `applySteps` gives it its `--i`.
+		const arrivalOf = (index: number) => {
+			const cell = plan.cells[index]?.[seriesIndex];
+			if (cell && cell.step !== null) return cell.slot;
+			return column && column.step !== null ? index : (plan.rows[index]?.slot ?? 0);
+		};
+
 		let reached = from - 1;
 
 		if (column && column.step !== null) reached = shown(column.step) ? to : from - 1;
 		else while (reached < to && shown(stepAt(reached + 1))) reached++;
+
+		const before = run.dataset.reached === undefined ? from - 1 : Number(run.dataset.reached);
+		run.dataset.reached = String(reached);
+
+		// Forwards from the last point already there, or from the first new point; backwards at once.
+		if (reached > before) {
+			const fromShown = before >= from ? 1 : 0;
+			const lead = arrivalOf(before + 1) - fromShown;
+			run.style.setProperty("--_lead", String(Math.max(lead, 0)));
+			run.style.setProperty("--_span", String(Math.max(arrivalOf(reached) - lead, 0)));
+		} else {
+			if (reached < before) leave(state.figure, run);
+			run.style.setProperty("--_lead", "0");
+			run.style.setProperty("--_span", "0");
+		}
 
 		// On a step chart each row has a width of its own; otherwise the line goes from point to point.
 		let share = 0;
@@ -335,6 +373,9 @@ export const stepTo = (state: ChartState, step: number, quietly = false): void =
 	if (!plan) return;
 	const next = Math.min(Math.max(Math.round(step), 0), plan.count);
 	const changed = next !== state.step;
+
+	// Going back, everything that goes, goes at once.
+	state.figure.toggleAttribute("data-back", next < state.step);
 	state.step = next;
 	state.figure.style.setProperty("--_step", String(next));
 	reveal(state);
@@ -385,5 +426,11 @@ export const makeControls = (
 	};
 
 	controls.append(button("previous"), button("next"));
+
+	// Quick clicks count as a double or triple click, which would select the chart around the buttons.
+	controls.addEventListener("mousedown", (event) => {
+		if (event.detail > 1) event.preventDefault();
+	});
+
 	return controls;
 };

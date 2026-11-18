@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.5.3] - [Unreleased]
+
+### Changed
+- APCA comes from apca-w3, the reference code.
+- With APCA, the console shows Lc with its sign, negative for light text on dark, as APCA asks.
+- With APCA, large text is 36px, or 24px bold, as in its Bronze simple mode.
+
+### Fixed
+- A line that arrives on a step reaches each point when that point appears, as in the build.
+- A step back fades out what goes all at once, instead of in reverse.
+- Fast clicks on Previous and Next no longer select the chart.
+- Resizing a chart with steps no longer shows the marks of later steps for a moment.
+
+
 ## [1.5.2] - 2026-11-18
 
 ### Fixed
@@ -165,7 +179,7 @@
 - `checkContrast` and `checkTextContrast` in `@martinomagnifico/tablechart/core`. A script that builds its own charts, can check their contrast too.
 - `--tablechart-value-on-dark` and `--tablechart-value-on-light`, the two colours a number inside a bar chooses from, such as ivory and navy. If neither has enough contrast with the bar, the number gets to be black or white.
 - `--tablechart-value-contrast`, the contrast a number inside a bar needs: 5:1 by default, a little more than the 4.5:1 that WCAG asks, so it is easier to read.
-- `--tablechart-contrast-wcag: 3` measures contrast with APCA, from the draft of WCAG 3, for the number colours and the warnings alike. It follows what people see more closely than WCAG 2, which stays the default.
+- `--tablechart-contrast-wcag: 3` measures contrast with APCA, for the number colours and the warnings alike. It follows what people see more closely than WCAG 2, which stays the default.
 - `--tablechart-marker-ease`, the easing with which a scatter marker grows. With a `linear()` curve, markers can bounce in.
 
 ### Changed

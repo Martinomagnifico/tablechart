@@ -1,37 +1,38 @@
 import { LIBRARY_NAME, SHOWN_CLASS } from "../config";
-import { contrastOf, markOf, methodOf, paintOf, rgbOf, surfaceOf } from "./colour";
+import { markOf, paintOf, surfaceOf } from "./colour";
+import { APCA, methodOf } from "./core/methods";
+import { over, rgbOf } from "./core/rgb";
 import { tableOf } from "../shared/table";
 
-// What each method asks, and how it writes a contrast. A line, slice or bar needs 3:1 with the background (WCAG 1.4.11), or Lc 30
-// with APCA; text needs 4.5:1 (WCAG 1.4.3), or Lc 60, and less if it is large. Parts next to each other are kept apart by a gap
-// in the background colour, so each one is checked against the background only.
-const METHODS = {
-	2: {
-		part: 3,
-		text: 4.5,
-		large: 3,
+// How each method writes a contrast in a warning. A line, slice or bar needs 3:1 with the background (WCAG 1.4.11), or Lc 30 with
+// APCA; text needs 4.5:1 (WCAG 1.4.3), or Lc 60 as APCA asks of labels, and less if it is large. Parts next to each other are kept
+// apart by a gap in the background colour, so each one is checked against the background only.
+const WORDS_WCAG = {
+	// Two decimals, so 2.98 does not read as 3.0.
+	show: (contrast: number) => `${(Math.floor(contrast * 100) / 100).toFixed(2)}:1`,
+	need: (needed: number, _measured: number) => `${needed}:1`,
+	partRule: "WCAG 1.4.11",
+	textRule: "WCAG 1.4.3",
+};
 
-		// Two decimals, so 2.98 does not read as 3.0.
-		show: (contrast: number) => `${(Math.floor(contrast * 100) / 100).toFixed(2)}:1`,
-		need: (contrast: number) => `${contrast}:1`,
-		partRule: "WCAG 1.4.11",
-		textRule: "WCAG 1.4.3",
-	},
-	3: {
-		part: 30,
-		text: 60,
-		large: 45,
-		show: (contrast: number) => `Lc ${Math.floor(contrast)}`,
-		need: (contrast: number) => `Lc ${contrast}`,
-		partRule: "APCA, WCAG 3 draft",
-		textRule: "APCA, WCAG 3 draft",
-	},
+const WORDS_APCA = {
+	// With its sign, as APCA asks: negative for light on dark. Cut towards zero, so -59.6 does not read as -60.
+	show: (contrast: number) => `Lc ${Math.trunc(contrast)}`,
+	need: (needed: number, measured: number) => `Lc ${measured < 0 ? -needed : needed}`,
+	partRule: "APCA",
+	textRule: "APCA",
+};
+
+/** The method of a chart, with the words for its warnings. */
+const methodWithWords = (figure: HTMLElement) => {
+	const method = methodOf(figure);
+	return { ...method, ...(method === APCA ? WORDS_APCA : WORDS_WCAG) };
 };
 
 /** Warns about each line, slice or bar that does not stand out enough from the background. Faint parts that are out of focus are left out. */
 export const checkContrast = (figure: HTMLElement): void => {
 	const surface = surfaceOf(figure);
-	const method = METHODS[methodOf(figure)];
+	const method = methodWithWords(figure);
 
 	// The names of the value columns, from the header row; a chart with one value column needs none.
 	const names = Array.from(tableOf(figure)?.querySelectorAll("thead tr:first-child > *") ?? []).map((cell) => (cell.textContent ?? "").trim());
@@ -52,12 +53,11 @@ export const checkContrast = (figure: HTMLElement): void => {
 
 		for (const element of elements) {
 			const paintOf = paint(element);
-			const [red, green, blue, alpha] = rgbOf(paintOf);
 
 			// A see-through colour is what it makes on the background.
-			const color = [red, green, blue].map((value, index) => value * alpha + surface[index] * (1 - alpha));
-			const contrast = contrastOf(methodOf(figure), color, surface);
-			if (contrast >= method.part) continue;
+			const color = over(rgbOf(paintOf), surface);
+			const contrast = method.measure(color, surface);
+			if (Math.abs(contrast) >= method.part) continue;
 			const seriesAttribute = element.getAttribute("data-series");
 			const row = rows[Number(element.getAttribute("data-row") ?? 0) - 1] ?? "";
 			const column = kind === "Slice" ? "" : seriesAttribute ? names[Number(seriesAttribute)] : "";
@@ -85,7 +85,7 @@ export const checkContrast = (figure: HTMLElement): void => {
 						: `${several ? "Bars" : "Bar"} ${list}${column ? ` in column "${column}"` : ""} ${several ? "have" : "has"}`;
 
 		console.warn(
-			`[${LIBRARY_NAME}] ${what} a contrast of ${method.show(contrast)} with the background. It needs at least ${method.need(method.part)} (${method.partRule}).`,
+			`[${LIBRARY_NAME}] ${what} a contrast of ${method.show(contrast)} with the background. It needs at least ${method.need(method.part, contrast)} (${method.partRule}).`,
 			figure
 		);
 	}
@@ -117,7 +117,7 @@ export const checkTextContrast = (figure: HTMLElement): void => {
 		}
 
 		const rows = Array.from(tableOf(figure)?.querySelectorAll("tbody tr > :first-child") ?? []).map((cell) => (cell.textContent ?? "").trim());
-		const method = METHODS[methodOf(figure)];
+		const method = methodWithWords(figure);
 		const shape = figure.dataset.chart === "bar" ? "bar" : "column";
 		const found = new Map<string, { what: string; names: string[]; contrast: number; needed: number }>();
 
@@ -126,10 +126,10 @@ export const checkTextContrast = (figure: HTMLElement): void => {
 			if (!mark) continue;
 			const style = getComputedStyle(value);
 			const fill = paintOf(mark);
-			const contrast = contrastOf(methodOf(figure), rgbOf(style.color), rgbOf(fill));
+			const contrast = method.measure(rgbOf(style.color), rgbOf(fill));
 			const size = Number.parseFloat(style.fontSize);
-			const needed = size >= 24 || (size >= 18.66 && Number(style.fontWeight) >= 700) ? method.large : method.text;
-			if (contrast >= needed) continue;
+			const needed = method.isLarge(size, Number(style.fontWeight)) ? method.large : method.text;
+			if (Math.abs(contrast) >= needed) continue;
 			const what = mark.classList.contains("tablechart-slice") ? "slice" : mark.classList.contains("tablechart-piece") ? `${shape} part` : shape;
 			const key = `${style.color}|${fill}`;
 			const entry = found.get(key) ?? { what, names: [], contrast, needed };
@@ -142,12 +142,10 @@ export const checkTextContrast = (figure: HTMLElement): void => {
 
 		for (const text of onSurface) {
 			const style = getComputedStyle(text);
-			const [red, green, blue, alpha] = rgbOf(style.color);
-			const color = [red, green, blue].map((value, index) => value * alpha + surface[index] * (1 - alpha));
-			const contrast = contrastOf(methodOf(figure), color, surface);
+			const contrast = method.measure(over(rgbOf(style.color), surface), surface);
 			const size = Number.parseFloat(style.fontSize);
-			const needed = size >= 24 || (size >= 18.66 && Number(style.fontWeight) >= 700) ? method.large : method.text;
-			if (contrast >= needed) continue;
+			const needed = method.isLarge(size, Number(style.fontWeight)) ? method.large : method.text;
+			if (Math.abs(contrast) >= needed) continue;
 			const entry = faint.get(style.color) ?? { names: [], contrast, needed };
 			entry.names.push(`"${text.textContent?.trim()}"`);
 			faint.set(style.color, entry);
@@ -155,7 +153,7 @@ export const checkTextContrast = (figure: HTMLElement): void => {
 
 		for (const { names, contrast, needed } of faint.values())
 			console.warn(
-				`[${LIBRARY_NAME}] The text ${names.join(", ")} has a contrast of ${method.show(contrast)} with the background. Text needs at least ${method.need(needed)} (${method.textRule}).`,
+				`[${LIBRARY_NAME}] The text ${names.join(", ")} has a contrast of ${method.show(contrast)} with the background. Text needs at least ${method.need(needed, contrast)} (${method.textRule}).`,
 				figure
 			);
 
@@ -163,7 +161,7 @@ export const checkTextContrast = (figure: HTMLElement): void => {
 			const several = names.length > 1;
 
 			console.warn(
-				`[${LIBRARY_NAME}] The text inside the ${what}${several ? "s" : ""} of ${names.join(", ")} has a contrast of ${method.show(contrast)} with ${several ? "those" : "that"} ${what}${several ? "s" : ""}. Text needs at least ${method.need(needed)} (${method.textRule}).`,
+				`[${LIBRARY_NAME}] The text inside the ${what}${several ? "s" : ""} of ${names.join(", ")} has a contrast of ${method.show(contrast)} with ${several ? "those" : "that"} ${what}${several ? "s" : ""}. Text needs at least ${method.need(needed, contrast)} (${method.textRule}).`,
 				figure
 			);
 		}

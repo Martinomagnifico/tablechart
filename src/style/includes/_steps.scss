@@ -13,7 +13,8 @@ $reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px 
 		:where(.tablechart-series, .tablechart-halo[data-kind="line"]),
 		:where(.tablechart-area-fill > *) {
 			clip-path: inset(-10px calc(100% + 10px) -10px -10px);
-			transition: clip-path #{$duration} ease;
+			transition: clip-path calc(var(--_span, 1) * #{$stagger}) linear;
+			transition-delay: calc(var(--_lead, 0) * #{$stagger});
 		}
 		:where(.tablechart-area-fill) {
 			opacity: 1;
@@ -35,6 +36,22 @@ $reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px 
 		:where(.tablechart-piece[data-grow="left"]) {
 			transform-origin: right;
 		}
+	}
+
+	// While a chart that steps is rendered again, such as at a new width, its new marks start where their step is.
+	[data-settling] *,
+	[data-settling] *::before {
+		transition: none !important;
+	}
+
+	// Going back, what goes fades out all at once, without the stagger of the build.
+	:where([data-animate][data-steps][data-back]) :where(*, *::before) {
+		transition-delay: 0s;
+	}
+	// The copy of a line or area as it was, which fades out while the line itself is cut back.
+	:where([data-animate][data-steps]) :where([data-leaving]) {
+		transition: opacity #{$fade} ease;
+		pointer-events: none;
 	}
 
 	:where([data-animate][data-steps].is-shown) {
@@ -96,6 +113,7 @@ $reveal: "inset(-10px calc((1 - var(--reveal, 0)) * (100% + 20px) - 10px) -10px 
 	align-items: center;
 	gap: 0.5em;
 	margin-top: var(--tablechart-control-gap, 0.75em);
+	user-select: none;
 
 	:where(button) {
 		display: inline-flex;

@@ -142,3 +142,5 @@ Tablechart is free and open source. If it saves you time, consider [sponsoring m
 ## License
 
 MIT © [Martinomagnifico](https://github.com/martinomagnifico)**
+
+The built scripts include [apca-w3](https://github.com/Myndex/apca-w3) by Andrew Somers and Myndex Research, under its own licence. APCA is a trademark of Myndex Research and Andrew Somers.

@@ -1,5 +1,6 @@
 import { sizeOf } from "../layout/measure";
-import { measureSurface, paintOf, rgbOf, sharedInk } from "../colour/colour";
+import { measureSurface, paintOf, sharedInk } from "../colour/colour";
+import { rgbOf } from "../colour/core/rgb";
 import { DIVIDE_CLASS, LEADER_CLASS, SLICE_CLASS, VIEWBOX_WIDTH } from "../config";
 import { sweepTiming, timing } from "../shared/timing";
 import { placeAt, short, svgEl, withRow } from "../draw/svg";

@@ -1,7 +1,9 @@
 // A column or bar whose colour has too little contrast with the background gets an edge that has enough (WCAG 1.4.11).
 import { BAR_CLASS, PIECE_CLASS, RULE_CLASS } from "../../config";
 import { short, svgEl } from "../../draw/svg";
-import { contrastOf, methodOf, rgbOf, surfaceOf } from "../colour";
+import { surfaceOf } from "../colour";
+import { contrastOf, methodOf } from "../core/methods";
+import { css, over, rgbOf } from "../core/rgb";
 import { clearBaseline, edgeColour } from "./colours";
 import { acrossGap, dashOf, EDGE_CLASS } from "./lines";
 import { edgeSamples, SAMPLE } from "./samples";
@@ -63,7 +65,7 @@ export const edgeBars = (figure: HTMLElement, svg: SVGSVGElement | null = figure
 	const pixelWidth = Number.parseFloat(style.getPropertyValue("--tablechart-bar-edge-width")) || 1;
 	const width = pixelWidth * unit * 2;
 	const method = methodOf(figure);
-	const needed = method === 3 ? 30 : 3;
+	const needed = method.part;
 	const surface = surfaceOf(figure).slice(0, 3);
 	const text = rgbOf(style.color).slice(0, 3);
 
@@ -87,8 +89,7 @@ export const edgeBars = (figure: HTMLElement, svg: SVGSVGElement | null = figure
 		if (paint.startsWith("url")) continue;
 
 		// The fill over the background, as it is seen.
-		const [red, green, blue, alpha] = rgbOf(paint);
-		const fill = [red, green, blue].map((value, channel) => value * alpha + surface[channel] * (1 - alpha));
+		const fill = over(rgbOf(paint), surface);
 		const colour = edgeColour(fill, text, surface, method, needed);
 		if (!colour) continue;
 		clearest = Math.max(clearest, contrastOf(method, colour, surface));
@@ -101,7 +102,7 @@ export const edgeBars = (figure: HTMLElement, svg: SVGSVGElement | null = figure
 		snapToPixels(mark, svg);
 		defs.append(clipOf(mark, `${prefix}${index}`));
 
-		const rgb = `rgb(${colour.join(" ")})`;
+		const rgb = css(colour);
 		mark.setAttribute("clip-path", `url(#${prefix}${index})`);
 		mark.setAttribute("data-edge", "");
 		mark.style.setProperty("--_edge", rgb);
@@ -124,5 +125,5 @@ export const edgeBars = (figure: HTMLElement, svg: SVGSVGElement | null = figure
 	}
 
 	// The baseline is darker than the edges, as text is: 4.5:1, or Lc 60.
-	if (clearest) clearBaseline(rules, surface, method, Math.max(clearest, method === 3 ? 60 : 4.5), pixelWidth);
+	if (clearest) clearBaseline(rules, surface, method, Math.max(clearest, method.text), pixelWidth);
 };

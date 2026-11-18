@@ -150,6 +150,24 @@ a {
 	}
 }
 
+// A link in the text that opens a new tab gets an arrow out of a box. The text for screen readers is in the link.
+// The link does not wrap, so the icon cannot go to the next line on its own.
+a[target="_blank"]:not(.btn) {
+	white-space: nowrap;
+}
+
+a[target="_blank"]:not(.btn)::after {
+	content: "";
+	display: inline-block;
+	width: 0.9em;
+	height: 0.9em;
+	margin-left: 0.2em;
+	vertical-align: -0.1em;
+	background-color: currentColor;
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m20 4-8 8'/%3E%3Cpath d='M20 9.6V4h-5.6'/%3E%3Cpath d='M9 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-3'/%3E%3C/svg%3E") center / contain no-repeat;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m20 4-8 8'/%3E%3Cpath d='M20 9.6V4h-5.6'/%3E%3Cpath d='M9 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-3'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
 p.small, span.small {
 	font-size: 75%;
 }

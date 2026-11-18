@@ -1,15 +1,15 @@
 {
 	"size": {
-		"js": 51.48,
+		"js": 51.91,
 		"css": 8.17,
-		"total": 59.65,
+		"total": 60.08,
 		"entries": {
-			"init": 51.38,
-			"create": 51.27,
-			"tablechart": 51.48,
-			"tablechart/core": 47.01,
-			"Both entries": 51.75,
-			"Script tag (IIFE)": 51.73,
+			"init": 51.81,
+			"create": 51.71,
+			"tablechart": 51.91,
+			"tablechart/core": 47.43,
+			"Both entries": 52.19,
+			"Script tag (IIFE)": 52.16,
 			"tablechart/additional-types": 4.91,
 			"Additional types script tag": 4.24,
 			"Stylesheet (CSS)": 8.17

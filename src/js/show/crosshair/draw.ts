@@ -1,5 +1,6 @@
 import { AXIS_GAP, VIEWBOX_WIDTH } from "../../config";
-import { inkerOf, rgbOf } from "../../colour/colour";
+import { inkerOf } from "../../colour/colour";
+import { rgbOf } from "../../colour/core/rgb";
 import { placeAt, svgEl } from "../../draw/svg";
 import { spread } from "../../layout/labels";
 import { tableOf } from "../../shared/table";

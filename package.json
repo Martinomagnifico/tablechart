@@ -1,6 +1,6 @@
 {
   "name": "@martinomagnifico/tablechart",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "Simple charts from an HTML or Markdown table: column, bar, line, area, waterfall, donut and scatter plot. Accessibility first.",
   "type": "module",
   "sideEffects": [
@@ -74,6 +74,7 @@
   "license": "MIT",
   "devDependencies": {
     "@vituum/vite-plugin-pug": "^2.0.1",
+    "apca-w3": "0.1.9",
     "liquidjs": "^10.30.0",
     "pdfjs-dist": "^6.5.438",
     "rolldown-plugin-dts": "^0.28.8",
