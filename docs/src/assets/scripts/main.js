@@ -59,7 +59,8 @@ document.querySelectorAll('.clamp-demo').forEach((card) => {
 		show();
 	};
 	slider.addEventListener('input', show);
-	new ResizeObserver(fit).observe(card);
+	// The row of the slider has the width of the card, and a height that the chart does not change.
+	new ResizeObserver(fit).observe(card.querySelector('.playground-row'));
 });
 
 // The dropdown of the apples demo: how contrast is measured, for this chart and for the text under it.
