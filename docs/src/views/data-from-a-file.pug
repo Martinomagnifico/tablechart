@@ -78,7 +78,7 @@ block content
 				"rain": [67, 56, 53, 41, 58, 65]
 			}
 
-		p Tablechart cannot tell which list has the names and which one the values. A #[em transform] tells it. A transform is a small function of your own. It gets the JSON, and gives back rows in one of the structures above. This one makes a row of each month, with the rain of that month as its value:
+		p The names and the values are in two separate lists, so it is not clear which value belongs to which name. A #[em transform] puts them together. A transform is a small function of your own. It gets the JSON, and gives back rows in one of the structures above. This one makes a row of each month, with the rain of that month as its value:
 
 		+codeblock('JS').
 			const perMonth = (data) =>
@@ -86,7 +86,7 @@ block content
 
 			init({ transforms: { perMonth } });
 
-		p There are two parts. In your JavaScript, the #[code transforms] option of #[code init()] gives the transform a name, once for the whole page. In the HTML, the attribute #[code data-chart-transform] on a figure says which transform that chart uses, by that name:
+		p There are two parts. In your JavaScript, the #[code transforms] option of #[code init()] gives the transform a name, once for the whole page. In the HTML, the attribute #[code data-chart-transform] on a figure sets which transform that chart uses, by that name:
 
 		+chart(null, '1')
 			figure(data-chart="column" data-chart-src=url('/data/rain.json') data-chart-transform="perMonth")
@@ -145,7 +145,7 @@ block content
 				…
 			]
 
-		p The response does not fit in two ways. The dates and the amounts are in two lists, so Tablechart cannot tell which amount goes with which date. And the response has days, where the chart has months.
+		p The response does not fit in two ways. The dates and the amounts are in two lists, so it is not clear which amount belongs to which date. And the response has days, where the chart has months.
 
 		h3#the-transform The transform
 		p The transform solves both. It goes through the days, adds the rain of each day to its month, and then makes a row of each month:
@@ -210,7 +210,7 @@ block content
 			li the transform throws an error, or gives back something that is not one of the structures
 			li the rows fail one of the checks below
 
-		p The message is #[em "The data for this chart could not be loaded."] The #[code loaderror] option sets another text. It has #[code role="status"], so a screen reader announces it without interrupting, and the translation key #[code tablechart-load-error], so a translation script translates it. The console names the figure, the step that failed (fetch, parse, transform or check), and the cause. The table written in the figure stays as it was.
+		p The message is #[em "The data for this chart could not be loaded."] The #[code loaderror] option sets another text. It has #[code role="status"], so a screen reader announces it without interrupting, and the translation key #[code tablechart-load-error], so a translation script translates it. In the console, a message shows the figure, the step that failed (fetch, parse, transform or check), and the cause. The table written in the figure stays as it was.
 
 		h3#checks Checks
 		p Before a chart is rendered, the rows are checked for:
@@ -219,7 +219,7 @@ block content
 			li a name in every row
 			li the same number of values in every row, as many as there are columns
 			li a number, a text or #[code null] in every value. As in a table, a value without a number, such as #[code "n/a"], is missing.
-		p The console names the row that failed. The same checks apply to a file that is read without a transform.
+		p The message in the console shows the row that failed. The same checks apply to a file that is read without a transform.
 
 		h3#no-fallback No fallback
 		p If a transform fails, the response is not read as it is. A response in the wrong structure could be read as a different table, and a wrong chart is worse than no chart. If you want the response read as it is, set #[code data-chart-transform="none"] on the figure.

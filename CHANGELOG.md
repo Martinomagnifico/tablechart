@@ -161,7 +161,7 @@
 
 ### Deprecated
 
-- `--tablechart-bar-value-color`, `-piece-`, `-up-`, `-down-` and `-total-value-color` still work, but go in 1.3.0, and the console warns about them. They set one colour without a contrast check; `--tablechart-value-on-dark` and `--tablechart-value-on-light` replace them.
+- `--tablechart-bar-value-color`, `-piece-`, `-up-`, `-down-` and `-total-value-color` still work, but go in 1.3.0, and a warning in the console shows them. They set one colour without a contrast check; `--tablechart-value-on-dark` and `--tablechart-value-on-light` replace them.
 
 ### Fixed
 
@@ -188,7 +188,7 @@
 
 - The parts of a stacked column or bar have a gap of 1px between them, but not at the zero line. Two parts in similar colours stay apart. `--tablechart-stack-gap` sets it.
 - A number inside a bar has at least 4.5:1 with the bar: in the background colour if that has enough, else a bit lighter or darker, else black or white. Before, a number on a middle colour could have less than 4.5:1.
-- With `debug`, the console warns about a line, slice or bar with a contrast below 3:1 with the background. That is the minimum for parts of a chart (WCAG 1.4.11).
+- With `debug`, a warning in the console shows a line, slice or bar with a contrast below 3:1 with the background. That is the minimum for parts of a chart (WCAG 1.4.11).
 
 ### Fixed
 
@@ -383,7 +383,7 @@
 
 ### Deprecated
 
-- The old variable names and the animate values `up` and `across`, removed in the next minor version. The console lists the ones a page still uses.
+- The old variable names and the animate values `up` and `across`, removed in the next minor version. A message in the console shows the ones a page still uses.
 
 
 ## [1.0.3] - 2026-10-11
@@ -473,7 +473,7 @@ Now at version 1!
 - The `shape` option: `"straight"` (the default), `"step"` or `"smooth"`. `data-chart-shape` on a figure overrides it, so `data-chart-shape="straight"` turns a chart back.
 - Lines and areas that grow up from zero: `data-chart-animate="up"`, or `animate: "up"` for every chart. `data-chart-animate="across"` is the opposite. Other chart types are not affected.
 - The moment a chart builds inside an element that animates in can be set: `data-chart-entrance` on a figure, or the `entrance` option, from `0` (when the element starts to move) to `1` (when it is in). It is `0.5`, halfway, by default, as before.
-- With `debug: true`, the console says how long each chart takes to build and to render, with a warning above 50 ms.
+- With `debug: true`, a message in the console shows how long each chart takes to build and to render, with a warning above 50 ms.
 
 ### Fixed
 
