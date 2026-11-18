@@ -2,7 +2,7 @@ extends /views/templates/layouts/_base
 
 append variables
 	- pagetitle = "Chart types | All types"
-	- pagedescription = "All Tablechart chart types on one page: area, bar, column, donut, line, pie, waterfall, and the additional types scatter and candlestick."
+	- pagedescription = "All Tablechart chart types on one page: area, bar, column, donut, line, pie, waterfall, combo, and the additional types scatter and candlestick."
 
 mixin type(name, href)
 	.card
@@ -82,6 +82,21 @@ block content
 								tr(data-kind=row[2])
 									th= row[0]
 									td= row[1]
+
+			+type("Combining charts", "/types/combo.html")
+				figure(data-chart="column" data-chart-aspect="0.6" aria-label="Budget and spend, in thousands of euros")
+					table
+						thead
+							tr
+								th Month
+								th Budget
+								th(data-chart="line") Spent
+						tbody
+							each row in [['Jan', '40', '36'], ['Feb', '42', '45'], ['Mar', '45', '41'], ['Apr', '45', '52']]
+								tr
+									th= row[0]
+									td= row[1]
+									td= row[2]
 
 	+section("Additional types")
 		p These chart types are in a script of their own. If you want to use one, load it before the charts are made. See #[a(href=url('/types/additional-types.html')) About additional types].

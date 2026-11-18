@@ -75,6 +75,15 @@ figures.push(
 	figure('data-chart="column"', combo(three, ["X", "Y", "Aim"]))
 );
 
+// Two value axes: a line on the right over columns, below zero on the right only, two columns and a line, and two lines.
+const right = (html, head) => html.replace(`<th data-chart="line">${head}</th>`, `<th data-chart="line" data-axis="right">${head}</th>`).replace(`<th>${head}</th>`, `<th data-axis="right">${head}</th>`);
+figures.push(
+	figure('data-chart="column" data-chart-grid', right(combo([["Jan", "67", "3.4"], ["Apr", "41", "9.9"], ["Jul", "74", "18.3"], ["Oct", "85", "11.0"]], ["Rain (mm)", "Heat (°C)"]), "Heat (°C)")),
+	figure('data-chart="column"', right(combo([["Nov", "12", "0.8"], ["Jan", "48", "-4.3"], ["Mar", "30", "-0.2"]], ["Snow", "Heat"]), "Heat")),
+	figure('data-chart="column" data-chart-grid', right(combo([["2021", "1200", "900", "25%"], ["2022", "1450", "1000", "31%"], ["2023", "1380", "1050", "24%"]], ["Sales", "Costs", "Margin"]), "Margin")),
+	figure('data-chart="line"', right(table([["1", "320", "4100"], ["2", "410", "4900"], ["3", "610", "7400"]], ["Visitors", "Revenue"]), "Revenue"))
+);
+
 // Scatter charts, an additional type: a few points, a crowded cluster whose names do not all fit, bubbles in groups, and a narrow one.
 const points = [["Apples", "12%", "3.4"], ["Quinces", "12%", "3.4"], ["Pears", "30%", "2.1"], ["Plums", "22%", "4.5"], ["Cherries", "41%", "n/a"]];
 const cluster = Array.from({ length: 30 }, (_, i) => [`Variety ${i + 1}`, String(50 + ((i * 7) % 11)), String(2 + ((i * 5) % 9) / 10)]);

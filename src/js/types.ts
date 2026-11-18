@@ -1,5 +1,6 @@
 import type { Config } from "./config";
 import type { Squeeze } from "./scale/scale";
+import type { Scale } from "./scale/axis";
 import type { StepPlan } from "./show/steps";
 
 /** How a line or an area runs from one point to the next. */
@@ -49,6 +50,8 @@ export interface Series {
 	group: boolean;
 	/** `data-chart="line"` on the header, in a chart that takes it: a line over the other marks. */
 	chart: "line" | null;
+	/** `data-axis="right"` on the header: the series has the value axis on the right, with a scale of its own. */
+	axis: "left" | "right";
 }
 
 export interface Segment extends Row {
@@ -70,6 +73,8 @@ export interface Geometry {
 	segments: Segment[];
 	cx: (index: number) => number;
 	y: (value: number) => number;
+	/** The scale of one series, on a chart with two value axes. */
+	yOf?: (series: number) => (value: number) => number;
 	/** Across: on a chart with two axes, and the value scale of a bar chart, set by its drawing. */
 	x?: (value: number) => number;
 	/** The plot inside the axes, on a chart with axes. */
@@ -169,6 +174,8 @@ export interface ChartType {
 	axes?: boolean;
 	/** A series with `data-chart="line"` on its header is a line over the marks, on the same scale. */
 	lines?: boolean;
+	/** A series with `data-axis="right"` on its header has a value axis of its own, on the right. */
+	twoAxes?: boolean;
 	/** Several series side by side, as groups of bars: their numbers are smaller, so the plot is marked `data-grouped` before anything is measured. */
 	groups?: boolean;
 	/** False: no numbers on the chart. They stay out of the layout, which costs a lot with many rows. */
@@ -258,6 +265,17 @@ export interface AnnotationType {
 	draw: (spec: HTMLElement, badge: HTMLElement | null, geo: Geometry) => void;
 }
 
+export interface RightAxis {
+	ticks: HTMLElement;
+	/** The title of each axis, left and right: the names of its series. */
+	titles: [HTMLElement, HTMLElement];
+	/** The series on the right, from 0. */
+	series: number[];
+	scale: Scale | null;
+	/** Its ticks are at the places of those on the left, so one set of gridlines serves both. */
+	aligned: boolean;
+}
+
 export interface ChartState {
 	/** What the chart needs by itself, for a group that shares a scale; null for a chart that cannot share one. */
 	measured?: { height: number; room: number; floor: number; ceiling: number; bottom: number } | null;
@@ -277,6 +295,8 @@ export interface ChartState {
 	centre: HTMLElement | null;
 	/** The axis titles and the place for the numbers along the axes. Without `numbers`, only for gridlines. */
 	axes: { titles: HTMLElement[]; ticks: HTMLElement; numbers: boolean; right: boolean } | null;
+	/** The second value axis, for the series with `data-axis="right"`; null on a chart with one value axis. */
+	rightAxis: RightAxis | null;
 	stacked: boolean;
 	totals: HTMLElement[];
 	totalCell: HTMLElement | null;

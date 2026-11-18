@@ -1,0 +1,137 @@
+extends /views/templates/layouts/_base
+
+append variables
+	- pagetitle = "Chart types | Combo"
+	- pagedescription = "Combo charts in Tablechart: columns with a line, and charts with a second value axis on the right."
+
+block content
+	.lane
+		.container
+			.page-header
+				h1 Combo
+				p.lead Columns with a line, and a second value axis on the right.
+
+	+section("Columns and a line")
+		p If you want to show a value column as a line over the columns, add #[code data-chart="line"] to its header. The line uses the same scale as the columns, unless it has #[a(href='#two-value-axes') a value axis of its own]. Each point is in the middle of its column, and arrives with it.
+
+		+chart(null, '5')
+			figure(data-chart="column")
+				figcaption
+					b Budget and spend
+					br
+					span thousands of euros
+				table
+					thead
+						tr
+							th Month
+							th Budget
+							th(data-chart="line") Spent
+					tbody
+						each row in [['Jan', '40', '36'], ['Feb', '42', '45'], ['Mar', '45', '41'], ['Apr', '45', '52'], ['May', '50', '47'], ['Jun', '52', '58']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+		p A line suits values that have an order, such as months or years. The legend shows a box for the columns and a line for the line.
+		p If a number of the line is on a column, the column is cut away under the number, so the number can be read. The numbers of the columns are inside the columns if they fit. If a point of the line would cover a number, or a number has no room, the chart has to omit it. If you hover over a column (or tap it on a touch device), a tooltip shows all numbers at that place.
+
+	+section("Several columns and a line")
+		p With more than one value column without #[code data-chart="line"], each row is a group of columns, and the line goes through the middle of each group. Several columns can have #[code data-chart="line"], and each one is a line.
+
+		+chart(null, '5')
+			figure(data-chart="column")
+				figcaption
+					b Apples sold
+					br
+					span thousands
+				table
+					thead
+						tr
+							th Month
+							th Farm shop
+							th Market
+							th(data-chart="line") Target
+					tbody
+						each row in [['Jan', '34', '41', '70'], ['Feb', '38', '45', '75'], ['Mar', '42', '53', '85'], ['Apr', '51', '49', '95']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+								td= row[3]
+
+	+section("Two value axes")
+		p If two columns have different units, such as rainfall and temperature, one scale does not fit both. If a column header has #[code data-axis="right"], that column gets a value axis of its own, on the right. The other columns keep the axis on the left.
+
+		+chart(null, '5')
+			figure(data-chart="column" data-chart-grid)
+				figcaption
+					b Climate at the orchard
+					br
+					span per month
+				table
+					thead
+						tr
+							th Month
+							th Rainfall (mm)
+							th(data-chart="line" data-axis="right") Temperature (°C)
+					tbody
+						each row in [['Jan', '67', '3.4'], ['Feb', '56', '3.8'], ['Mar', '53', '6.6'], ['Apr', '41', '9.9'], ['May', '58', '13.4'], ['Jun', '65', '16.1'], ['Jul', '74', '18.3'], ['Aug', '80', '18.0'], ['Sep', '76', '15.0'], ['Oct', '85', '11.0'], ['Nov', '82', '7.1'], ['Dec', '79', '4.2']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+		p Both axes show their numbers, and each axis has the names of its columns as its title. Zero is at the same height on both axes, and so is every number, so one set of gridlines fits both. If a column on the right has values below zero and the left has none, the left axis shows no numbers below zero.
+		p Each column keeps its own decimal places.
+
+	+section("Columns on both axes")
+		p A column on the right can also be columns rather than a line. Then each row is a group, and each column of the group has the scale of its own axis.
+
+		+chart(null, '5')
+			figure(data-chart="column" data-chart-grid)
+				figcaption
+					b Rain and visitors
+					br
+					span per month
+				table
+					thead
+						tr
+							th Month
+							th Rainfall (mm)
+							th(data-axis="right") Visitors
+					tbody
+						each row in [['Jan', '67', '120'], ['Feb', '56', '140'], ['Mar', '53', '180'], ['Apr', '41', '210'], ['May', '58', '260'], ['Jun', '65', '300']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+	+section("Two lines or two areas")
+		p On a line chart or an area chart, #[code data-axis="right"] works the same: that line or area gets the scale on the right. The names of the lines are in a legend under the chart, not at the ends of the lines, so both axes are at the edges of the chart. If you want the names at the ends, add #[code data-chart-legend="false"].
+
+		+chart(null, '1,5')
+			figure(data-chart="line" data-chart-grid)
+				figcaption
+					b Climate at the orchard
+					br
+					span per month
+				table
+					thead
+						tr
+							th Month
+							th Rainfall (mm)
+							th(data-axis="right") Temperature (°C)
+					tbody
+						each row in [['Jan', '67', '3.4'], ['Feb', '56', '3.8'], ['Mar', '53', '6.6'], ['Apr', '41', '9.9'], ['May', '58', '13.4'], ['Jun', '65', '16.1']]
+							tr
+								th= row[0]
+								td= row[1]
+								td= row[2]
+
+	+section("What does not combine")
+		ul
+			li #[code data-chart="line"] on a header works on a column chart only. On a bar, area or waterfall chart, the chart shows that column like the others, and the console says so.
+			li A chart with a line, or with two value axes, cannot be stacked.
+			li A chart with two value axes cannot have a #[a(href=url('/features/scale-break.html')) break in its scale].
+			li If every value column has #[code data-axis="right"], the chart has one axis. If you want that axis on the right, add #[code data-chart-axis="right"] to the figure.

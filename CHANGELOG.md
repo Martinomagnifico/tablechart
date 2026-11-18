@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- `data-axis="right"` on a column header, a second value axis with its own scale, for values with another unit, such as temperature next to rainfall.
+
 ## [1.4.3] - 2026-11-17
 
 ### Fixed

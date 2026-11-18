@@ -76,6 +76,7 @@ export const readSeries = (figure: HTMLElement, rows: Row[], langattribute: stri
 			line: lineOf(head?.getAttribute("data-line")),
 			group: !!head?.hasAttribute("data-group"),
 			chart: head?.getAttribute("data-chart") === "line" ? "line" : null,
+			axis: head?.getAttribute("data-axis") === "right" ? "right" : "left",
 		};
 	});
 };

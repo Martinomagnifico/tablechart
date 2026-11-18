@@ -30,6 +30,7 @@ import { ANNOTATIONS, CHARTS } from "../charts/registry";
 import { animated, axisRight, shapeOf, turnedOn } from "../shared/settings";
 import { settleMasks } from "../show/shown";
 import { tableOf } from "../shared/table";
+import { makeRightAxis } from "./right-axis";
 
 /** Three passes: keys, then every text element, then geometry. Geometry makes no text, so a translation script that sweeps once finds it all. */
 
@@ -188,6 +189,19 @@ export const build = (
 			series = series.map((one) => ({ ...one, chart: null }));
 		}
 	}
+	// A second value axis: `data-axis="right"` on some headers, in a chart that takes it.
+	if (series.some((one) => one.axis === "right")) {
+		const problem = !type.twoAxes
+			? `A ${kind} chart has one value axis, so data-axis="right" does nothing.`
+			: series.every((one) => one.axis === "right")
+				? `Every series has data-axis="right": set data-chart-axis="right" on the figure to put the value axis on the right.`
+				: null;
+		if (problem) {
+			console.warn(`[${LIBRARY_NAME}] ${problem}`);
+			series = series.map((one) => ({ ...one, axis: "left" }));
+		}
+	}
+	const twoAxes = series.some((one) => one.axis === "right");
 	lineStyles(figure, series, kind, config);
 	const lined = series.some((one) => one.chart);
 	const several = series.length > 1;
@@ -198,7 +212,8 @@ export const build = (
 	if (stackAsked && !type.stackable)
 		console.warn(`[${LIBRARY_NAME}] A ${kind} chart cannot be stacked.`);
 	if (stackAsked && lined) console.warn(`[${LIBRARY_NAME}] A chart with a line cannot be stacked.`);
-	const stacked = stackAsked && !!type.stackable && several && !lined;
+	if (stackAsked && twoAxes) console.warn(`[${LIBRARY_NAME}] A chart with two value axes cannot be stacked.`);
+	const stacked = stackAsked && !!type.stackable && several && !lined && !twoAxes;
 
 	// Hidden from screen readers: they read the table, which has the same numbers and names.
 	const plot = document.createElement("div");
@@ -233,8 +248,8 @@ export const build = (
 			if (cell.suffix) node.dataset.suffix = cell.suffix;
 			if (cell.missing) node.dataset.missing = cell.raw;
 			if (several) node.dataset.series = String(s + 1);
-			// The fields of a mark, such as x and y, each keep the decimal places of their own column.
-			if (type.columns) node.dataset.decimals = String(columnDecimals[s]);
+			// The fields of a mark, such as x and y, each keep the decimal places of their own column; as do series on two axes.
+			if (type.columns || twoAxes) node.dataset.decimals = String(columnDecimals[s]);
 			node.dataset.row = String(i + 1);
 			node.style.setProperty("--i", String(row.slot));
 			if (type.numbers === false && (s || i)) node.dataset.place = "none";
@@ -262,10 +277,9 @@ export const build = (
 	const last = rows[rows.length - 1];
 	const focused = series.some((one) => one.focus);
 	const legendAsked = figure.getAttribute("data-chart-legend");
+	// With two value axes, the names go in a legend: at the ends of the lines they would take room from both axes.
 	const legend =
-		several &&
-		!type.columns &&
-		(legendAsked === null ? config.legend || type.legend !== undefined : legendAsked !== "false")
+		several && !type.columns && (legendAsked === null ? config.legend || type.legend !== undefined || twoAxes : legendAsked !== "false")
 			? document.createElement("div")
 			: null;
 	if (legend) {
@@ -353,7 +367,8 @@ export const build = (
 	// The headers of the first two value columns are the titles of the axes; layout makes the numbers along them.
 	const fields = series.filter((one) => !one.group);
 	// Off by default on the other types: `data-chart-axis` adds the numbers along the value axis, `data-chart-grid` the gridlines.
-	const valueAxis = !type.axes && !type.centre && turnedOn(figure, "data-chart-axis", config.axis || !!type.valueAxis);
+	// With two value axes, both have their numbers: without them, the scales cannot be told apart.
+	const valueAxis = twoAxes || (!type.axes && !type.centre && turnedOn(figure, "data-chart-axis", config.axis || !!type.valueAxis));
 	const axes = type.axes
 		? {
 				titles: fields.slice(0, 2).map((one, s) => {
@@ -368,8 +383,9 @@ export const build = (
 				right: false,
 			}
 		: valueAxis || (!type.centre && turnedOn(figure, "data-chart-grid", config.grid))
-			? { titles: [], ticks: htmlEl(`${TICK_CLASS}s`, plot), numbers: valueAxis, right: type.categories !== "beside" && axisRight(figure, config) }
+			? { titles: [], ticks: htmlEl(`${TICK_CLASS}s`, plot), numbers: valueAxis, right: !twoAxes && type.categories !== "beside" && axisRight(figure, config) }
 			: null;
+	const rightAxis = twoAxes ? makeRightAxis(plot, series, config) : null;
 	type.text?.({ figure, plot, rows, series, config });
 
 	// A chart that steps (`data-fragment`) builds a step at a time, from left to right. Without animation it is shown whole.
@@ -443,6 +459,7 @@ export const build = (
 		categories: Array.from(categories.children) as HTMLElement[],
 		centre,
 		axes,
+		rightAxis,
 		stacked,
 		totals,
 		totalCell,

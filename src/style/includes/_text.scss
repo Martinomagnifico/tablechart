@@ -222,6 +222,13 @@
 		writing-mode: vertical-rl;
 		transform: translate(0, -50%) rotate(180deg);
 	}
+	// With two value axes, over the numbers of each axis, from its outer edge inwards.
+	&[data-axis="left"] {
+		transform: translate(0, -100%);
+	}
+	&[data-axis="right"] {
+		transform: translate(-100%, -100%);
+	}
 }
 
 // One equal column per bar, matching the plot's bands.

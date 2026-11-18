@@ -30,7 +30,8 @@ import { withCrop } from "./crop";
 import type { Box } from "./collision";
 import { inkInside, inkNames, measureSurface } from "../colour/colour";
 import { applySteps } from "../show/steps";
-import { drawFrame, frameScalesOf, placeFrame, placeValueAxis, valueAxisOf } from "./chart-axes";
+import { drawFrame, frameScalesOf, leftSeries, placeFrame, placeValueAxis, valueAxisOf } from "./chart-axes";
+import { placeBothAxes, rightScaleOf } from "./right-axis";
 import { agree, remember } from "./chart-group";
 import { fitNames, lineUpNames } from "./names";
 import { cornerOf, cssLength, heightRange } from "../shared/settings";
@@ -178,6 +179,7 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 		...state.categories,
 		...annotations.map((a) => a.badge),
 		...(axes?.titles ?? []),
+		...(state.rightAxis?.titles ?? []),
 		...ticks,
 	]);
 
@@ -223,9 +225,11 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 		stacked: state.stacked,
 		numbers: !(pick.mode === "set" && !pick.keys.length && !rows.some((row) => row.pinned)),
 	};
+	// With two value axes, the left scale reaches the values of its own series only.
+	const onLeft = leftSeries(state);
 	const { extent, depth, steps } = reachOf(
-		segments,
-		rows.flatMap((row) => row.cells.slice(0, series.length).map((cell) => cell.value)),
+		state.rightAxis ? [] : segments,
+		rows.flatMap((row) => onLeft.flatMap((s) => (row.cells[s] ? [row.cells[s].value] : []))),
 		state.stacked ? rows.map((row) => stackReach(row, series.length, type.running)) : null
 	);
 
@@ -236,8 +240,11 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 	const headroom = Math.max(type.headroom?.(room) ?? labelHeight, lineSeries.length ? (line.headroom?.(room) ?? 0) : 0) + noteRoom;
 	const floor = 2 * unit + (type.footroom?.(room) ?? 0) + (depth < 0 ? labelHeight + 4 * unit : 0);
 	// The top number of a value axis is centred on its line, so half of it is above the plot.
+	// With two value axes, a title over each axis too.
+	const titleRoom = state.rightAxis ? largest(state.rightAxis.titles.map((title) => sizeOf(title).height)) * unit + 4 * unit : 0;
 	const axisRoom = along?.numbers && !sideways ? labelHeight / 2 + 2 * unit : 0;
-	const top = Math.max(headroom, axisRoom, state.agreed?.room ?? 0);
+	// The titles go above the numbers over the marks, such as those of a line.
+	const top = Math.max(headroom, axisRoom, state.agreed?.room ?? 0) + titleRoom;
 	const foot = Math.max(floor, state.agreed?.floor ?? 0);
 
 	const plotHeight = height - top - foot;
@@ -263,12 +270,13 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 		ceiling,
 		extent,
 		depth,
-		breakable: !!type.breakable,
+		breakable: !!type.breakable && !state.rightAxis,
 		segments,
 	});
 	for (const problem of problems) console.warn(`[${LIBRARY_NAME}] ${problem}`);
 	const breakAt = compress ? compress.gap : null;
-	state.measured = [column, bar, line, area].includes(type) && !compress && !steps ? { height, room: top, floor: foot, ceiling, bottom } : null;
+	// Two value axes cannot share a scale with another chart.
+	state.measured = [column, bar, line, area].includes(type) && !compress && !steps && !state.rightAxis ? { height, room: top, floor: foot, ceiling, bottom } : null;
 
 	// The empty space where the scale jumps: `--tablechart-break-gap`, or 1.3% of the width if not set.
 	const breakGap = (compress && cssLength(state.figure, unit, "--tablechart-break-gap", "")) ?? BREAK_GAP;
@@ -283,6 +291,10 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 	let frame: Geometry["frame"];
 	let shownTicks: number[][] = [];
 	if (axes) ({ frame, x, y, shownTicks } = placeFrame(axes, ticks, scales, height, unit));
+	// The series on the right axis have its scale; the others that of the left.
+	const yRight = state.rightAxis && valueScale ? rightScaleOf(state.rightAxis, valueScale, y) : null;
+	const onRight = (s: number) => !!yRight && !!state.rightAxis?.series.includes(s);
+	const yOf = yRight ? (s: number) => (onRight(s) ? yRight : y) : undefined;
 
 	// The bands give up the room the widest series name needs.
 	const shape = shapeOf(state.figure, config);
@@ -327,6 +339,7 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 		segments,
 		cx,
 		y,
+		yOf,
 		x,
 		frame,
 		axisSide: frame ? "left" : along?.numbers && !sideways ? (along.right ? "right" : "left") : null,
@@ -384,7 +397,7 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 	if (lineSeries.length) {
 		// The columns first, then the line over them, in the same bands.
 		const bars = series.flatMap((one, s) => (one.chart ? [] : [s]));
-		type.draw({ ...geo, own: bars, ...(bars.length === 1 && only(bars[0])) });
+		type.draw({ ...geo, own: bars, ...(bars.length === 1 && { ...only(bars[0]), y: yOf?.(bars[0]) ?? y }) });
 		line.draw({ ...geo, own: lineSeries });
 	} else type.draw(geo);
 	if (geo.rowAt) state.rowAt = geo.rowAt;
@@ -411,7 +424,8 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 	}
 
 	// The numbers along the value axis, fewer where two would touch, and none in the cut of a broken scale.
-	if (along && valueScale) placeValueAxis(state, config, along, valueScale, sideways && geo.x ? geo.x : y, compress, height, unit, gutter);
+	if (along && valueScale && yRight) placeBothAxes(state, config, along, valueScale, y, yRight, height, unit, gutter);
+	else if (along && valueScale) placeValueAxis(state, config, along, valueScale, sideways && geo.x ? geo.x : y, compress, height, unit, gutter);
 
 	for (const [n, annotation] of annotations.entries()) {
 		annotation.badge?.setAttribute("data-note", String(n + 1));
@@ -425,6 +439,8 @@ const layoutOne = withCrop((state: ChartState, config: Config): boolean => {
 				...(state.totals.length && { values: state.totals }),
 			}),
 			...(s > 0 && !state.stacked && only(s)),
+			// A series on the right axis is read on its scale.
+			...(onRight(s) && yRight && { y: yRight, domain: [state.rightAxis?.scale?.min ?? 0, state.rightAxis?.scale?.max ?? 1] as [number, number] }),
 			// Without steps, commentary comes when the marks are done: no later than their stagger steps.
 			after: state.plan ? annotation.after : Math.min(annotation.after, Number(plot.style.getPropertyValue("--count")) || annotation.after),
 			note: n + 1,

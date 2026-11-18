@@ -6,6 +6,9 @@ import { createServer } from "vite";
 
 const vite = await createServer({ configFile: false, logLevel: "error", server: { middlewareMode: true }, appType: "custom" });
 const { along, reachOf, squeezeOf } = await vite.ssrLoadModule("/src/js/scale/scale.ts");
+const { alignScales } = await vite.ssrLoadModule("/src/js/scale/align.ts");
+const { ticksOf } = await vite.ssrLoadModule("/src/js/scale/axis.ts");
+const scale = (min, max, step) => ({ min, max, step, ticks: ticksOf(min, max, step) });
 const bar = (value) => ({ kind: "bar", from: 0, to: value, value });
 const step = (from, to) => ({ kind: to > from ? "up" : "down", from, to, value: to - from });
 const ask = (more) => ({ from: null, to: null, size: null, ceiling: 100, extent: 98, depth: 0, breakable: true, segments: [], ...more });
@@ -47,6 +50,29 @@ const tests = {
 		const squeeze = { lo: 10, hi: 90, gap: 50, share: 0.3 };
 		const points = [0, 5, 10, 30, 50, 70, 90, 95, 100].map((value) => along(value, 100, 400, squeeze, 8));
 		points.forEach((point, k) => assert.ok(!k || point > points[k - 1], `not rising at step ${k}`));
+	},
+	"a right axis has as many ticks as the left": () => {
+		const { left, right, aligned } = alignScales(scale(0, 100, 20), [3.4, 18.3]);
+		assert.equal(aligned, true);
+		assert.deepEqual(left.ticks, [0, 20, 40, 60, 80, 100]);
+		assert.deepEqual(right.ticks, [0, 5, 10, 15, 20, 25]);
+	},
+	"the right step is the smallest nice step that fits, not a multiple of the first try": () => {
+		const { right } = alignScales(scale(0, 70, 10), [3.4, 16.1]);
+		assert.deepEqual(right.ticks, [0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5]);
+	},
+	"values below zero on the right take the left below zero too": () => {
+		const { left, right } = alignScales(scale(0, 60, 10), [-4.3, 4.5]);
+		assert.equal(left.min / left.step, right.min / right.step);
+		assert.ok(right.min <= -4.3 && right.max >= 4.5);
+		assert.equal(left.ticks.length, right.ticks.length);
+	},
+	"a left scale the author set with its own ticks keeps them": () => {
+		const own = { min: 0, max: 100, step: 0, ticks: [0, 25, 50, 75, 100] };
+		const { left, right, aligned } = alignScales(own, [3, 9]);
+		assert.equal(left, own);
+		assert.equal(aligned, false);
+		assert.ok(right.max >= 9);
 	},
 };
 

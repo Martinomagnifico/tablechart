@@ -205,30 +205,7 @@ block content
 								td= row[2]
 
 	+section("Columns and a line")
-		p If you want to show a value column as a line over the columns, add #[code data-chart="line"] to its header. The line uses the same scale as the columns. Each point is in the middle of its column, and arrives with it.
-
-		+chart(null, '5')
-			figure(data-chart="column")
-				figcaption
-					b Budget and spend
-					br
-					span thousands of euros
-				table
-					thead
-						tr
-							th Month
-							th Budget
-							th(data-chart="line") Spent
-					tbody
-						each row in [['Jan', '40', '36'], ['Feb', '42', '45'], ['Mar', '45', '41'], ['Apr', '45', '52'], ['May', '50', '47'], ['Jun', '52', '58']]
-							tr
-								th= row[0]
-								td= row[1]
-								td= row[2]
-
-		p A line suits values that have an order, such as months or years. The legend shows a box for the columns and a line for the line.
-		p If a number of the line is on a column, the column is cut away under the number, so the number can be read. The numbers of the columns are inside the columns if they fit. If a point of the line would cover a number, or a number has no room, the chart has to omit it. If you hover over a column (or tap it on a touch device), a tooltip shows all numbers at that place.
-		p A chart with a line cannot be stacked.
+		p If you want a value column as a line over the columns, add #[code data-chart="line"] to its header. If a column has #[code data-axis="right"], it gets a value axis of its own, on the right. See #[a(href=url('/types/combo.html')) Combo].
 
 	+section("Many columns")
 		p With many columns, only the numbers of the largest values are shown, and the names under the chart get smaller or fewer. On a narrow screen, a column chart can be shown as a bar chart. See #[a(href=url('/features/many-rows.html')) Many rows].

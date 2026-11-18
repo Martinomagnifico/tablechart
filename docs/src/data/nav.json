@@ -28,6 +28,11 @@
                     "text": "Chart types | All types",
                     "label": "All types",
                     "href": "/types/index.html"
+                },
+                {
+                    "text": "Chart types | Combo",
+                    "label": "Combinations",
+                    "href": "/types/combo.html"
                 }
             ],
             "examplesLabel": "Types",

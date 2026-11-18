@@ -13,6 +13,7 @@ export const column: ChartType = {
 	segments,
 	series: true,
 	lines: true,
+	twoAxes: true,
 	groups: true,
 	legend: "box",
 	stackable: true,
@@ -86,7 +87,8 @@ export const column: ChartType = {
 						label.dataset.place = "none";
 						return;
 					}
-					const end = y(cell.value);
+					// With two value axes, each column has the scale of its own series; both have zero at the baseline.
+					const end = (geo.yOf?.(s) ?? y)(cell.value);
 					const below = cell.value < 0;
 					// A value of zero has no column. A very small one is at least one unit, on its own side of the baseline.
 					const tall = Math.max(Math.abs(baseline - end), 1);

@@ -7,6 +7,7 @@ import { stackReach } from "../shared/stacks";
 import { measureAll, sizeOf } from "./measure";
 import { writeNumber } from "../shared/numbers";
 import type { Squeeze } from "../scale/scale";
+import { alignScales } from "../scale/align";
 import { heightRange, turnedOn } from "../shared/settings";
 import { htmlEl, placeAt, short, svgEl } from "../draw/svg";
 
@@ -28,7 +29,7 @@ export const valueAxisOf = (state: ChartState, config: Config, along: ChartAxes,
 		? rows.flatMap((row) => Object.values(stackReach(row, series.length, type.running)))
 		: segs.some((s) => s.kind === "up" || s.kind === "down")
 			? segs.flatMap((s) => [s.from, s.to])
-			: rows.flatMap((row) => row.cells.slice(0, series.length).filter((cell) => !cell.missing).map((cell) => cell.value));
+			: valuesOf(rows, leftSeries(state));
 	// A chart whose scale floats fits its values; the others reach zero.
 	const zero = type.floats ? [] : [0];
 	const min = Math.min(...zero, -largest(all.map((value) => -value)));
@@ -46,31 +47,62 @@ export const valueAxisOf = (state: ChartState, config: Config, along: ChartAxes,
 		const hi = round(to, true);
 		valueScale = { min: lo, max: hi, step, ticks: ticksOf(lo, hi, step) };
 	}
-	along.ticks.textContent = "";
-	const first = rows.find((row) => !row.missing);
+	// A second axis on the right: both scales have zero and their ticks at the same height.
+	const right = state.rightAxis;
+	if (right) {
+		const aligned = alignScales(valueScale, valuesOf(rows, right.series));
+		valueScale = aligned.left;
+		right.scale = aligned.right;
+		right.aligned = aligned.aligned;
+	}
 	// A scale that floats, as for prices, writes its numbers as the table does, so a value at the pointer fits beside it.
 	const written = type.floats ? rows.flatMap((row) => row.cells.slice(0, series.length).map((cell) => decimalsIn(cell.number))) : [];
-	const places = largest([...valueScale.ticks.map((value) => decimalsIn(String(value))), ...written]);
-	for (const value of valueScale.ticks) {
-		const tick = htmlEl(TICK_CLASS, along.ticks);
+	writeTicks(along.ticks, valueScale, firstCell(state, leftSeries(state)), written, config);
+	if (right?.scale) writeTicks(right.ticks, right.scale, firstCell(state, right.series), [], config);
+	if (along.numbers) {
+		const ticks = [...along.ticks.children, ...(right?.ticks.children ?? [])] as HTMLElement[];
+		for (const tick of ticks) delete tick.dataset.place;
+		measureAll(ticks);
+		const widest = (box: HTMLElement) => `${largest([0, ...(Array.from(box.children) as HTMLElement[]).map((tick) => sizeOf(tick).width)]) + 10}px`;
+		if (sideways) plot.style.marginBottom = `${(ticks[0] ? sizeOf(ticks[0]).height : 0) + 6}px`;
+		else {
+			const side = along.right ? "marginRight" : "marginLeft";
+			plot.style[side] = widest(along.ticks);
+			if (right) plot.style.marginRight = widest(right.ticks);
+			if (namesUnder) {
+				namesUnder.style[side] = plot.style[side];
+				if (right) namesUnder.style.marginRight = plot.style.marginRight;
+			}
+		}
+	}
+	return valueScale;
+};
+
+/** The series on the left axis: all of them on a chart with one value axis. */
+export const leftSeries = (state: ChartState): number[] =>
+	state.series.flatMap((_one, s) => (state.rightAxis?.series.includes(s) ? [] : [s]));
+
+const valuesOf = (rows: ChartState["rows"], series: number[]): number[] =>
+	rows.flatMap((row) => series.flatMap((s) => (row.cells[s] && !row.cells[s].missing ? [row.cells[s].value] : [])));
+
+/** The first cell of the first row with a number, in the first of `series`, for the text around the numbers of its axis, such as `%`. */
+const firstCell = (state: ChartState, series: number[]) => {
+	const s = series[0] ?? 0;
+	return state.rows.find((row) => row.cells[s] && !row.cells[s].missing)?.cells[s] ?? state.rows[0]?.cells[s];
+};
+
+/** The numbers along a value axis, left out until they are measured. */
+const writeTicks = (box: HTMLElement, scale: Scale, first: { prefix: string; suffix: string } | undefined, written: number[], config: Config): void => {
+	box.textContent = "";
+	const places = largest([...scale.ticks.map((value) => decimalsIn(String(value))), ...written]);
+	for (const value of scale.ticks) {
+		const tick = htmlEl(TICK_CLASS, box);
 		tick.dataset.value = String(value);
 		tick.dataset.place = "none";
 		if (first?.prefix) tick.dataset.prefix = first.prefix;
 		if (first?.suffix) tick.dataset.suffix = first.suffix;
 		writeNumber(tick, places, config.locale);
 	}
-	if (along.numbers) {
-		const ticks = Array.from(along.ticks.children) as HTMLElement[];
-		for (const tick of ticks) delete tick.dataset.place;
-		measureAll(ticks);
-		if (sideways) plot.style.marginBottom = `${(ticks[0] ? sizeOf(ticks[0]).height : 0) + 6}px`;
-		else {
-			const side = along.right ? "marginRight" : "marginLeft";
-			plot.style[side] = `${largest([0, ...ticks.map((tick) => sizeOf(tick).width)]) + 10}px`;
-			if (namesUnder) namesUnder.style[side] = plot.style[side];
-		}
-	}
-	return valueScale;
 };
 
 /** The scales and numbers of a chart with two axes, for a first guess at the room. Once they are measured, some may be left out. */
@@ -163,29 +195,44 @@ export const drawFrame = (state: ChartState, config: Config, frame: NonNullable<
 };
 
 /** The numbers along the value axis, fewer where two would touch, and none in the cut of a broken scale; the gridlines and the line of the axis. */
-export const placeValueAxis = (state: ChartState, config: Config, along: ChartAxes, valueScale: Scale, at: (value: number) => number, compress: Squeeze | null, height: number, unit: number, gutter: number): void => {
+export const placeValueAxis = (
+	state: ChartState,
+	config: Config,
+	along: ChartAxes,
+	valueScale: Scale,
+	at: (value: number) => number,
+	compress: Squeeze | null,
+	height: number,
+	unit: number,
+	gutter: number,
+	// The ticks to show, such as those at the places of the left axis; `numbered` leaves out a number but keeps its gridline.
+	more: { shown?: number[]; numbered?: (value: number) => boolean; grid?: boolean } = {}
+): number[] => {
 	const { svg, type } = state;
 	const sideways = type.categories === "beside";
 	const gap = AXIS_GAP * unit;
 	const ticks = Array.from(along.ticks.children) as HTMLElement[];
 	const size = (value: number) => sizeOf(ticks.find((tick) => Number(tick.dataset.value) === value) ?? ticks[0]);
-	const shown = thin(valueScale, (list) =>
-		list.every((v, k) =>
-			!k || (sideways ? at(v) - at(list[k - 1]) > ((size(v).width + size(list[k - 1]).width) / 2) * unit + gap : at(list[k - 1]) - at(v) > size(v).height * unit + gap / 2)
-		)
-	).ticks.filter((v) => !compress || v <= compress.lo || v >= compress.hi);
+	const shown =
+		more.shown ??
+		thin(valueScale, (list) =>
+			list.every((v, k) =>
+				!k || (sideways ? at(v) - at(list[k - 1]) > ((size(v).width + size(list[k - 1]).width) / 2) * unit + gap : at(list[k - 1]) - at(v) > size(v).height * unit + gap / 2)
+			)
+		).ticks.filter((v) => !compress || v <= compress.lo || v >= compress.hi);
+	const numbered = shown.filter(more.numbered ?? (() => true));
 	// On the right, the axis is past the names at the ends of the lines, and the gridlines reach it.
 	const right = along.right && !sideways;
 	const edge = right ? VIEWBOX_WIDTH : 0;
 	for (const tick of ticks) {
 		const value = Number(tick.dataset.value);
-		const on = along.numbers && shown.includes(value);
+		const on = along.numbers && numbered.includes(value);
 		tick.dataset.place = on ? (sideways ? "below" : right ? "after" : "before") : "none";
 		if (on) placeAt(tick, sideways ? at(value) : right ? edge + gap : -gap, sideways ? height + gap : at(value), VIEWBOX_WIDTH, height);
 	}
 	const end = right && along.numbers ? VIEWBOX_WIDTH : VIEWBOX_WIDTH - gutter;
 	// Under the marks.
-	if (turnedOn(state.figure, "data-chart-grid", config.grid))
+	if (more.grid !== false && turnedOn(state.figure, "data-chart-grid", config.grid))
 		svg.prepend(
 			svgEl("path", {
 				class: GRID_CLASS,
@@ -201,8 +248,9 @@ export const placeValueAxis = (state: ChartState, config: Config, along: ChartAx
 				class: AXIS_CLASS,
 				d: [
 					sideways ? `M${short(at(valueScale.min))},${short(height)}H${short(at(valueScale.max))}` : `M${edge},${short(at(valueScale.max))}V${short(foot)}`,
-					...shown.map((v) => (sideways ? `M${short(at(v))},${short(height)}v${short(4 * unit)}` : `M${edge},${short(at(v))}h${short((right ? 4 : -4) * unit)}`)),
+					...numbered.map((v) => (sideways ? `M${short(at(v))},${short(height)}v${short(4 * unit)}` : `M${edge},${short(at(v))}h${short((right ? 4 : -4) * unit)}`)),
 				].join(""),
 			})
 		);
+	return shown;
 };

@@ -21,6 +21,7 @@ const trend = (area: boolean): ChartType => ({
 	series: true,
 	stackable: true,
 	running: true,
+	twoAxes: true,
 	swatch: area ? "box" : undefined,
 
 	// Room for the numbers above the points; without numbers, for the points only.
@@ -55,7 +56,9 @@ const trend = (area: boolean): ChartType => ({
 		// Where a line is, as a value: on zero, or in a stack on the line before it.
 		const topValue = (s: number, i: number): number => stacks[i]?.[s].to ?? cellAt(s, i)?.value ?? 0;
 		const bottomValue = (s: number, i: number): number => stacks[i]?.[s].from ?? 0;
-		const pointAt = (s: number, i: number): Point => [cx(i), y(topValue(s, i))];
+		// With two value axes, each line has the scale of its own series.
+		const yOf = (s: number) => geo.yOf?.(s) ?? y;
+		const pointAt = (s: number, i: number): Point => [cx(i), yOf(s)(topValue(s, i))];
 
 		// What tells one series from another, on every mark of it.
 		const marks = series.map((one, s) => {
@@ -98,7 +101,7 @@ const trend = (area: boolean): ChartType => ({
 		const topSlopes = smooth ? series.map((_one, s) => tangentsWithGaps(rows.length, (i) => missing(s, i), (i) => pointAt(s, i))) : [];
 		const bottomSlopes =
 			smooth && area
-				? series.map((_one, s) => tangentsWithGaps(rows.length, (i) => missing(s, i), (i) => [cx(i), y(bottomValue(s, i))]))
+				? series.map((_one, s) => tangentsWithGaps(rows.length, (i) => missing(s, i), (i) => [cx(i), yOf(s)(bottomValue(s, i))]))
 				: [];
 
 		// The path commands through `points` after a path that is at the first one (on a step chart, at its left edge).
@@ -116,14 +119,14 @@ const trend = (area: boolean): ChartType => ({
 			return commands;
 		};
 		const pointsOf = (s: number, a: number, b: number, value: (s: number, i: number) => number): Point[] =>
-			rows.slice(a, b + 1).map((_row, k) => [cx(a + k), y(value(s, a + k))]);
+			rows.slice(a, b + 1).map((_row, k) => [cx(a + k), yOf(s)(value(s, a + k))]);
 		const slopesOf = (slopes: number[][], s: number, a: number, b: number): number[] | null => (smooth ? slopes[s].slice(a, b + 1) : null);
 		// Where a run starts and ends across the plot: on a step chart, at the edges of its first and last row.
 		const leftOf = (a: number) => cx(a) - (step ? band / 2 : 0);
 		const rightOf = (b: number) => cx(b) + (step ? band / 2 : 0);
 
 		// Every area fades over the same height, so the same height has the same strength. A stack stays flat: its bands are the data.
-		const levels = stacked ? [] : own.flatMap((s) => rows.flatMap((_row, i) => (missing(s, i) ? [] : [y(topValue(s, i))])));
+		const levels = stacked ? [] : own.flatMap((s) => rows.flatMap((_row, i) => (missing(s, i) ? [] : [yOf(s)(topValue(s, i))])));
 		const [highest, lowest] = levels.reduce(([top, bottom], level) => [Math.min(top, level), Math.max(bottom, level)], [baseline, baseline]);
 		const fadeOf = (s: number) =>
 			`fill:url(#${fadeFill(svg, highest, baseline, lowest, { style: marks[s].ink, ...(focused && !series[s].focus && { "data-muted": "" }) })}); `;
@@ -365,7 +368,7 @@ const trend = (area: boolean): ChartType => ({
 			if (stacked && s > 0 && topValue(s, i) < bottomValue(s, i)) return true;
 			// A number at an end is moved inwards, past the points of its row.
 			if (stacked && !step && i > 0 && i < last) {
-				const middle = (y(bottomValue(s, i)) + y(topValue(s, i))) / 2;
+				const middle = (yOf(s)(bottomValue(s, i)) + yOf(s)(topValue(s, i))) / 2;
 				const box: Box = [cx(i) - width / 2, middle - labelHeight / 2, width, labelHeight];
 				const covered = own.some((o) => {
 					const [px, py] = pointAt(o, i);
@@ -373,7 +376,7 @@ const trend = (area: boolean): ChartType => ({
 				});
 				if (covered) return true;
 			}
-			return stacked && Math.abs(y(bottomValue(s, i)) - y(topValue(s, i))) < labelHeight * 1.2;
+			return stacked && Math.abs(yOf(s)(bottomValue(s, i)) - yOf(s)(topValue(s, i))) < labelHeight * 1.2;
 		};
 
 		own.forEach((s) => {
@@ -394,9 +397,9 @@ const trend = (area: boolean): ChartType => ({
 				else if (place === "middle" && i === 0) x += inwards;
 				else if (place === "middle" && i === last) x -= inwards;
 
-				const py = y(topValue(s, i));
+				const py = yOf(s)(topValue(s, i));
 				const offsets: Record<Exclude<Place, "none">, number> = {
-					middle: (y(bottomValue(s, i)) - py) / 2,
+					middle: (yOf(s)(bottomValue(s, i)) - py) / 2,
 					above: -7 * unit,
 					below: 7 * unit,
 				};
@@ -558,7 +561,7 @@ const trend = (area: boolean): ChartType => ({
 			const i = lastOf(s);
 			const [px, py] = pointAt(s, i);
 			const end = step ? px + band / 2 : px;
-			return { name, s, x: end + endGap, y: stacked ? (py + y(bottomValue(s, i))) / 2 : py };
+			return { name, s, x: end + endGap, y: stacked ? (py + yOf(s)(bottomValue(s, i))) / 2 : py };
 		});
 		const nameHeight = (names[0] ? sizeOf(names[0]).height : 0) * unit;
 		for (const end of spread(ends, nameHeight)) {
