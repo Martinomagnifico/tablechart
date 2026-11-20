@@ -72,3 +72,90 @@ document.querySelectorAll('.wcag-demo').forEach((card) => {
 		figure.tablechart?.refresh();
 	});
 });
+
+// The menu drawer on narrow screens. In a function, so its names do not become globals that another script overwrites.
+document.addEventListener('DOMContentLoaded', () => {
+	const nav = document.getElementById('main-nav');
+	if (!nav) return;
+	const content = document.querySelector('.docs-content');
+	const root = document.documentElement;
+	let lockedAt = null;
+
+	// The page behind the open drawer stays where it is. The styles are in _nav.scss ([data-scroll-lock]); this keeps the scroll position.
+	const scrollLock = (on) => {
+		if (on === (lockedAt !== null)) return;
+		if (on) {
+			lockedAt = window.scrollY;
+			root.style.setProperty('--locked-at', `${-lockedAt}px`);
+			// The value keeps a classic scrollbar on a page that has one, so nothing shifts.
+			root.dataset.scrollLock = root.scrollHeight > root.clientHeight ? 'scrollbar' : '';
+		} else {
+			delete root.dataset.scrollLock;
+			root.style.removeProperty('--locked-at');
+			window.scrollTo({ top: lockedAt, behavior: 'instant' });
+			lockedAt = null;
+		}
+	};
+
+	// The drawer looks modal, so it behaves modal: nothing behind it scrolls or is tabbable.
+	const modal = (on) => {
+		content?.toggleAttribute('inert', on);
+		scrollLock(on);
+	};
+
+	// Click beside the drawer. The toggle is skipped: it already toggles itself.
+	document.addEventListener('click', (e) => {
+		if (nav.contains(e.target) || e.target.closest('.nav-toggle')) return;
+		nav.panel?.close(e);
+	});
+
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape') nav.panel?.close(e);
+	});
+
+	// The check on the target matters, because the nav sections are panels whose events bubble.
+	nav.addEventListener('panel:opening', (e) => e.target === nav && modal(true));
+	nav.addEventListener('panel:closed', (e) => e.target === nav && modal(false));
+	// Resizing to desktop makes it static, which is not a close, so release here.
+	nav.addEventListener('panel:staticchange', () => modal(false));
+});
+
+// Highlighting, loaded only on a page with code, and after the page, so it holds nothing up. The script tag of this file has the URLs.
+(() => {
+	if (!document.querySelector('pre code')) return;
+	const urls = document.querySelector('script[data-highlighter]').dataset;
+	const load = (src) => new Promise((done) => {
+		const script = document.createElement('script');
+		script.src = src;
+		script.onload = done;
+		document.head.appendChild(script);
+	});
+	load(urls.highlighter).then(() => load(urls.lineNumbers)).then(() => {
+		// Exclude the install wizard, and any block JS writes itself (.live-code): hljs rebuilds a block from its text, which would throw away the <mark> elements the static demo puts there.
+		hljs.configure({ cssSelector: 'pre code:not(.iw-code):not(.live-code)' });
+		hljs.highlightAll();
+		hljs.initLineNumbersOnLoad();
+		// The install wizard writes its code before this is loaded.
+		document.querySelectorAll('pre code.iw-code:not([data-highlighted])').forEach((code) => hljs.highlightElement(code));
+	});
+})();
+
+// Highlight the lines a code block asks for with data-lines, such as "2-8", once the line numbers have made a row of each line.
+(() => {
+	const blocks = document.querySelectorAll('pre[data-lines]');
+	if (!blocks.length) return;
+	const mark = (pre) => {
+		const rows = pre.querySelectorAll('table.hljs-ln tr');
+		if (!rows.length) return false;
+		pre.dataset.lines.split(',').forEach((part) => {
+			const ends = part.split('-').map(Number);
+			for (let n = ends[0]; n <= (ends[1] || ends[0]); n++) rows[n - 1]?.classList.add('is-highlighted');
+		});
+		return true;
+	};
+	blocks.forEach((pre) => {
+		if (mark(pre)) return;
+		const watcher = new MutationObserver(() => { if (mark(pre)) watcher.disconnect(); });
+		watcher.observe(pre, { childList: true, subtree: true });
+	});
+})();
